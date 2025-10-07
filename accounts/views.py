@@ -126,7 +126,7 @@ def static_debug(request: HttpRequest) -> JsonResponse:
     data = {
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': str(settings.STATIC_ROOT),
-        'STATICFILES_DIRS': list(settings.STATICFILES_DIRS),
+        'STATICFILES_DIRS': [str(d) for d in settings.STATICFILES_DIRS],
         'DEBUG': settings.DEBUG,
         'results': {}
     }
@@ -135,7 +135,7 @@ def static_debug(request: HttpRequest) -> JsonResponse:
         root_path = os.path.normpath(os.path.join(str(settings.STATIC_ROOT), path))
         data['results'][path] = {
             'found_by_finders': bool(abs_path),
-            'abs_path': abs_path,
+            'abs_path': str(abs_path) if abs_path else None,
             'served_url': static_url(path),
             'exists_in_STATIC_ROOT': os.path.exists(root_path),
             'static_root_path': root_path,
