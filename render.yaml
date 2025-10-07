@@ -42,6 +42,12 @@ services:
         value: "10"
       - key: DEFAULT_FROM_EMAIL
         value: "ChurchConnect <marllouie4@gmail.com>"
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        value: "1053022434620-53ddgsjm3docsougushcna2a5hoqe0vd.apps.googleusercontent.com"
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        value: "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"
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        value: "https://churchiligan.onrender.com/google/callback/"
       - key: STATIC_VERSION
         value: "1"
 

@@ -40,6 +40,11 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER or 'webma
 # Brevo API key for HTTP-based email (works better on restricted hosts like Render)
 BREVO_API_KEY = env('BREVO_API_KEY', default='')
 
+# Google OAuth configuration
+GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID', default='')
+GOOGLE_OAUTH_CLIENT_SECRET = env('GOOGLE_OAUTH_CLIENT_SECRET', default='')
+GOOGLE_OAUTH_REDIRECT_URI = env('GOOGLE_OAUTH_REDIRECT_URI', default='')
+
 # Logging for production
 LOGGING['handlers']['file'] = {
     'class': 'logging.FileHandler',

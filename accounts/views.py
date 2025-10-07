@@ -921,22 +921,17 @@ def google_login(request):
         from google_auth_oauthlib import flow
         import json
         
-        # Check if Google OAuth is configured
-        # TEMPORARY: Use hardcoded credentials for testing
-        client_id = '1053022434620-53ddgsjm3docsougushcna2a5hoqe0vd.apps.googleusercontent.com'
-        client_secret = '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'
+        # Get Google OAuth credentials from settings
+        from django.conf import settings
+        client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', None)
+        client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', None)
+        redirect_uri = getattr(settings, 'GOOGLE_OAUTH_REDIRECT_URI', None)
         
-        # Google OAuth credentials configured
-        
-        if (not client_id or 
-            not client_secret or
-            'demo_client_id_not_configured' in client_id or
-            'demo_client_secret_not_configured' in client_secret):
+        if not client_id or not client_secret or not redirect_uri:
             messages.warning(request, 'Google OAuth is not yet configured. Please set up Google OAuth credentials to use this feature.')
             return redirect('landing')
         
         # Create OAuth flow
-        redirect_uri = 'http://127.0.0.1:8000/google/callback/'
         client_config = {
             "web": {
                 "client_id": client_id,
@@ -1018,13 +1013,15 @@ def google_callback(request):
             messages.error(request, 'No authorization code received from Google.')
             return redirect('landing')
         
-        # Create OAuth flow and fetch token
-        # TEMPORARY: Use hardcoded credentials for testing
-        client_id = '1053022434620-53ddgsjm3docsougushcna2a5hoqe0vd.apps.googleusercontent.com'
-        client_secret = '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'
-        redirect_uri = 'http://127.0.0.1:8000/google/callback/'
+        # Get Google OAuth credentials from settings
+        from django.conf import settings
+        client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', None)
+        client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', None)
+        redirect_uri = getattr(settings, 'GOOGLE_OAUTH_REDIRECT_URI', None)
         
-        # Google OAuth callback processing
+        if not client_id or not client_secret or not redirect_uri:
+            messages.error(request, 'Google OAuth is not configured properly.')
+            return redirect('landing')
         
         client_config = {
             "web": {
