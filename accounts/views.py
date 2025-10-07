@@ -216,15 +216,21 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     if owned_churches.exists():
         post_form = PostForm()
 
-    # Get community feed from followed churches
+    # Get community feed from followed churches AND owned churches
     community_feed = []
     if request.user.is_authenticated:
         # Get churches the user follows
         followed_churches = ChurchFollow.objects.filter(user=request.user).values_list('church_id', flat=True)
         
-        # Get recent posts from followed churches, limited to last 20 posts
+        # Get churches the user owns
+        owned_church_ids = owned_churches.values_list('id', flat=True)
+        
+        # Combine followed and owned churches (remove duplicates)
+        all_church_ids = set(followed_churches) | set(owned_church_ids)
+        
+        # Get recent posts from followed AND owned churches, limited to last 20 posts
         recent_posts = Post.objects.filter(
-            church_id__in=followed_churches,
+            church_id__in=all_church_ids,
             is_active=True
         ).select_related('church').order_by('-created_at')[:20]
         

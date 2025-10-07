@@ -91,10 +91,14 @@ def create_church_verification_notifications(sender, instance, created, **kwargs
             # Send approval email
             from accounts.email_utils import send_church_verification_approved_email
             from django.urls import reverse
+            from django.conf import settings
             
             try:
-                # Build church URL
-                church_url = f"http://localhost:8000{reverse('core:church_detail', kwargs={'slug': instance.church.slug})}"
+                # Build church URL with proper domain
+                site_url = settings.ALLOWED_HOSTS[0] if settings.ALLOWED_HOSTS else 'localhost:8000'
+                protocol = 'https' if 'onrender.com' in site_url else 'http'
+                church_path = reverse('core:church_detail', kwargs={'slug': instance.church.slug})
+                church_url = f"{protocol}://{site_url}{church_path}"
                 
                 # Format approved date
                 from django.utils import timezone

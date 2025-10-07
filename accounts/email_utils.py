@@ -353,18 +353,17 @@ def send_church_verification_approved_email(user_email, user_name, church_name, 
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Use Django's send_mail (respects EMAIL_BACKEND setting)
-        send_mail(
+        # Use Brevo HTTP API for reliable email delivery
+        success = send_email_via_brevo_api(
+            to_email=user_email,
             subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user_email],
-            html_message=html_message,
-            fail_silently=False,
+            html_content=html_message,
+            plain_content=plain_message
         )
         
-        logger.info(f"Church verification approved email sent successfully to {user_email}")
-        return True
+        if success:
+            logger.info(f"Church verification approved email sent successfully to {user_email}")
+        return success
         
     except Exception as e:
         logger.error(f"Failed to send church verification approved email to {user_email}: {str(e)}")
@@ -395,18 +394,17 @@ def send_church_verification_rejected_email(user_email, church_name, rejection_n
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Use Django's send_mail (respects EMAIL_BACKEND setting)
-        send_mail(
+        # Use Brevo HTTP API for reliable email delivery
+        success = send_email_via_brevo_api(
+            to_email=user_email,
             subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user_email],
-            html_message=html_message,
-            fail_silently=False,
+            html_content=html_message,
+            plain_content=plain_message
         )
         
-        logger.info(f"Church verification rejected email sent successfully to {user_email}")
-        return True
+        if success:
+            logger.info(f"Church verification rejected email sent successfully to {user_email}")
+        return success
         
     except Exception as e:
         logger.error(f"Failed to send church verification rejected email to {user_email}: {str(e)}")
