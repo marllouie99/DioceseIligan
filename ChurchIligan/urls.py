@@ -33,3 +33,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Fallback: serve collected static files via Django in production too
+# (acceptable for low-traffic/student project on Render free tier)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
