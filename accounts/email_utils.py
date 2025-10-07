@@ -4,13 +4,32 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from .models import EmailVerification, PasswordReset, LoginCode
 import logging
+import threading
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
 
-def send_verification_email(email, code):
+def send_email_async(func):
     """
-    Send verification email with the provided code
+    Decorator to send emails asynchronously in a separate thread.
+    Prevents blocking the HTTP request while sending emails.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Run the email function in a separate thread
+        thread = threading.Thread(target=func, args=args, kwargs=kwargs)
+        thread.daemon = True  # Thread dies when main thread dies
+        thread.start()
+        # Return True immediately (optimistic response)
+        return True
+    return wrapper
+
+
+@send_email_async
+def _send_verification_email_worker(email, code):
+    """
+    Worker function to send verification email (runs in background thread)
     """
     try:
         subject = 'ChurchConnect - Verify Your Email'
@@ -38,17 +57,25 @@ def send_verification_email(email, code):
                 fail_silently=False,
             )
             logger.info(f"Verification email sent successfully to {email}")
-            return True
         except Exception as smtp_error:
             logger.error(f"SMTP failed: {smtp_error}")
             # Print code to console as fallback
             print(f"=== EMAIL SEND FAILED - VERIFICATION CODE FOR {email}: {code} ===")
             logger.error(f"VERIFICATION CODE FOR {email}: {code}")
-            return True  # Still return True so signup can continue
         
     except Exception as e:
         logger.error(f"Failed to send verification email to {email}: {str(e)}")
-        return False
+        print(f"=== EMAIL EXCEPTION - VERIFICATION CODE FOR {email}: {code} ===")
+
+
+def send_verification_email(email, code):
+    """
+    Send verification email with the provided code (async)
+    Returns immediately while email is sent in background thread
+    """
+    logger.info(f"Queuing verification email to {email}")
+    _send_verification_email_worker(email, code)
+    return True
 
 
 def send_verification_code(email):
@@ -95,9 +122,10 @@ def has_recent_verification(email, minutes=2):
     ).exists()
 
 
-def send_password_reset_email(email, code):
+@send_email_async
+def _send_password_reset_email_worker(email, code):
     """
-    Send password reset email with the provided code
+    Worker function to send password reset email (runs in background thread)
     """
     try:
         subject = 'ChurchConnect - Password Reset Code'
@@ -112,21 +140,33 @@ def send_password_reset_email(email, code):
         plain_message = strip_tags(html_message)
         
         # Use Django's send_mail (respects EMAIL_BACKEND setting)
-        send_mail(
-            subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            html_message=html_message,
-            fail_silently=False,
-        )
-        
-        logger.info(f"Password reset email sent successfully to {email}")
-        return True
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            logger.info(f"Password reset email sent successfully to {email}")
+        except Exception as smtp_error:
+            logger.error(f"SMTP failed for password reset: {smtp_error}")
+            print(f"=== EMAIL SEND FAILED - PASSWORD RESET CODE FOR {email}: {code} ===")
         
     except Exception as e:
         logger.error(f"Failed to send password reset email to {email}: {str(e)}")
-        return False
+        print(f"=== EMAIL EXCEPTION - PASSWORD RESET CODE FOR {email}: {code} ===")
+
+
+def send_password_reset_email(email, code):
+    """
+    Send password reset email with the provided code (async)
+    Returns immediately while email is sent in background thread
+    """
+    logger.info(f"Queuing password reset email to {email}")
+    _send_password_reset_email_worker(email, code)
+    return True
 
 
 def send_password_reset_code(email):
@@ -173,9 +213,10 @@ def has_recent_password_reset(email, minutes=2):
     ).exists()
 
 
-def send_login_code_email(email, code):
+@send_email_async
+def _send_login_code_email_worker(email, code):
     """
-    Send login code email with the provided code
+    Worker function to send login code email (runs in background thread)
     """
     try:
         subject = 'ChurchConnect - Your Login Code'
@@ -190,21 +231,33 @@ def send_login_code_email(email, code):
         plain_message = strip_tags(html_message)
         
         # Use Django's send_mail (respects EMAIL_BACKEND setting)
-        send_mail(
-            subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            html_message=html_message,
-            fail_silently=False,
-        )
-        
-        logger.info(f"Login code email sent successfully to {email}")
-        return True
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            logger.info(f"Login code email sent successfully to {email}")
+        except Exception as smtp_error:
+            logger.error(f"SMTP failed for login code: {smtp_error}")
+            print(f"=== EMAIL SEND FAILED - LOGIN CODE FOR {email}: {code} ===")
         
     except Exception as e:
         logger.error(f"Failed to send login code email to {email}: {str(e)}")
-        return False
+        print(f"=== EMAIL EXCEPTION - LOGIN CODE FOR {email}: {code} ===")
+
+
+def send_login_code_email(email, code):
+    """
+    Send login code email with the provided code (async)
+    Returns immediately while email is sent in background thread
+    """
+    logger.info(f"Queuing login code email to {email}")
+    _send_login_code_email_worker(email, code)
+    return True
 
 
 def send_login_code(email):

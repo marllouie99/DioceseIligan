@@ -153,6 +153,7 @@ EMAIL_PORT = int(env('EMAIL_PORT', default=587))
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', default='True') == 'True'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_TIMEOUT = int(env('EMAIL_TIMEOUT', default=10))  # 10 second timeout for SMTP connections
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=f'Church Iligan Connect <{env("EMAIL_HOST_USER", default="noreply@churchiligan.com")}>')
 
 # Email verification settings

@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "bash build.sh"
-    startCommand: "gunicorn ChurchIligan.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: "gunicorn ChurchIligan.wsgi:application -c gunicorn.conf.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -38,6 +38,8 @@ services:
         value: "marllouie4@gmail.com"
       - key: EMAIL_HOST_PASSWORD
         value: "idcj jedy dicx ychg"
+      - key: EMAIL_TIMEOUT
+        value: "10"
       - key: STATIC_VERSION
         value: "1"
 
