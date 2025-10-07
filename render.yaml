@@ -26,12 +26,18 @@ services:
         value: ""
       - key: GOOGLE_OAUTH_REDIRECT_URI
         value: "https://churchiligan.onrender.com/google/callback/"
-      - key: EMAIL_HOST_USER
-        value: ""
-      - key: EMAIL_HOST_PASSWORD
-        value: ""
       - key: EMAIL_BACKEND
-        value: "django.core.mail.backends.console.EmailBackend"
+        value: "django.core.mail.backends.smtp.EmailBackend"
+      - key: EMAIL_HOST
+        value: "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: EMAIL_HOST_USER
+        sync: false  # Set this in Render Dashboard (your Gmail address)
+      - key: EMAIL_HOST_PASSWORD
+        sync: false  # Set this in Render Dashboard (Gmail App Password)
       - key: STATIC_VERSION
         value: "1"
 
