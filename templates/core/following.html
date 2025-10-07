@@ -1,0 +1,199 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Following - ChurchConnect{% endblock %}
+
+{% block body_class %}page-following{% endblock %}
+
+{% block extra_css %}
+  <!-- Centralized Warm Sacred Earth Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="{% static 'css/pages/following.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="following-page warm-sacred-earth page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Following</h1>
+      <p class="page-subtitle">Churches you're following</p>
+    </div>
+  </div>
+
+  <!-- Churches List -->
+  <div class="churches-list">
+    {% for church in followed_churches %}
+      <div class="church-card" data-church-id="{{ church.id }}">
+        <div class="church-header">
+          <div class="church-avatar">
+            {% if church.logo %}
+              <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
+            {% else %}
+              <div class="avatar-placeholder">{{ church.initial }}</div>
+            {% endif %}
+          </div>
+          <div class="church-info">
+            <h3 class="church-name">{{ church.name }}</h3>
+            <p class="church-location">{{ church.city }}, {{ church.state }}</p>
+            <div class="church-badges">
+              <span class="denomination-badge">{{ church.get_denomination_display }}</span>
+              <span class="size-badge">{{ church.get_size_display }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="church-content">
+          <p class="church-description">{{ church.description|truncatewords:20 }}</p>
+          
+          <div class="church-details">
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              <span>{{ church.followers_count }} followers</span>
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{{ church.member_count }} members</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="church-actions">
+          {% if church.slug %}
+          <a href="{% url 'core:church_detail' church.slug %}" class="btn btn-outline">View Details</a>
+          {% else %}
+          <a href="#" class="btn btn-outline disabled" title="Church details not available">View Details</a>
+          {% endif %}
+          <button class="follow-btn following" 
+                  data-church-id="{{ church.id }}"
+                  data-action="unfollow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+            Following
+          </button>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+          <path d="M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+        <h3>No churches followed</h3>
+        <p>Start following churches to see them here. Discover churches in your community!</p>
+        <a href="{% url 'core:discover' %}" class="btn btn-primary">Discover Churches</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle follow/unfollow buttons
+  const followButtons = document.querySelectorAll('.follow-btn');
+  
+  followButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const churchId = this.dataset.churchId;
+      const action = this.dataset.action;
+      const url = action === 'follow' ? 
+        `{% url 'core:follow_church' 0 %}`.replace('0', churchId) :
+        `{% url 'core:unfollow_church' 0 %}`.replace('0', churchId);
+      
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Following...';
+      this.disabled = true;
+      
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update button state
+          if (data.action === 'followed') {
+            this.dataset.action = 'unfollow';
+            this.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              Following
+            `;
+            this.classList.add('following');
+          } else {
+            // Remove the church card from the list
+            const churchCard = this.closest('.church-card');
+            churchCard.style.transition = 'opacity 0.3s ease';
+            churchCard.style.opacity = '0';
+            setTimeout(() => {
+              churchCard.remove();
+            }, 300);
+          }
+          
+          // Show success message
+          showNotification(data.message, 'success');
+        } else {
+          showNotification(data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', 'error');
+      })
+      .finally(() => {
+        this.disabled = false;
+      });
+    });
+  });
+});
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+</script>
+{% endblock %}

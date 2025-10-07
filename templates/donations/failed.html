@@ -1,0 +1,133 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Donation Failed - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .donation-result {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 40px;
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .result-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .result-icon svg {
+    width: 48px;
+    height: 48px;
+    color: white;
+  }
+  
+  .donation-result h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+  }
+  
+  .error-box {
+    padding: 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    margin: 24px 0;
+  }
+  
+  .error-box p {
+    margin: 0;
+    color: #dc2626;
+    font-weight: 600;
+  }
+  
+  .donation-result .message {
+    font-size: 16px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-block;
+  }
+  
+  .btn-primary {
+    background: #e91e63;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #c2185b;
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary {
+    background: white;
+    color: #4b5563;
+    border: 2px solid #e5e7eb;
+  }
+  
+  .btn-secondary:hover {
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="donation-result failed">
+  <div class="result-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  </div>
+  
+  <h1>Donation Failed</h1>
+  
+  {% if message %}
+  <div class="error-box">
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  
+  <p class="message">
+    We encountered an error while processing your donation. No charges have been made to your account.
+    <br><br>
+    Please try again or contact support if the problem persists.
+  </p>
+  
+  <div class="actions">
+    {% if post %}
+    <a href="{% url 'core:church_detail' post.church.slug %}" class="btn-primary">Try Again</a>
+    {% endif %}
+    <a href="{% url 'dashboard' %}" class="btn-secondary">Go to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

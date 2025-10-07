@@ -1,0 +1,591 @@
+/* My Appointments Page - Warm Sacred Earth Theme */
+
+/* Apply Warm Sacred Earth body background - matches dashboard/manage church */
+body:has(.appointments-page),
+body.appointments-page {
+  background:
+    /* Wood grain texture overlay */
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
+    /* Paper texture pattern */
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
+    /* Warm glow effects */
+    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.03) 40%, transparent 70%),
+    radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.06) 0%, rgba(139, 69, 19, 0.03) 50%, transparent 80%),
+    radial-gradient(90% 60% at 80% 80%, rgba(101, 67, 33, 0.08) 0%, rgba(139, 69, 19, 0.04) 40%, transparent 80%),
+    /* Main warm brown gradient */
+    linear-gradient(45deg, #FAF6E8 0%, #F4E6D0 25%, #F0E2CC 50%, #F4E6D0 75%, #FAF6E8 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Page-scoped variables for Warm Sacred Earth theme */
+.appointments-page {
+  --brand: #8B4513;       /* Saddle Brown */
+  --brand-2: #DAA520;     /* Goldenrod */
+  --accent-gold: #B8860B; /* Dark Goldenrod */
+  --text: #2D1810;        /* Very dark brown */
+  --text-light: #FFF9E6;  /* Cream white */
+  --muted: #6B4226;       /* Medium brown */
+  --muted-2: #8B6F47;     /* Muted olive-brown */
+  --border: rgba(139, 69, 19, 0.18);
+  --card-bg: #FFF8DC;     /* Cornsilk */
+  --warm-white: #FFF9E6;  /* Cream White */
+  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Page Header with Warm Sacred Earth styling */
+.page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+  padding: 2rem;
+  background:
+    /* Aged parchment texture */
+    radial-gradient(ellipse 120px 70px at 88% 12%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 88%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    linear-gradient(135deg, var(--card-bg) 0%, #F4E6D0 50%, var(--card-bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 
+    0 16px 32px rgba(139, 69, 19, 0.12),
+    0 6px 12px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(101, 67, 33, 0.15);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Status Filter Pills with Warm Sacred Earth aesthetic */
+.status-pills {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    /* Subtle parchment texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.015) 0px, rgba(160, 82, 45, 0.015) 1px, transparent 1px, transparent 12px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F4E6D0 50%, var(--warm-white) 100%);
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  box-shadow: 
+    0 8px 24px rgba(139, 69, 19, 0.1),
+    0 4px 8px rgba(101, 67, 33, 0.05),
+    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 25px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.12);
+}
+
+.status-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.18);
+  text-decoration: none;
+  background: var(--warm-white);
+  border-color: rgba(139, 69, 19, 0.3);
+}
+
+.status-pill.active {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  border-color: var(--brand);
+  color: var(--text-light);
+  box-shadow: 
+    0 6px 20px rgba(139, 69, 19, 0.35),
+    0 2px 8px rgba(160, 82, 45, 0.25);
+  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+}
+
+.status-pill .count {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 24px;
+  text-align: center;
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  box-shadow: 0 1px 3px rgba(139, 69, 19, 0.12);
+}
+
+.status-pill.active .count {
+  background: var(--warm-white);
+  color: var(--brand);
+  border-color: rgba(255, 249, 230, 0.3);
+}
+
+/* Booking List with enhanced parchment texture */
+.booking-list {
+  background:
+    /* Multi-layer aged parchment texture */
+    radial-gradient(ellipse 100px 60px at 80% 20%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 120px at 20% 80%, rgba(160, 82, 45, 0.05) 0%, transparent 75%),
+    radial-gradient(ellipse 60px 40px at 90% 90%, rgba(101, 67, 33, 0.04) 0%, transparent 60%),
+    /* Paper grain texture */
+    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.01) 0px, rgba(139, 69, 19, 0.01) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(115deg, rgba(160, 82, 45, 0.008) 0px, rgba(160, 82, 45, 0.008) 1px, transparent 1px, transparent 4px),
+    /* Base parchment color */
+    linear-gradient(135deg, var(--card-bg) 0%, #F4E6D0 25%, #F0E2CC 50%, #F4E6D0 75%, var(--card-bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 16px 32px rgba(139, 69, 19, 0.12),
+    0 6px 12px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.booking-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  gap: 2rem;
+  padding: 1.5rem 2rem;
+  align-items: center;
+  border-top: 1px solid rgba(139, 69, 19, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.booking-row:first-child {
+  border-top: none;
+}
+
+.booking-row:hover {
+  background:
+    /* Enhanced parchment on hover */
+    radial-gradient(ellipse 120px 80px at 85% 25%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 140px at 15% 75%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 3px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F6E8D2 25%, #F2E4CE 50%, #F6E8D2 75%, var(--warm-white) 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 40px rgba(139, 69, 19, 0.15),
+    0 8px 16px rgba(101, 67, 33, 0.1),
+    inset 0 1px 0 rgba(255, 249, 230, 0.95);
+}
+
+/* Booking Service Info */
+.booking-service {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin: 0;
+}
+
+.booking-sub {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.booking-church {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* Booking Details */
+.booking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.booking-date {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1f2937;
+  margin: 0;
+}
+
+.booking-time {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.booking-status {
+  margin-top: 0.5rem;
+}
+
+/* Status Badges */
+.badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge.requested {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+.badge.reviewed {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #8b5cf6;
+}
+
+.badge.approved {
+  background: #dcfce7;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.badge.completed {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #6b7280;
+}
+
+.badge.declined {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+/* Booking Actions */
+.booking-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  width: 140px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  border: 2px solid;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-outline {
+  background: white;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.btn-outline:hover {
+  background: #f9fafb;
+  color: #374151;
+  border-color: #9ca3af;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  color: var(--text-light);
+  border-color: var(--brand);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #7A3F0F 0%, #B8860B 100%);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.35);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--brand) 100%);
+  color: var(--text-light);
+  border-color: var(--accent-gold);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #A0751A 0%, #7A3F0F 100%);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  border-color: #059669;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  color: white;
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Empty State with beautiful parchment styling */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background:
+    /* Elegant aged parchment texture */
+    radial-gradient(ellipse 150px 100px at 70% 30%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 120px 80px at 30% 70%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    radial-gradient(ellipse 80px 60px at 90% 80%, rgba(101, 67, 33, 0.05) 0%, transparent 60%),
+    /* Fine paper grain */
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 4px),
+    repeating-linear-gradient(120deg, rgba(160, 82, 45, 0.01) 0px, rgba(160, 82, 45, 0.01) 1px, transparent 1px, transparent 5px),
+    linear-gradient(135deg, var(--card-bg) 0%, #F4E6D0 50%, var(--card-bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 
+    0 16px 32px rgba(139, 69, 19, 0.12),
+    0 6px 12px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.empty-state h3 {
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.empty-state p {
+  color: var(--muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Review Modal Styles */
+.review-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.review-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.review-modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.review-modal-content {
+  padding: 2rem;
+}
+
+.service-info-display {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.service-info-display h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.service-info-display p {
+  margin: 0;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Review Form Styles */
+.review-form-modal .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.review-form-modal label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.star-rating-modal {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+  justify-content: center;
+}
+
+.star-rating-modal .star {
+  font-size: 2rem;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.star-rating-modal .star:hover,
+.star-rating-modal .star.filled {
+  color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.review-form-modal .form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.review-form-modal .form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .appointments-page {
+    padding: 1rem;
+  }
+  
+  .booking-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    text-align: center;
+    padding: 1.25rem 1rem;
+  }
+  
+  .booking-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .status-pills {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+  
+  .status-pill {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}

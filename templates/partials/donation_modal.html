@@ -1,0 +1,88 @@
+<!-- Donation Modal -->
+<div id="donation-modal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content donation-modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <svg class="modal-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Make a Donation
+      </h3>
+      <button type="button" class="modal-close" id="donation-modal-close">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Post Info -->
+      <div class="donation-post-info">
+        <div class="post-info-content">
+          <h4 id="donation-post-title" class="post-title"></h4>
+          <p id="donation-church-name" class="church-name"></p>
+          <div id="donation-goal-info" class="goal-info" style="display: none;">
+            <span class="goal-label">Goal:</span>
+            <span id="donation-goal-amount" class="goal-amount"></span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Donation Form -->
+      <form id="donation-form">
+        {% csrf_token %}
+        <input type="hidden" id="donation-post-id" name="post_id">
+        <input type="hidden" id="donation-church-slug" name="church_slug">
+        
+        <!-- Amount Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Amount</label>
+          <div class="amount-options">
+            <button type="button" class="amount-btn" data-amount="100">₱100</button>
+            <button type="button" class="amount-btn" data-amount="250">₱250</button>
+            <button type="button" class="amount-btn" data-amount="500">₱500</button>
+            <button type="button" class="amount-btn" data-amount="1000">₱1,000</button>
+            <button type="button" class="amount-btn" data-amount="2500">₱2,500</button>
+            <button type="button" class="amount-btn" data-amount="5000">₱5,000</button>
+          </div>
+          
+          <div class="custom-amount-wrapper">
+            <label for="custom-amount" class="form-label">Or enter custom amount</label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">₱</span>
+              <input type="number" id="custom-amount" name="amount" class="form-input" 
+                     placeholder="0.00" min="10" step="0.01">
+            </div>
+            <small class="form-hint">Minimum donation: ₱10</small>
+          </div>
+        </div>
+        
+        <!-- Message -->
+        <div class="form-group">
+          <label for="donation-message" class="form-label">Message (Optional)</label>
+          <textarea id="donation-message" name="message" class="form-input" rows="3" 
+                    placeholder="Share why you're donating..." maxlength="500"></textarea>
+          <small class="form-hint"><span id="message-char-count">0</span>/500 characters</small>
+        </div>
+        
+        <!-- Anonymous Option -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="donation-anonymous" name="is_anonymous">
+            <span>Donate anonymously (hide my name)</span>
+          </label>
+        </div>
+        
+        <!-- PayPal Button Container -->
+        <div id="paypal-button-container" class="paypal-button-container"></div>
+        
+        <div id="donation-error-message" class="error-message" style="display: none;"></div>
+        
+        <p class="donation-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          You'll be redirected to PayPal to complete your donation securely.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

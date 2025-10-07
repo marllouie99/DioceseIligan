@@ -1,0 +1,372 @@
+<div class="content-section">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="posts">Posts & Updates</button>
+    <button class="tab-btn" data-tab="ratings">Reviews</button>
+    <button class="tab-btn" data-tab="events">Events</button>
+    {% if church.is_verified %}
+      <button class="tab-btn" data-tab="appointments">Request Appointment</button>
+    {% endif %}
+  </div>
+  <div id="tab-content">
+    <div id="posts" class="tab-panel active">
+      {% if church.owner == request.user %}
+        <div class="social-post-creation">
+          <div class="post-creation-card">
+            <!-- Church Avatar and Input Bar -->
+            <div class="post-input-section">
+              <div class="church-avatar">
+                {% if church.logo %}
+                  <img src="{{ church.logo.url }}" alt="{{ church.name }}" loading="lazy" decoding="async">
+                {% else %}
+                  <div class="church-avatar-placeholder">
+                    {{ church.name|first|upper }}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="post-input-container">
+                <input type="text" 
+                       id="church-post-input-trigger" 
+                       class="post-input-bar" 
+                       placeholder="What's happening at {{ church.name }}?"
+                       readonly>
+              </div>
+            </div>
+            
+            <!-- Post Type Buttons -->
+            <div class="post-type-buttons">
+              <button type="button" class="post-type-btn" data-type="general">
+                <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Update</span>
+              </button>
+              
+              <button type="button" class="post-type-btn" data-type="photo">
+                <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <span>Photo</span>
+              </button>
+              
+              <button type="button" class="post-type-btn" data-type="event">
+                <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Event</span>
+              </button>
+              
+              <button type="button" class="post-type-btn" data-type="prayer">
+                <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Prayer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <div class="posts-filter">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All Posts</button>
+          <button class="filter-tab" data-filter="recent">Recent</button>
+          <button class="filter-tab" data-filter="with-images">With Images</button>
+          <button class="filter-tab" data-filter="text-only">Text Only</button>
+        </div>
+        <div class="filter-sort">
+          <select class="sort-select" onchange="sortPosts(this.value)">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="posts-feed">
+        {% if posts %}
+          {% for post in posts %}
+            {% include 'partials/post_card.html' with post=post %}
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <h3>No posts yet</h3>
+            <p>When this church shares updates, you'll see them here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div id="ratings" class="tab-panel">
+      {% if total_church_reviews > 0 %}
+        <div class="reviews-section">
+          <!-- Overall Rating Summary -->
+          <div class="overall-rating-section">
+            <div class="overall-rating-header">
+              <h3>Overall Rating</h3>
+              <p class="overall-reviews-count">Based on {{ total_church_reviews }} review{{ total_church_reviews|pluralize }} across all services</p>
+            </div>
+            
+            <div class="overall-rating-display">
+              <div class="overall-rating-left">
+                <div class="overall-rating-number">{{ overall_rating }}</div>
+                <div class="overall-rating-stars">
+                  {% for i in "12345" %}
+                    {% if i|add:0 <= overall_rating %}
+                      <span class="star filled large">★</span>
+                    {% else %}
+                      <span class="star large">☆</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <div class="overall-rating-text">{{ total_church_reviews }} review{{ total_church_reviews|pluralize }}</div>
+              </div>
+              
+              <div class="overall-rating-breakdown">
+                {% for rating, count in overall_rating_distribution.items %}
+                  <div class="rating-breakdown-row">
+                    <span class="rating-label">{{ rating }}</span>
+                    <div class="rating-bar">
+                      <div class="rating-fill" style="width: {% if total_church_reviews > 0 %}{% widthratio count total_church_reviews 100 %}{% else %}0{% endif %}%"></div>
+                    </div>
+                    <span class="rating-count">{{ count }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          
+          {% if recent_reviews %}
+          <div class="reviews-header">
+            <h3>Recent Reviews</h3>
+            <p class="reviews-count">{{ recent_reviews|length }} recent review{{ recent_reviews|length|pluralize }}</p>
+          </div>
+          {% endif %}
+          
+          <div class="reviews-list">
+            {% for review in recent_reviews %}
+              <div class="review-card-enhanced" onclick="location.href='{% url 'core:service_reviews' review.service.id %}'">
+                <div class="review-main">
+                  <div class="reviewer-avatar">
+                    {% if review.user.profile.profile_picture %}
+                      <img src="{{ review.user.profile.profile_picture.url }}" alt="{{ review.reviewer_name }}" class="avatar-img">
+                    {% else %}
+                      <div class="avatar-placeholder">
+                        {{ review.reviewer_name|first|upper }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="review-content-enhanced">
+                    <div class="review-header-enhanced">
+                      <div class="reviewer-info">
+                        <h4 class="reviewer-name">{{ review.reviewer_name }}</h4>
+                        <div class="review-meta">
+                          <span class="review-date">{{ review.created_at|timesince }} ago</span>
+                          <span class="service-tag-inline">{{ review.service.name }}</span>
+                        </div>
+                      </div>
+                      <div class="review-rating-enhanced">
+                        <div class="rating-stars">
+                          {% for i in "12345" %}
+                            {% if i|add:0 <= review.rating %}
+                              <span class="star filled">★</span>
+                            {% else %}
+                              <span class="star">☆</span>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <span class="rating-number">{{ review.rating }}.0</span>
+                      </div>
+                    </div>
+                    
+                    <div class="review-text">
+                      <h5 class="review-title">{{ review.title }}</h5>
+                      <p class="review-comment">{{ review.comment|truncatewords:25 }}</p>
+                    </div>
+                    
+                    {% if review.helpful_votes > 0 %}
+                      <div class="review-helpful">
+                        <i data-feather="thumbs-up"></i>
+                        <span>{{ review.helpful_votes }} helpful</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <div class="reviews-footer">
+            <a href="#" class="view-all-reviews">View All Reviews →</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i data-feather="star"></i>
+          </div>
+          <h3>No reviews yet</h3>
+          <p>Be the first to rate and review this church's services.</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <div id="events" class="tab-panel">
+      <div class="empty-state">
+        <h3>No events yet</h3>
+        <p>Upcoming church events will appear here.</p>
+      </div>
+    </div>
+    
+    <div id="appointments" class="tab-panel">
+      {% if not church.is_verified %}
+        <div class="empty-state">
+          <h3>Verification pending</h3>
+          <p>This church has not been verified yet. Services and appointment requests will be available once verification is approved.</p>
+        </div>
+      {% elif bookable_services %}
+        <div class="services-grid">
+          {% for service in bookable_services %}
+            <div class="service-card">
+              <div class="service-image-container" onclick="openServiceGallery('{{ service.id }}')">
+                {% if service.get_primary_image %}
+                  <img src="{{ service.get_primary_image.image.url }}" alt="{{ service.name }}" loading="lazy" decoding="async" width="640" height="360">
+                  {% with service.service_images.all|length as img_count %}
+                    {% if img_count > 1 %}
+                      <div class="image-count-badge">
+                        <i data-feather="image"></i>
+                        {{ img_count }}
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+                {% elif service.image %}
+                  <img src="{{ service.image.url }}" alt="{{ service.name }}" loading="lazy" decoding="async" width="640" height="360">
+                {% else %}
+                  <div class="no-image">📅</div>
+                {% endif %}
+                <div class="image-overlay">
+                  <i data-feather="eye"></i>
+                  <span>View Photos</span>
+                </div>
+              </div>
+              
+              <div class="service-info">
+                <h4 class="service-title">
+                  {{ service.name }}
+                  {% if service.review_count > 0 %}
+                    <div class="service-title-rating">
+                      {% for i in "12345" %}
+                        {% if i|add:0 <= service.average_rating %}
+                          <i data-feather="star" class="star filled"></i>
+                        {% else %}
+                          <i data-feather="star" class="star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </h4>
+                <p class="service-location">{{ service.church_location.name|default:"Church Location" }}</p>
+                <p>{{ service.description|default:"No description provided."|truncatewords:20 }}</p>
+                <div class="service-meta">
+                  <span>{{ service.duration_display }}</span>
+                  <span>{% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}</span>
+                </div>
+              </div>
+              
+              <div class="service-actions">
+                {% if can_request_appointment %}
+                  <button type="button" 
+                          class="btn btn-primary book-service-btn" 
+                          onclick="openBookingModal('{{ service.id }}', '{{ church.id }}')"
+                          data-service-id="{{ service.id }}"
+                          data-service-name="{{ service.name }}"
+                          data-service-duration="{{ service.duration_display }}"
+                          data-service-price="{% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}"
+                          data-church-id="{{ church.id }}"
+                          data-church-name="{{ church.name }}"
+                          data-advance-booking-days="{{ service.advance_booking_days }}">
+                    Request Appointment
+                  </button>
+                  <a href="{% url 'core:service_reviews' service.id %}" 
+                     class="btn btn-secondary service-reviews-btn">
+                    <i data-feather="star"></i>
+                    Reviews ({{ service.review_count }})
+                  </a>
+                {% else %}
+                  <a href="{% url 'manage_profile' %}"
+                     class="btn btn-secondary"
+                     title="Complete your profile to request appointments.">
+                    Complete Profile to Request
+                  </a>
+                  <a href="{% url 'core:service_reviews' service.id %}" 
+                     class="btn btn-secondary service-reviews-btn">
+                    <i data-feather="star"></i>
+                    Reviews ({{ service.review_count }})
+                  </a>
+                  {% if essential_missing %}
+                    <div class="small text-muted" style="margin-top:6px;">
+                      Required: 
+                      {% for item in essential_missing|slice:":3" %}
+                        {{ item }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                      {% if essential_missing|length > 3 %}
+                        + {{ essential_missing|length|add:"-3" }} more
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>No requestable services yet</h3>
+          <p>This church has not published any requestable services.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Service Image Gallery Modal -->
+<div id="serviceGalleryModal" class="gallery-modal">
+  <div class="gallery-modal-content">
+    <div class="gallery-header">
+      <h3 id="galleryServiceName">Service Photos</h3>
+      <button class="gallery-close" onclick="closeServiceGallery()">
+        <i data-feather="x"></i>
+      </button>
+    </div>
+    
+    <div class="gallery-container">
+      <button class="gallery-nav gallery-prev" onclick="previousImage()">
+        <i data-feather="chevron-left"></i>
+      </button>
+      
+      <div class="gallery-main">
+        <img id="galleryMainImage" src="" alt="Service Photo" loading="lazy">
+        <div class="gallery-counter">
+          <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
+        </div>
+      </div>
+      
+      <button class="gallery-nav gallery-next" onclick="nextImage()">
+        <i data-feather="chevron-right"></i>
+      </button>
+    </div>
+    
+    <div class="gallery-thumbnails">
+      <div id="galleryThumbnails" class="thumbnails-container">
+        <!-- Thumbnails will be dynamically loaded -->
+      </div>
+    </div>
+  </div>
+</div>
+
+

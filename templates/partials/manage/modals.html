@@ -1,0 +1,23 @@
+{% load static %}
+{# All Modals for Manage Church Page #}
+
+<!-- Bulk Edit Modal -->
+{% include 'partials/manage/modals/bulk_edit_modal.html' %}
+
+<!-- Export Modal -->
+{% include 'partials/manage/modals/export_modal.html' %}
+
+<!-- Import Modal -->
+{% include 'partials/manage/modals/import_modal.html' %}
+
+<!-- Image Cropper Modal -->
+{% include 'partials/manage/modals/cropper_modal.html' %}
+
+<!-- Reset Modal -->
+{% include 'partials/manage/modals/reset_modal.html' %}
+
+<!-- Create Post Modal -->
+{% include 'partials/manage/modals/create_post_modal.html' with church=church %}
+
+<!-- Edit Post Modal -->
+{% include 'partials/manage/modals/edit_post_modal.html' with church=church %}

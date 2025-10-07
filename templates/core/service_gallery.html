@@ -1,0 +1,315 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} - Image Gallery{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/services.css' %}?v={{ STATIC_VERSION }}">
+<style>
+  .gallery-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .gallery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  
+  .gallery-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+  }
+  
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-button:hover {
+    background: #4b5563;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .gallery-item {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .gallery-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .gallery-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  
+  .gallery-item-info {
+    padding: 15px;
+  }
+  
+  .gallery-item-caption {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .gallery-item-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .primary-badge {
+    background: #10b981;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .order-badge {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .no-images {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+  }
+  
+  .no-images-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  
+  .no-images h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #374151;
+  }
+  
+  .no-images p {
+    font-size: 1rem;
+    margin: 0;
+  }
+  
+  .image-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+  
+  .lightbox-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  
+  .lightbox-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+  
+  .lightbox-close:hover {
+    background: white;
+    transform: scale(1.1);
+  }
+  
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+  
+  .lightbox-nav:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  .lightbox-nav.prev {
+    left: -60px;
+  }
+  
+  .lightbox-nav.next {
+    right: -60px;
+  }
+  
+  .lightbox-info {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+  }
+  
+  .lightbox-caption {
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+  }
+  
+  .lightbox-counter {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+  <div class="gallery-header">
+    <h1 class="gallery-title">{{ service.name }} - Image Gallery</h1>
+    <a href="{% url 'core:manage_church' %}?tab=services" class="back-button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Services
+    </a>
+  </div>
+  
+  {% if images %}
+    <div class="gallery-grid">
+      {% for image in images %}
+        <div class="gallery-item" onclick="openLightbox({{ forloop.counter0 }})">
+          <img src="{{ image.image.url }}" alt="{{ image.caption|default:service.name }}" class="gallery-image" loading="lazy" decoding="async">
+          <div class="gallery-item-info">
+            <p class="gallery-item-caption">{{ image.caption|default:"No caption" }}</p>
+            <div class="gallery-item-meta">
+              {% if image.is_primary %}
+                <span class="primary-badge">Primary</span>
+              {% endif %}
+              <span class="order-badge">#{{ image.order|add:1 }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="no-images">
+      <div class="no-images-icon">📷</div>
+      <h3>No Images Found</h3>
+      <p>This service doesn't have any images yet.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Image Lightbox -->
+<div id="image-lightbox" class="image-lightbox">
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightbox-image" class="lightbox-image" src="" alt="">
+    <button class="lightbox-nav prev" onclick="previousImage()">‹</button>
+    <button class="lightbox-nav next" onclick="nextImage()">›</button>
+    <div class="lightbox-info">
+      <p id="lightbox-caption" class="lightbox-caption"></p>
+      <p id="lightbox-counter" class="lightbox-counter"></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Make gallery images data available to JavaScript
+  window.galleryImages = [
+    {% for image in images %}
+      {
+        url: '{{ image.image.url }}',
+        caption: '{{ image.caption|default:service.name|escapejs }}',
+        is_primary: {{ image.is_primary|yesno:"true,false" }},
+        order: {{ image.order }}
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+</script>
+{% load static %}
+<!-- Load gallery modules -->
+<script src="{% static 'js/modules/image-lightbox.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/gallery-navigation.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/gallery-events.js' %}?v={{ STATIC_VERSION }}"></script>
+<!-- Load main service gallery application -->
+<script src="{% static 'js/service_gallery_new.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

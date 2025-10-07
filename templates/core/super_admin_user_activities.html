@@ -1,0 +1,466 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}User Activities • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<style>
+.activity-filters {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #666;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.activity-table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.activity-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activity-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.status-success {
+  color: #059669;
+  font-weight: 500;
+}
+
+.status-failed {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.verification-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.verification-used {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.verification-unused {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.verification-expired {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.device-info {
+  font-size: 0.875rem;
+  color: #666;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pagination a,
+.pagination span {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #666;
+}
+
+.pagination .current {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+</style>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="super-admin-page">
+  <h1 class="page-title">User Activity Registration</h1>
+
+  <!-- Filters -->
+  <div class="activity-filters">
+    <form method="get" id="filter-form">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="days">Time Period</label>
+          <select name="days" id="days">
+            <option value="7" {% if current_filters.days == '7' %}selected{% endif %}>Last 7 days</option>
+            <option value="30" {% if current_filters.days == '30' or not current_filters.days %}selected{% endif %}>Last 30 days</option>
+            <option value="90" {% if current_filters.days == '90' %}selected{% endif %}>Last 90 days</option>
+            <option value="0" {% if current_filters.days == '0' %}selected{% endif %}>All time</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="activity_type">Activity Type</label>
+          <select name="activity_type" id="activity_type">
+            <option value="">All Activities</option>
+            {% for value, label in activity_type_choices %}
+              <option value="{{ value }}" {% if current_filters.activity_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="success">Status</label>
+          <select name="success" id="success">
+            <option value="">All Status</option>
+            <option value="success" {% if current_filters.success == 'success' %}selected{% endif %}>Success</option>
+            <option value="failed" {% if current_filters.success == 'failed' %}selected{% endif %}>Failed</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="search">Search</label>
+          <input type="text" name="search" id="search" placeholder="Email, username, IP, code..." value="{{ current_filters.search }}">
+        </div>
+
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary">Filter</button>
+          <a href="{% url 'core:super_admin_user_activities' %}" class="btn btn-outline">Reset</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_activities }}</div>
+      <div class="stat-label">Total Activities</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.success_count }}</div>
+      <div class="stat-label">Successful</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.failed_count }}</div>
+      <div class="stat-label">Failed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_verifications }}</div>
+      <div class="stat-label">Verification Codes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.used_verifications }}</div>
+      <div class="stat-label">Used Codes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.expired_verifications }}</div>
+      <div class="stat-label">Expired Codes</div>
+    </div>
+  </div>
+
+  <!-- User Activities Table -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="section-title">User Activities</div>
+      <div class="panel-actions">
+        <span class="badge">{{ activities|length }} of {{ stats.total_activities }} total</span>
+      </div>
+    </div>
+
+    {% if activities %}
+      <div class="activity-table">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Activity</th>
+              <th>Status</th>
+              <th>IP Address</th>
+              <th>Device/Browser</th>
+              <th>Details</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for activity in activities %}
+              <tr>
+                <td>
+                  <div>
+                    <strong>{{ activity.display_name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ activity.email }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="activity-type">{{ activity.get_activity_type_display }}</span>
+                  {% if activity.verification_code %}
+                    <br><small class="text-muted">Code: {{ activity.verification_code }}</small>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="{% if activity.success %}status-success{% else %}status-failed{% endif %}">
+                    {{ activity.status_display }}
+                  </span>
+                </td>
+                <td>
+                  <code>{{ activity.ip_address }}</code>
+                  {% if activity.country %}
+                    <br><small class="text-muted">{{ activity.city }}{% if activity.city %}, {% endif %}{{ activity.country }}</small>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="device-info">
+                    {% if activity.browser_info %}
+                      <div title="{{ activity.user_agent }}">{{ activity.browser_info }}</div>
+                      {% if activity.os_info %}<small class="text-muted">{{ activity.os_info }}</small>{% endif %}
+                    {% else %}
+                      <div title="{{ activity.user_agent }}">{{ activity.device_info|default:"Unknown" }}</div>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if activity.details %}
+                    <small class="text-muted">{{ activity.details|truncatechars:50 }}</small>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>
+                  <div>{{ activity.created_at|date:'M j, Y' }}</div>
+                  <small class="text-muted">{{ activity.created_at|time:'g:i A' }}</small>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination for activities -->
+      {% if activities.has_other_pages %}
+        <div class="pagination">
+          {% if activities.has_previous %}
+            <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.previous_page_number }}">&laquo; Previous</a>
+          {% endif %}
+          
+          <span class="current">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span>
+          
+          {% if activities.has_next %}
+            <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.next_page_number }}">Next &raquo;</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <p>No user activities found for the selected filters.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Email Verification Codes Table -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="section-title">Email Verification Codes</div>
+      <div class="panel-actions">
+        <span class="badge">{{ verifications|length }} of {{ stats.total_verifications }} total</span>
+      </div>
+    </div>
+
+    {% if verifications %}
+      <div class="activity-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Attempts</th>
+              <th>IP Address</th>
+              <th>Device Info</th>
+              <th>Created</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for verification in verifications %}
+              <tr>
+                <td>
+                  <strong>{{ verification.email }}</strong>
+                </td>
+                <td>
+                  <code>{{ verification.code }}</code>
+                </td>
+                <td>
+                  {% if verification.is_used %}
+                    <span class="verification-status verification-used">Used</span>
+                  {% elif verification.expires_at < now %}
+                    <span class="verification-status verification-expired">Expired</span>
+                  {% else %}
+                    <span class="verification-status verification-unused">Pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="{% if verification.attempts >= 5 %}text-danger{% elif verification.attempts >= 3 %}text-warning{% endif %}">
+                    {{ verification.attempts }}/5
+                  </span>
+                </td>
+                <td>
+                  {% if verification.ip_address %}
+                    <code>{{ verification.ip_address }}</code>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="device-info">
+                    {% if verification.device_info %}
+                      <div title="{{ verification.user_agent }}">{{ verification.device_info }}</div>
+                    {% elif verification.user_agent %}
+                      <div title="{{ verification.user_agent }}">{{ verification.user_agent|truncatechars:30 }}</div>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <div>{{ verification.created_at|date:'M j, Y' }}</div>
+                  <small class="text-muted">{{ verification.created_at|time:'g:i A' }}</small>
+                </td>
+                <td>
+                  <div>{{ verification.expires_at|date:'M j, Y' }}</div>
+                  <small class="text-muted">{{ verification.expires_at|time:'g:i A' }}</small>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination for verifications -->
+      {% if verifications.has_other_pages %}
+        <div class="pagination">
+          {% if verifications.has_previous %}
+            <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.previous_page_number }}">&laquo; Previous</a>
+          {% endif %}
+          
+          <span class="current">Page {{ verifications.number }} of {{ verifications.paginator.num_pages }}</span>
+          
+          {% if verifications.has_next %}
+            <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.next_page_number }}">Next &raquo;</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <p>No verification codes found for the selected filters.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- JavaScript for auto-submit filters -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('filter-form');
+      const selects = form.querySelectorAll('select:not([name="search"])');
+      
+      selects.forEach(select => {
+        select.addEventListener('change', function() {
+          form.submit();
+        });
+      });
+    });
+  </script>
+</div>
+{% endblock %}

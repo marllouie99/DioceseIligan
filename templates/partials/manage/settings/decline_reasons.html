@@ -1,0 +1,66 @@
+{% load static %}
+{# Decline Reasons Settings Section #}
+<div id="decline-reasons-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Decline Reasons</h3>
+      <p class="section-description">Manage reasons for declining appointment requests</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="decline-reasons-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Add New Reason</h4>
+        <p class="setting-description">Create a new decline reason</p>
+      </div>
+      <div class="setting-control">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" name="label" id="decline-reason-label" class="form-input" placeholder="e.g., Schedule conflict, Incomplete requirements" maxlength="200" required>
+          <label class="toggle-switch" title="Active">
+            <input type="checkbox" name="is_active" id="decline-reason-active" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <button type="button" class="btn btn-primary" id="add-decline-reason-btn">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Existing Reasons</h4>
+        <p class="setting-description">Activate/deactivate or remove reasons</p>
+      </div>
+      <div class="setting-control">
+        {% if decline_reasons %}
+          <ul class="list" style="list-style:none; padding:0; margin:0;">
+            {% for r in decline_reasons %}
+              <li style="display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border,#e5e7eb); padding:8px 12px; border-radius:8px; margin-bottom:8px;">
+                <span style="flex:1;">{{ r.label }}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label class="toggle-switch" title="Toggle Active">
+                    <input type="checkbox" {% if r.is_active %}checked{% endif %} 
+                           onchange="toggleDeclineReason({{ r.id }}, this.checked)">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <button type="button" class="btn-icon btn-danger" 
+                          onclick="removeDeclineReason({{ r.id }})" title="Delete">
+                    {% include 'partials/icons/trash.html' %}
+                  </button>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state-mini">
+            <p>No decline reasons created yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

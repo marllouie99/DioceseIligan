@@ -1,0 +1,348 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify Email - ChurchConnect</title>
+  <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
+  <style>
+    .verification-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .verification-input {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 8px;
+      font-family: 'Courier New', monospace;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    
+    .verification-input:focus {
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .email-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .email-info .icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .email-info h3 {
+      color: #1e40af;
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    
+    .email-info p {
+      color: #1e40af;
+      margin: 0;
+      font-size: 14px;
+    }
+    
+    .masked-email {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+    
+    .resend-section {
+      text-align: center;
+      margin: 24px 0;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+    
+    .resend-btn {
+      background: #6b7280;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .resend-btn:hover:not(:disabled) {
+      background: #4b5563;
+    }
+    
+    .resend-btn:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+    }
+    
+    .timer-text {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    
+    .help-text {
+      font-size: 14px;
+      color: #64748b;
+      text-align: center;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+    
+    .back-link {
+      display: inline-block;
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    
+    .code-digits {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+    
+    .code-digit {
+      width: 50px;
+      height: 60px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .code-digit:focus {
+      border-color: #3b82f6;
+      background: white;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-wrap">
+    <div class="card verification-container">
+      <div class="logo-stack">
+        <div class="logo-glow"></div>
+        <div class="logo-badge">CC</div>
+      </div>
+
+      <h1 class="title">Check your email</h1>
+      <p class="subtitle">We sent a verification code to your email</p>
+
+      <div class="email-info">
+        <div class="icon">📧</div>
+        <h3>Verification code sent to:</h3>
+        <p class="masked-email">{{ masked_email }}</p>
+      </div>
+
+      {% if messages %}
+      <div>
+        {% for message in messages %}
+          <p style="color:{% if message.tags == 'success' %}#059669{% else %}#b91c1c{% endif %}; margin: 8px 4px; text-align: center;">{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="form">
+        <form method="post" action="" id="verification-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="verify" />
+          {{ form.email }}
+
+          <div class="field">
+            <div class="label">Enter verification code</div>
+            <div class="input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1v6m0 6v6" stroke="#94a3b8" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="3" stroke="#94a3b8" stroke-width="1.5"/>
+              </svg>
+              {{ form.verification_code }}
+            </div>
+            {% if form.verification_code.errors %}
+              <small style="color:#b91c1c">{{ form.verification_code.errors.0 }}</small>
+            {% endif %}
+            {% if form.non_field_errors %}
+              <small style="color:#b91c1c">{{ form.non_field_errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="actions">
+            <button class="btn-primary" type="submit" id="verify-btn">Verify Email</button>
+          </div>
+        </form>
+
+        <div class="resend-section">
+          <p class="help-text">Didn't receive the code?</p>
+          <button class="resend-btn" id="resend-btn" type="button">Resend Code</button>
+          <div class="timer-text" id="timer-text" style="display: none;"></div>
+        </div>
+
+        <div class="links">
+          <p class="muted">
+            <a href="{% url 'landing' %}" class="back-link">← Back to signup</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-focus verification input
+    document.addEventListener('DOMContentLoaded', function() {
+      const verificationInput = document.querySelector('.verification-input');
+      if (verificationInput) {
+        verificationInput.focus();
+      }
+    });
+
+    // Handle resend verification code
+    document.getElementById('resend-btn').addEventListener('click', function() {
+      const btn = this;
+      const timerText = document.getElementById('timer-text');
+      
+      // Disable button and show loading
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      
+      // Get CSRF token
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      // Send AJAX request
+      fetch('{% url "resend_verification_code" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrftoken
+        },
+        body: 'csrfmiddlewaretoken=' + csrftoken
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          showMessage(data.message, 'success');
+          
+          // Start countdown timer (30 seconds)
+          let seconds = 30;
+          btn.style.display = 'none';
+          timerText.style.display = 'block';
+          
+          const countdown = setInterval(() => {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            if (seconds > 60) {
+              timerText.textContent = `Please wait ${minutes}:${remainingSeconds.toString().padStart(2, '0')} before requesting another code`;
+            } else {
+              timerText.textContent = `Please wait ${seconds} seconds before requesting another code`;
+            }
+            
+            if (seconds <= 0) {
+              clearInterval(countdown);
+              btn.style.display = 'inline-block';
+              btn.disabled = false;
+              btn.textContent = 'Resend Code';
+              timerText.style.display = 'none';
+            }
+            seconds--;
+          }, 1000);
+        } else {
+          showMessage(data.message, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Resend Code';
+        }
+      })
+      .catch(error => {
+        showMessage('Failed to resend code. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Resend Code';
+      });
+    });
+
+    function showMessage(message, type) {
+      // Remove existing messages
+      const existingMessages = document.querySelectorAll('.temp-message');
+      existingMessages.forEach(msg => msg.remove());
+      
+      // Create new message
+      const messageEl = document.createElement('p');
+      messageEl.className = 'temp-message';
+      messageEl.style.color = type === 'success' ? '#059669' : '#b91c1c';
+      messageEl.style.margin = '8px 4px';
+      messageEl.style.textAlign = 'center';
+      messageEl.textContent = message;
+      
+      // Insert after form
+      const form = document.getElementById('verification-form');
+      form.parentNode.insertBefore(messageEl, form.nextSibling);
+      
+      // Remove after 5 seconds
+      setTimeout(() => {
+        messageEl.remove();
+      }, 5000);
+    }
+
+    // Auto-submit when 6 digits are entered
+    let formSubmitted = false;
+    document.querySelector('.verification-input').addEventListener('input', function(e) {
+      const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+      e.target.value = value;
+      
+      if (value.length === 6 && !formSubmitted) {
+        formSubmitted = true;
+        // Disable the verify button to prevent double submission
+        document.getElementById('verify-btn').disabled = true;
+        document.getElementById('verify-btn').textContent = 'Verifying...';
+        
+        // Auto-submit after a short delay
+        setTimeout(() => {
+          document.getElementById('verification-form').submit();
+        }, 500);
+      }
+    });
+
+    // Prevent double submission on manual button click
+    document.getElementById('verification-form').addEventListener('submit', function(e) {
+      if (formSubmitted) {
+        e.preventDefault();
+        return false;
+      }
+      formSubmitted = true;
+      document.getElementById('verify-btn').disabled = true;
+      document.getElementById('verify-btn').textContent = 'Verifying...';
+    });
+
+    // Prevent non-numeric input
+    document.querySelector('.verification-input').addEventListener('keypress', function(e) {
+      if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>

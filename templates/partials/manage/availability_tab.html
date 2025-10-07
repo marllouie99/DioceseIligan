@@ -1,0 +1,62 @@
+{% load static %}
+{# Availability Tab Content #}
+<div class="tab-panel {% if request.GET.tab == 'availability' %}active{% endif %}" id="availability">
+  <div class="tab-header">
+    <h2>Availability</h2>
+    <p>Manage your church's availability and mark closed dates</p>
+  </div>
+  <div class="tab-content">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          {% if 'availability' in message|lower or 'created' in message|lower %}
+            <div class="message message-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div class="availability-management">
+      <div class="availability-layout">
+        <!-- Closed Dates List -->
+        <div class="closed-dates-section">
+          <h3>Closed Dates & Special Hours</h3>
+          {% if church and church.availability.all %}
+            <div class="closed-dates-list">
+              {% for availability in church.availability.all %}
+                {% include 'partials/manage/availability_item.html' with availability=availability %}
+              {% endfor %}
+            </div>
+          {% else %}
+            {% include 'partials/manage/empty_availability.html' %}
+          {% endif %}
+        </div>
+        
+        <!-- Calendar Widget -->
+        <div class="availability-calendar">
+          <h3>Calendar View</h3>
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <button class="calendar-nav" id="prev-month" type="button" aria-label="Previous month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15,18 9,12 15,6"/>
+                </svg>
+              </button>
+              <h4 class="calendar-month" id="current-month"></h4>
+              <button class="calendar-nav" id="next-month" type="button" aria-label="Next month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9,18 15,12 9,6"/>
+                </svg>
+              </button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+              <!-- Calendar will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

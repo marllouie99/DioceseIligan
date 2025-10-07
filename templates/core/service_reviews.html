@@ -1,0 +1,165 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} Reviews - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/service_reviews.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="service-reviews-page warm-sacred-earth">
+  <!-- CSRF token for AJAX actions -->
+  <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
+  
+  <!-- Back Navigation - Outside Header -->
+  <div class="page-navigation">
+    <div class="back-navigation">
+      <a href="{% url 'core:church_detail' church.slug %}#appointments" class="back-button">
+        <i data-feather="arrow-left"></i>
+        <span>Back to Request Appointment</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Service Header -->
+  <div class="service-header">
+    <div class="service-info">
+      <div class="header-navigation">
+        <nav class="breadcrumb">
+          <a href="{% url 'core:church_detail' church.slug %}">{{ church.name }}</a>
+          <span>/</span>
+          <span>{{ service.name }} Reviews</span>
+        </nav>
+      </div>
+      
+      <div class="service-header-content">
+        <h1>{{ service.name }}</h1>
+        
+        <div class="service-meta">
+          <span class="duration">{{ service.duration_display }}</span>
+          <span class="price">{% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}</span>
+        </div>
+        
+        <p class="service-description">{{ service.description|default:"No description available." }}</p>
+        
+        <div class="service-gallery-button">
+          <button class="btn btn-gallery" onclick="openServiceGallery({{ service.id }})">
+            <i data-feather="image"></i>
+            <span>View Gallery</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Service Rating Column -->
+    {% if total_reviews > 0 %}
+      <div class="service-header-rating">
+        <div class="rating-summary">
+          <div class="rating-number">{{ average_rating }}</div>
+          <div class="rating-stars">
+            {% for i in "12345" %}
+              {% if i|add:0 <= average_rating %}
+                <i data-feather="star" class="star filled"></i>
+              {% else %}
+                <i data-feather="star" class="star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div class="rating-count">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</div>
+        </div>
+        
+        <!-- Rating Breakdown in Header -->
+        <div class="header-rating-breakdown">
+          {% for rating, count in rating_distribution.items %}
+            <div class="header-rating-row">
+              <span class="header-rating-label">{{ rating }}</span>
+              <div class="header-rating-bar">
+                <div class="header-rating-fill" style="width: {% widthratio count total_reviews 100 %}%"></div>
+              </div>
+              <span class="header-rating-count">{{ count }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="service-header-rating">
+        <div class="rating-summary">
+          <div class="rating-number">-</div>
+          <div class="rating-stars">
+            {% for i in "12345" %}
+              <i data-feather="star" class="star"></i>
+            {% endfor %}
+          </div>
+          <div class="rating-count">No reviews yet</div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Reviews Column in Header -->
+    <div class="service-header-reviews">
+      <h4>All Reviews</h4>
+      
+      {% if reviews %}
+        <div class="header-reviews-list">
+          {% for review in reviews|slice:":3" %}
+            <div class="header-review-item">
+              <div class="header-review-header">
+                <span class="header-reviewer-name">{{ review.reviewer_name }}</span>
+                <div class="header-review-rating">
+                  {% for i in "12345" %}
+                    {% if i|add:0 <= review.rating %}
+                      <i data-feather="star" class="star filled small"></i>
+                    {% else %}
+                      <i data-feather="star" class="star small"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <p class="header-review-title">{{ review.title }}</p>
+              <p class="header-review-comment">{{ review.comment|truncatewords:15 }}</p>
+            </div>
+          {% endfor %}
+          
+          {% if reviews|length > 3 %}
+            <div class="header-reviews-more">
+              <p>+ {{ reviews|length|add:"-3" }} more review{{ reviews|length|add:"-3"|pluralize }}</p>
+            </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="header-reviews-empty">
+          <p>No reviews yet</p>
+          <small>Be the first to review!</small>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.csrfToken = '{{ csrf_token }}';
+  window.serviceId = {{ service.id }};
+  
+  // Initialize Feather icons when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof feather !== 'undefined') {
+      feather.replace();
+    }
+  });
+</script>
+<script defer src="{% static 'js/service-reviews.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

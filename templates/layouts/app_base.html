@@ -1,0 +1,165 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}ChurchConnect{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/forest-serenity-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ STATIC_VERSION }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %} {% if profile_essentials_incomplete %}needs-essentials{% endif %}">
+  <!-- Mobile sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      {% block sidebar %}{% endblock %}
+    </aside>
+    <div class="main">
+      <header class="topbar {% if user.is_superuser and is_admin_mode %}admin-mode{% endif %}">
+        {% block topbar %}{% endblock %}
+      </header>
+      <main class="content">
+        {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <!-- Load utility modules first -->
+  <script defer src="{% static 'js/core/utils.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/core/navigation.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/core/search.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/core/toasts.js' %}?v={{ STATIC_VERSION }}"></script>
+  <!-- Load profile modules -->
+  <script defer src="{% static 'js/profile/profile.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/profile/profile-modal.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/profile/profile-form.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/profile/profile-avatar.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/profile/profile-display.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/profile/profile-utils.js' %}?v={{ STATIC_VERSION }}"></script>
+  <!-- Load notification modules -->
+  <script defer src="{% static 'js/notifications/notification-dropdown.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/notifications/notification-api.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/notifications/notification-badge.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/notifications/notification-events.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/notifications/notification-utils.js' %}?v={{ STATIC_VERSION }}"></script>
+  <!-- Load main applications -->
+  <script defer src="{% static 'js/app/app_new.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/app/notifications_new.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/app/profile_new.js' %}?v={{ STATIC_VERSION }}"></script>
+  <!-- Load dashboard modules -->
+  <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/post-bookmark.js' %}?v={{ STATIC_VERSION }}"></script>
+  
+  <!-- Mobile Menu Toggle Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      
+      if (mobileMenuToggle && sidebar && sidebarOverlay) {
+        // Toggle sidebar on mobile menu button click
+        mobileMenuToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('mobile-open');
+          sidebarOverlay.classList.toggle('active');
+          document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        });
+        
+        // Close sidebar when overlay is clicked
+        sidebarOverlay.addEventListener('click', function() {
+          sidebar.classList.remove('mobile-open');
+          sidebarOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+        
+        // Close sidebar on window resize to desktop size
+        window.addEventListener('resize', function() {
+          if (window.innerWidth > 768) {
+            sidebar.classList.remove('mobile-open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
+  </script>
+  
+  <!-- Global Post Menu Delegated Handler (toggle + outside close) -->
+  <script>
+    (function() {
+      if (window.postMenuDelegatedHandlerAttached) return;
+      window.postMenuDelegatedHandlerAttached = true;
+
+      function handle(e) {
+        const target = e.target;
+        const btn = target.closest('.post-menu-btn');
+        const insideDropdown = target.closest('.post-menu-dropdown');
+        const insideModal = target.closest('.post-modal');
+
+        // Toggle when clicking the 3-dots button
+        if (btn) {
+          e.preventDefault();
+
+          const card = btn.closest('.post-card');
+          if (!card) return;
+          const dropdown = card.querySelector('.post-menu-dropdown');
+          if (!dropdown) return;
+
+          const willOpen = !dropdown.classList.contains('show');
+
+          // Close all others
+          document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+            dd.classList.remove('show');
+            const c = dd.closest('.post-card');
+            if (c) c.classList.remove('dropdown-open');
+            dd.style && dd.style.removeProperty && dd.style.removeProperty('display');
+          });
+
+          // Open current if intended
+          if (willOpen) {
+            dropdown.classList.add('show');
+            dropdown.style && dropdown.style.removeProperty && dropdown.style.removeProperty('display');
+            card.classList.add('dropdown-open');
+          }
+          return;
+        }
+
+        // If clicking a menu item, close its dropdown and let its own handler run
+        if (target.closest('.menu-item')) {
+          const dd = target.closest('.post-menu-dropdown');
+          if (dd) {
+            dd.classList.remove('show');
+            const c = dd.closest('.post-card');
+            if (c) c.classList.remove('dropdown-open');
+          }
+          return;
+        }
+
+        // Outside click: close all (ignore clicks inside dropdown or modals)
+        if (!insideDropdown && !insideModal) {
+          document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+            dd.classList.remove('show');
+            const c = dd.closest('.post-card');
+            if (c) c.classList.remove('dropdown-open');
+            dd.style && dd.style.removeProperty && dd.style.removeProperty('display');
+          });
+        }
+      }
+
+      // Single click handler
+      document.addEventListener('click', handle, false);
+    })();
+  </script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

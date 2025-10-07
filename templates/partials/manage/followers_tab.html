@@ -1,0 +1,311 @@
+{% load static %}
+{# Followers Tab Content #}
+<div class="tab-panel" id="followers">
+  <div class="tab-header">
+    <h2>Recent Followers</h2>
+    <p>People who recently started following your church</p>
+  </div>
+  <div class="tab-content">
+    <!-- Followers Analytics -->
+    <div class="followers-stats parchment-card">
+      <div class="unified-content-management">
+        <div class="analytics-cards">
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ follower_count|default:"0" }}</h4>
+              <p>Total Followers</p>
+              <span class="analytics-change">All time community</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <path d="M20 8v6M23 11h-6"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ recent_followers|length|default:"0" }}</h4>
+              <p>New This Week</p>
+              <span class="analytics-change">Recent growth</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ recent_followers|length|default:"0" }}</h4>
+              <p>Active Followers</p>
+              <span class="analytics-change">Engaging regularly</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>85%</h4>
+              <p>Growth Rate</p>
+              <span class="analytics-change">Monthly increase</span>
+            </div>
+          </div>
+        </div>
+        
+        {# Followers Analytics Charts #}
+        <div class="analytics-charts">
+          <div class="charts-grid">
+            {# Follower Growth Trend Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Follower Growth Trend</h4>
+                <p>Monthly follower acquisition over time</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="followersGrowthChart"
+                        width="400" height="200"
+                        data-total="{{ follower_count|default:'0' }}"
+                        data-recent="{{ recent_followers|length|default:'0' }}"></canvas>
+                <div class="chart-details">
+                  <div class="post-preview">
+                    <div class="engagement-stats">
+                      <span class="stat">Total: {{ follower_count|default:"0" }}</span>
+                      <span class="stat">This Week: {{ recent_followers|length|default:"0" }}</span>
+                      <span class="stat">Growth: 85%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {# Follower Engagement Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Follower Engagement</h4>
+                <p>Activity levels of your followers</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="followersEngagementChart" width="400" height="200"></canvas>
+                <div class="posts-ranking followers-engagement">
+                  <div class="ranking-item">
+                    <div class="rank-number">🔥</div>
+                    <div class="post-info">
+                      <p>Highly Active</p>
+                      <div class="engagement-total">{{ recent_followers|length|default:"0" }} followers</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: 85%;"></div>
+                    </div>
+                  </div>
+                  <div class="ranking-item">
+                    <div class="rank-number">📊</div>
+                    <div class="post-info">
+                      <p>Moderately Active</p>
+                      <div class="engagement-total">{{ follower_count|add:"-"|add:recent_followers|length|default:"0" }} followers</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: 60%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if recent_followers %}
+      <div class="followers-management">
+
+        <!-- Enhanced Search and Filter Section -->
+        <div class="followers-controls-wrapper">
+          <div class="controls-header">
+            <h4>Search & Filter Followers</h4>
+          </div>
+          <div class="followers-controls">
+            <div class="search-section">
+              <div class="followers-search">
+                <div class="search-input-container">
+                  <i data-feather="search" class="search-icon"></i>
+                  <input 
+                    type="text" 
+                    id="followerSearch" 
+                    placeholder="Search followers by name or email..." 
+                    class="search-input"
+                    autocomplete="off"
+                  >
+                  <button type="button" id="clearSearch" class="clear-search" style="display: none;">
+                    <i data-feather="x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="followers-list" id="followersList">
+          {% for follow in recent_followers %}
+            <div class="follower-item" 
+                 data-name="{{ follow.user.get_full_name|default:follow.user.username|lower }}"
+                 data-email="{{ follow.user.email|lower }}"
+                 data-joined="{{ follow.followed_at|date:'Y-m-d' }}"
+                 data-user-id="{{ follow.user.id }}">
+              <div class="follower-avatar">
+                {% if follow.user.profile.profile_picture %}
+                  <img src="{{ follow.user.profile.profile_picture.url }}" alt="{{ follow.user.get_full_name|default:follow.user.username }}" loading="lazy" decoding="async">
+                {% else %}
+                  <div class="avatar-placeholder">{{ follow.user.get_full_name|default:follow.user.username|first|upper }}</div>
+                {% endif %}
+              </div>
+              <div class="follower-info">
+                <div class="follower-name">{{ follow.user.get_full_name|default:follow.user.username }}</div>
+                <div class="follower-time">{{ follow.followed_at|timesince }} ago</div>
+                {% if follow.user.email %}
+                  <div class="follower-email">{{ follow.user.email }}</div>
+                {% endif %}
+                <div class="follower-joined">Joined {{ follow.followed_at|date:"M d, Y" }}</div>
+              </div>
+              <div class="follower-actions">
+                <div class="action-buttons">
+                  <button type="button" 
+                          class="action-btn primary" 
+                          onclick="viewFollowerActivity('{{ follow.user.id }}', '{{ follow.user.get_full_name|default:follow.user.username }}')"
+                          title="View Activity">
+                    <i data-feather="activity"></i>
+                    Activity
+                  </button>
+                  <button type="button" 
+                          class="action-btn secondary" 
+                          onclick="viewFollowerProfile('{{ follow.user.id }}')"
+                          title="View Profile">
+                    <i data-feather="user"></i>
+                    Profile
+                  </button>
+                </div>
+                <div class="follower-stats">
+                  <div class="stat-badge">
+                    <i data-feather="heart"></i>
+                    <span>{{ follow.user.interactions_count|default:0 }}</span>
+                  </div>
+                  <div class="stat-badge">
+                    <i data-feather="calendar"></i>
+                    <span>{{ follow.user.appointments_count|default:0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="noResults" class="no-results" style="display: none;">
+              <div class="empty-state">
+                <i data-feather="search" class="empty-icon"></i>
+                <h3>No followers found</h3>
+                <p>Try adjusting your search or filter criteria.</p>
+              </div>
+            </div>
+            
+            {% if recent_followers|length >= 20 %}
+              <div class="followers-pagination">
+                <a href="#" class="btn btn-outline">View All Followers</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h3>No Recent Followers</h3>
+        <p>When people start following your church, they'll appear here. Share your church profile to get more followers!</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Follower Activity Modal -->
+<div id="followerActivityModal" class="follower-modal">
+  <div class="follower-modal-content">
+    <div class="follower-modal-header">
+      <h3 id="followerActivityTitle">Follower Activity</h3>
+      <button class="follower-modal-close" onclick="closeFollowerActivity()">
+        <i data-feather="x"></i>
+      </button>
+    </div>
+    
+    <div class="follower-modal-body">
+      <div class="activity-tabs">
+        <button class="activity-tab active" data-tab="interactions">Interactions</button>
+        <button class="activity-tab" data-tab="appointments">Appointments</button>
+        <button class="activity-tab" data-tab="reviews">Reviews</button>
+        <button class="activity-tab" data-tab="timeline">Timeline</button>
+      </div>
+      
+      <div class="activity-content">
+        <div id="interactions-tab" class="activity-panel active">
+          <div class="activity-loading">
+            <i data-feather="loader" class="spinning"></i>
+            <span>Loading interactions...</span>
+          </div>
+          <div class="activity-list" id="interactionsList" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+          </div>
+        </div>
+        
+        <div id="appointments-tab" class="activity-panel">
+          <div class="activity-loading">
+            <i data-feather="loader" class="spinning"></i>
+            <span>Loading appointments...</span>
+          </div>
+          <div class="activity-list" id="appointmentsList" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+          </div>
+        </div>
+        
+        <div id="reviews-tab" class="activity-panel">
+          <div class="activity-loading">
+            <i data-feather="loader" class="spinning"></i>
+            <span>Loading reviews...</span>
+          </div>
+          <div class="activity-list" id="reviewsList" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+          </div>
+        </div>
+        
+        <div id="timeline-tab" class="activity-panel">
+          <div class="activity-loading">
+            <i data-feather="loader" class="spinning"></i>
+            <span>Loading timeline...</span>
+          </div>
+          <div class="activity-list" id="timelineList" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,510 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .breadcrumbs { display: flex; align-items: center; gap: 8px; color: var(--muted, #6b7280); font-size: 14px; }
+  .breadcrumbs a { color: inherit; text-decoration: none; }
+  
+  /* Booking Wizard Styles */
+  .booking-wizard { max-width: 800px; margin: 0 auto; }
+  .step-indicator { display: flex; justify-content: center; margin-bottom: 30px; }
+  .step { display: flex; align-items: center; position: relative; }
+  .step:not(:last-child):after { content: ''; width: 100px; height: 2px; background: #e5e7eb; margin: 0 10px; }
+  .step.active:not(:last-child):after { background: var(--primary, #8B5CF6); }
+  .step-number { width: 32px; height: 32px; border-radius: 50%; background: #f3f4f6; color: #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
+  .step.active .step-number { background: var(--primary, #8B5CF6); color: white; }
+  .step.completed .step-number { background: #10b981; color: white; }
+  .step-label { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #6b7280; white-space: nowrap; }
+  .step.active .step-label { color: var(--primary, #8B5CF6); font-weight: 500; }
+  
+  .wizard-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 24px; }
+  
+  .service-header { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+  .service-title h2 { margin: 0 0 4px 0; font-size: 24px; font-weight: 700; color: #1f2937; }
+  .service-church { margin: 0 0 12px 0; color: #6b7280; font-size: 16px; }
+  .service-meta { display: flex; flex-wrap: wrap; gap: 16px; }
+  .service-meta span { display: inline-flex; align-items: center; padding: 6px 12px; background: #f3f4f6; border-radius: 20px; font-size: 14px; color: #374151; font-weight: 500; }
+  
+  .booking-info { background: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 14px; color: #1e40af; }
+  
+  .profile-warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+  .profile-warning-header { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #92400e; margin-bottom: 8px; }
+  .profile-warning-text { color: #92400e; font-size: 14px; margin-bottom: 12px; }
+  .missing-fields { display: flex; flex-wrap: gap: 8px; margin-bottom: 12px; }
+  .missing-field { background: rgba(217, 119, 6, 0.1); color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+  
+  .form-section { margin-bottom: 24px; }
+  .form-label { display: block; font-weight: 500; color: #374151; margin-bottom: 8px; font-size: 16px; }
+  .form-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; }
+  .form-input:focus { border-color: var(--primary, #8B5CF6); outline: none; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); }
+  .form-textarea { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; resize: vertical; min-height: 100px; }
+  .form-textarea:focus { border-color: var(--primary, #8B5CF6); outline: none; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); }
+  .form-hint { font-size: 13px; color: #6b7280; margin-top: 8px; }
+  .form-error { color: #dc2626; font-size: 14px; margin-top: 8px; padding: 8px 12px; background: #fef2f2; border-radius: 6px; border-left: 4px solid #dc2626; }
+  
+  .date-input-wrapper { position: relative; }
+  .date-input { padding-right: 48px; }
+  .date-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #9ca3af; }
+  
+  .time-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-top: 16px; }
+  .time-slot { 
+    padding: 16px 12px; 
+    border: 2px solid #e5e7eb; 
+    border-radius: 12px; 
+    text-align: center; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    font-weight: 500;
+    font-size: 15px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .time-slot:hover { 
+    border-color: var(--primary, #8B5CF6); 
+    background: #f8faff; 
+    box-shadow: 0 4px 6px rgba(139, 92, 246, 0.1);
+    transform: translateY(-1px);
+  }
+  .time-slot.selected { 
+    border-color: var(--primary, #8B5CF6); 
+    background: var(--primary, #8B5CF6); 
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    transform: translateY(-1px);
+  }
+  .time-slot.unavailable { opacity: 0.5; cursor: not-allowed; background: #f9fafb; }
+  
+  .section-title { margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #1f2937; }
+  .appointment-summary { background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-label { font-weight: 500; color: #64748b; }
+  .summary-value { font-weight: 600; color: #1e293b; }
+  
+  .wizard-actions { display: flex; justify-content: space-between; padding-top: 24px; border-top: 1px solid #e5e7eb; }
+  .btn { padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn-primary { background: var(--primary, #8B5CF6); color: white; }
+  .btn-primary:hover { background: #7c3aed; }
+  .btn-secondary { background: #f3f4f6; color: #374151; }
+  .btn-secondary:hover { background: #e5e7eb; }
+  .btn-outline { background: white; color: #6b7280; border: 1px solid #d1d5db; }
+  .btn-outline:hover { background: #f9fafb; }
+  
+  .step-content { display: none; }
+  .step-content.active { display: block; }
+  
+  @media (max-width: 768px) {
+    .step-indicator { margin-bottom: 20px; }
+    .step:not(:last-child):after { width: 60px; }
+    .wizard-card { padding: 16px; }
+    .service-title h2 { font-size: 20px; }
+    .service-meta { gap: 8px; }
+    .service-meta span { padding: 4px 8px; font-size: 12px; }
+    .time-slots { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+    .appointment-summary { padding: 16px; }
+    .summary-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .wizard-actions { flex-direction: column-reverse; gap: 12px; }
+  }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <a href="{% url 'core:discover' %}">Discover</a>
+      <span>›</span>
+      {% if church.slug %}
+      <a href="{% url 'core:church_detail' church.slug %}">{{ church.name }}</a>
+      {% else %}
+      <span>{{ church.name }}</span>
+      {% endif %}
+      <span>›</span>
+      <span>Request Appointment</span>
+    </div>
+    {% if church.slug %}
+    <a href="{% url 'core:church_detail' church.slug %}" class="btn btn-outline">Back to Church</a>
+    {% else %}
+    <a href="{% url 'core:discover' %}" class="btn btn-outline">Back to Discover</a>
+    {% endif %}
+  </div>
+
+  <div class="booking-wizard">
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label">Choose date</div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label">Choose time</div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label">Confirm</div>
+      </div>
+    </div>
+
+    <div class="wizard-card">
+      <!-- Service Information Header -->
+      <div class="service-header">
+        <div class="service-title">
+          <h2>{{ service.name }}</h2>
+          <p class="service-church">at {{ church.name }}</p>
+        </div>
+        <div class="service-details">
+          <div class="service-meta">
+            <span class="service-duration">⏱️ {{ service.duration_display }}</span>
+            <span class="service-price">💰 {% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}</span>
+            {% if service.requires_approval %}
+            <span class="service-approval">✅ Approval required</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Booking Information -->
+      <div class="booking-info">
+        <strong>Booking Request:</strong> Choose your preferred date and time. The church will review and confirm your appointment.
+      </div>
+
+      <!-- Profile Warning (if incomplete) -->
+      {% if profile_essentials_incomplete %}
+      <div class="profile-warning">
+        <div class="profile-warning-header">
+          <span>⚠️</span>
+          <span>Complete Profile Required</span>
+        </div>
+        <div class="profile-warning-text">
+          Churches need your contact information to confirm appointments. Please complete these fields:
+        </div>
+        <div class="missing-fields">
+          {% for field in profile_essentials_missing %}
+          <span class="missing-field">{{ field|title }}</span>
+          {% endfor %}
+        </div>
+        <a href="{% url 'manage_profile' %}" class="btn btn-primary">Complete Profile</a>
+      </div>
+      {% endif %}
+
+      <form method="post" class="booking-form" id="bookingForm">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="form-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <!-- Step 1: Choose Date -->
+        <div class="step-content active" data-step="1">
+          <div class="form-section">
+            <label class="form-label" for="id_date">Preferred Date</label>
+            <div class="date-input-wrapper">
+              <input type="date" id="id_date" name="date" class="form-input date-input" required
+                     min="{{ today|date:'Y-m-d' }}" max="{{ max_date|date:'Y-m-d' }}"
+                     value="{{ form.date.value|default:'' }}">
+              <div class="date-icon">📅</div>
+            </div>
+            <div class="form-hint">Choose any available date within the next {{ service.advance_booking_days }} days</div>
+            {% if form.date.errors %}
+              <div class="form-error">{{ form.date.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Step 2: Choose Time -->
+        <div class="step-content" data-step="2">
+          <div class="form-section">
+            <label class="form-label">Preferred Time</label>
+            <p class="form-hint" style="margin-bottom: 16px;">Choose your preferred appointment time. All times are approximate and subject to church availability.</p>
+            <div class="time-slots" id="timeSlots">
+              <!-- Time slots will be populated by JavaScript -->
+            </div>
+            <input type="hidden" id="selectedTime" name="time" value="">
+            <input type="hidden" id="startTimeField" name="start_time" value="">
+            <div class="form-hint" style="margin-top: 16px;">Click on a time slot to select it</div>
+          </div>
+        </div>
+
+        <!-- Step 3: Confirm -->
+        <div class="step-content" data-step="3">
+          <div class="form-section">
+            <h4 class="section-title">Review Your Appointment</h4>
+            <div class="appointment-summary">
+              <div class="summary-item">
+                <span class="summary-label">Service</span>
+                <span class="summary-value">{{ service.name }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Church</span>
+                <span class="summary-value">{{ church.name }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Date</span>
+                <span class="summary-value" id="summaryDate">Please select a date</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Time</span>
+                <span class="summary-value" id="summaryTime">Please select a time</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Duration</span>
+                <span class="summary-value">{{ service.duration_display }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Cost</span>
+                <span class="summary-value">{% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}</span>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <label class="form-label" for="id_notes">Additional Notes (optional)</label>
+              <textarea id="id_notes" name="notes" class="form-textarea" 
+                        placeholder="Any special requests or information for the church">{{ form.notes.value|default:'' }}</textarea>
+              {% if form.notes.errors %}
+                <div class="form-error">{{ form.notes.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="wizard-actions">
+          <button type="button" id="backBtn" class="btn btn-outline" style="display: none;">Back</button>
+          <div>
+            <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="nextBtn" class="btn btn-primary">Next</button>
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">Submit Request</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Booking Wizard State Management
+    let currentStep = 1;
+    const totalSteps = 3;
+    let selectedDate = '';
+    let selectedTime = '';
+    
+    // DOM Elements
+    const steps = document.querySelectorAll('.step');
+    const stepContents = document.querySelectorAll('.step-content');
+    const nextBtn = document.getElementById('nextBtn');
+    const backBtn = document.getElementById('backBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const dateInput = document.getElementById('id_date');
+    const timeSlots = document.getElementById('timeSlots');
+    const selectedTimeInput = document.getElementById('selectedTime');
+    const startTimeField = document.getElementById('startTimeField');
+    const summaryDate = document.getElementById('summaryDate');
+    const summaryTime = document.getElementById('summaryTime');
+    
+    // Organized time slots by period
+    const timeSlotGroups = {
+      morning: ['9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'],
+      afternoon: ['1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM']
+    };
+    
+    // Initialize wizard
+    updateStepDisplay();
+    generateTimeSlots();
+    
+    // Event Listeners
+    nextBtn.addEventListener('click', function() {
+      if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          updateStepDisplay();
+        }
+      }
+    });
+    
+    backBtn.addEventListener('click', function() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    });
+    
+    cancelBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to cancel? Your booking information will be lost.')) {
+        window.history.back();
+      }
+    });
+    
+    dateInput.addEventListener('change', function() {
+      selectedDate = this.value;
+      updateSummary();
+    });
+    
+    // Functions
+    function updateStepDisplay() {
+      // Update step indicators
+      steps.forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber === currentStep) {
+          step.classList.add('active');
+        } else if (stepNumber < currentStep) {
+          step.classList.add('completed');
+        }
+      });
+      
+      // Update step content
+      stepContents.forEach((content, index) => {
+        content.classList.remove('active');
+        if (index + 1 === currentStep) {
+          content.classList.add('active');
+        }
+      });
+      
+      // Update navigation buttons
+      backBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+      
+      if (currentStep === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-block';
+        updateSummary();
+      } else {
+        nextBtn.style.display = 'inline-block';
+        submitBtn.style.display = 'none';
+      }
+    }
+    
+    function validateCurrentStep() {
+      switch (currentStep) {
+        case 1:
+          if (!dateInput.value) {
+            alert('Please select a preferred date.');
+            return false;
+          }
+          selectedDate = dateInput.value;
+          return true;
+        
+        case 2:
+          if (!selectedTime) {
+            alert('Please select a preferred time slot.');
+            return false;
+          }
+          return true;
+        
+        default:
+          return true;
+      }
+    }
+    
+    function generateTimeSlots() {
+      timeSlots.innerHTML = '';
+      
+      // Create morning section
+      const morningSection = document.createElement('div');
+      morningSection.innerHTML = '<h5 style="margin: 0 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">Morning</h5>';
+      const morningSlots = document.createElement('div');
+      morningSlots.className = 'time-slots';
+      
+      timeSlotGroups.morning.forEach(time => {
+        const slot = createTimeSlot(time);
+        morningSlots.appendChild(slot);
+      });
+      
+      morningSection.appendChild(morningSlots);
+      timeSlots.appendChild(morningSection);
+      
+      // Create afternoon section
+      const afternoonSection = document.createElement('div');
+      afternoonSection.innerHTML = '<h5 style="margin: 24px 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">Afternoon</h5>';
+      const afternoonSlots = document.createElement('div');
+      afternoonSlots.className = 'time-slots';
+      
+      timeSlotGroups.afternoon.forEach(time => {
+        const slot = createTimeSlot(time);
+        afternoonSlots.appendChild(slot);
+      });
+      
+      afternoonSection.appendChild(afternoonSlots);
+      timeSlots.appendChild(afternoonSection);
+    }
+    
+    function createTimeSlot(time) {
+      const slot = document.createElement('div');
+      slot.className = 'time-slot';
+      slot.textContent = time;
+      slot.addEventListener('click', function() {
+        // Remove selection from other slots
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        // Select this slot
+        this.classList.add('selected');
+        selectedTime = time;
+        selectedTimeInput.value = time;
+        
+        // Convert to 24-hour format for the start_time field
+        const time24 = convertTo24Hour(time);
+        startTimeField.value = time24;
+      });
+      return slot;
+    }
+    
+    function updateSummary() {
+      if (selectedDate) {
+        const dateObj = new Date(selectedDate);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        summaryDate.textContent = dateObj.toLocaleDateString('en-US', options);
+      }
+      
+      if (selectedTime) {
+        summaryTime.textContent = selectedTime;
+      }
+    }
+    
+    // Helper function to convert 12-hour time to 24-hour format
+    function convertTo24Hour(time12h) {
+      const [time, modifier] = time12h.split(' ');
+      let [hours, minutes] = time.split(':');
+      
+      if (hours === '12') {
+        hours = '00';
+      }
+      
+      if (modifier === 'PM') {
+        hours = parseInt(hours, 10) + 12;
+      }
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes}`;
+    }
+    
+    // Form submission enhancement
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      if (currentStep !== totalSteps) {
+        e.preventDefault();
+        alert('Please complete all steps before submitting.');
+        return false;
+      }
+      
+      if (!selectedDate || !selectedTime) {
+        e.preventDefault();
+        alert('Please select both date and time.');
+        return false;
+      }
+    });
+  });
+</script>
+{% endblock %}

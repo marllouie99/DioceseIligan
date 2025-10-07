@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurchConnect - Verification Update</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .email-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-badge {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 60px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .info-icon {
+            text-align: center;
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        .church-name {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 25px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .info-message {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .info-message h3 {
+            color: #92400e;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .info-message p {
+            margin: 8px 0;
+            color: #78350f;
+            font-size: 15px;
+        }
+        .rejection-notes {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .rejection-notes h3 {
+            color: #1e293b;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }
+        .rejection-notes p {
+            color: #475569;
+            font-size: 15px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .next-steps {
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .next-steps h3 {
+            color: #1e40af;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 12px 0;
+        }
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .step-text {
+            color: #1e40af;
+            font-size: 15px;
+            padding-top: 2px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            padding: 15px 35px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .cta-button:hover {
+            opacity: 0.9;
+        }
+        .button-container {
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .support-link {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .support-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <div class="logo-badge">CC</div>
+            <h1>ChurchConnect</h1>
+            <p class="subtitle">Church Verification Status</p>
+        </div>
+
+        <div class="info-icon">📋</div>
+
+        <div class="church-name">
+            {{ church_name }}
+        </div>
+
+        <div class="info-message">
+            <h3>ℹ️ Verification Request Update</h3>
+            <p>Thank you for submitting your church verification request. After careful review, we need additional information or documentation to complete your verification.</p>
+        </div>
+
+        {% if rejection_notes %}
+        <div class="rejection-notes">
+            <h3>📝 Review Notes:</h3>
+            <p>{{ rejection_notes }}</p>
+        </div>
+        {% endif %}
+
+        <div class="next-steps">
+            <h3>🔄 Next Steps:</h3>
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-text">Review the feedback provided above carefully</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-text">Gather the required documents or make necessary corrections</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-text">Submit a new verification request with updated information</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-text">Contact support if you need clarification or assistance</div>
+            </div>
+        </div>
+
+        <p style="font-size: 16px; color: #334155; margin: 25px 0;">
+            We understand how important verification is for your church's online presence. Our team is here to help you through the process. Don't hesitate to reach out if you have any questions about the requirements.
+        </p>
+
+        <div class="button-container">
+            <a href="http://localhost:8000/" class="cta-button">Go to Church Dashboard</a>
+        </div>
+
+        <p style="font-size: 14px; color: #64748b; text-align: center; margin-top: 30px;">
+            We appreciate your patience and look forward to helping you achieve verified status.
+        </p>
+
+        <div class="footer">
+            <p>Need help? Contact our support team at <a href="mailto:support@churchconnect.com" class="support-link">support@churchconnect.com</a></p>
+            <p style="margin-top: 15px;">© 2025 ChurchConnect. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

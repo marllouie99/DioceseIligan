@@ -1,0 +1,335 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Manage Services - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/manage_church.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/services.css' %}?v={{ STATIC_VERSION }}">
+<style>
+/* Quick Actions Styles */
+.quick-actions {
+  margin-top: 40px;
+  padding: 32px;
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.quick-actions h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 24px 0;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  background: #f1f5f9;
+  border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.1);
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.action-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.action-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px 0;
+}
+
+.action-content p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Service Actions */
+.service-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-icon:hover {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.btn-icon.btn-danger:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-icon svg {
+  width: 16px;
+  height: 16px;
+}
+</style>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="manage-services-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Manage Services</h1>
+        <p class="page-subtitle">Manage bookable services for {{ church.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Management -->
+  <div class="services-management">
+    <div class="services-header">
+      <h2>Bookable Services</h2>
+      <button class="btn btn-primary" onclick="openServiceModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14m7-7H5"/>
+        </svg>
+        Create New Service
+      </button>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+      <form method="GET" class="search-filter-form" id="search-form">
+        <div class="search-group">
+          <input type="text" name="search" value="{{ search_query }}" placeholder="Search services..." class="search-input">
+          <button type="submit" class="search-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="filter-group">
+          <select name="status" class="filter-select">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+          </select>
+          
+          <select name="price" class="filter-select">
+            <option value="">All Prices</option>
+            <option value="free" {% if price_filter == 'free' %}selected{% endif %}>Free</option>
+            <option value="paid" {% if price_filter == 'paid' %}selected{% endif %}>Paid</option>
+          </select>
+          
+          {% if search_query or status_filter or price_filter %}
+            <a href="{% url 'core:manage_services' %}" class="clear-filters-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+              Clear Filters
+            </a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+    
+    {% if services %}
+      <div class="services-list">
+        {% for service in services %}
+          <div class="service-card">
+            <div class="service-image">
+              {% with service_images=service.get_images %}
+                {% if service_images %}
+                  <div class="service-image-stack" onclick="openPhotoGallery({{ service.id }})">
+                    {% for image in service_images|slice:":3" %}
+                      <img src="{{ image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
+                    {% endfor %}
+                    {% if service_images.count > 3 %}
+                      <div class="image-count-badge">+{{ service_images.count|add:"-3" }}</div>
+                    {% endif %}
+                  </div>
+                {% elif service.image %}
+                  <img src="{{ service.image.url }}" alt="{{ service.name }}" class="service-img" onclick="openImageGallery({{ service.id }})" loading="lazy" decoding="async">
+                {% else %}
+                  <div class="service-placeholder" onclick="openImageGallery({{ service.id }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              {% endwith %}
+            </div>
+            
+            <div class="service-info">
+              <div class="service-header">
+                <div class="service-name">{{ service.name }}</div>
+                <div class="service-price">
+                  <span class="{% if service.is_free %}price-free{% else %}price-paid{% endif %}">{{ service.price_display }}</span>
+                </div>
+              </div>
+              
+              <div class="service-description">{{ service.description|truncatewords:20 }}</div>
+              
+              <div class="service-details">
+                <span class="service-duration">{{ service.duration_display }}</span>
+                <span class="service-bookings">Max {{ service.max_bookings_per_day }}/day</span>
+                <span class="service-advance">{{ service.advance_booking_days }} days advance</span>
+                {% if service.requires_approval %}
+                  <span class="service-approval">Requires Approval</span>
+                {% endif %}
+                {% if not service.is_active %}
+                  <span class="service-inactive">Inactive</span>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="service-actions">
+              <a href="{% url 'core:edit_service' service.id %}" class="btn-icon" title="Edit Service" aria-label="Edit Service">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </a>
+              <a href="{% url 'core:manage_service_images' service.id %}" class="btn-icon" title="Manage Images" aria-label="Manage Images">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21,15 16,10 5,21"/>
+                </svg>
+              </a>
+              <a href="{% url 'core:delete_service' service.id %}" class="btn-icon btn-danger" title="Delete Service" aria-label="Delete Service">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <h3>No Bookable Services Yet</h3>
+          <p>Create services that people can book appointments for, like counseling sessions, baptisms, or consultations.</p>
+          <a href="{% url 'core:create_service' %}" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14m7-7H5"/>
+            </svg>
+            Create First Service
+          </a>
+        </div>
+      {% endif %}
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h3>Quick Actions</h3>
+    <div class="actions-grid">
+      <a href="{% url 'core:manage_church' %}" class="action-card">
+        <div class="action-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </div>
+        <div class="action-content">
+          <h4>Church Settings</h4>
+          <p>Manage your church information and settings</p>
+        </div>
+      </a>
+      
+      <a href="{% url 'core:manage_availability' %}" class="action-card">
+        <div class="action-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+        </div>
+        <div class="action-content">
+          <h4>Manage Availability</h4>
+          <p>Set closed dates and special hours</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.djangoUrls = {
+    manageServiceImages: "{% url 'core:manage_service_images' 0 %}",
+    serviceGallery: "{% url 'core:service_gallery' 0 %}"
+  };
+  window.csrfToken = '{{ csrf_token }}';
+</script>
+<script defer src="{% static 'js/core/manage_services.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

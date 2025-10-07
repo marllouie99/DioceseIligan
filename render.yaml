@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: churchiligan
+    runtime: python
+    plan: free
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn ChurchIligan.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "churchiligan.onrender.com,127.0.0.1,localhost"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: churchiligan-db
+          property: connectionString
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://churchiligan.onrender.com,http://127.0.0.1:8000,http://localhost:8000"
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        value: ""
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        value: ""
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        value: "https://churchiligan.onrender.com/google/callback/"
+      - key: EMAIL_HOST_USER
+        value: ""
+      - key: EMAIL_HOST_PASSWORD
+        value: ""
+
+databases:
+  - name: churchiligan-db
+    plan: free
+    databaseName: churchiligan
+    user: churchiligan

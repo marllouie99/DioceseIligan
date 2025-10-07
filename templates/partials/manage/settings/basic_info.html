@@ -1,0 +1,68 @@
+{% load static %}
+{# Basic Information Settings Section #}
+<div id="basic-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Basic Information</h3>
+      <p class="section-description">Manage your church's basic details and identity</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="basic-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Church Name</h4>
+        <p class="setting-description">The official name of your church</p>
+        <div class="setting-status">
+          <span class="status-badge active">Required</span>
+          <span class="status-description">This will appear on your church profile</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="form-error">{{ form.name.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Description</h4>
+        <p class="setting-description">Brief description of your church</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Help people learn about your church</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="form-error">{{ form.description.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Denomination</h4>
+        <p class="setting-description">Your church's denomination or affiliation</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Helps categorize your church</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.denomination }}
+        {% if form.denomination.errors %}
+          <div class="form-error">{{ form.denomination.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

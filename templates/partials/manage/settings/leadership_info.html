@@ -1,0 +1,68 @@
+{% load static %}
+{# Leadership Information Settings Section #}
+<div id="leadership-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Leadership Information</h3>
+      <p class="section-description">Information about church leadership and staff</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="leadership-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Pastor Name</h4>
+        <p class="setting-description">Primary pastor or leader</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Displayed on church profile</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.pastor_name }}
+        {% if form.pastor_name.errors %}
+          <div class="form-error">{{ form.pastor_name.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Pastor Bio</h4>
+        <p class="setting-description">Brief biography of the pastor</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Helps people learn about leadership</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.pastor_bio }}
+        {% if form.pastor_bio.errors %}
+          <div class="form-error">{{ form.pastor_bio.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Leadership Team</h4>
+        <p class="setting-description">Other key staff members</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Additional church leadership</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.leadership_team }}
+        {% if form.leadership_team.errors %}
+          <div class="form-error">{{ form.leadership_team.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

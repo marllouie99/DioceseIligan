@@ -1,0 +1,24 @@
+{% extends "layouts/app_base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} • ChurchConnect{% endblock %}
+
+{% block sidebar %}
+  {% include "partials/sidebar.html" %}
+{% endblock %}
+
+{% block topbar %}
+  {% include "partials/topbar.html" %}
+{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">{{ page_title }}</h1>
+  <div class="panel">
+    <p>This is a temporary page for <strong>{{ page_title }}</strong>. The full feature will be built soon.</p>
+    <ul class="bullets">
+      <li>Consistent layout with sidebar and topbar</li>
+      <li>Responsive and accessible UI</li>
+      <li>Logged-in only (redirects to landing if not authenticated)</li>
+    </ul>
+  </div>
+{% endblock %}

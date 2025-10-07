@@ -1,0 +1,135 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/booking.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="manage-booking-page warm-sacred-earth">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 1-2 2v12a2 2 0 0 0 2 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Appointment Details</h1>
+        <p class="page-subtitle">Manage booking information and status updates</p>
+      </div>
+      <div class="header-actions">
+        <a href="{% url 'core:manage_church' %}?tab=appointments" class="btn btn-secondary">Back to Appointments</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="row" style="align-items:center; justify-content:space-between;">
+        <div>
+          <div class="section-title">Appointment ID</div>
+          <div class="value">{{ booking.code }}</div>
+        </div>
+        <div>
+          <div class="section-title">Current Status</div>
+          <span class="badge {{ booking.status }}">{{ booking.get_status_display }}</span>
+        </div>
+      </div>
+
+      <hr/>
+      <div>
+        <div class="section-title">Appointment Information</div>
+        <div class="row"><div class="label">Service</div><div class="value">{{ booking.service.name }}</div></div>
+        <div class="row"><div class="label">Date & Time</div><div class="value">{{ booking.date|date:'l, F j, Y' }} • {% if booking.start_time and booking.end_time %}{{ booking.start_time|time:'g:i A' }} - {{ booking.end_time|time:'g:i A' }}{% else %}Time not specified{% endif %}</div></div>
+        <div class="row"><div class="label">Notes</div><div class="value">{{ booking.notes|default:'No additional notes provided' }}</div></div>
+      </div>
+
+      <hr/>
+      <div>
+        <div class="section-title">Client Information</div>
+        <div class="row"><div class="label">Client Name</div><div class="value">{{ booking.user.get_full_name|default:booking.user.username }}</div></div>
+        <div class="row"><div class="label">Email Address</div><div class="value">{{ booking.user.email }}</div></div>
+        {% if booking.user.profile and booking.user.profile.phone %}
+          <div class="row"><div class="label">Phone Number</div><div class="value">{{ booking.user.profile.phone }}</div></div>
+        {% endif %}
+        {% if booking.user.profile and booking.user.profile.address %}
+          <div class="row"><div class="label">Address</div><div class="value">{{ booking.user.profile.address }}</div></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Status Management</div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="label">New Status</div>
+          <select name="status" class="form-select">
+            {% for value,label in booking.STATUS_CHOICES %}
+              <option value="{{ value }}" {% if value == booking.status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="row" id="decline-reason-row" style="display:none;">
+          <div class="label">Decline Reason</div>
+          <div class="value" style="flex:1;">
+            <select name="decline_reason" class="form-select" id="decline-reason-select">
+              <option value="">-- Select a reason --</option>
+              {% for r in decline_reasons %}
+                <option value="{{ r.label }}">{{ r.label }}</option>
+              {% endfor %}
+              <option value="__custom__">Other (specify)</option>
+            </select>
+            <input type="text" name="decline_reason_custom" id="decline-reason-custom" class="form-input" placeholder="Enter custom reason" style="margin-top:8px; display:none;">
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end; gap:8px;">
+          <button type="submit" class="btn btn-primary">Update Status</button>
+        </div>
+      </form>
+
+      <hr/>
+      <div class="section-title">Invoice</div>
+      {% if booking.status == 'canceled' or booking.status == 'declined' %}
+        <p>This booking is {{ booking.get_status_display|lower }}. Invoice is not available.</p>
+      {% else %}
+        <p>Once an appointment is reviewed, the client can print the invoice with details to bring to your church office for completion.</p>
+        <a href="{% url 'core:booking_invoice' booking.id %}" class="btn btn-outline">Open Invoice</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+(function() {
+  const statusSelect = document.querySelector('select[name="status"]');
+  const reasonRow = document.getElementById('decline-reason-row');
+  const reasonSelect = document.getElementById('decline-reason-select');
+  const reasonCustom = document.getElementById('decline-reason-custom');
+  function refresh() {
+    const show = statusSelect && statusSelect.value === 'declined';
+    if (!reasonRow) return;
+    reasonRow.style.display = show ? 'flex' : 'none';
+    if (!show) return;
+    const isCustom = reasonSelect && reasonSelect.value === '__custom__';
+    if (reasonCustom) reasonCustom.style.display = isCustom ? 'block' : 'none';
+  }
+  if (statusSelect) statusSelect.addEventListener('change', refresh);
+  if (reasonSelect) reasonSelect.addEventListener('change', refresh);
+  // Initial state
+  refresh();
+})();
+</script>
+{% endblock %}

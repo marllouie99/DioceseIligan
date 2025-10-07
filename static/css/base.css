@@ -1,0 +1,60 @@
+/* Base styles and CSS variables */
+:root {
+  --bg: #f5f7fb;
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted-2: #94a3b8;
+  --card: #ffffff;
+  --border: rgba(15, 23, 42, 0.08);
+  --brand: #7c3aed; /* violet-600 */
+  --brand-2: #8b5cf6;
+  --shadow-md: 0 10px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 16px 30px rgba(0,0,0,0.12);
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, sans-serif; 
+  color: var(--text); 
+  /* Forest Serenity multi-layer gradient background */
+  background:
+    /* Top left glow effect */
+    radial-gradient(70% 50% at 20% 20%, rgba(5, 150, 105, 0.15) 0%, rgba(5, 150, 105, 0.05) 40%, transparent 70%),
+    /* Center blend */
+    radial-gradient(80% 60% at 30% 50%, rgba(15, 118, 110, 0.08) 0%, rgba(5, 150, 105, 0.04) 50%, transparent 80%),
+    /* Bottom right concentration */
+    radial-gradient(90% 60% at 80% 80%, rgba(2, 44, 34, 0.9) 0%, rgba(6, 78, 59, 0.6) 40%, transparent 80%),
+    /* Main diagonal gradient - dark bottom right to light top left */
+    linear-gradient(45deg, #022c22 0%, #043a2f 25%, #054e3b 50%, #0f766e 75%, #064e3b 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Utility classes */
+.icon { 
+  width: 18px; 
+  height: 18px; 
+  color: var(--muted-2); 
+}
+
+.icon svg { 
+  width: 100%; 
+  height: 100%; 
+  fill: currentColor; 
+}
+
+.text-muted { 
+  color: var(--muted); 
+}
+
+.small { 
+  font-size: 12px; 
+}

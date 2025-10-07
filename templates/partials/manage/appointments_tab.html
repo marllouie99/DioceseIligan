@@ -1,0 +1,141 @@
+{% load static %}
+{# Appointments Tab Content #}
+<div class="tab-panel {% if not request.GET.tab or request.GET.tab == 'appointments' %}active{% endif %}" id="appointments">
+  <div class="tab-header">
+    <h2>Appointments</h2>
+    <p>Manage church appointments and scheduling</p>
+  </div>
+  <div class="tab-content">
+    <!-- Appointments Analytics -->
+    <div class="appointment-stats parchment-card">
+      <div class="unified-content-management">
+        <div class="analytics-cards">
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ booking_counts.all|default:"0" }}</h4>
+              <p>Total Appointments</p>
+              <span class="analytics-change">All time bookings</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ booking_counts.requested|default:"0" }}</h4>
+              <p>Pending Review</p>
+              <span class="analytics-change">Awaiting response</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ booking_counts.approved|default:"0" }}</h4>
+              <p>Approved</p>
+              <span class="analytics-change">Ready to proceed</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ booking_counts.completed|default:"0" }}</h4>
+              <p>Completed</p>
+              <span class="analytics-change">Successfully finished</span>
+            </div>
+          </div>
+        </div>
+        
+        {# Appointments Analytics Charts #}
+        <div class="analytics-charts">
+          <div class="charts-grid">
+            {# Appointments Status Breakdown Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Appointments Breakdown</h4>
+                <p>Distribution of appointment statuses</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="appointmentsBreakdownChart"
+                        width="400" height="200"
+                        data-pending="{{ booking_counts.requested|default:'0' }}"
+                        data-approved="{{ booking_counts.approved|default:'0' }}"
+                        data-completed="{{ booking_counts.completed|default:'0' }}"
+                        data-reviewed="{{ booking_counts.reviewed|default:'0' }}"></canvas>
+                <div class="chart-details">
+                  <div class="post-preview">
+                    <div class="engagement-stats">
+                      <span class="stat">Pending: {{ booking_counts.requested|default:"0" }}</span>
+                      <span class="stat">Approved: {{ booking_counts.approved|default:"0" }}</span>
+                      <span class="stat">Completed: {{ booking_counts.completed|default:"0" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {# Monthly Appointments Trend Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Monthly Trends</h4>
+                <p>Appointment volume over time</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="appointmentsTrendChart" width="400" height="200"></canvas>
+                <div class="posts-ranking appointments-summary">
+                  <div class="ranking-item">
+                    <div class="rank-number">📅</div>
+                    <div class="post-info">
+                      <p>This Month Activity</p>
+                      <div class="engagement-total">{{ booking_counts.all|default:"0" }} total appointments</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: 100%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-pills">
+      <a class="status-pill {% if appt_status == 'all' %}active{% endif %}" data-status="all" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=all#appointments">All <span class="count">{{ booking_counts.all }}</span></a>
+      <a class="status-pill {% if appt_status == 'requested' %}active{% endif %}" data-status="requested" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=requested#appointments">Pending <span class="count">{{ booking_counts.requested }}</span></a>
+      <a class="status-pill {% if appt_status == 'reviewed' %}active{% endif %}" data-status="reviewed" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=reviewed#appointments">Reviewed <span class="count">{{ booking_counts.reviewed }}</span></a>
+      <a class="status-pill {% if appt_status == 'approved' %}active{% endif %}" data-status="approved" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=approved#appointments">Approved <span class="count">{{ booking_counts.approved }}</span></a>
+      <a class="status-pill {% if appt_status == 'completed' %}active{% endif %}" data-status="completed" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=completed#appointments">Completed <span class="count">{{ booking_counts.completed }}</span></a>
+    </div>
+    <div id="appointments-list">
+      {% include 'core/partials/appointments_list.html' %}
+    </div>
+  </div>
+</div>

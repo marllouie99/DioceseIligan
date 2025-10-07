@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurchConnect - Your Login Code</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background-color: #F4E6D0;
+            color: #2D1810;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(139, 69, 19, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #FFF9E6;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #2D1810;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .code-container {
+            background: linear-gradient(135deg, #F5F5DC 0%, #FFF8DC 100%);
+            border: 2px solid #DAA520;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.1);
+        }
+        .code-label {
+            font-size: 16px;
+            color: #6B4226;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .code {
+            font-size: 36px;
+            font-weight: 700;
+            color: #8B4513;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid #D2B48C;
+        }
+        .instructions {
+            font-size: 16px;
+            color: #5A3D2A;
+            margin: 25px 0;
+            line-height: 1.6;
+        }
+        .expiry-notice {
+            background: rgba(218, 165, 32, 0.1);
+            border-left: 4px solid #DAA520;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .expiry-notice p {
+            margin: 0;
+            font-size: 14px;
+            color: #8B4513;
+            font-weight: 600;
+        }
+        .security-note {
+            background: rgba(139, 69, 19, 0.05);
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .security-note h3 {
+            color: #8B4513;
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+        .security-note p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #5A3D2A;
+            line-height: 1.5;
+        }
+        .footer {
+            background: #F4E6D0;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid rgba(139, 69, 19, 0.2);
+        }
+        .footer p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #6B4226;
+        }
+        .church-name {
+            color: #8B4513;
+            font-weight: 600;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                width: 100%;
+            }
+            .header, .content, .footer {
+                padding: 25px 20px;
+            }
+            .code {
+                font-size: 30px;
+                letter-spacing: 6px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🔑</div>
+            <h1>Your Login Code</h1>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hello! Here is your secure login code for <span class="church-name">ChurchConnect</span>.
+            </div>
+            
+            <div class="code-container">
+                <div class="code-label">Your Login Code:</div>
+                <div class="code">{{ code }}</div>
+            </div>
+            
+            <div class="instructions">
+                Enter this code on the login verification page to access your account. 
+                This provides a secure way to sign in without remembering a password.
+            </div>
+            
+            <div class="expiry-notice">
+                <p>⏰ This code expires in 15 minutes for security purposes.</p>
+            </div>
+            
+            <div class="security-note">
+                <h3>🛡️ Security Information</h3>
+                <p>• This code is for <strong>{{ email }}</strong> only</p>
+                <p>• Never share this code with anyone</p>
+                <p>• If you didn't request this code, please ignore this email</p>
+                <p>• Each code can only be used once</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This email was sent from <span class="church-name">ChurchConnect</span></p>
+            <p>A secure platform for our church community</p>
+            <p style="font-size: 12px; color: #8B7355; margin-top: 15px;">
+                If you have any questions, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

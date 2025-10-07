@@ -1,0 +1,146 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ChurchConnect{% endblock %}
+
+{% block body_class %}page-appointments{% endblock %}
+
+{% block extra_css %}
+  <!-- Centralized Warm Sacred Earth Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="{% static 'css/pages/appointments.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="appointments-page warm-sacred-earth page-container">
+  <div class="page-header">
+    <h1 style="margin:0;">My Appointments</h1>
+    <p class="text-muted">Track your appointment requests. Click on a status to filter.</p>
+  </div>
+
+  <!-- Status Filter Pills -->
+
+  <div class="status-pills">
+    <a class="status-pill {% if status_filter == 'all' %}active{% endif %}" href="{% url 'core:appointments' %}?status=all">All <span class="count">{{ counts.all }}</span></a>
+    <a class="status-pill {% if status_filter == 'requested' %}active{% endif %}" href="{% url 'core:appointments' %}?status=requested">Pending <span class="count">{{ counts.requested }}</span></a>
+    <a class="status-pill {% if status_filter == 'reviewed' %}active{% endif %}" href="{% url 'core:appointments' %}?status=reviewed">Reviewed <span class="count">{{ counts.reviewed }}</span></a>
+    <a class="status-pill {% if status_filter == 'approved' %}active{% endif %}" href="{% url 'core:appointments' %}?status=approved">Approved <span class="count">{{ counts.approved }}</span></a>
+    <a class="status-pill {% if status_filter == 'completed' %}active{% endif %}" href="{% url 'core:appointments' %}?status=completed">Completed <span class="count">{{ counts.completed }}</span></a>
+  </div>
+
+  {% if bookings %}
+    <div class="booking-list">
+      {% for b in bookings %}
+        <div class="booking-row">
+          <div class="booking-service">
+            <h3 class="booking-title">{{ b.service.name }}</h3>
+            <p class="booking-sub booking-church">at {{ b.church.name }}</p>
+            <p class="booking-sub">ID: {{ b.code }} • Requested: {{ b.created_at|date:'M j, Y' }}</p>
+          </div>
+          <div class="booking-details">
+            <p class="booking-date">{{ b.date|date:'M j, Y' }}</p>
+            <p class="booking-time">{% if b.start_time and b.end_time %}{{ b.start_time|time:'g:i A' }} - {{ b.end_time|time:'g:i A' }}{% else %}Time: No time set{% endif %}</p>
+            <div class="booking-status">
+              <span class="badge {{ b.status }}">{{ b.get_status_display }}</span>
+            </div>
+            {% if b.status == 'declined' and b.decline_reason %}
+              <p class="booking-sub" style="color: #dc2626; margin-top: 0.5rem;">Declined: {{ b.decline_reason }}</p>
+            {% endif %}
+          </div>
+          <div class="booking-actions">
+            {% if b.church.slug %}
+            <a href="{% url 'core:church_detail' b.church.slug %}" class="btn btn-outline">View Church</a>
+            {% else %}
+            <a href="#" class="btn btn-outline disabled" title="Church details not available">View Church</a>
+            {% endif %}
+            {% if b.status == 'reviewed' or b.status == 'approved' %}
+              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-primary">Print Invoice</a>
+            {% elif b.status == 'completed' %}
+              {% if b.user_has_reviewed %}
+                <a href="{% url 'core:service_reviews' b.service.id %}" class="btn btn-success">Check Review</a>
+              {% else %}
+                <button class="btn btn-secondary" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})">Rate & Review</button>
+              {% endif %}
+              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-outline">View Invoice</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>No appointments yet</h3>
+      <p>Request an appointment from a church page to get started.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Review Modal -->
+<div id="reviewModal" class="review-modal-overlay" style="display: none;">
+  <div class="review-modal">
+    <div class="review-modal-header">
+      <h3>Rate & Review Service</h3>
+      <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+    </div>
+    
+    <div class="review-modal-content">
+      <div class="service-info-display">
+        <h4 id="modal-service-name"></h4>
+        <p id="modal-church-name"></p>
+      </div>
+
+      <form id="reviewForm" class="review-form-modal">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label>Overall Rating *</label>
+          <div class="star-rating-modal" data-rating="0">
+            {% for i in "12345" %}
+              <i class="star" data-value="{{ i }}">★</i>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="rating" id="modal-rating" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="modal-title">Review Title *</label>
+          <input type="text" name="title" id="modal-title" class="form-control" required placeholder="Summary of your experience">
+        </div>
+        
+        <div class="form-group">
+          <label for="modal-comment">Review Comment *</label>
+          <textarea name="comment" id="modal-comment" class="form-control" rows="4" required placeholder="Share your detailed experience..."></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- External JavaScript -->
+<script>
+  // Django template variables for JavaScript
+  window.djangoUrls = {
+    createReviewUrl: "{% url 'core:create_service_review' service_id=0 %}"
+  };
+</script>
+<script src="{% static 'js/my_appointments.js' %}"></script>
+
+{% endblock %}

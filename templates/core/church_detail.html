@@ -1,0 +1,918 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ church.name }} - ChurchConnect{% endblock %}
+
+{% block body_class %}page-church-detail{% endblock %}
+
+{% block extra_css %}
+<!-- Centralized Warm Sacred Earth Theme -->
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/booking_modal.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="church-detail-page warm-sacred-earth page-container">
+  <!-- CSRF token for AJAX actions -->
+  <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
+  {% include 'partials/church/header.html' %}
+
+  <!-- Church Content -->
+  <div class="church-content">
+    <div class="content-main">
+      <!-- About Section -->
+      <div class="content-section about-section">
+        <h2 class="section-title">About</h2>
+        <div class="section-content">
+          <p class="church-description">{{ church.description|linebreaks }}</p>
+        </div>
+      </div>
+
+      {% include 'partials/church/tabs.html' %}
+    </div>
+
+    {% include 'partials/church/sidebar.html' %}
+  </div>
+</div>
+
+{% include 'partials/church/create_post_modal.html' %}
+{% include 'partials/booking_modal.html' %}
+
+<!-- Report Post Modal -->
+<div id="report-post-modal" class="post-modal" style="display: none;">
+  <div class="post-modal-content">
+    <div class="post-modal-header">
+      <h3 class="post-modal-title">Report Post</h3>
+      <button type="button" class="post-modal-close report-modal-close">&times;</button>
+    </div>
+    
+    <form id="report-post-form" class="report-form">
+      {% csrf_token %}
+      <input type="hidden" id="report-post-id" name="post_id">
+      
+      <div class="form-group">
+        <label for="report-reason" class="form-label">Reason for reporting *</label>
+        <select id="report-reason" name="reason" class="form-input" required>
+          <option value="">Select a reason...</option>
+          <option value="spam">Spam or misleading</option>
+          <option value="inappropriate">Inappropriate content</option>
+          <option value="harassment">Harassment or hate speech</option>
+          <option value="violence">Violence or dangerous content</option>
+          <option value="false_info">False information</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="report-description" class="form-label">Additional details *</label>
+        <textarea id="report-description" name="description" class="form-input" rows="4" 
+                  placeholder="Please provide more details about why you're reporting this post..."
+                  maxlength="500" required></textarea>
+        <div class="char-counter">
+          <span id="report-char-count">0</span>/500
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn-secondary report-cancel-btn">Cancel</button>
+        <button type="submit" class="btn-primary report-submit-btn">
+          <span class="btn-text">Submit Report</span>
+          <div class="loading-spinner" style="display: none;"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Post Modal -->
+<div id="edit-post-modal" class="post-modal" style="display: none;">
+  <div class="post-modal-content">
+    <div class="post-modal-header">
+      <h3 class="post-modal-title">Edit Post</h3>
+      <button type="button" class="post-modal-close edit-modal-close">&times;</button>
+    </div>
+    
+    <form id="edit-post-form" class="post-creation-form" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" id="edit-post-id" name="post_id">
+      <input type="hidden" id="edit-post-type" name="post_type" value="general">
+      
+      <!-- Event-Specific Fields -->
+      <div id="edit-event-fields" class="event-fields" style="display: none;">
+        <div class="form-group">
+          <label for="edit-event-title" class="form-label">Event Title</label>
+          <input type="text" id="edit-event-title" name="event_title" class="form-input event-input"
+                 placeholder="Enter event title..." maxlength="200">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group form-group-half">
+            <label for="edit-event-start-date" class="form-label">Start Date</label>
+            <input type="date" id="edit-event-start-date" name="event_start_date" class="form-input event-input">
+          </div>
+          
+          <div class="form-group form-group-half">
+            <label for="edit-event-end-date" class="form-label">End Date</label>
+            <input type="date" id="edit-event-end-date" name="event_end_date" class="form-input event-input">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group form-group-half">
+            <label for="edit-event-start-time" class="form-label">Start Time</label>
+            <input type="time" id="edit-event-start-time" name="event_start_time" class="form-input event-input">
+          </div>
+          
+          <div class="form-group form-group-half">
+            <label for="edit-event-end-time" class="form-label">End Time</label>
+            <input type="time" id="edit-event-end-time" name="event_end_time" class="form-input event-input">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-event-location" class="form-label">Location (Optional)</label>
+          <input type="text" id="edit-event-location" name="event_location" class="form-input event-input"
+                 placeholder="Enter event location..." maxlength="200">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-post-content" class="form-label" id="edit-content-label">What's on your mind?</label>
+        <textarea id="edit-post-content" name="content" class="form-input post-textarea" rows="5"
+                  placeholder="Share your thoughts..." maxlength="1000" required></textarea>
+        <div class="char-counter">
+          <span id="edit-char-count">0</span>/1000
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Image</label>
+        <input type="file" id="edit-post-image" name="image" accept="image/*" style="display: none;">
+        <div id="edit-image-preview" class="image-preview" style="display: none;">
+          <img id="edit-preview-img" src="" alt="Preview">
+          <button type="button" class="remove-image" id="edit-remove-image">&times;</button>
+        </div>
+        <button type="button" class="btn-secondary" id="edit-upload-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Change Image
+        </button>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn-secondary edit-cancel-btn">Cancel</button>
+        <button type="submit" class="btn-primary post-submit-btn">
+          <span class="btn-text">Update Post</span>
+          <div class="loading-spinner" style="display: none;"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{# CSRF Token for AJAX requests #}
+{% csrf_token %}
+<script>
+  window.csrfToken = '{{ csrf_token }}';
+  window.djangoUrls = {
+    followChurch: "{% url 'core:follow_church' 0 %}",
+    unfollowChurch: "{% url 'core:unfollow_church' 0 %}",
+    trackPostView: "{% url 'core:track_post_view' 0 %}",
+    getPostData: "{% url 'core:get_post_data' 0 %}",
+    updatePost: "{% url 'core:update_post' 0 %}",
+    reportPost: "{% url 'core:report_post' 0 %}"
+  };
+</script>
+
+<!-- PayPal SDK (Orders API v2) -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}"></script>
+
+<!-- Donation Modal -->
+{% include 'partials/donation_modal.html' %}
+
+<script defer src="{% static 'js/booking_modal.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/expandable-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/post-view-tracker.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/donation.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/service-reviews.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/service-gallery.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/church_detail.js' %}?v={{ STATIC_VERSION }}"></script>
+
+{% if church.owner == request.user %}
+<script>
+// Church Post Creation JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const postInputTrigger = document.getElementById('church-post-input-trigger');
+    const postTypeButtons = document.querySelectorAll('.post-type-btn');
+    const modal = document.getElementById('church-post-creation-modal');
+    const modalClose = document.querySelector('.post-modal-close');
+    const form = document.getElementById('church-post-form');
+    const textArea = document.getElementById('church-post-content');
+    const charCount = document.getElementById('church-char-count');
+    const submitBtn = form.querySelector('.post-submit-btn');
+    const fileInput = document.getElementById('church-post-image');
+    const imagePreview = document.getElementById('church-image-preview');
+    const previewImg = document.getElementById('church-preview-img');
+    const removeImageBtn = document.getElementById('church-remove-image');
+    const messageDiv = document.getElementById('church-post-creation-message');
+    const imageUploadSection = document.getElementById('church-image-upload-section');
+    const eventFields = document.getElementById('church-event-fields');
+    const contentLabel = document.getElementById('church-content-label');
+    const eventTitleInput = document.getElementById('church-event-title');
+    const eventStartDateInput = document.getElementById('church-event-start-date');
+    const eventEndDateInput = document.getElementById('church-event-end-date');
+    const eventLocationInput = document.getElementById('church-event-location');
+    
+    let currentPostType = 'general';
+    
+    // Open modal when clicking the input bar
+    postInputTrigger.addEventListener('click', function() {
+        openPostModal('general');
+    });
+    
+    // Handle post type button clicks
+    postTypeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postType = this.getAttribute('data-type');
+            openPostModal(postType);
+        });
+    });
+    
+    // Close modal
+    modalClose.addEventListener('click', closePostModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closePostModal();
+        }
+    });
+    
+    // ESC key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display !== 'none') {
+            closePostModal();
+        }
+    });
+    
+    function openPostModal(postType) {
+        currentPostType = postType;
+        modal.style.display = 'flex';
+        
+        const modalContent = document.querySelector('.post-modal-content');
+        
+        // Update placeholder based on post type
+        updatePlaceholderForType(postType);
+        
+        // Handle event-specific fields
+        if (postType === 'event') {
+            eventFields.style.display = 'block';
+            contentLabel.style.display = 'block';
+            imageUploadSection.style.display = 'block';
+            modalContent.classList.add('event-modal');
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const minDateTime = now.toISOString().slice(0, 16);
+            eventStartDateInput.min = minDateTime;
+            eventEndDateInput.min = minDateTime;
+            // Focus on event title
+            setTimeout(() => eventTitleInput.focus(), 100);
+        } else {
+            eventFields.style.display = 'none';
+            contentLabel.style.display = 'none';
+            modalContent.classList.remove('event-modal');
+            // Focus on textarea for non-event posts
+            setTimeout(() => textArea.focus(), 100);
+        }
+        
+        // Show/hide image upload based on type
+        if (postType === 'photo') {
+            imageUploadSection.style.display = 'block';
+        } else if (postType !== 'event') {
+            imageUploadSection.style.display = 'none';
+        }
+    }
+    
+    function closePostModal() {
+        modal.style.display = 'none';
+        // Reset form
+        form.reset();
+        charCount.textContent = '0';
+        imagePreview.style.display = 'none';
+        previewImg.src = '';
+        charCount.style.color = 'inherit';
+        submitBtn.disabled = true;
+        imageUploadSection.style.display = 'none';
+        eventFields.style.display = 'none';
+        contentLabel.style.display = 'none';
+        donationFields.style.display = 'none';
+        donationToggle.checked = false;
+    }
+    
+    function updatePlaceholderForType(postType) {
+        const placeholders = {
+            'general': 'Share your thoughts, updates, or inspiration...',
+            'photo': 'Share a photo with your community...',
+            'event': 'Tell your community about this upcoming event...',
+            'prayer': 'Share a prayer request or praise...'
+        };
+        textArea.placeholder = placeholders[postType] || placeholders['general'];
+    }
+    
+    // Character count
+    textArea.addEventListener('input', function() {
+        const count = this.value.length;
+        charCount.textContent = count;
+        
+        // Enable/disable submit button
+        if (currentPostType === 'event') {
+            // For events, also check required fields
+            const hasTitle = eventTitleInput.value.trim().length > 0;
+            const hasStartDate = eventStartDateInput.value.length > 0;
+            const hasEndDate = eventEndDateInput.value.length > 0;
+            submitBtn.disabled = count === 0 || !hasTitle || !hasStartDate || !hasEndDate;
+        } else {
+            submitBtn.disabled = count === 0;
+        }
+        
+        // Color coding for character count
+        if (count > 900) {
+            charCount.style.color = '#dc2626'; // Red
+        } else if (count > 700) {
+            charCount.style.color = '#d97706'; // Orange
+        } else {
+            charCount.style.color = 'inherit';
+        }
+    });
+    
+    // Event field validation
+    [eventTitleInput, eventStartDateInput, eventEndDateInput].forEach(input => {
+        input.addEventListener('input', function() {
+            if (currentPostType === 'event') {
+                const hasTitle = eventTitleInput.value.trim().length > 0;
+                const hasStartDate = eventStartDateInput.value.length > 0;
+                const hasEndDate = eventEndDateInput.value.length > 0;
+                const hasContent = textArea.value.trim().length > 0;
+                submitBtn.disabled = !hasTitle || !hasStartDate || !hasEndDate || !hasContent;
+            }
+        });
+    });
+    
+    // Validate end date is after start date
+    eventEndDateInput.addEventListener('change', function() {
+        if (eventStartDateInput.value && eventEndDateInput.value) {
+            const startDate = new Date(eventStartDateInput.value);
+            const endDate = new Date(eventEndDateInput.value);
+            if (endDate < startDate) {
+                showMessage('End date must be after start date.', 'error');
+                eventEndDateInput.value = '';
+            }
+        }
+    });
+    
+    // Image preview
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showMessage('Image size must be less than 10MB.', 'error');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Remove image
+    removeImageBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        imagePreview.style.display = 'none';
+        previewImg.src = '';
+    });
+    
+    // Donation toggle
+    const donationToggle = document.getElementById('church-enable-donation');
+    const donationFields = document.getElementById('church-donation-fields');
+    
+    if (donationToggle && donationFields) {
+        const hasPayPal = donationToggle.getAttribute('data-has-paypal') === 'true';
+        
+        // Disable checkbox if PayPal not configured
+        if (!hasPayPal) {
+            donationToggle.disabled = true;
+            donationToggle.style.cursor = 'not-allowed';
+            donationToggle.style.opacity = '0.5';
+        }
+        
+        donationToggle.addEventListener('change', function() {
+            // Double-check PayPal configuration
+            if (!hasPayPal) {
+                this.checked = false;
+                showMessage('Please set up your PayPal email in Church Settings first.', 'error');
+                return;
+            }
+            donationFields.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Prevent clicking label if PayPal not configured
+        const donationLabel = document.querySelector('label[for="church-enable-donation"]');
+        if (donationLabel && !hasPayPal) {
+            donationLabel.style.cursor = 'not-allowed';
+            donationLabel.style.opacity = '0.6';
+        }
+    }
+    
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validation for event posts
+        if (currentPostType === 'event') {
+            if (!eventTitleInput.value.trim()) {
+                showMessage('Please enter an event title.', 'error');
+                return;
+            }
+            if (!eventStartDateInput.value) {
+                showMessage('Please select an event start date.', 'error');
+                return;
+            }
+            if (!eventEndDateInput.value) {
+                showMessage('Please select an event end date.', 'error');
+                return;
+            }
+        }
+        
+        const formData = new FormData(this);
+        
+        // Add post type to form data
+        formData.append('post_type', currentPostType);
+        
+        // Add event fields if it's an event post
+        if (currentPostType === 'event') {
+            formData.append('event_title', eventTitleInput.value.trim());
+            formData.append('event_start_date', eventStartDateInput.value);
+            formData.append('event_end_date', eventEndDateInput.value);
+            formData.append('event_location', eventLocationInput.value.trim());
+        }
+        
+        const submitText = submitBtn.querySelector('.submit-text');
+        const submitLoading = submitBtn.querySelector('.submit-loading');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitText.style.display = 'none';
+        submitLoading.style.display = 'inline-flex';
+        
+        try {
+            const response = await fetch('{% url "core:create_post" church.slug %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': window.csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) {
+                const data = await response.json();
+                showMessage(data.message || 'Failed to create post.', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showMessage(data.message || 'Post created successfully!', 'success');
+                
+                // Close modal and reload page after success
+                setTimeout(() => {
+                    closePostModal();
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showMessage(data.message || 'Failed to create post.', 'error');
+            }
+        } catch (error) {
+            console.error('Post creation error:', error);
+            showMessage('An error occurred while creating the post. Please check the console for details.', 'error');
+        } finally {
+            // Reset loading state
+            if (currentPostType === 'event') {
+                const hasTitle = eventTitleInput.value.trim().length > 0;
+                const hasStartDate = eventStartDateInput.value.length > 0;
+                const hasEndDate = eventEndDateInput.value.length > 0;
+                const hasContent = textArea.value.trim().length > 0;
+                submitBtn.disabled = !hasTitle || !hasStartDate || !hasEndDate || !hasContent;
+            } else {
+                submitBtn.disabled = textArea.value.length === 0;
+            }
+            submitText.style.display = 'inline';
+            submitLoading.style.display = 'none';
+        }
+    });
+    
+    function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = `form-message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        // Hide message after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+{% endif %}
+
+
+
+<!-- Report and Edit Post Modals JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Report Post Modal Elements
+    const reportModal = document.getElementById('report-post-modal');
+    const reportForm = document.getElementById('report-post-form');
+    const reportPostIdInput = document.getElementById('report-post-id');
+    const reportDescription = document.getElementById('report-description');
+    const reportCharCount = document.getElementById('report-char-count');
+    const reportModalClose = document.querySelector('.report-modal-close');
+    const reportCancelBtn = document.querySelector('.report-cancel-btn');
+    const reportSubmitBtn = document.querySelector('.report-submit-btn');
+    
+    // Edit Post Modal Elements
+    const editModal = document.getElementById('edit-post-modal');
+    const editForm = document.getElementById('edit-post-form');
+    const editPostIdInput = document.getElementById('edit-post-id');
+    const editPostTypeInput = document.getElementById('edit-post-type');
+    const editContent = document.getElementById('edit-post-content');
+    const editCharCount = document.getElementById('edit-char-count');
+    const editModalClose = document.querySelector('.edit-modal-close');
+    const editCancelBtn = document.querySelector('.edit-cancel-btn');
+    const editEventFields = document.getElementById('edit-event-fields');
+    const editFileInput = document.getElementById('edit-post-image');
+    const editImagePreview = document.getElementById('edit-image-preview');
+    const editPreviewImg = document.getElementById('edit-preview-img');
+    const editUploadBtn = document.getElementById('edit-upload-btn');
+    const editRemoveImageBtn = document.getElementById('edit-remove-image');
+    
+    // Handle Report Button Clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.report-post-btn')) {
+            const btn = e.target.closest('.report-post-btn');
+            const postId = btn.dataset.postId;
+            
+            // Close the dropdown menu
+            const dropdown = btn.closest('.post-menu-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+                const postCard = dropdown.closest('.post-card');
+                if (postCard) {
+                    postCard.classList.remove('dropdown-open');
+                }
+            }
+            
+            openReportModal(postId);
+        }
+        
+        if (e.target.closest('.edit-post-btn')) {
+            const btn = e.target.closest('.edit-post-btn');
+            const postId = btn.dataset.postId;
+            
+            // Close the dropdown menu
+            const dropdown = btn.closest('.post-menu-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+                const postCard = dropdown.closest('.post-card');
+                if (postCard) {
+                    postCard.classList.remove('dropdown-open');
+                }
+            }
+            
+            openEditModal(postId);
+        }
+    });
+    
+    // Report Modal Functions
+    function openReportModal(postId) {
+        reportPostIdInput.value = postId;
+        reportModal.style.display = 'flex';
+        reportForm.reset();
+        reportCharCount.textContent = '0';
+    }
+    
+    function closeReportModal() {
+        reportModal.style.display = 'none';
+        reportForm.reset();
+        
+        // Small delay to prevent immediate re-opening issues
+        setTimeout(() => {
+            // Ensure all dropdowns are properly closed
+            document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+                dd.classList.remove('show');
+                const card = dd.closest('.post-card');
+                if (card) card.classList.remove('dropdown-open');
+            });
+        }, 100);
+    }
+    
+    // Edit Modal Functions
+    function openEditModal(postId) {
+        // Fetch post data
+        fetch(window.djangoUrls.getPostData.replace('0', postId), {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': window.csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const post = data.post;
+                
+                // Populate form fields
+                editPostIdInput.value = post.id;
+                editPostTypeInput.value = post.post_type;
+                editContent.value = post.content;
+                editCharCount.textContent = post.content.length;
+                
+                // Handle event fields
+                if (post.post_type === 'event') {
+                    editEventFields.style.display = 'block';
+                    document.getElementById('edit-event-title').value = post.event_title;
+                    document.getElementById('edit-event-start-date').value = post.event_start_date;
+                    document.getElementById('edit-event-end-date').value = post.event_end_date;
+                    document.getElementById('edit-event-start-time').value = post.event_start_time;
+                    document.getElementById('edit-event-end-time').value = post.event_end_time;
+                    document.getElementById('edit-event-location').value = post.event_location;
+                } else {
+                    editEventFields.style.display = 'none';
+                }
+                
+                // Handle image preview
+                if (post.has_image && post.image_url) {
+                    editPreviewImg.src = post.image_url;
+                    editImagePreview.style.display = 'block';
+                } else {
+                    editImagePreview.style.display = 'none';
+                }
+                
+                editModal.style.display = 'flex';
+            } else {
+                alert(data.message || 'Failed to load post data');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching post data:', error);
+            alert('An error occurred while loading the post');
+        });
+    }
+    
+    function closeEditModal() {
+        editModal.style.display = 'none';
+        editForm.reset();
+        editEventFields.style.display = 'none';
+        editImagePreview.style.display = 'none';
+        
+        // Small delay to prevent immediate re-opening issues
+        setTimeout(() => {
+            // Ensure all dropdowns are properly closed
+            document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+                dd.classList.remove('show');
+                const card = dd.closest('.post-card');
+                if (card) card.classList.remove('dropdown-open');
+            });
+        }, 100);
+    }
+    
+    // Report Modal Event Listeners
+    if (reportModalClose) reportModalClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeReportModal();
+    });
+    if (reportCancelBtn) reportCancelBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeReportModal();
+    });
+    if (reportModal) {
+        reportModal.addEventListener('click', function(e) {
+            if (e.target === reportModal) {
+                e.stopPropagation();
+                closeReportModal();
+            }
+        });
+    }
+    
+    // Edit Modal Event Listeners
+    if (editModalClose) editModalClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeEditModal();
+    });
+    if (editCancelBtn) editCancelBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeEditModal();
+    });
+    if (editModal) {
+        editModal.addEventListener('click', function(e) {
+            if (e.target === editModal) {
+                e.stopPropagation();
+                closeEditModal();
+            }
+        });
+    }
+    
+    // Character counters
+    if (reportDescription) {
+        reportDescription.addEventListener('input', function() {
+            reportCharCount.textContent = this.value.length;
+        });
+    }
+    
+    if (editContent) {
+        editContent.addEventListener('input', function() {
+            const count = this.value.length;
+            editCharCount.textContent = count;
+            
+            if (count > 900) {
+                editCharCount.style.color = '#dc2626';
+            } else if (count > 700) {
+                editCharCount.style.color = '#f59e0b';
+            } else {
+                editCharCount.style.color = 'inherit';
+            }
+        });
+    }
+    
+    // Edit image upload
+    if (editUploadBtn) {
+        editUploadBtn.addEventListener('click', function() {
+            editFileInput.click();
+        });
+    }
+    
+    if (editFileInput) {
+        editFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Image size must be less than 10MB');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editPreviewImg.src = e.target.result;
+                    editImagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    if (editRemoveImageBtn) {
+        editRemoveImageBtn.addEventListener('click', function() {
+            editFileInput.value = '';
+            editImagePreview.style.display = 'none';
+            editPreviewImg.src = '';
+        });
+    }
+    
+    // Report Form Submission
+    if (reportForm) {
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postId = reportPostIdInput.value;
+            const formData = new FormData(reportForm);
+            
+            // Show loading state
+            reportSubmitBtn.disabled = true;
+            reportSubmitBtn.querySelector('.btn-text').style.display = 'none';
+            reportSubmitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            
+            fetch(window.djangoUrls.reportPost.replace('0', postId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeReportModal();
+                } else {
+                    alert(data.message || 'Failed to submit report');
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting report:', error);
+                alert('An error occurred while submitting your report');
+            })
+            .finally(() => {
+                reportSubmitBtn.disabled = false;
+                reportSubmitBtn.querySelector('.btn-text').style.display = 'inline';
+                reportSubmitBtn.querySelector('.loading-spinner').style.display = 'none';
+            });
+        });
+    }
+    
+    // Edit Form Submission
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postId = editPostIdInput.value;
+            const formData = new FormData(editForm);
+            
+            // Validate event fields if event type
+            const postType = editPostTypeInput.value;
+            if (postType === 'event') {
+                const eventTitle = document.getElementById('edit-event-title').value.trim();
+                const eventStartDate = document.getElementById('edit-event-start-date').value;
+                
+                if (!eventTitle) {
+                    alert('Event title is required for event posts');
+                    return;
+                }
+                if (!eventStartDate) {
+                    alert('Event start date is required for event posts');
+                    return;
+                }
+            }
+            
+            // Show loading state
+            const submitBtn = editForm.querySelector('.post-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            
+            fetch(window.djangoUrls.updatePost.replace('0', postId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeEditModal();
+                    // Reload page to show updated post
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to update post');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating post:', error);
+                alert('An error occurred while updating the post');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.btn-text').style.display = 'inline';
+                submitBtn.querySelector('.loading-spinner').style.display = 'none';
+            });
+        });
+    }
+    
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (reportModal && reportModal.style.display === 'flex') closeReportModal();
+            if (editModal && editModal.style.display === 'flex') closeEditModal();
+        }
+    });
+});
+</script>
+{% endblock %}

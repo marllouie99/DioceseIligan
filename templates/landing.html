@@ -1,0 +1,278 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to ChurchConnect</title>
+  <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body>
+  <div class="landing-wrap">
+    <div class="landing-container">
+      <!-- Left Side - Hero Carousel -->
+      <div class="hero-content">
+        <div class="hero-carousel">
+          <!-- Slide 1: Welcome & Mission -->
+          <div class="hero-slide active" data-slide="0">
+            <h1>Connect Your Church Community</h1>
+            <p class="subtitle">Building stronger spiritual connections through technology and faith</p>
+            
+            <div class="mission-statement">
+              <h3>🌿 Our Mission</h3>
+              <p>We believe every church deserves powerful tools to build meaningful relationships, manage services seamlessly, and grow their spiritual community. ChurchConnect brings faith communities together in the digital age.</p>
+            </div>
+          </div>
+
+          <!-- Slide 2: Testimonials -->
+          <div class="hero-slide" data-slide="1">
+            <h2>What Church Leaders Say</h2>
+            <p class="subtitle">Trusted by pastors and church communities worldwide</p>
+            
+            <div class="testimonials">
+              <div class="testimonial">
+                <p class="testimonial-quote">"ChurchConnect has transformed how we manage our services and connect with our congregation. It's intuitive and perfectly designed for church needs."</p>
+                <p class="testimonial-author">— Pastor Maria Santos, Grace Community Church</p>
+              </div>
+              
+              <div class="testimonial">
+                <p class="testimonial-quote">"Our church growth increased by 40% since using ChurchConnect. The platform makes it easy for members to stay engaged and participate."</p>
+                <p class="testimonial-author">— Rev. David Kim, Faith Baptist Church</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3: Stats & Impact -->
+          <div class="hero-slide" data-slide="2">
+            <h2>Growing Communities</h2>
+            <p class="subtitle">Join thousands of churches already using ChurchConnect</p>
+            
+            <div class="stats-bar">
+              <div class="stat-item">
+                <span class="stat-number">500+</span>
+                <p class="stat-label">Churches</p>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">25K+</span>
+                <p class="stat-label">Members</p>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number">98%</span>
+                <p class="stat-label">Satisfaction</p>
+              </div>
+            </div>
+
+            <div class="cta-section">
+              <p class="cta-text">Ready to transform your church community?</p>
+              <div class="cta-arrow">→</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carousel Controls -->
+        <div class="carousel-controls">
+          <div class="carousel-dots">
+            <button class="dot active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="dot" data-slide="1" aria-label="Slide 2"></button>
+            <button class="dot" data-slide="2" aria-label="Slide 3"></button>
+          </div>
+          <div class="carousel-nav">
+            <button class="nav-btn prev" id="prevSlide" aria-label="Previous slide">‹</button>
+            <button class="nav-btn next" id="nextSlide" aria-label="Next slide">›</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Side - Glassmorphism Form -->
+      <div class="card">
+      <div class="logo-stack">
+        <div class="logo-glow"></div>
+        <div class="logo-badge">CC</div>
+      </div>
+
+      <h1 class="title" id="heading-title">{% if active_tab == 'signup' %}Create your account{% else %}Welcome to ChurchConnect{% endif %}</h1>
+      <p class="subtitle">Connect with your church community</p>
+
+      <div class="segmented" id="segmented">
+        <button id="tab-signin" class="{% if active_tab != 'signup' %}active{% endif %}">Sign In</button>
+        <button id="tab-signup" class="{% if active_tab == 'signup' %}active{% endif %}">Sign Up</button>
+      </div>
+
+      {% if messages %}
+      <div>
+        {% for message in messages %}
+          <p style="color:#b91c1c; margin: 8px 4px;">{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="form">
+        <!-- Progressive Sign In Form -->
+        <form id="signin-form" method="post" action="{% url 'landing' %}" style="{% if active_tab == 'signup' %}display:none{% endif %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="signin" />
+
+          <!-- Step 1: Email Entry -->
+          <div id="email-step" class="login-step">
+            <div class="field">
+              <div class="label">Email</div>
+              <div class="input">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16v12H4z" stroke="#94a3b8" stroke-width="1.5"/><path d="M4 7l8 6 8-6" stroke="#94a3b8" stroke-width="1.5"/></svg>
+                <input type="email" name="email_or_username" id="signin-email" placeholder="Your email address" required />
+              </div>
+              {% if login_form.email_or_username.errors %}
+                <small style="color:#b91c1c">{{ login_form.email_or_username.errors.0 }}</small>
+              {% endif %}
+            </div>
+
+            <div class="actions">
+              <button class="btn-primary" type="button" id="email-continue-btn">Continue</button>
+            </div>
+
+            <!-- OR Divider -->
+            <div class="divider">
+              <span>OR</span>
+            </div>
+
+            <!-- Google OAuth Button -->
+            <div class="actions">
+              {% if google_oauth_configured %}
+                <a href="{% url 'google_login' %}" class="btn-google">
+                  <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Continue with Google
+                </a>
+              {% else %}
+                <div class="btn-google-disabled">
+                  <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#9CA3AF" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#9CA3AF" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#9CA3AF" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#9CA3AF" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Google OAuth (Setup Required)
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Email Sign-in Code Option -->
+            <div class="actions">
+              <a href="{% url 'login_with_code' %}" class="btn-secondary">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M4 8l8 5 8-5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                Email sign-in code
+              </a>
+            </div>
+          </div>
+
+          <!-- Step 2: Login Options (initially hidden) -->
+          <div id="login-options-step" class="login-step" style="display: none;">
+            <!-- Show entered email -->
+            <div class="email-display">
+              <div class="label">Email</div>
+              <div class="email-value" id="displayed-email"></div>
+            </div>
+
+            <!-- Password Option -->
+            <div class="field">
+              <div class="label">Password <a href="{% url 'forgot_password' %}" class="forgot-link">Forgot your password?</a></div>
+              <div class="input">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10V8a6 6 0 1112 0v2" stroke="#94a3b8" stroke-width="1.5"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#94a3b8" stroke-width="1.5"/></svg>
+                <input type="password" name="password" id="signin-password" placeholder="Your password" />
+                <button class="password-toggle" type="button" aria-label="toggle password">👁</button>
+              </div>
+              {% if login_form.password.errors %}
+                <small style="color:#b91c1c">{{ login_form.password.errors.0 }}</small>
+              {% endif %}
+            </div>
+
+            <div class="actions">
+              <button class="btn-primary" type="submit">Sign In</button>
+            </div>
+
+
+            <!-- Go Back Option -->
+            <div class="back-link">
+              <button type="button" id="go-back-btn" class="go-back">← Go back</button>
+            </div>
+          </div>
+
+          <!-- Sign Up Link (shown in both steps) -->
+          <div class="links signup-link">
+            <p class="muted">Don't have an account? <a href="#" id="link-signup">Sign up</a></p>
+          </div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="signup-form" method="post" action="{% url 'landing' %}" style="{% if active_tab == 'signup' %}display:block{% else %}display:none{% endif %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="signup" />
+
+          <div class="field">
+            <div class="label">Full name</div>
+            <div class="input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="#94a3b8" stroke-width="1.5"/><path d="M4 20c1.8-3.2 5-5 8-5s6.2 1.8 8 5" stroke="#94a3b8" stroke-width="1.5"/></svg>
+              {{ signup_form.full_name }}
+            </div>
+            {% if signup_form.full_name.errors %}
+              <small style="color:#b91c1c">{{ signup_form.full_name.errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="field">
+            <div class="label">Email</div>
+            <div class="input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16v12H4z" stroke="#94a3b8" stroke-width="1.5"/><path d="M4 7l8 6 8-6" stroke="#94a3b8" stroke-width="1.5"/></svg>
+              {{ signup_form.email }}
+            </div>
+            {% if signup_form.email.errors %}
+              <small style="color:#b91c1c">{{ signup_form.email.errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="field">
+            <div class="label">Password</div>
+            <div class="input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10V8a6 6 0 1112 0v2" stroke="#94a3b8" stroke-width="1.5"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#94a3b8" stroke-width="1.5"/></svg>
+              {{ signup_form.password }}
+              <button class="password-toggle" type="button" aria-label="toggle password">👁</button>
+            </div>
+            {% if signup_form.password.errors %}
+              <small style="color:#b91c1c">{{ signup_form.password.errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="field">
+            <div class="label">Confirm password</div>
+            <div class="input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10V8a6 6 0 1112 0v2" stroke="#94a3b8" stroke-width="1.5"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#94a3b8" stroke-width="1.5"/></svg>
+              {{ signup_form.confirm_password }}
+            </div>
+            {% if signup_form.confirm_password.errors %}
+              <small style="color:#b91c1c">{{ signup_form.confirm_password.errors.0 }}</small>
+            {% endif %}
+          </div>
+
+          <div class="actions">
+            <button class="btn-primary" type="submit">Create account</button>
+          </div>
+
+          <div class="links">
+            <p class="muted">Already have an account? <a href="#" id="link-signin">Sign In</a></p>
+          </div>
+        </form>
+      </div>
+      </div>
+    </div>
+  </div>
+  <script defer src="{% static 'js/landing.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/hero-carousel.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/utils/clock-sync.js' %}?v={{ STATIC_VERSION }}"></script>
+</body>
+</html>

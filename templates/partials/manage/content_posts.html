@@ -1,0 +1,19 @@
+{# Post Management Sub-tab #}
+<div class="sub-tab-panel" id="content-posts">
+  {# Posts Management Section #}
+  {% include 'partials/manage/posts_management.html' with posts=posts posts_count=posts_count follower_count=follower_count church=church %}
+  
+  {# Other Content Sections #}
+  <div class="other-content-sections">
+    <div class="content-section">
+      <h3>Media Gallery</h3>
+      <p>Upload and organize photos and videos</p>
+      <button class="btn btn-outline">Manage Media</button>
+    </div>
+    <div class="content-section">
+      <h3>Sermons</h3>
+      <p>Upload and manage sermon recordings</p>
+      <button class="btn btn-outline">Manage Sermons</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+{% load static %}
+{# Settings Tab Content #}
+<div class="tab-panel" id="settings">
+  <div class="tab-header">
+    <h2>Settings</h2>
+    <p>Configure church settings and preferences</p>
+  </div>
+  <div class="tab-content">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          {% if 'setting' in message|lower or 'verification' in message|lower or 'profile' in message|lower or 'upload' in message|lower %}
+            <div class="message message-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Settings Layout -->
+    <div class="settings-layout">
+      {# Settings Sidebar Navigation #}
+      {% include 'partials/manage/settings_sidebar.html' %}
+
+      {# Settings Content Area #}
+      {% include 'partials/manage/settings_content.html' with church=church form=form verif_form=verif_form decline_reasons=decline_reasons %}
+    </div>
+  </div>
+</div>

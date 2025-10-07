@@ -1,0 +1,4880 @@
+/* Scoped overrides to prevent collisions from other pages using similar class names */
+.church-detail-page .church-header { display: block; }
+.church-detail-page .church-cover { width: 100%; }
+.church-detail-page .church-actions { display: flex; gap: 10px; justify-self: end; }
+.church-detail-page .church-actions .btn { flex: 0 0 auto; width: auto; }
+/* Church Detail Page Styles */
+
+.content .church-detail-page {
+  /* Sizing via .page-container; set variables here */
+  --page-max-width: 1400px;
+  --page-padding: 16px 24px;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Reset: never constrain the BODY width on this page class (prevents right-side gap) */
+body.page-church-detail {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Enhanced Church Header with Subtle Forest Glass Effect */
+.church-header {
+  /* Warm Sacred Earth parchment header */
+  background:
+    radial-gradient(ellipse 120px 70px at 88% 12%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 88%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border: 2px solid rgba(139, 69, 19, 0.18);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 2px 6px rgba(101, 67, 33, 0.06);
+  display: block;
+  position: relative;
+  margin-bottom: -2px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s;
+}
+
+.church-header:hover {
+  box-shadow: 
+    0 12px 24px rgba(139, 69, 19, 0.16),
+    0 4px 12px rgba(101, 67, 33, 0.08);
+  transform: translateY(-4px);
+  border-color: rgba(139, 69, 19, 0.26);
+}
+
+/* Enhanced Church Cover */
+.church-cover { 
+  width: 100%; 
+  height: 220px; 
+  background: linear-gradient(135deg, 
+    rgba(255, 249, 230, 0.8) 0%, 
+    rgba(244, 230, 208, 0.7) 100%);
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.church-cover .cover-image { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.church-cover:hover .cover-image {
+  transform: scale(1.05);
+}
+
+.church-cover .cover-placeholder { 
+  height: 100%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: rgba(15, 118, 110, 0.6); 
+  background: linear-gradient(135deg, 
+    rgba(240, 253, 250, 0.8) 0%, 
+    rgba(219, 234, 254, 0.6) 100%);
+  font-size: 16px;
+  font-weight: 500;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.church-cover .cover-placeholder svg { 
+  width: 48px;
+  height: 48px;
+  color: rgba(15, 118, 110, 0.4);
+  display: block;
+}
+
+/* Add subtle overlay for better text readability */
+.church-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(139, 69, 19, 0.08) 100%);
+  pointer-events: none;
+}
+
+.church-info { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; padding: 20px; align-items: center; }
+
+/* Keep actions aligned to the right edge of the header grid */
+.church-actions { justify-self: end; }
+
+/* Enhanced Church Avatar */
+.church-avatar { 
+  width: 96px; 
+  height: 96px; 
+  position: relative;
+  z-index: 2;
+  margin-top: -48px; /* Overlap the cover image */
+}
+
+.church-avatar .avatar-image { 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.church-avatar .avatar-image:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.church-avatar .avatar-placeholder { 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 50%; 
+  background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+  color: #fff; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: 800; 
+  font-size: 34px; 
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.church-avatar .avatar-placeholder:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Details */
+.church-details { display:flex; flex-direction:column; gap: 8px; }
+.church-name { margin:0; font-size: 28px; font-weight: 800; color: var(--text, #111827); display: flex; align-items: center; gap: 8px; }
+.church-location-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.church-location { margin:0; color: var(--muted, #6b7280); order: 1; }
+.church-badges { display:flex; flex-direction:column; gap:4px; flex-wrap:wrap; align-self: flex-start; width: 100%; }
+.church-denomination-row { display: flex; align-items: flex-start; width: 100%; margin-top: 4px; }
+.denomination-badge { 
+  background: none; 
+  color: var(--muted, #6b7280); 
+  padding: 0; 
+  border-radius: 0; 
+  font-size: 14px; 
+  font-weight: 400; 
+  text-transform: none; 
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  order: 2;
+}
+
+.denomination-badge::before {
+  content: "⛪";
+  font-size: 16px;
+  color: var(--muted, #6b7280);
+}
+.size-badge { background:#dcfce7; color:#166534; padding:4px 10px; border-radius: 9999px; font-size:12px; font-weight:700; text-transform:uppercase; }
+.verified-badge { background:#fef3c7; color:white; padding:4px 10px; border-radius: 9999px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px; }
+.verified-badge svg { width:14px; height:14px; }
+
+/* Enhanced Church Statistics */
+.church-stats { 
+  display: flex; 
+  gap: 16px; 
+  flex-wrap: wrap; 
+  align-items: center;
+  margin-top: 16px;
+}
+
+.stat-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.7);
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  padding: 12px 16px; 
+  border-radius: 16px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s;
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.06);
+}
+
+.stat-item:hover {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.03) 1px, rgba(139, 69, 19, 0.03) 2px),
+    rgba(255, 249, 230, 0.9);
+  border-color: rgba(139, 69, 19, 0.25);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.1);
+  transform: translateY(-2px);
+}
+
+.stat-item svg { 
+  width: 20px; 
+  height: 20px; 
+  color: #8B4513;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.stat-item:hover svg {
+  color: #A0522D;
+  transform: scale(1.1);
+}
+
+.stat-number { 
+  font-weight: 800;
+  color: #111827;
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+  transform: scale(1.05);
+}
+
+.stat-label { 
+  color: #6b7280; 
+  font-size: 12px; 
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.church-actions { display:flex; gap:16px; align-items:center; }
+
+/* Quick Actions */
+.quick-actions { display: flex; gap: 8px; }
+.quick-action-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f8fafc; border: 1px solid var(--border); color: var(--muted); text-decoration: none; transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s; }
+.quick-action-btn:hover { background: var(--brand); color: white; border-color: var(--brand); transform: translateY(-2px); }
+.quick-action-btn svg { width: 18px; height: 18px; }
+
+/* Enhanced Follow Button */
+.follow-btn { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 12px 20px; 
+  border-radius: 16px; 
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: white; 
+  cursor: pointer; 
+  font-weight: 700; 
+  font-size: 14px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.2),
+    0 2px 4px rgba(101, 67, 33, 0.12);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s;
+}
+
+.follow-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.25) 50%, 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.follow-btn:hover::before {
+  left: 100%;
+}
+
+.follow-btn:hover { 
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.25),
+    0 2px 6px rgba(101, 67, 33, 0.18);
+}
+
+.follow-btn.following { 
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 
+    0 4px 8px rgba(16, 185, 129, 0.22),
+    0 2px 4px rgba(16, 185, 129, 0.14);
+}
+
+.follow-btn.following:hover { 
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 16px rgba(16, 185, 129, 0.4),
+    0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.follow-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.follow-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Enhanced Message Button */
+.message-btn { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 12px 20px; 
+  border-radius: 16px; 
+  border: 2px solid rgba(139, 69, 19, 0.3);
+  background: rgba(244, 230, 208, 0.9);
+  color: #654321; 
+  cursor: pointer; 
+  font-weight: 600; 
+  font-size: 14px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  
+  /* Warm Sacred Earth shadow */
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.15),
+    0 2px 4px rgba(101, 67, 33, 0.1);
+  
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s, color 0.3s;
+}
+
+.message-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.message-btn:hover::before {
+  left: 100%;
+}
+
+.message-btn:hover { 
+  background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.22),
+    0 2px 6px rgba(101, 67, 33, 0.15);
+}
+
+.message-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.message-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Content layout */
+.church-content { 
+  display: grid; 
+  grid-template-columns: 1fr 360px; 
+  gap: 24px; 
+  margin-top: 0px;
+}
+.content-main, .content-sidebar { min-width:0; }
+
+/* Match dashboard sidebar column behavior */
+.church-detail-page .content-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow: visible; /* avoid clipping dropdowns */
+}
+
+@media (min-width: 769px) {
+  .church-detail-page .content-sidebar {
+    margin-top: 0;
+  }
+}
+
+/* Enhanced Content Sections */
+.content-section { 
+  /* Warm Sacred Earth parchment card */
+  background:
+    /* Age spots */
+    radial-gradient(ellipse 100px 60px at 88% 12%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 90px 55px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    /* Fine paper grain */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    /* Main parchment base */
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border: 2px solid rgba(139, 69, 19, 0.18);
+  border-radius: 20px; 
+  padding: 20px; 
+  margin-bottom: 24px;
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.12),
+    0 2px 6px rgba(101, 67, 33, 0.06);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, border-color 0.3s;
+}
+
+.content-section:hover {
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.16),
+    0 4px 8px rgba(101, 67, 33, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(139, 69, 19, 0.28);
+}
+
+.section-title { 
+  font-size: 20px; 
+  font-weight: 800; 
+  margin: 0 0 20px 0; 
+  color: #2D1810;
+  position: relative;
+  padding-bottom: 12px;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #8B4513, #DAA520);
+  border-radius: 2px;
+}
+
+.section-content { 
+  color: #111827; 
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+/* Ensure inline icons in content sections don't blow up */
+.section-content svg,
+.content-section .contact-info svg { width: 18px; height: 18px; color: #6b7280; flex-shrink: 0; }
+.content-section .contact-info { display: flex; align-items: center; gap: 8px; }
+
+/* General safety: if any images show up in content, keep them contained */
+.section-content img { max-width: 100%; height: auto; border-radius: 8px; }
+
+/* Enhanced Tabs with Forest Serenity */
+.tabs { 
+  display: flex; 
+  gap: 4px; 
+  border-bottom: none;
+  margin: 0 0 28px; 
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.6);
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  border-radius: 16px; 
+  padding: 6px;
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.tab-btn { 
+  flex: 1; 
+  padding: 14px 20px; 
+  border: none; 
+  border-radius: 0; 
+  background: transparent; 
+  cursor: pointer; 
+  font-weight: 700; 
+  font-size: 14px;
+  color: #6B4226; 
+  text-align: center; 
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(218, 165, 32, 0.2) 50%, 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.tab-btn:hover::before {
+  left: 100%;
+}
+
+.tab-btn.active { 
+  color: #2D1810;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.15),
+    0 2px 4px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+}
+
+.tab-btn:hover:not(.active) { 
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 249, 230, 0.8);
+  color: #654321;
+  transform: translateY(-1px);
+}
+
+.tab-panel { 
+  display: none; 
+  padding: 0;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-panel.active { 
+  display: block; 
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced Services Grid */
+.services-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+  gap: 24px; 
+  margin-top: 24px;
+}
+
+.service-card { 
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.82) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px; 
+  overflow: hidden; 
+  display: flex; 
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, border-color 0.3s;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: rgba(15, 118, 110, 0.2);
+}
+
+.service-image-container {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.service-thumb { 
+  height: 160px; 
+  background: linear-gradient(135deg, 
+    rgba(240, 253, 250, 0.8) 0%, 
+    rgba(219, 234, 254, 0.6) 100%);
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-thumb img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.service-card:hover .service-thumb img {
+  transform: scale(1.1);
+}
+
+.service-info { 
+  padding: 20px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px;
+  flex: 1;
+}
+
+.service-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.service-location {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.service-meta { 
+  display: flex; 
+  gap: 16px; 
+  color: #6b7280; 
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: auto;
+}
+
+.service-actions { 
+  margin-top: 16px; 
+  display: flex; 
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.service-actions .btn {
+  flex: 1;
+  min-width: 120px;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 0;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Image overlay for gallery indication */
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.service-image-container:hover .image-overlay {
+  opacity: 1;
+}
+
+/* Enhanced Sidebar with Forest Serenity */
+.sidebar-section { 
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.82) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px; 
+  padding: 20px; 
+  margin-bottom: 24px;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, border-color 0.3s;
+}
+
+.sidebar-section:hover {
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+  border-color: rgba(15, 118, 110, 0.2);
+}
+
+/* Services Section in sidebar */
+.sidebar-subtitle { font-size:14px; color: var(--muted); margin: 0 0 16px 0; }
+.section-btn { width: auto; justify-content: center; margin-bottom: 16px; }
+
+/* Services header with icon */
+.services-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.request-appointment-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #8B4513; color: white; text-decoration: none; transition: transform 0.2s, background 0.2s; }
+.request-appointment-icon:hover { background: #A0522D; color: white; transform: translateY(-1px); }
+.request-appointment-icon svg { width: 16px; height: 16px; }
+
+/* Quick Info Sidebar */
+.quick-info { display: grid; gap: 12px; }
+.info-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+.info-item:last-child { border-bottom: none; }
+.info-label { font-weight: 600; color: var(--muted); }
+.info-value { font-weight: 600; color: var(--text); }
+.sidebar-title { font-size:18px; font-weight:700; margin:0 0 8px 0; color: var(--text); }
+.sidebar-btn { width: 100%; justify-content: center; margin-bottom: 16px; }
+.contact-details { display:grid; gap:12px; }
+.contact-item { display:flex; align-items:center; gap:8px; color:var(--text,#111827); font-size: 14px; padding: 8px 0; }
+.contact-label { font-weight: 600; color: var(--muted); min-width: 80px; flex-shrink: 0; }
+.contact-item a { color: var(--brand); text-decoration: none; }
+.contact-item a:hover { text-decoration: underline; }
+
+.social-links { display:grid; gap:10px; }
+.social-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; border:1px solid var(--border,#e5e7eb); padding:10px 12px; border-radius:10px; }
+.social-link svg { width:18px; height:18px; }
+
+.followers-list { display:grid; gap:10px; }
+.follower-item { display:flex; align-items:center; gap:10px; }
+.follower-avatar .avatar-placeholder { width:36px; height:36px; border-radius:50%; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; }
+.follower-info .follower-name { font-weight:600; }
+.follower-info .follower-time { color:#6b7280; font-size:12px; }
+
+/* Empty state */
+.empty-state { border: 1px dashed var(--border, #e5e7eb); border-radius: 12px; padding: 24px; text-align: center; color: var(--muted, #6b7280); background: #fafafa; }
+
+/* Create Post Section */
+.create-post-section { margin-bottom: 12px; /* Reduced margin to move filter closer */ }
+.create-post-btn { 
+  width: 100%; 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 16px 20px; 
+  background: transparent; 
+  border: 1px solid rgba(255, 255, 255, 0.3); 
+  border-radius: 16px; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+  text-align: left;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-post-btn:hover { 
+  background: rgba(255, 255, 255, 0.05); 
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.4), 0 0 32px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: none;
+}
+.create-post-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.create-post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.create-post-avatar .avatar-placeholder { width: 100%; height: 100%; background: #111827; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; }
+.create-post-text { color: var(--muted, #6b7280); font-size: 14px; }
+
+/* ====================================================
+   📱 ENHANCED DASHBOARD LAYOUT WITH WARM SACRED EARTH
+   ==================================================== */
+
+/* Dashboard Layout - Modern Grid System */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  max-width: var(--page-max-width, 1400px);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 24px;
+  align-items: start;
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
+}
+
+/* Main Content Area Enhancement */
+.dashboard-layout .main-content {
+  min-width: 0; /* Prevent overflow */
+  background: transparent;
+  border-radius: 24px;
+  padding: 0;
+}
+
+.dashboard-layout .main-content .section-title {
+  margin: 0 0 24px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #2D1810;
+  font-family: Georgia, 'Times New Roman', serif;
+  position: relative;
+  padding-bottom: 16px;
+  text-shadow: 0 2px 3px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .main-content .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #8B4513, #DAA520);
+  border-radius: 2px;
+}
+
+/* Enhanced Sidebar with Warm Sacred Earth Theme */
+.dashboard-layout .sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky !important;
+  top: 8px !important; /* Fine-tuned to align with post creation card */
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  align-self: flex-start;
+  padding: 0;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 69, 19, 0.3) transparent;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(139, 69, 19, 0.3);
+  border-radius: 3px;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 69, 19, 0.5);
+}
+
+/* Alignment variable for precise tuning */
+:root {
+  --dashboard-sidebar-align-nudge: -12px; /* adjust between -6px and -18px if needed */
+}
+
+/* Fine-tune vertical alignment with post creation card (desktop only) */
+@media (min-width: 769px) {
+  .dashboard-layout .sidebar-content { margin-top: 0; }
+  .dashboard-layout .sidebar-content > .sidebar-section:first-child { margin-top: var(--dashboard-sidebar-align-nudge); }
+  .dashboard-layout .post-creation-card { margin-top: 0; }
+}
+
+/* ====================================================
+   🌿 FOREST SERENITY POSTS FEED CONTAINER
+   ==================================================== */
+
+/* Enhanced Posts Feed with Multi-layer Background */
+.posts-feed { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px;
+  padding: 24px;
+  border-radius: 20px;
+  
+  /* Multi-layer gradient background - Landing page pattern */
+  background:
+    /* Top left glow effect */
+    radial-gradient(70% 50% at 20% 20%, rgba(5, 150, 105, 0.08) 0%, transparent 70%),
+    /* Center blend */
+    radial-gradient(80% 60% at 30% 50%, rgba(15, 118, 110, 0.04) 0%, transparent 80%),
+    /* Bottom right concentration */
+    radial-gradient(90% 60% at 80% 80%, rgba(2, 44, 34, 0.02) 0%, transparent 80%),
+    /* Main subtle gradient */
+    linear-gradient(145deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+  
+  /* Reduced backdrop blur */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  
+  /* Subtle border */
+  border: 1px solid rgba(15, 118, 110, 0.08);
+  
+  /* Beautiful shadow system */
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.04),
+    0 4px 8px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  /* Position relative for inner highlights */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Make dashboard feed container fully transparent with no padding */
+.dashboard-layout .posts-feed {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  overflow: visible;
+}
+
+/* Enhanced Community Feed Post Cards for Dashboard */
+.dashboard-layout .post-card {
+  margin-bottom: 24px;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure post card with open dropdown appears above others */
+.dashboard-layout .post-card.dropdown-open {
+  z-index: 100000 !important;
+}
+
+.dashboard-layout .post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(139, 69, 19, 0.15),
+    0 8px 16px rgba(101, 67, 33, 0.1),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.dashboard-layout .posts-feed::before {
+  content: none;
+}
+
+/* =============================================
+   Dashboard-specific Post Card aesthetic tweaks
+   ============================================= */
+/* Beautiful Warm Sacred Earth Post Cards */
+.dashboard-layout .post-card {
+  /* Multi-layer parchment texture background */
+  background:
+    /* Age spots and weathering */
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+    /* Fine paper grain texture */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    /* Main parchment base */
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
+  
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 2px solid rgba(139, 69, 19, 0.15);
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.1),
+    0 2px 4px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(248, 244, 230, 0.9),
+    inset 0 -1px 0 rgba(139, 69, 19, 0.05);
+}
+
+/* Reduce decorative header glass on dashboard */
+.dashboard-layout .post-header {
+  background: transparent;
+  border-bottom: 0 !important;
+  box-shadow: none;
+  padding: 14px 16px;
+  margin-bottom: -1px !important; /* Eliminate gap below header */
+}
+
+/* Tone down avatar ring to be subtler on dashboard */
+.dashboard-layout .post-author-avatar {
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+}
+
+/* Enhanced Post Content with Warm Sacred Earth */
+.dashboard-layout .post-content {
+  background: 
+    /* Subtle paper texture */
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    /* Warm cream base */
+    rgba(255, 251, 240, 0.85);
+  border-radius: 0;
+  padding: 24px 20px;
+  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+/* Enhanced Post Text Colors for better readability */
+.dashboard-layout .post-text {
+  color: #2D1810 !important;
+  line-height: 1.6;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .post-author-name {
+  color: #654321 !important;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .post-time {
+  background: transparent;
+  border: none;
+  color: #6B4226 !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Eliminate gaps - Dashboard Layout */
+.dashboard-layout .post-header + .post-content-wrapper {
+  border-top: none !important;
+  margin-top: -2px !important; /* Extra overlap for seamless connection */
+}
+
+.dashboard-layout .post-content-wrapper {
+  margin-top: -1px !important; /* Ensure seamless connection with header */
+}
+
+.dashboard-layout .post-content {
+  margin-top: -1px !important; /* Slight overlap to connect with header */
+}
+
+.dashboard-layout .post-actions {
+  margin-top: -1px !important; /* Slight overlap to eliminate gap */
+}
+
+/* Ensure high-contrast text on dashboard cards */
+.dashboard-layout .post-text { color: #0f172a; }
+.dashboard-layout .post-author-name { color: #0f172a; }
+.dashboard-layout .post-time { background: transparent; border: none; color: #0b7667; }
+
+/* Enhanced Actions Bar with Warm Sacred Earth */
+.dashboard-layout .post-actions {
+  background: 
+    /* Rich paper texture overlay */
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(139, 69, 19, 0.06) 1px,
+      rgba(139, 69, 19, 0.06) 2px
+    ),
+    /* Darker warm brown base with gradient */
+    linear-gradient(135deg, rgba(210, 180, 140, 0.8) 0%, rgba(195, 165, 125, 0.7) 100%);
+  border-top: 2px solid rgba(139, 69, 19, 0.25);
+  padding: 16px 20px;
+  position: relative;
+}
+
+.dashboard-layout .post-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(218, 165, 32, 0.3) 50%, 
+    transparent 100%);
+}
+
+/* Enhanced Action Buttons with Warm Sacred Earth */
+.dashboard-layout .post-action { 
+  color: #2D1810 !important; 
+  background: transparent !important; 
+  border: none !important;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .post-action:hover { 
+  color: #654321 !important; 
+  background: rgba(218, 165, 32, 0.2) !important; 
+  border: none !important;
+  border-radius: 8px;
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Enhanced Like Button with Warm Sacred Earth */
+.dashboard-layout .post-action.like-btn,
+.dashboard-layout .post-action.like-btn *,
+.dashboard-layout .post-action.like-btn .like-count,
+.dashboard-layout .like-count {
+  color: #2D1810 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .post-action.like-btn:hover,
+.dashboard-layout .post-action.like-btn:hover *,
+.dashboard-layout .post-action.like-btn:hover .like-count {
+  color: #654321 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
+}
+
+/* Liked state */
+.dashboard-layout .post-action.like-btn.liked,
+.dashboard-layout .post-action.like-btn.liked *,
+.dashboard-layout .post-action.like-btn.liked .like-count {
+  color: #B8860B !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  font-weight: 800;
+}
+
+/* Warm Sacred Earth fade overlay for dashboard posts */
+.dashboard-layout .content-fade-overlay { 
+  background: linear-gradient(
+    transparent 0%, 
+    rgba(248, 244, 230, 0.6) 70%, 
+    rgba(244, 230, 208, 0.8) 100%
+  ); 
+}
+
+/* Remove extra separators in comments area on dashboard */
+.dashboard-layout .comment-form { border-top: 0; background: transparent; padding: 12px 16px; }
+.dashboard-layout .post-comments-section { background: transparent; }
+
+/* Slightly smaller gaps inside actions for compact look */
+.dashboard-layout .post-actions { gap: 20px; }
+
+/* Ensure dropdowns aren't clipped in dashboard */
+.dashboard-layout {
+  overflow: visible !important;
+}
+
+.dashboard-layout .main-content {
+  overflow: visible !important;
+}
+
+.dashboard-layout .posts-feed {
+  overflow: visible !important;
+}
+
+.dashboard-layout .post-card {
+  overflow: visible !important;
+}
+
+.dashboard-layout .post-header {
+  overflow: visible !important;
+}
+
+.dashboard-layout .post-menu {
+  overflow: visible !important;
+}
+
+/* Ensure dropdown appears above sidebar sections */
+.post-menu-dropdown.show {
+  z-index: 99999 !important;
+  position: absolute !important;
+}
+
+/* Ensure church detail post cards with open dropdowns appear above others */
+.church-detail-page .post-card.dropdown-open {
+  z-index: 100000 !important;
+  position: relative;
+}
+
+
+/* Subtle inner glow effect */
+.posts-feed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(15, 118, 110, 0.2) 50%, 
+    transparent 100%);
+  z-index: 1;
+}
+
+/* Beautiful Warm Sacred Earth Sidebar Sections */
+.dashboard-layout .sidebar-section {
+  /* Multi-layer parchment texture background */
+  background:
+    /* Age spots and weathering */
+    radial-gradient(ellipse 100px 60px at 85% 15%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 50px at 15% 85%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+    /* Fine paper grain texture */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.025) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    /* Main parchment base - lighter for better text contrast */
+    linear-gradient(135deg, #FAF6E8 0%, #F6F0E2 50%, #F2EBDC 100%);
+  
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  
+  /* Enhanced shadow system */
+  box-shadow: 
+    0 12px 24px rgba(139, 69, 19, 0.15),
+    0 4px 8px rgba(101, 67, 33, 0.1),
+    inset 0 1px 0 rgba(250, 246, 232, 0.9),
+    inset 0 -1px 0 rgba(139, 69, 19, 0.1);
+  
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dashboard-layout .sidebar-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(218, 165, 32, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(160, 82, 45, 0.05) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.dashboard-layout .sidebar-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(139, 69, 19, 0.25),
+    0 8px 16px rgba(101, 67, 33, 0.15),
+    inset 0 1px 0 rgba(244, 230, 208, 0.9),
+    inset 0 -1px 0 rgba(139, 69, 19, 0.15);
+  border-color: rgba(139, 69, 19, 0.3);
+}
+
+.dashboard-layout .sidebar-section:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced Sidebar Titles with Church Typography */
+.dashboard-layout .sidebar-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #2D1810;
+  margin: 0 0 20px 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  position: relative;
+  padding-bottom: 12px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .sidebar-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #8B4513, #DAA520);
+  border-radius: 2px;
+}
+
+/* Enhanced Suggested Churches with Warm Sacred Earth */
+.dashboard-layout .suggested-churches {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-layout .church-suggestion {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: 
+    /* Subtle paper texture */
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    /* Warm cream base - lighter for better text contrast */
+    rgba(255, 253, 245, 0.9);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 253, 245, 0.95);
+}
+
+.dashboard-layout .church-suggestion:hover {
+  transform: translateY(-2px);
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 253, 245, 0.98);
+  border-color: rgba(139, 69, 19, 0.25);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 253, 245, 1);
+}
+
+.dashboard-layout .church-suggestion:last-child {
+  border-bottom: 1px solid rgba(139, 69, 19, 0.15);
+}
+
+/* Enhanced Church Avatars with Gold Gradient */
+.dashboard-layout .church-avatar-small {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-right: 16px;
+  border: 3px solid rgba(255, 249, 230, 0.8);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.2),
+    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-layout .church-suggestion:hover .church-avatar-small {
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.3),
+    inset 0 1px 0 rgba(218, 165, 32, 0.4);
+}
+
+/* Enhanced Church Information */
+.dashboard-layout .church-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-right: 16px;
+}
+
+.dashboard-layout .church-name-small {
+  font-weight: 800;
+  color: #2D1810;
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.4;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-layout .church-location-small {
+  color: #654321;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.3;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Enhanced Follow Buttons with Warm Sacred Earth */
+.dashboard-layout .follow-btn-small {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: white;
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 70px;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.2),
+    inset 0 1px 0 rgba(218, 165, 32, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-layout .follow-btn-small::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(218, 165, 32, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.dashboard-layout .follow-btn-small:hover::before {
+  left: 100%;
+}
+
+.dashboard-layout .follow-btn-small:hover {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  border-color: rgba(218, 165, 32, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.3),
+    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+}
+
+/* Enhanced Upcoming Events with Warm Sacred Earth */
+.dashboard-layout .upcoming-events {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-layout .event-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background: 
+    /* Subtle paper texture */
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    /* Warm cream base - lighter for better text contrast */
+    rgba(255, 253, 245, 0.9);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 253, 245, 0.95);
+  gap: 12px;
+}
+
+.dashboard-layout .event-card:hover {
+  transform: translateY(-2px);
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 253, 245, 0.98);
+  border-color: rgba(139, 69, 19, 0.25);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 253, 245, 1);
+}
+
+.dashboard-layout .event-date-badge {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%);
+  border-radius: 12px;
+  border: 3px solid rgba(255, 249, 230, 0.8);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.2),
+    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dashboard-layout .event-card:hover .event-date-badge {
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.3),
+    inset 0 1px 0 rgba(218, 165, 32, 0.4);
+}
+
+.dashboard-layout .event-date-month {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-layout .event-date-day {
+  font-size: 20px;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-layout .event-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dashboard-layout .event-title {
+  font-weight: 800;
+  color: #2D1810;
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.3;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.dashboard-layout .event-church {
+  color: #654321;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.3;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-layout .event-time,
+.dashboard-layout .event-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8B4513;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.3;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-layout .event-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #A0522D;
+}
+
+.dashboard-layout .event-view-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: white;
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  white-space: nowrap;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.2),
+    inset 0 1px 0 rgba(218, 165, 32, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-layout .event-view-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(218, 165, 32, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.dashboard-layout .event-view-btn:hover::before {
+  left: 100%;
+}
+
+.dashboard-layout .event-view-btn:hover {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  border-color: rgba(218, 165, 32, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.3),
+    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+}
+
+.dashboard-layout .empty-events {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 253, 245, 0.8);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 16px;
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 253, 245, 0.95);
+}
+
+.dashboard-layout .empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #A0522D;
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.dashboard-layout .empty-text {
+  color: #654321;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* Enhanced Activity Feed with Warm Sacred Earth */
+.dashboard-layout .activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-layout .activity-item {
+  padding: 16px;
+  background: 
+    /* Subtle paper texture */
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    /* Warm cream base */
+    rgba(255, 249, 230, 0.85);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 1px 3px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.dashboard-layout .activity-item:hover {
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.03) 1px, rgba(139, 69, 19, 0.03) 2px),
+    rgba(255, 249, 230, 0.95);
+  border-color: rgba(139, 69, 19, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 3px 6px rgba(139, 69, 19, 0.12),
+    inset 0 1px 0 rgba(255, 249, 230, 0.95);
+}
+
+.dashboard-layout .activity-item:last-child {
+  border: 1px solid rgba(139, 69, 19, 0.15);
+}
+
+.dashboard-layout .activity-text {
+  font-size: 13px;
+  color: #2D1810;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-layout .activity-text strong {
+  color: #654321;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-layout .activity-time {
+  font-size: 11px;
+  color: #6B4226;
+  font-weight: 600;
+  font-style: italic;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* ====================================================
+   Dashboard Layout Overrides
+   ==================================================== */
+
+/* ====================================================
+   🏛️ WARM SACRED EARTH BACKGROUND SYSTEM FOR DASHBOARD
+   ==================================================== */
+
+/* Dashboard Layout with Warm Sacred Earth Background - sizing handled above */
+
+/* Add beautiful Warm Sacred Earth background to body when dashboard is active */
+body.dashboard-page {
+  background:
+    /* Wood grain texture overlay */
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
+    /* Paper texture patterns */
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.04) 0%, transparent 50%),
+    /* Warm glow effects */
+    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.03) 40%, transparent 70%),
+    radial-gradient(80% 60% at 80% 80%, rgba(139, 69, 19, 0.06) 0%, rgba(139, 69, 19, 0.02) 40%, transparent 70%),
+    /* Main warm brown gradient */
+    linear-gradient(45deg, #F8F4E6 0%, #F4E6D0 25%, #F0E2CC 50%, #EDD9C4 75%, #F8F4E6 100%);
+  background-attachment: fixed;
+  background-size: 
+    8px 8px,
+    300px 300px,
+    400px 400px,
+    500px 300px,
+    600px 400px,
+    100% 100%;
+}
+
+/* Alternative approach for browsers that don't support :has() */
+.dashboard-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  background:
+    /* Wood grain texture overlay */
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
+    /* Paper texture patterns */
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.04) 0%, transparent 50%),
+    /* Warm glow effects */
+    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.03) 40%, transparent 70%),
+    radial-gradient(80% 60% at 80% 80%, rgba(139, 69, 19, 0.06) 0%, rgba(139, 69, 19, 0.02) 40%, transparent 70%),
+    /* Main warm brown gradient */
+    linear-gradient(45deg, #F8F4E6 0%, #F4E6D0 25%, #F0E2CC 50%, #EDD9C4 75%, #F8F4E6 100%);
+  background-size: 
+    8px 8px,
+    300px 300px,
+    400px 400px,
+    500px 300px,
+    600px 400px,
+    100% 100%;
+}
+
+/* ====================================================
+   📱 RESPONSIVE DESIGN FOR DASHBOARD LAYOUT
+   ==================================================== */
+
+/* Tablet and smaller screens */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    max-width: 100%;
+    padding: 0 16px;
+  }
+  
+  .dashboard-layout .main-content .section-title {
+    font-size: 24px;
+  }
+  
+  .dashboard-layout .sidebar-title {
+    font-size: 18px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 12px;
+  }
+  
+  .dashboard-layout .sidebar-content {
+    position: static !important;
+    max-height: none;
+    order: 2;
+  }
+  
+  .dashboard-layout .main-content {
+    order: 1;
+  }
+  
+  .dashboard-layout .main-content .section-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-layout .sidebar-section {
+    padding: 20px;
+  }
+  
+  .dashboard-layout .church-suggestion {
+    padding: 12px;
+  }
+  
+  .dashboard-layout .church-avatar-small {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+    margin-right: 12px;
+  }
+  
+  .dashboard-layout .church-name-small {
+    font-size: 14px;
+  }
+  
+  .dashboard-layout .church-location-small {
+    font-size: 12px;
+  }
+  
+  .dashboard-layout .follow-btn-small {
+    padding: 6px 12px;
+    font-size: 11px;
+    min-width: 60px;
+  }
+  
+  .dashboard-layout .activity-item {
+    padding: 12px;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .dashboard-layout {
+    padding: 0 8px;
+    gap: 16px;
+  }
+  
+  .dashboard-layout .main-content .section-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .dashboard-layout .sidebar-section {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .dashboard-layout .sidebar-title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Church Detail Page Layout - Sizing handled at top of file */
+
+/* Add subtle Warm Sacred Earth background overlay */
+.church-detail-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(139, 69, 19, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Apply full Warm Sacred Earth background to body when church detail is active */
+body.page-church-detail {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
+    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.03) 40%, transparent 70%),
+    radial-gradient(80% 60% at 80% 80%, rgba(139, 69, 19, 0.06) 0%, rgba(139, 69, 19, 0.02) 40%, transparent 70%),
+    linear-gradient(45deg, #F8F4E6 0%, #F4E6D0 25%, #F0E2CC 50%, #EDD9C4 75%, #F8F4E6 100%);
+  background-attachment: fixed;
+}
+
+/* Responsive layout for Church Detail page */
+@media (max-width: 1024px) {
+  .church-content { grid-template-columns: 1fr 320px; gap: 24px; }
+}
+
+@media (max-width: 768px) {
+  .church-content { grid-template-columns: 1fr; gap: 20px; }
+  .content-sidebar { order: 2; }
+  .content-main { order: 1; }
+}
+
+/* Apply the exact same post card styling that works on dashboard */
+.church-detail-page .post-card {
+  /* Warm Sacred Earth parchment card - matches dashboard */
+  background:
+    /* Age spots and weathering */
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+    /* Fine paper grain texture */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    /* Main parchment base */
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%) !important;
+  border: 2px solid rgba(139, 69, 19, 0.15) !important;
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.1),
+    0 2px 4px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(248, 244, 230, 0.9),
+    inset 0 -1px 0 rgba(139, 69, 19, 0.05);
+  margin-bottom: 24px;
+  border-radius: 16px;
+}
+
+/* Post header styling - same as dashboard */
+.church-detail-page .post-header {
+  background: transparent;
+  border-bottom: 0 !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  margin-bottom: -1px !important; /* Eliminate gap below header */
+}
+
+/* Eliminate gaps - Church Detail Page */
+.church-detail-page .post-header + .post-content-wrapper {
+  border-top: none !important;
+  margin-top: -2px !important; /* Extra overlap for seamless connection */
+}
+
+.church-detail-page .post-content-wrapper {
+  margin-top: -1px !important; /* Ensure seamless connection with header */
+}
+
+.church-detail-page .post-content {
+  margin-top: -1px !important; /* Slight overlap to connect with header */
+}
+
+.church-detail-page .post-actions {
+  margin-top: -1px !important; /* Slight overlap to eliminate gap */
+}
+
+/* Avatar styling - same as dashboard */
+.church-detail-page .post-author-avatar {
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+}
+
+/* Content area - same as dashboard */
+.church-detail-page .post-content {
+  background: 
+    /* Subtle paper texture */
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    /* Warm cream base */
+    rgba(255, 251, 240, 0.85) !important;
+  border-radius: 0;
+  padding: 24px 20px;
+  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+/* Text colors - same as dashboard */
+.church-detail-page .post-text { 
+  color: #2D1810 !important;
+  line-height: 1.6;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+.church-detail-page .post-author-name { 
+  color: #654321 !important;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+.church-detail-page .post-time { 
+  background: transparent; 
+  border: none; 
+  color: #6B4226 !important; 
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Actions bar - same as dashboard */
+.church-detail-page .post-actions {
+  background: 
+    /* Rich paper texture overlay */
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(139, 69, 19, 0.06) 1px,
+      rgba(139, 69, 19, 0.06) 2px
+    ),
+    /* Darker warm brown base with gradient */
+    linear-gradient(135deg, rgba(210, 180, 140, 0.8) 0%, rgba(195, 165, 125, 0.7) 100%);
+  border-top: 2px solid rgba(139, 69, 19, 0.25);
+  padding: 16px 20px;
+  position: relative;
+  border-radius: 0;
+  gap: 20px;
+}
+
+/* Action buttons - same as dashboard */
+.church-detail-page .post-action { 
+  color: #2D1810 !important; 
+  background: transparent !important; 
+  border: none !important; 
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+.church-detail-page .post-action:hover { 
+  color: #654321 !important; 
+  background: rgba(218, 165, 32, 0.2) !important; 
+  border: none !important; 
+  border-radius: 8px;
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Ensure like button specifically is white */
+.church-detail-page .post-action.like-btn,
+.church-detail-page .post-action.like-btn *,
+.church-detail-page .post-action.like-btn .like-count,
+.church-detail-page .like-count {
+  color: #2D1810 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.church-detail-page .post-action.like-btn:hover,
+.church-detail-page .post-action.like-btn:hover *,
+.church-detail-page .post-action.like-btn:hover .like-count {
+  color: #654321 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
+}
+
+/* Liked state */
+.church-detail-page .post-action.like-btn.liked,
+.church-detail-page .post-action.like-btn.liked *,
+.church-detail-page .post-action.like-btn.liked .like-count {
+  color: #B8860B !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  font-weight: 800;
+}
+
+/* Fade overlay - same as dashboard */
+.church-detail-page .content-fade-overlay { 
+  background: linear-gradient(
+    transparent 0%, 
+    rgba(248, 244, 230, 0.6) 70%, 
+    rgba(244, 230, 208, 0.8) 100%
+  ); 
+}
+
+/* Comment form - same as dashboard */
+.church-detail-page .comment-form { 
+  border-top: 0; 
+  background: transparent; 
+  padding: 12px 16px; 
+}
+.church-detail-page .post-comments-section { 
+  background: transparent; 
+}
+
+/* Church Detail Posts Feed - Make transparent like dashboard */
+.church-detail-page .posts-feed {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important; /* Remove all padding for seamless integration */
+  margin: 0 !important; /* Remove all margins too */
+  border-radius: 0 !important; /* Remove rounded corners */
+  overflow: visible !important;
+  gap: 0 !important; /* Remove gap between post cards */
+}
+
+/* Remove any overlays from posts feed - same as dashboard */
+.church-detail-page .posts-feed::before {
+  content: none;
+}
+
+/* Church Detail Page Comment Enhancements - Apply all dashboard comment improvements */
+.church-detail-page .comment {
+  padding: 12px 16px; /* Same as dashboard - proper spacing from edges */
+}
+
+.church-detail-page .comment-input-group {
+  padding: 8px 0;
+}
+
+.church-detail-page .comment-input {
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 251, 240, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.church-detail-page .comment-input:focus {
+  border-color: rgba(139, 69, 19, 0.3);
+  box-shadow: 
+    0 0 0 3px rgba(218, 165, 32, 0.15),
+    0 4px 12px rgba(139, 69, 19, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+/* ====================================================
+   🌿 FOREST SERENITY RESPONSIVE
+   ==================================================== */
+
+@media (max-width: 768px) {
+  .dashboard-layout .sidebar-section {
+    padding: 16px;
+  }
+  
+  .dashboard-layout .church-suggestion {
+    padding: 12px 0;
+  }
+  
+  /* Church Detail Page Mobile Styling */
+  .church-detail-page .posts-feed {
+    padding: 16px;
+    border-radius: 16px;
+    margin: 16px;
+  }
+  
+  .dashboard-layout .follow-btn-small {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  
+  /* Mobile Post Cards */
+  .post-card {
+    margin-bottom: 16px;
+    border-radius: 0;
+  }
+  
+  .post-header {
+    padding: 16px;
+  }
+  
+  .post-author-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .post-content {
+    padding: 0 16px 16px;
+  }
+  
+  .post-actions {
+    gap: 20px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .post-action {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .expand-toggle {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  /* Mobile Posts Feed */
+  .posts-feed {
+    padding: 16px;
+    gap: 16px;
+    border-radius: 16px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .dashboard-layout .sidebar-content {
+    gap: 16px; /* Reduce gap between sections */
+  }
+  
+  .dashboard-layout .church-avatar-small {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .dashboard-layout .church-name-small {
+    font-size: 13px;
+  }
+  
+  .dashboard-layout .church-location-small {
+    font-size: 11px;
+  }
+  
+  .dashboard-layout .activity-text {
+    font-size: 11px;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr 280px; /* Smaller sidebar on tablets */
+    gap: 20px;
+  }
+  
+  .dashboard-layout .sidebar-content {
+    top: 50px !important; /* Reduced to compensate for increased padding-top on tablets */
+    max-height: calc(100vh - 70px);
+    padding-top: 44px !important; /* Posts-feed padding (24px) + Post header padding (20px) = 44px */
+  }
+}
+
+/* ====================================================
+   🌿 FOREST SERENITY POST CARDS - Glassmorphism Design
+   ==================================================== */
+
+/* Post Card - Enhanced with Forest Serenity Glassmorphism */
+.post-card {
+  /* Multi-layer glassmorphism background */
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.25) 0%, 
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.12) 100%);
+  
+  /* Reduced backdrop blur */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  /* Refined border with forest green accent */
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  
+  /* Smooth rounded corners */
+  border-radius: 16px;
+  
+  /* Multi-layer shadow system */
+  box-shadow: 
+    /* Primary depth shadow */
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    /* Secondary ambient shadow */
+    0 8px 16px rgba(0, 0, 0, 0.04),
+    /* Inner highlight */
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    /* Subtle forest green glow */
+    0 0 8px rgba(5, 150, 105, 0.08);
+  
+  /* Ensure smooth height transitions */
+  will-change: transform, box-shadow;
+  
+  /* Scroll offset for anchor links */
+  scroll-margin-top: 100px;
+}
+
+/* Post Card Hover Effects */
+.post-card:hover {
+  /* Enhanced shadow on hover */
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.12),
+    0 12px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 0 1px rgba(15, 118, 110, 0.1);
+  
+  /* Subtle lift effect */
+  transform: translateY(-2px);
+  
+  /* Enhanced border glow */
+  border-color: rgba(15, 118, 110, 0.2);
+}
+
+/* Highlight effect when post is targeted via anchor link */
+.post-card:target {
+  animation: highlightPost 2s ease-in-out;
+  border-color: rgba(139, 69, 19, 0.4);
+  box-shadow: 
+    0 0 0 3px rgba(218, 165, 32, 0.3),
+    0 30px 60px rgba(139, 69, 19, 0.15),
+    0 12px 24px rgba(139, 69, 19, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+@keyframes highlightPost {
+  0%, 100% {
+    background: linear-gradient(145deg, 
+      rgba(255, 255, 255, 0.25) 0%, 
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0.12) 100%);
+  }
+  15%, 45% {
+    background: linear-gradient(145deg, 
+      rgba(255, 240, 200, 0.5) 0%, 
+      rgba(255, 235, 180, 0.4) 50%,
+      rgba(255, 245, 190, 0.35) 100%);
+  }
+}
+
+/* Post Badges - Event and Donation indicators */
+.post-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.post-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.post-badge svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.event-badge {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.12) 100%);
+  color: #1e40af;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.event-badge:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.18) 100%);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.event-badge svg {
+  stroke: #1e40af;
+}
+
+.donation-badge {
+  background: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(219, 39, 119, 0.12) 100%);
+  color: #be185d;
+  border: 1px solid rgba(233, 30, 99, 0.3);
+}
+
+.donation-badge:hover {
+  background: linear-gradient(135deg, rgba(233, 30, 99, 0.15) 0%, rgba(219, 39, 119, 0.18) 100%);
+  border-color: rgba(233, 30, 99, 0.4);
+}
+
+.donation-badge svg {
+  fill: #be185d;
+}
+
+/* Responsive badge adjustments */
+@media (max-width: 640px) {
+  .post-badges {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  
+  .post-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  
+  .post-badge svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Post Content Styles - Full display without expand/collapse */
+
+/* Text Truncation Styles */
+.text-truncation-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.text-truncated {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  line-clamp: 3 !important;
+  overflow: hidden !important;
+  word-wrap: break-word !important;
+  line-height: 1.5 !important;
+  width: 100% !important;
+}
+
+.text-full {
+  word-wrap: break-word;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.text-see-more {
+  background: none !important;
+  border: none !important;
+  color: #0f766e !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  padding: 4px 0 !important;
+  margin-top: 4px !important;
+  transition: color 0.2s ease !important;
+}
+
+.text-see-more:hover {
+  color: #065f46 !important;
+  text-decoration: underline !important;
+}
+/* Forest Serenity Post Header */
+.post-header { 
+  display: flex; 
+  align-items: center; 
+  gap: 14px; 
+  padding: 20px 20px 16px; /* Reduced bottom padding for tighter connection */
+  margin-bottom: -1px; /* Slight overlap to eliminate gap */
+  
+  /* Subtle glassmorphism background */
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 100%);
+  
+  /* Enhanced backdrop blur */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* More subtle border */
+  border-bottom: 1px solid rgba(15, 118, 110, 0.06);
+  border-radius: 16px 16px 0 0;
+  
+  /* Inner highlight */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+/* Enhanced Post Author Avatar */
+.post-author-avatar { 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 50%; 
+  overflow: hidden; 
+  flex-shrink: 0;
+  
+  /* Forest green border with glow */
+  border: 2px solid rgba(15, 118, 110, 0.2);
+  
+  /* Subtle shadow */
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  
+  /* Smooth transitions */
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-author-avatar:hover {
+  /* Enhanced border on hover */
+  border-color: rgba(15, 118, 110, 0.4);
+  
+  /* Subtle scale effect */
+  transform: scale(1.05);
+  
+  /* Enhanced shadow */
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.12),
+    0 0 0 2px rgba(15, 118, 110, 0.1);
+}
+
+.post-author-avatar img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.post-author-avatar:hover img {
+  transform: scale(1.1);
+}
+
+.post-author-avatar .avatar-placeholder { 
+  width: 100%; 
+  height: 100%; 
+  
+  /* Forest green gradient background */
+  background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+  
+  color: #fff; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: 600; 
+  font-size: 16px;
+  
+  /* Subtle inner glow */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.post-author-info { flex: 1; }
+/* Enhanced Post Author Name */
+.post-author-name { 
+  font-weight: 600; 
+  color: #111827; 
+  font-size: 15px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px;
+  line-height: 1.4;
+}
+
+/* Forest Serenity Church Name Link */
+.church-name-link { 
+  color: inherit; 
+  text-decoration: none; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.church-name-link:hover { 
+  color: #0f766e;
+  text-decoration: none;
+  
+  /* Subtle glow effect */
+  text-shadow: 0 0 8px rgba(15, 118, 110, 0.3);
+}
+
+/* Subtle underline animation */
+.church-name-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0f766e, #059669);
+  transition: width 0.3s ease;
+}
+
+.church-name-link:hover::after {
+  width: 100%;
+}
+.post-author-type { color: var(--muted, #6b7280); font-size: 12px; }
+/* Enhanced Post Time */
+.post-time { 
+  color: #6b7280; 
+  font-size: 13px;
+  font-weight: 500;
+  
+  /* Subtle background */
+  background: rgba(15, 118, 110, 0.05);
+  padding: 4px 8px;
+  border-radius: 8px;
+  
+  /* Subtle border */
+  border: 1px solid rgba(15, 118, 110, 0.08);
+  
+  /* Smooth transition */
+  transition: all 0.3s ease;
+}
+
+.post-time:hover {
+  background: rgba(15, 118, 110, 0.08);
+  color: #374151;
+}
+
+/* Forest Serenity Verification Badge */
+.verified-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  position: relative;
+  overflow: hidden;
+  
+  /* Beautiful forest green gradient */
+  background: linear-gradient(135deg, 
+    rgba(5, 150, 105, 0.15) 0%, 
+    rgba(16, 185, 129, 0.12) 100%);
+  
+  /* Enhanced backdrop blur */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  color: white;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  
+  /* Beautiful border */
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  
+  /* Subtle shadow */
+  box-shadow: 
+    0 2px 4px rgba(5, 150, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Multiple continuous animations */
+  animation: 
+    verifiedPulse 3s ease-in-out infinite,
+    gentleGlow 2.5s ease-in-out infinite alternate;
+}
+
+.verified-tag:hover {
+  /* Enhanced gradient on hover with brighter appearance */
+  background: linear-gradient(135deg, 
+    rgba(5, 150, 105, 0.25) 0%, 
+    rgba(16, 185, 129, 0.22) 100%);
+  
+  /* Keep white text on hover */
+  color: white;
+  
+  /* Enhanced border with glow */
+  border-color: rgba(5, 150, 105, 0.4);
+  
+  /* Multi-layer enhanced shadows with glow */
+  box-shadow: 
+    0 6px 16px rgba(5, 150, 105, 0.3),
+    0 0 20px rgba(5, 150, 105, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  
+  /* Interactive transform with lift and slight scale */
+  transform: translateY(-2px) scale(1.08);
+  
+  /* Enhanced backdrop blur on hover */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Subtle pulse animation for verified tags */
+@keyframes verifiedPulse {
+  0% {
+    box-shadow: 
+      0 2px 4px rgba(5, 150, 105, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 2px 8px rgba(5, 150, 105, 0.25),
+      0 0 12px rgba(5, 150, 105, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 2px 4px rgba(5, 150, 105, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Continuous shine animation overlay */
+.verified-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent);
+  border-radius: 8px;
+  pointer-events: none;
+  animation: shineAnimation 4s ease-in-out infinite;
+}
+
+/* Shine animation keyframes */
+@keyframes shineAnimation {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    left: 100%;
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* Gentle glow animation for continuous visual interest */
+@keyframes gentleGlow {
+  0% {
+    border-color: rgba(5, 150, 105, 0.2);
+    backdrop-filter: blur(8px);
+  }
+  100% {
+    border-color: rgba(5, 150, 105, 0.35);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Shine animation overlay */
+
+/* Sparkle animations removed */
+
+
+/* Post Menu */
+/* Enhanced Post Menu */
+.post-menu { 
+  position: relative;
+  margin-left: auto;
+}
+
+.post-menu-btn { 
+  background: transparent; 
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  padding: 10px; 
+  border-radius: 50%; 
+  cursor: pointer; 
+  color: #6b7280; 
+  
+  /* No backdrop blur for non-glass look */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Subtle shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.post-menu-btn:hover { 
+  background: rgba(15, 118, 110, 0.08);
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.2);
+  
+  /* Enhanced shadow */
+  box-shadow: 0 4px 8px rgba(15, 118, 110, 0.15);
+  
+  /* Subtle scale effect */
+  transform: scale(1.1);
+}
+
+.post-menu-btn svg { 
+  width: 16px; 
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.post-menu-btn:hover svg {
+  transform: rotate(90deg);
+}
+
+/* Post Save Action in Header */
+.post-save-action {
+  position: relative;
+  margin-left: auto;
+}
+
+.post-save-action .post-action {
+  background: transparent;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Subtle shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.post-save-action .post-action:hover {
+  background: rgba(15, 118, 110, 0.08);
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.2);
+  
+  /* Enhanced shadow */
+  box-shadow: 0 4px 8px rgba(15, 118, 110, 0.15);
+  
+  /* Subtle scale effect */
+  transform: scale(1.1);
+}
+
+.post-save-action .post-action svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.post-save-action .post-action.bookmarked {
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.25);
+}
+
+.post-save-action .post-action.bookmarked svg {
+  fill: currentColor;
+}
+
+.post-save-action .action-text {
+  display: none; /* Hide text in header, only show icon */
+}
+
+/* Post Menu in Actions Bar */
+.post-actions .post-menu {
+  margin-left: auto;
+}
+
+.post-actions .post-menu-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-actions .post-menu-btn:hover {
+  background: rgba(15, 118, 110, 0.08);
+  color: #0f766e;
+}
+
+.post-actions .post-menu-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Ensure all post cards have proper stacking context */
+.post-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* Post content elements must have lower z-index than menu */
+.post-content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.post-header {
+  position: relative;
+  z-index: 10;
+  transform: translateZ(1px); /* Ensure header is above content */
+}
+
+.post-actions {
+  position: relative;
+  z-index: 1;
+}
+
+/* Post menu container must be positioned with high z-index */
+.post-menu {
+  position: relative;
+  z-index: 999999 !important;
+  transform: translateZ(2px) !important; /* Higher stacking context */
+}
+
+/* Universal Post Menu Dropdown - Works on both Church Details & Dashboard */
+.post-menu-dropdown { 
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  
+  /* Solid white background */
+  background: #ffffff;
+  
+  /* Simple border */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  
+  /* Clean shadow */
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.05);
+  
+  z-index: 9999999 !important;
+  min-width: 180px;
+  
+  /* Smooth entrance animation */
+  opacity: 0;
+  transform: translateZ(3px) translateY(-8px) scale(0.95) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+
+.post-menu-dropdown.show {
+  opacity: 1;
+  transform: translateZ(3px) translateY(0) scale(1) !important;
+  pointer-events: all;
+}
+
+/* Enhanced Menu Items */
+.menu-item { 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%; 
+  padding: 14px 18px; 
+  text-align: left; 
+  background: none; 
+  border: none; 
+  color: #111827; 
+  font-size: 14px; 
+  font-weight: 500;
+  cursor: pointer; 
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Subtle border radius for first/last items */
+  border-radius: 0;
+}
+
+.menu-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item span {
+  flex: 1;
+}
+
+.menu-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.menu-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.menu-item:only-child {
+  border-radius: 8px;
+}
+
+.menu-item:hover { 
+  /* Warm Sacred Earth brown hover background */
+  background: linear-gradient(145deg,
+    rgba(139, 69, 19, 0.08) 0%,
+    rgba(139, 69, 19, 0.05) 100%);
+  
+  color: #8B4513;
+  
+  /* Subtle scale effect */
+  transform: translateX(4px);
+  
+  /* Enhanced backdrop blur */
+  backdrop-filter: blur(10px);
+}
+
+.menu-item:hover svg {
+  transform: scale(1.1);
+  stroke: #8B4513;
+}
+
+/* Edit button specific styling */
+.edit-post-btn {
+  color: #111827;
+}
+
+.edit-post-btn:hover {
+  background: linear-gradient(145deg,
+    rgba(218, 165, 32, 0.08) 0%,
+    rgba(218, 165, 32, 0.05) 100%);
+  color: #DAA520;
+}
+
+.edit-post-btn:hover svg {
+  stroke: #DAA520;
+}
+
+/* Report button specific styling */
+.report-post-btn {
+  color: #111827;
+}
+
+.report-post-btn:hover {
+  background: linear-gradient(145deg,
+    rgba(220, 38, 38, 0.08) 0%,
+    rgba(220, 38, 38, 0.05) 100%);
+  color: #dc2626;
+}
+
+.report-post-btn:hover svg {
+  stroke: #dc2626;
+}
+
+.menu-item-danger { 
+  color: #dc2626;
+}
+
+.menu-item-danger:hover { 
+  background: linear-gradient(145deg,
+    rgba(220, 38, 38, 0.08) 0%,
+    rgba(220, 38, 38, 0.05) 100%);
+  
+  color: #991b1b;
+}
+
+/* Posts Filter */
+.posts-filter { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 16px; 
+  background: transparent; 
+  border-bottom: none; 
+  margin-bottom: 32px; /* Add gap between filter and posts */
+}
+.filter-tabs { display: flex; gap: 8px; }
+.filter-tab { padding: 8px 16px; background: none; border: 1px solid transparent; border-radius: 20px; cursor: pointer; font-size: 14px; color: var(--muted, #6b7280); transition: all 0.2s; }
+.filter-tab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+.filter-tab:hover:not(.active) { background: #e2e8f0; color: var(--text, #111827); }
+.filter-sort { display: flex; align-items: center; }
+.sort-select { padding: 8px 12px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; background: #fff; font-size: 14px; color: var(--text, #111827); cursor: pointer; }
+/* Enhanced Post Content */
+.post-content { 
+  padding: 16px 20px 16px; /* Added top padding for proper spacing */
+  position: relative;
+  margin-top: -1px; /* Slight overlap to connect with header */
+}
+
+.post-text { 
+  color: #111827; 
+  line-height: 1.6; 
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 400;
+  
+  /* Enhanced readability */
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+}
+
+/* Beautiful Post Images */
+.post-image { 
+  width: 100%; 
+  max-height: 420px; 
+  object-fit: cover; 
+  border-radius: 0;
+  
+  /* Subtle shadow */
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.06);
+  
+  /* Enhanced border */
+  border: 1px solid rgba(15, 118, 110, 0.1);
+  
+  /* Smooth transitions */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-image:hover {
+  /* Enhanced shadow on hover */
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.15),
+    0 6px 12px rgba(0, 0, 0, 0.1);
+  
+  /* Subtle scale effect */
+  transform: scale(1.02);
+  
+  /* Enhanced border */
+  border-color: rgba(15, 118, 110, 0.2);
+}
+/* Forest Serenity Post Actions */
+.post-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: 28px; 
+  padding: 20px; /* Match post-header padding exactly */
+  margin-top: -1px; /* Slight overlap to eliminate gap */
+  
+  /* Enhanced glassmorphism background - similar to post-header */
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.06) 100%);
+  
+  /* Enhanced backdrop blur to match header */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Subtle forest green border */
+  border-top: 1px solid rgba(15, 118, 110, 0.06);
+  border-radius: 0;
+  
+  /* Enhanced inner highlight to match header */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Enhanced Post Action Buttons */
+.post-action { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  color: white; 
+  font-size: 14px; 
+  font-weight: 500;
+  cursor: pointer; 
+  padding: 8px 12px;
+  border-radius: 10px;
+  
+  /* Smooth transitions */
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Force remove background - clean look */
+  background: transparent !important;
+  backdrop-filter: none !important;
+  
+  /* Force remove border */
+  border: none !important;
+}
+
+.post-action:hover { 
+  color: white;
+  
+  /* Subtle hover background */
+  background: rgba(15, 118, 110, 0.08);
+  
+  /* No border on hover */
+  border: none;
+  
+  /* Subtle scale effect */
+  transform: translateY(-1px) scale(1.05);
+  
+  /* Simple shadow */
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.15);
+}
+
+/* Active/Liked States */
+.post-action.liked {
+  color: white;
+  background: rgba(5, 150, 105, 0.12);
+  border: none;
+}
+
+.post-action.bookmarked {
+  color: white;
+  background: rgba(16, 185, 129, 0.12);
+  border: none;
+}
+
+.post-action.saved {
+  color: white;
+  background: rgba(16, 185, 129, 0.12);
+  border: none;
+}
+
+.post-action svg { 
+  width: 18px; 
+  height: 18px;
+  transition: all 0.3s ease;
+}
+
+.post-action:hover svg {
+  transform: scale(1.1);
+}
+
+/* Action Count Styling */
+.action-count {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(15, 118, 110, 0.1);
+  min-width: 20px;
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Modal Styles */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.modal-content { background: #fff; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border, #e5e7eb); }
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted, #6b7280); }
+.modal-body { padding: 20px; }
+.modal-footer { display: flex; gap: 12px; justify-content: flex-end; padding: 20px; border-top: 1px solid var(--border, #e5e7eb); }
+
+/* Post Author in Modal */
+.modal .post-author { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.modal .post-author-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.modal .post-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.modal .post-author-avatar .avatar-placeholder { width: 100%; height: 100%; background: #111827; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; }
+.modal .post-author-name { font-weight: 600; color: var(--text, #111827); font-size: 14px; }
+.modal .post-author-type { color: var(--muted, #6b7280); font-size: 12px; }
+
+/* ====================================================
+   🌿 FOREST SERENITY COMMENT SYSTEM
+   ==================================================== */
+
+/* Nuclear CSS Approach for Input Transparency */
+.post-comments-section input,
+.post-comments-section textarea,
+.comment-form input,
+.comment-form textarea,
+.comment-input {
+  background: none !important;
+  background-color: transparent !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+.post-comments-section input:-webkit-autofill,
+.post-comments-section textarea:-webkit-autofill,
+.comment-form input:-webkit-autofill,
+.comment-form textarea:-webkit-autofill,
+.comment-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Enhanced Comment Input */
+.comment-input {
+  width: 100%;
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-radius: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #111827;
+  resize: vertical;
+  min-height: 44px;
+  
+  /* Glassmorphism background */
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 100%) !important;
+  
+  /* Enhanced backdrop blur */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Beautiful shadow */
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: rgba(15, 118, 110, 0.3);
+  
+  /* Enhanced focus background */
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.8) 100%) !important;
+  
+  /* Enhanced shadow with green glow */
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.08),
+    0 0 0 3px rgba(15, 118, 110, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.comment-input::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Comment Form Container */
+.comment-form {
+  padding: 16px;
+  
+  /* Subtle glassmorphism background */
+  background: linear-gradient(145deg,
+    rgba(15, 118, 110, 0.02) 0%,
+    rgba(15, 118, 110, 0.01) 100%);
+  
+  backdrop-filter: blur(5px);
+  border-radius: 0;
+  border-top: 1px solid rgba(15, 118, 110, 0.08);
+}
+
+.modal .post-content textarea { 
+  width: 100%; 
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-radius: 8px;
+  padding: 12px;
+  outline: none; 
+  resize: none; 
+  font-size: 16px; 
+  line-height: 1.5; 
+  color: #111827;
+  
+  /* Glassmorphism background */
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 100%) !important;
+  
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.modal .post-content textarea:focus {
+  border-color: rgba(15, 118, 110, 0.3);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.modal .post-content textarea::placeholder { 
+  color: #6b7280;
+}
+
+/* Post Options (Modal) */
+.modal .post-options { display: flex; gap: 16px; margin-top: 16px; }
+.modal .post-option-btn { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border, #e5e7eb); border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--muted, #6b7280); }
+.modal .post-option-btn:hover { background: #e2e8f0; }
+.modal .post-option-btn svg { width: 18px; height: 18px; }
+
+/* Cover placeholder text */
+.church-cover .cover-placeholder::after {
+  content: 'No cover image';
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .church-content { grid-template-columns: 1fr; }
+  .church-info { grid-template-columns: auto 1fr; }
+}
+
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 768px) {
+  .content .church-detail-page {
+    --page-padding: 12px 16px;
+  }
+  
+  .church-header {
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .church-cover {
+    height: 160px;
+  }
+  
+  .church-avatar {
+    width: 80px;
+    height: 80px;
+    margin-top: -40px;
+  }
+  
+  .church-info {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .church-name {
+    font-size: 24px;
+    text-align: center;
+  }
+  
+  .church-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .stat-item {
+    padding: 10px 14px;
+    border-radius: 0;
+  }
+  
+  .follow-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .content-section {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .tabs {
+    padding: 4px;
+    border-radius: 0;
+    margin-bottom: 20px;
+  }
+  
+  .tab-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .service-card {
+    border-radius: 16px;
+  }
+  
+  .sidebar-section {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .church-info { 
+    grid-template-columns: 1fr; 
+    justify-items: center; 
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .church-actions { 
+    justify-content: center; 
+    flex-direction: column; 
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .quick-actions { 
+    justify-content: center; 
+  }
+  
+  .church-cover { 
+    height: 140px; 
+  }
+  
+  .church-location-row { 
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .church-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .denomination-badge {
+    font-size: 13px;
+    padding: 0;
+  }
+  
+  .size-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
+/* Enhanced Reviews Styles */
+.reviews-section {
+  padding: 0;
+}
+
+/* Overall Rating Section */
+.overall-rating-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.overall-rating-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.overall-rating-header h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+}
+
+.overall-reviews-count {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: 1rem !important;
+  margin: 0;
+  font-weight: 600 !important;
+}
+
+.overall-rating-display {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.overall-rating-left {
+  text-align: center;
+}
+
+.overall-rating-number {
+  font-size: 4rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.overall-rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.overall-rating-stars .star.large {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.overall-rating-stars .star.large.filled {
+  color: #fbbf24;
+}
+
+.overall-rating-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.overall-rating-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rating-breakdown-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.rating-label {
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: 10px;
+}
+
+.rating-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rating-fill {
+  height: 100%;
+  background: #fbbf24;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.rating-count {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 20px;
+  text-align: right;
+}
+
+.reviews-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reviews-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.reviews-count {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-card-enhanced {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.review-card-enhanced:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.review-main {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.reviewer-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f3f4f6;
+}
+
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid #f3f4f6;
+}
+
+.verified-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.verified-badge i {
+  width: 10px;
+  height: 10px;
+  color: white;
+}
+
+.review-content-enhanced {
+  flex: 1;
+  min-width: 0;
+}
+
+.review-header-enhanced {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.reviewer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reviewer-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.service-tag-inline {
+  background: #f0f9ff;
+  color: #0284c7;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.review-rating-enhanced {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.rating-stars .star {
+  font-size: 16px;
+  color: #d1d5db;
+  line-height: 1;
+}
+
+.rating-stars .star.filled {
+  color: #fbbf24;
+}
+
+.rating-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.service-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0f9ff;
+  color: #0284c7;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  width: fit-content;
+}
+
+.service-tag i {
+  width: 14px;
+  height: 14px;
+}
+
+.review-text {
+  margin-bottom: 0.75rem;
+}
+
+.review-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.review-comment {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.review-helpful {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.review-helpful i {
+  width: 14px;
+  height: 14px;
+  color: #10b981;
+}
+
+.reviews-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.view-all-reviews {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.view-all-reviews:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.empty-state .empty-icon {
+  width: 48px;
+  height: 48px;
+  background: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.empty-state .empty-icon i {
+  width: 24px;
+  height: 24px;
+  color: #9ca3af;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .overall-rating-section {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .overall-rating-display {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .overall-rating-number {
+    font-size: 3rem;
+  }
+  
+  .overall-rating-stars .star.large {
+    font-size: 20px;
+  }
+  
+  .overall-rating-breakdown {
+    gap: 0.5rem;
+  }
+  
+  .rating-breakdown-row {
+    gap: 0.75rem;
+  }
+  
+  .review-main {
+    gap: 0.75rem;
+  }
+  
+  .avatar-img,
+  .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .review-header-enhanced {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .review-rating-enhanced {
+    align-self: flex-start;
+  }
+  
+  .rating-stars .star {
+    font-size: 14px;
+  }
+  
+  .service-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Social Media Style Post Creation - Warm Sacred Earth Theme */
+.social-post-creation {
+  margin-bottom: 24px;
+  margin-top: 0; /* Ensure consistent top alignment */
+}
+
+.post-creation-card {
+  background: 
+    /* Multi-layer parchment texture */
+    radial-gradient(ellipse 150px 100px at 85% 15%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 120px 80px at 15% 85%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    /* Fine paper grain */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.025) 0.8px, transparent 2.5px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.02) 0.8px, transparent 2.5px),
+    /* Warm Sacred Earth base gradient */
+    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+  
+  border: 2px solid rgba(139, 69, 19, 0.18);
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 3px 6px rgba(101, 67, 33, 0.06),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+    
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.post-creation-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 12px 24px rgba(139, 69, 19, 0.15),
+    0 4px 8px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.95);
+  border-color: rgba(139, 69, 19, 0.22);
+}
+
+/* Post Input Section */
+.post-input-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+.social-post-creation .church-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reset any header avatar overlap styles */
+  margin: 1px 0 0 0; /* slight optical alignment with input bar */
+  position: static;
+  top: auto;
+  transform: none;
+}
+
+.social-post-creation .church-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.social-post-creation .church-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFF9E6;
+}
+
+.post-input-container {
+  flex: 1;
+}
+
+.post-input-bar {
+  width: 100%;
+  padding: 0 18px;
+  border: 2px solid rgba(139, 69, 19, 0.15);
+  border-radius: 24px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  color: #6B4226;
+  cursor: pointer;
+  height: 48px; /* Match avatar size for perfect centering */
+  display: block;
+  line-height: 48px; /* Vertically center input text/placeholder */
+  
+  background: 
+    /* Wood grain texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 3px),
+    /* Warm cream base */
+    linear-gradient(135deg, #FFF9E6 0%, #F9F2E4 100%);
+    
+  transition: all 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.post-input-bar:hover {
+  border-color: rgba(139, 69, 19, 0.25);
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 3px),
+    linear-gradient(135deg, #FFFAEC 0%, #FAF4E6 100%);
+}
+
+.post-input-bar::placeholder {
+  color: #8B6F47;
+  font-style: italic;
+}
+
+/* Post Type Buttons */
+.post-type-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  padding-top: 12px;
+}
+
+.post-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  color: #6B4226;
+}
+
+.post-type-btn:hover {
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
+    linear-gradient(135deg, rgba(255, 249, 230, 0.5) 0%, rgba(247, 240, 224, 0.5) 100%);
+  transform: translateY(-1px);
+  color: #2D1810;
+}
+
+.post-type-icon {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+}
+
+/* Colorful icons for different post types */
+.post-type-btn[data-type="general"] .post-type-icon {
+  color: #3B82F6; /* Blue for updates */
+}
+
+.post-type-btn[data-type="photo"] .post-type-icon {
+  color: #10B981; /* Green for photos */
+}
+
+.post-type-btn[data-type="event"] .post-type-icon {
+  color: #F59E0B; /* Orange for events */
+}
+
+.post-type-btn[data-type="prayer"] .post-type-icon {
+  color: #8B5CF6; /* Purple for prayers */
+}
+
+.post-type-btn:hover .post-type-icon {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* Post Creation Modal */
+.post-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.post-modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transition: max-width 0.3s ease;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Wider modal for event posts */
+.post-modal-content.event-modal {
+  max-width: 700px;
+}
+
+/* Better layout for event fields in wider modal */
+.post-modal-content.event-modal .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.post-modal-content.event-modal .form-group-half {
+  margin-bottom: 0;
+}
+
+/* Tablet adjustments for event modal */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .post-modal-content.event-modal {
+    max-width: 650px;
+  }
+}
+
+.post-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+}
+
+.post-modal-title {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+}
+
+.post-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.post-modal-close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Modal Form Styling */
+.post-creation-form,
+.report-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Mobile Responsiveness for Social Media Style */
+@media (max-width: 768px) {
+  .post-type-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .post-type-btn {
+    padding: 16px 12px;
+    font-size: 14px;
+  }
+  
+  .post-type-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .church-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .church-avatar-placeholder {
+    font-size: 14px;
+  }
+  
+  .post-input-bar {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  
+  .post-modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .post-modal-content.event-modal {
+    max-width: 95%;
+  }
+  
+  /* Stack form fields on mobile */
+  .post-modal-content.event-modal .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .post-modal-content.event-modal .form-group-half {
+    margin-bottom: 20px;
+  }
+  
+  .post-creation-form {
+    padding: 20px;
+  }
+}
+
+  .post-creation-header {
+  margin-bottom: 24px;
+  text-align: center;
+  }
+
+/* =============================================================================
+   EVENT CARD ICON CLAMP (Fallback)
+   Ensure SVG icons inside event cards never blow up due to global SVG rules
+   ============================================================================= */
+
+.post-content .event-info-card .event-header .event-icon {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
+}
+
+.post-content .event-info-card .detail-icon {
+  width: 16px !important;
+  height: 16px !important;
+  display: inline-block !important;
+}
+
+.post-content .event-info-card svg {
+  flex: 0 0 auto !important;
+}
+
+.post-content .event-info-card .event-icon,
+.post-content .event-info-card .detail-icon {
+  stroke-width: 1.75 !important;
+}
+
+.post-creation-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2D1810;
+  margin: 0 0 8px 0;
+  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.post-creation-subtitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  color: #6B4226;
+  margin: 0;
+  font-style: italic;
+}
+
+.post-creation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.event-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(139, 69, 19, 0.03);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  border-radius: 12px;
+  margin-bottom: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D1810;
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(139, 69, 19, 0.08);
+}
+
+.form-select,
+.form-input[type="text"],
+.form-input[type="email"],
+.form-input[type="date"],
+.form-input[type="time"],
+select.form-input {
+  padding: 12px 16px;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  color: #2D1810;
+  width: 100%;
+  
+  background: 
+    /* Wood grain texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
+    /* Warm cream base */
+    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
+    
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-select:focus,
+.form-input:focus {
+  border-color: #DAA520;
+  box-shadow: 
+    0 0 0 3px rgba(218, 165, 32, 0.2),
+    0 4px 8px rgba(139, 69, 19, 0.1);
+  transform: translateY(-1px);
+}
+
+.post-textarea,
+textarea.form-input {
+  padding: 16px;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 16px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2D1810;
+  resize: vertical;
+  min-height: 120px;
+  width: 100%;
+  
+  background: 
+    /* Aged paper texture */
+    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 40px at 10% 90%, rgba(160, 82, 45, 0.03) 0%, transparent 70%),
+    /* Paper grain */
+    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.015) 0.5px, transparent 2px),
+    /* Warm cream base */
+    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
+    
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.post-textarea:focus,
+textarea.form-input:focus {
+  border-color: #DAA520;
+  box-shadow: 
+    0 0 0 3px rgba(218, 165, 32, 0.2),
+    0 6px 12px rgba(139, 69, 19, 0.12);
+  transform: translateY(-2px);
+  
+  background: 
+    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 40px at 10% 90%, rgba(160, 82, 45, 0.05) 0%, transparent 70%),
+    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.025) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFAEC 0%, #F9F2E4 100%);
+}
+
+.post-textarea::placeholder,
+textarea.form-input::placeholder {
+  color: #8B6F47;
+  font-style: italic;
+}
+
+.character-count,
+.char-counter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  color: #8B6F47;
+  margin-top: -4px;
+}
+
+.image-upload-area {
+  position: relative;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  border: 2px dashed rgba(139, 69, 19, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, rgba(255, 249, 230, 0.6) 0%, rgba(247, 240, 224, 0.6) 100%);
+}
+
+.file-upload-label:hover {
+  border-color: #DAA520;
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, rgba(255, 249, 230, 0.8) 0%, rgba(247, 240, 224, 0.8) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+}
+
+.upload-icon {
+  width: 24px;
+  height: 24px;
+  color: #8B4513;
+}
+
+.upload-text {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  color: #6B4226;
+  font-weight: 500;
+}
+
+.image-preview {
+  position: relative;
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(139, 69, 19, 0.9);
+  color: #FFF9E6;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: rgba(101, 67, 33, 0.95);
+  transform: scale(1.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.post-submit-btn,
+.btn-primary,
+.report-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFF9E6;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: 140px;
+  
+  background: 
+    /* Wood grain texture overlay */
+    repeating-linear-gradient(45deg, rgba(101, 67, 33, 0.1) 0px, rgba(101, 67, 33, 0.1) 1px, transparent 1px, transparent 3px),
+    /* Multi-layer gradient */
+    linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #8B4513 50%, #654321 75%, #8B4513 100%);
+    
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.3),
+    0 3px 6px rgba(101, 67, 33, 0.2),
+    inset 0 1px 0 rgba(218, 165, 32, 0.4);
+}
+
+.btn-secondary,
+.report-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: 2px solid rgba(139, 69, 19, 0.3);
+  border-radius: 50px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6B4226;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: 120px;
+  
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
+    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
+    
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.1),
+    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+}
+
+.btn-secondary:hover,
+.report-cancel-btn:hover {
+  border-color: rgba(139, 69, 19, 0.4);
+  color: #2D1810;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.15),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+}
+
+.post-submit-btn:hover:not(:disabled),
+.btn-primary:hover:not(:disabled),
+.report-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 24px rgba(139, 69, 19, 0.35),
+    0 5px 10px rgba(101, 67, 33, 0.25),
+    inset 0 1px 0 rgba(218, 165, 32, 0.5);
+    
+  background: 
+    repeating-linear-gradient(45deg, rgba(101, 67, 33, 0.15) 0px, rgba(101, 67, 33, 0.15) 1px, transparent 1px, transparent 3px),
+    linear-gradient(135deg, #E6B800 0%, #CC9900 25%, #A0522D 50%, #7A4B1A 75%, #A0522D 100%);
+}
+
+.post-submit-btn:active:not(:disabled),
+.btn-primary:active:not(:disabled),
+.report-submit-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.25),
+    0 2px 4px rgba(101, 67, 33, 0.15),
+    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+}
+
+.post-submit-btn:disabled,
+.btn-primary:disabled,
+.report-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.2),
+    0 1px 2px rgba(101, 67, 33, 0.1);
+}
+
+.submit-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.submit-loading {
+  display: none;
+}
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.form-message {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.form-message.success {
+  background: 
+    repeating-linear-gradient(25deg, rgba(34, 139, 34, 0.05) 0.5px, transparent 2px),
+    linear-gradient(135deg, rgba(220, 252, 231, 0.9) 0%, rgba(187, 247, 208, 0.9) 100%);
+  color: #065f46;
+  border: 2px solid rgba(34, 139, 34, 0.2);
+}
+
+.form-message.error {
+  background: 
+    repeating-linear-gradient(25deg, rgba(185, 28, 28, 0.05) 0.5px, transparent 2px),
+    linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(252, 165, 165, 0.9) 100%);
+  color: #991b1b;
+  border: 2px solid rgba(185, 28, 28, 0.2);
+}
+
+/* Enhanced Mobile Responsiveness for Post Creation */
+@media (max-width: 768px) {
+  .post-creation-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .post-creation-title {
+    font-size: 20px;
+  }
+  
+  .church-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .post-input-bar {
+    padding: 0 16px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 14px;
+  }
+  
+  .post-type-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .post-type-btn {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .post-type-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .post-textarea {
+    padding: 14px;
+    font-size: 15px;
+  }
+  
+  .post-submit-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    min-width: 140px;
+  }
+}
+
+/* ====================================================
+   📸 PHOTO GALLERY SECTION
+   ==================================================== */
+
+/* Photo Gallery Header */
+.photo-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.view-all-link {
+  color: #8B4513;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.view-all-link:hover {
+  color: #A0522D;
+  text-decoration: underline;
+}
+
+/* Photo Gallery Grid - 3x3 Grid Layout (Similar to Facebook) */
+.photo-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Photo Item */
+.photo-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding-bottom: 100%; /* 1:1 Aspect Ratio */
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    rgba(240, 253, 250, 0.8) 0%, 
+    rgba(219, 234, 254, 0.6) 100%);
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 8px;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.photo-item:hover {
+  transform: scale(1.05);
+  z-index: 2;
+  box-shadow: 0 6px 12px rgba(139, 69, 19, 0.25);
+  border-color: rgba(139, 69, 19, 0.4);
+}
+
+.photo-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.photo-item:hover img {
+  transform: scale(1.1);
+}
+
+/* Photo Overlay */
+.photo-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-item:hover .photo-overlay {
+  opacity: 1;
+}
+
+.photo-overlay svg {
+  width: 28px;
+  height: 28px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* 2x2 Grid for smaller screens or fewer photos */
+@media (max-width: 768px) {
+  .photo-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+}
+
+/* Special layout for exactly 4 photos (2x2) */
+.photo-gallery-grid:has(.photo-item:nth-child(4):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+/* Special layout for 1 photo */
+.photo-gallery-grid:has(.photo-item:only-child) {
+  grid-template-columns: 1fr;
+}
+
+/* Special layout for 2 photos */
+.photo-gallery-grid:has(.photo-item:nth-child(2):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}

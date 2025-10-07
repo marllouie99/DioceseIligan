@@ -1,0 +1,198 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Edit Availability Entry - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/availability.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="edit-availability-page warm-sacred-earth">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Edit Availability Entry</h1>
+        <p class="page-subtitle">Update closed dates or special hours for {{ church.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div class="form-container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="availability-form" id="availability-edit-form">
+      {% csrf_token %}
+      
+      <div class="form-sections">
+        <!-- Date and Type Section -->
+        <div class="form-section">
+          <h2 class="section-title">Date & Type</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="{{ form.date.id_for_label }}" class="form-label">Date *</label>
+              {{ form.date }}
+              {% if form.date.errors %}
+                <div class="form-error">{{ form.date.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.type.id_for_label }}" class="form-label">Type *</label>
+              {{ form.type }}
+              {% if form.type.errors %}
+                <div class="form-error">{{ form.type.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability Settings Section -->
+        <div class="form-section">
+          <h2 class="section-title">Availability Settings</h2>
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label class="form-checkbox-label">
+                {{ form.is_closed }}
+                <span class="checkbox-text">Church is closed on this date</span>
+              </label>
+              <small class="form-help">If checked, the church will be closed for all bookable services on this date</small>
+              {% if form.is_closed.errors %}
+                <div class="form-error">{{ form.is_closed.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Settings Section (shown when not closed) -->
+        <div class="form-section" id="time-settings" style="display: none;">
+          <h2 class="section-title">Time Settings</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="{{ form.start_time.id_for_label }}" class="form-label">Start Time *</label>
+              {{ form.start_time }}
+              {% if form.start_time.errors %}
+                <div class="form-error">{{ form.start_time.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.end_time.id_for_label }}" class="form-label">End Time *</label>
+              {{ form.end_time }}
+              {% if form.end_time.errors %}
+                <div class="form-error">{{ form.end_time.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        <div class="form-section">
+          <h2 class="section-title">Description</h2>
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="{{ form.reason.id_for_label }}" class="form-label">Reason</label>
+              {{ form.reason }}
+              <small class="form-help">e.g., Holiday, Maintenance, Special Event</small>
+              {% if form.reason.errors %}
+                <div class="form-error">{{ form.reason.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group form-group-full">
+              <label for="{{ form.notes.id_for_label }}" class="form-label">Additional Notes</label>
+              {{ form.notes }}
+              <small class="form-help">Additional details about this availability change</small>
+              {% if form.notes.errors %}
+                <div class="form-error">{{ form.notes.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'core:manage_church' %}?tab=availability" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          <span class="btn-text">Update Availability Entry</span>
+          <span class="btn-spinner" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin">
+              <path d="M21 12a9 9 0 11-6.219-8.56"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('availability-edit-form');
+  const isClosedCheckbox = document.getElementById('id_is_closed');
+  const timeSettings = document.getElementById('time-settings');
+  const startTimeField = document.getElementById('id_start_time');
+  const endTimeField = document.getElementById('id_end_time');
+  
+  // Toggle time settings based on closed checkbox
+  function toggleTimeSettings() {
+    if (isClosedCheckbox.checked) {
+      timeSettings.style.display = 'none';
+      startTimeField.required = false;
+      endTimeField.required = false;
+    } else {
+      timeSettings.style.display = 'block';
+      startTimeField.required = true;
+      endTimeField.required = true;
+    }
+  }
+  
+  isClosedCheckbox.addEventListener('change', toggleTimeSettings);
+  
+  // Initial state
+  toggleTimeSettings();
+  
+  // Handle form submission
+  if (form) {
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+    
+    form.addEventListener('submit', function(e) {
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.textContent = 'Updating Entry...';
+      btnSpinner.style.display = 'inline-block';
+      submitBtn.style.opacity = '0.8';
+    });
+  }
+});
+</script>
+{% endblock %}

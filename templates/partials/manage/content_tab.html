@@ -1,0 +1,10 @@
+{# Content Tab #}
+<div class="tab-panel" id="content">
+  <div class="tab-header">
+    <h2>Posts & Content</h2>
+    <p>Manage your church posts and announcements</p>
+  </div>
+  
+  {# Content Sub-tabs #}
+  {% include 'partials/manage/content_sub_tabs.html' with analytics=analytics follower_count=follower_count posts=posts posts_count=posts_count church=church %}
+</div>

@@ -1,0 +1,557 @@
+/* 
+ * Card Components - Warm Sacred Earth Theme
+ * Reusable card styles with parchment textures
+ * Version: 1.0
+ */
+
+/* =============================================================================
+   BASE CARD STYLES
+   Foundation for all card variants
+   ============================================================================= */
+
+.card {
+  background: var(--gradient-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-hover);
+  border-color: var(--border-dark);
+}
+
+/* =============================================================================
+   PARCHMENT CARDS
+   Cards with aged paper textures
+   ============================================================================= */
+
+.parchment-card {
+  background:
+    /* Multi-layer aged parchment texture */
+    var(--aged-spot-1),
+    var(--aged-spot-2),
+    radial-gradient(ellipse 60px 40px at 90% 90%, rgba(101, 67, 33, 0.04) 0%, transparent 60%),
+    /* Paper grain texture */
+    var(--grain-fine),
+    var(--grain-medium),
+    /* Base parchment color */
+    var(--gradient-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl), var(--shadow-inset);
+  backdrop-filter: blur(8px);
+  transition: var(--transition-normal);
+  padding: var(--spacing-lg);
+}
+
+.parchment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2xl), var(--shadow-inset-hover);
+  border-color: var(--border-dark);
+  background:
+    /* Enhanced parchment on hover */
+    radial-gradient(ellipse 120px 80px at 85% 25%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 140px at 15% 75%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    var(--grain-fine),
+    var(--gradient-card-hover);
+}
+
+/* Compact Parchment Card */
+.parchment-card-compact {
+  background:
+    /* Subtle texture for smaller cards */
+    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.01) 0px, rgba(139, 69, 19, 0.01) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F6E8D2 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+  padding: var(--spacing-md);
+}
+
+.parchment-card-compact:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background:
+    radial-gradient(ellipse 100px 60px at 85% 15%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%);
+}
+
+/* =============================================================================
+   CHURCH CARDS
+   Specific cards for church listings
+   ============================================================================= */
+
+.church-card {
+  background:
+    /* Multi-layer aged parchment texture */
+    radial-gradient(ellipse 100px 60px at 85% 15%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 120px at 15% 85%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    radial-gradient(ellipse 60px 40px at 95% 95%, rgba(101, 67, 33, 0.05) 0%, transparent 60%),
+    /* Paper grain texture */
+    var(--grain-fine),
+    var(--grain-medium),
+    /* Base parchment color */
+    var(--gradient-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  backdrop-filter: blur(8px);
+}
+
+.church-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2xl), var(--shadow-inset-hover);
+  border-color: var(--border-dark);
+  background:
+    /* Enhanced parchment on hover */
+    radial-gradient(ellipse 120px 80px at 90% 20%, rgba(139, 69, 19, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 140px at 10% 80%, rgba(160, 82, 45, 0.08) 0%, transparent 75%),
+    var(--grain-fine),
+    var(--gradient-card-hover);
+}
+
+/* =============================================================================
+   PROFILE CARDS
+   Cards for user profiles and information
+   ============================================================================= */
+
+.profile-card {
+  background:
+    /* Enhanced texture for profile cards */
+    radial-gradient(ellipse 60px 40px at 50% 20%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 6px),
+    var(--gradient-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  transition: var(--transition-normal);
+  padding: var(--spacing-lg);
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-hover);
+}
+
+/* =============================================================================
+   INFO CARDS
+   Cards for displaying information items
+   ============================================================================= */
+
+.info-card {
+  padding: var(--spacing-lg);
+  background:
+    /* Subtle texture for info items */
+    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.01) 0px, rgba(139, 69, 19, 0.01) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F6E8D2 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background:
+    radial-gradient(ellipse 100px 60px at 85% 15%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 4px),
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%);
+}
+
+/* =============================================================================
+   STAT CARDS
+   Cards for displaying statistics
+   ============================================================================= */
+
+.stat-card {
+  text-align: center;
+  padding: var(--spacing-lg);
+  background:
+    /* Enhanced stats card texture */
+    radial-gradient(ellipse 60px 40px at 50% 20%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 6px),
+    var(--gradient-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  transition: var(--transition-normal);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-hover);
+}
+
+.stat-number {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--brand);
+  margin-bottom: var(--spacing-sm);
+  font-family: var(--font-family-primary);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* =============================================================================
+   ACTIVITY CARDS
+   Cards for activity feeds and recent items
+   ============================================================================= */
+
+.activity-card {
+  background:
+    /* Subtle texture for activity */
+    radial-gradient(ellipse 60px 40px at 80% 20%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.008) 0px, rgba(139, 69, 19, 0.008) 1px, transparent 1px, transparent 5px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F6E8D2 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+}
+
+.activity-card:hover {
+  background:
+    radial-gradient(ellipse 80px 60px at 85% 25%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.012) 0px, rgba(139, 69, 19, 0.012) 1px, transparent 1px, transparent 5px),
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%);
+  box-shadow: var(--shadow-md);
+}
+
+/* =============================================================================
+   CARD HEADER AND CONTENT
+   Common card sections
+   ============================================================================= */
+
+.card-header {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.card-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text);
+  margin: 0 0 var(--spacing-xs) 0;
+  font-family: var(--font-family-primary);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.card-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.card-content {
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.card-footer {
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
+  margin-top: var(--spacing-md);
+}
+
+/* =============================================================================
+   AVATAR COMPONENTS
+   Avatar styling for cards
+   ============================================================================= */
+
+.avatar-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  border: 2px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+}
+
+/* =============================================================================
+   BADGE COMPONENTS
+   Status badges for cards
+   ============================================================================= */
+
+.badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-family: var(--font-family-primary);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-pending {
+  background: var(--gradient-badge-pending);
+  color: var(--badge-pending-text);
+  border: 1px solid var(--border-dark);
+}
+
+.badge-approved {
+  background: var(--gradient-badge-approved);
+  color: var(--badge-approved-text);
+  border: 1px solid var(--border-light);
+}
+
+.badge-completed {
+  background: var(--gradient-badge-completed);
+  color: var(--badge-completed-text);
+  border: 1px solid var(--border-dark);
+}
+
+.badge-declined {
+  background: var(--gradient-badge-declined);
+  color: var(--badge-declined-text);
+  border: 1px solid var(--border-light);
+}
+
+/* Size variants */
+.badge-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+}
+
+.badge-lg {
+  padding: 0.75rem 1.25rem;
+  font-size: var(--font-size-sm);
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   Mobile-specific card adjustments
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .parchment-card,
+  .church-card,
+  .profile-card {
+    padding: var(--spacing-md);
+  }
+  
+  .card-header,
+  .card-content,
+  .card-footer {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+  
+  .stat-number {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar-image,
+  .avatar-placeholder {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .avatar-placeholder {
+    font-size: var(--font-size-lg);
+  }
+  
+  .card-title {
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* =============================================================================
+   EVENT INFO CARD
+   Special card for displaying event information in posts
+   ============================================================================= */
+
+.event-info-card {
+  background: 
+    radial-gradient(ellipse 120px 80px at 20% 20%, rgba(184, 134, 11, 0.08) 0%, transparent 70%),
+    var(--grain-fine),
+    linear-gradient(135deg, rgba(255, 249, 230, 0.95) 0%, rgba(253, 245, 230, 0.9) 100%);
+  border: 2px solid rgba(184, 134, 11, 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 
+    0 4px 12px rgba(139, 69, 19, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid rgba(184, 134, 11, 0.2);
+}
+
+.event-title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.event-location-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--brand);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.event-location-badge .location-icon {
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.event-info-card .event-icon {
+  width: 24px !important;
+  height: 24px !important;
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.event-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text);
+  margin: 0;
+  font-family: var(--font-family-primary);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.event-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.event-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.event-info-card .detail-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--brand);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+.detail-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text);
+  word-wrap: break-word;
+}
+
+/* Comprehensive SVG protection for event cards */
+.event-info-card svg {
+  flex: 0 0 auto !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.event-info-card .event-header svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.event-info-card .event-detail-item svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+@media (max-width: 768px) {
+  .event-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .event-info-card .event-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .event-info-card .detail-icon {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}

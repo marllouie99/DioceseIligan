@@ -1,0 +1,25 @@
+{% load static %}
+{# Individual Availability Item #}
+<div class="closed-date-item availability-item {% if availability.is_closed %}closed{% else %}special-hours{% endif %}" data-date="{{ availability.date|date:'Y-m-d' }}">
+  <div class="date-info">
+    <div class="date">{{ availability.date|date:"M d, Y" }}</div>
+    <div class="date-type">
+      {% if availability.is_closed %}
+        <span class="status-closed">Closed</span>
+      {% else %}
+        <span class="status-special">{{ availability.start_time|time:"g:i A" }} - {{ availability.end_time|time:"g:i A" }}</span>
+      {% endif %}
+    </div>
+    {% if availability.reason %}
+      <div class="date-reason">{{ availability.reason }}</div>
+    {% endif %}
+  </div>
+  <div class="date-actions">
+    <a href="{% url 'core:edit_availability' availability.id %}" class="btn-icon" title="Edit">
+      {% include 'partials/icons/edit.html' %}
+    </a>
+    <a href="{% url 'core:delete_availability' availability.id %}" class="btn-icon btn-danger" title="Delete">
+      {% include 'partials/icons/trash.html' %}
+    </a>
+  </div>
+</div>

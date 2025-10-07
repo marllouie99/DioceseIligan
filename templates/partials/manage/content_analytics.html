@@ -1,0 +1,120 @@
+{# Content Analytics Sub-tab #}
+<div class="sub-tab-panel active" id="content-analytics">
+  {# Analytics Overview Section #}
+  <div class="analytics-overview">
+    <h3>Content Analytics</h3>
+    <div class="analytics-cards">
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_posts }}</h4>
+          <p>Total Posts</p>
+          <span class="analytics-change">+{{ analytics.posts_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_likes }}</h4>
+          <p>Total Likes</p>
+          <span class="analytics-change">+{{ analytics.likes_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_comments }}</h4>
+          <p>Total Comments</p>
+          <span class="analytics-change">+{{ analytics.comments_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+            <path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ follower_count }}</h4>
+          <p>Total Followers</p>
+          <span class="analytics-change">+{{ analytics.followers_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_views }}</h4>
+          <p>Total Views</p>
+          <span class="analytics-change">+{{ analytics.views_last_30_days }} this month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {# Top Performing Posts Section #}
+  {% if analytics.top_posts %}
+  <div class="top-posts-section">
+    <h3>Top Performing Posts</h3>
+    <div class="top-posts-grid">
+      {% for post in analytics.top_posts %}
+      <div class="top-post-card">
+        <div class="top-post-content">
+          <p>{{ post.content|truncatechars:100 }}</p>
+          {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post image" class="top-post-image">
+          {% endif %}
+        </div>
+        <div class="top-post-stats">
+          <span class="stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+            {{ post.likes_count }}
+          </span>
+          <span class="stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            {{ post.comments_count }}
+          </span>
+          <span class="stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            {{ post.view_count }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>

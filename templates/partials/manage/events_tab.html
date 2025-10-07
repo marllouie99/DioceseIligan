@@ -1,0 +1,58 @@
+{% load static %}
+{# Events Tab Content #}
+<div class="tab-panel" id="events">
+  <div class="tab-header">
+    <h2>Events</h2>
+    <p>Manage church events and special occasions</p>
+  </div>
+  
+  <div class="tab-content">
+    <div class="posts-management">
+      <div class="posts-header">
+        <div class="posts-stats">
+          <div class="stat-item">
+            <span class="stat-number">{{ event_posts_count }}</span>
+            <span class="stat-label">Total Events</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ follower_count }}</span>
+            <span class="stat-label">Followers</span>
+          </div>
+        </div>
+        <a href="{% url 'core:church_detail' church.slug %}#posts" class="btn btn-primary">
+          {% include 'partials/icons/plus.html' %}
+          Create New Event
+        </a>
+      </div>
+
+      {% if event_posts %}
+        <div class="posts-list">
+          {% for post in event_posts %}
+            {% include 'partials/manage/post_card.html' with post=post church=church %}
+          {% endfor %}
+        </div>
+        
+        {% if event_posts_count > 20 %}
+          <div class="posts-pagination">
+            <p class="text-muted">Showing 20 of {{ event_posts_count }} event posts</p>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <h3>No Events Scheduled</h3>
+          <p>Create event posts to share upcoming church activities and special occasions with your community.</p>
+          <a href="{% url 'core:church_detail' church.slug %}#posts" class="btn btn-primary">
+            {% include 'partials/icons/plus.html' %}
+            Create Event Post
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

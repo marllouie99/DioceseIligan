@@ -1,0 +1,250 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Edit Service - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/services.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="edit-service-page warm-sacred-earth">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Edit Service</h1>
+        <p class="page-subtitle">Update {{ service.name }} for {{ church.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div class="form-container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="service-form" id="service-edit-form">
+      {% csrf_token %}
+      
+      <div class="form-sections">
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">Service Information</h2>
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="{{ form.name.id_for_label }}" class="form-label">Service Name *</label>
+              {{ form.name }}
+              <small class="form-help">e.g., Counseling Session, Baptism, Wedding Consultation</small>
+              {% if form.name.errors %}
+                <div class="form-error">{{ form.name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group form-group-full">
+              <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+              {{ form.description }}
+              <small class="form-help">Describe what this service includes and what people can expect</small>
+              {% if form.description.errors %}
+                <div class="form-error">{{ form.description.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="form-section">
+          <h2 class="section-title">Pricing</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-checkbox-label">
+                {{ form.is_free }}
+                <span class="checkbox-text">This service is free</span>
+              </label>
+              {% if form.is_free.errors %}
+                <div class="form-error">{{ form.is_free.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group" id="price-group">
+              <label for="{{ form.price.id_for_label }}" class="form-label">Price</label>
+              {{ form.price }}
+              <small class="form-help">Enter the price for this service</small>
+              {% if form.price.errors %}
+                <div class="form-error">{{ form.price.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group" id="currency-group">
+              <label for="{{ form.currency.id_for_label }}" class="form-label">Currency</label>
+              {{ form.currency }}
+              {% if form.currency.errors %}
+                <div class="form-error">{{ form.currency.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Scheduling Section -->
+        <div class="form-section">
+          <h2 class="section-title">Scheduling</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="{{ form.duration.id_for_label }}" class="form-label">Duration *</label>
+              {{ form.duration }}
+              {% if form.duration.errors %}
+                <div class="form-error">{{ form.duration.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.max_bookings_per_day.id_for_label }}" class="form-label">Max Bookings Per Day *</label>
+              {{ form.max_bookings_per_day }}
+              <small class="form-help">Maximum number of appointments per day</small>
+              {% if form.max_bookings_per_day.errors %}
+                <div class="form-error">{{ form.max_bookings_per_day.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.advance_booking_days.id_for_label }}" class="form-label">Advance Booking Days *</label>
+              {{ form.advance_booking_days }}
+              <small class="form-help">How many days in advance can this be booked</small>
+              {% if form.advance_booking_days.errors %}
+                <div class="form-error">{{ form.advance_booking_days.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="form-section">
+          <h2 class="section-title">Settings</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-checkbox-label">
+                {{ form.is_active }}
+                <span class="checkbox-text">Service is active and available for booking</span>
+              </label>
+              {% if form.is_active.errors %}
+                <div class="form-error">{{ form.is_active.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group">
+              <label class="form-checkbox-label">
+                {{ form.requires_approval }}
+                <span class="checkbox-text">Bookings require church approval</span>
+              </label>
+              <small class="form-help">If checked, bookings will need to be approved before confirmation</small>
+              {% if form.requires_approval.errors %}
+                <div class="form-error">{{ form.requires_approval.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions Section -->
+        <div class="form-section">
+          <h2 class="section-title">Instructions & Policies</h2>
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="{{ form.preparation_notes.id_for_label }}" class="form-label">Preparation Notes</label>
+              {{ form.preparation_notes }}
+              <small class="form-help">Instructions for people booking this service (e.g., what to bring, how to prepare)</small>
+              {% if form.preparation_notes.errors %}
+                <div class="form-error">{{ form.preparation_notes.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group form-group-full">
+              <label for="{{ form.cancellation_policy.id_for_label }}" class="form-label">Cancellation Policy</label>
+              {{ form.cancellation_policy }}
+              <small class="form-help">Cancellation policy (e.g., 24 hours notice required)</small>
+              {% if form.cancellation_policy.errors %}
+                <div class="form-error">{{ form.cancellation_policy.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'core:manage_church' %}?tab=services" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          <span class="btn-text">Update Service</span>
+          <span class="btn-spinner" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin">
+              <path d="M21 12a9 9 0 11-6.219-8.56"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('service-edit-form');
+  if (form) {
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+    
+    // Handle pricing toggle
+    const isFreeCheckbox = document.getElementById('id_is_free');
+    const priceGroup = document.getElementById('price-group');
+    const currencyGroup = document.getElementById('currency-group');
+    
+    function togglePricingFields() {
+      if (isFreeCheckbox.checked) {
+        priceGroup.style.display = 'none';
+        currencyGroup.style.display = 'none';
+      } else {
+        priceGroup.style.display = 'block';
+        currencyGroup.style.display = 'block';
+      }
+    }
+    
+    // Initial state
+    togglePricingFields();
+    
+    // Listen for changes
+    isFreeCheckbox.addEventListener('change', togglePricingFields);
+    
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.textContent = 'Updating Service...';
+      btnSpinner.style.display = 'inline-block';
+      submitBtn.style.opacity = '0.8';
+    });
+  }
+});
+</script>
+{% endblock %}

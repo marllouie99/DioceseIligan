@@ -1,0 +1,68 @@
+{% load static %}
+{# Contact Information Settings Section #}
+<div id="contact-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Contact Information</h3>
+      <p class="section-description">Manage how people can reach your church</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="contact-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Email Address</h4>
+        <p class="setting-description">Primary email for church communications</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Used for booking confirmations and inquiries</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="form-error">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Phone Number</h4>
+        <p class="setting-description">Contact phone number</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Displayed on your church profile</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.phone }}
+        {% if form.phone.errors %}
+          <div class="form-error">{{ form.phone.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Website</h4>
+        <p class="setting-description">Church website URL</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Link to your church website</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.website }}
+        {% if form.website.errors %}
+          <div class="form-error">{{ form.website.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

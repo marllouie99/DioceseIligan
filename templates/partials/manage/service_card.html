@@ -1,0 +1,66 @@
+{% load static %}
+{# Individual Service Card #}
+<div class="service-card">
+  <div class="service-image">
+    {% with service_images=service.get_images %}
+      {% if service_images %}
+        {% with images_count=service_images.count %}
+        <div class="service-image-stack" onclick="openPhotoGallery({{ service.id }})">
+          {% for image in service_images|slice:":3" %}
+            <img src="{{ image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
+          {% endfor %}
+          {% if images_count > 3 %}
+            <div class="image-count-badge">+{{ images_count|add:"-3" }}</div>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% elif service.image %}
+        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="service-img" onclick="openImageGallery({{ service.id }})" loading="lazy" decoding="async">
+      {% else %}
+        <div class="service-placeholder" onclick="openImageGallery({{ service.id }})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+  
+  <div class="service-info">
+    <div class="service-header">
+      <div class="service-name">{{ service.name }}</div>
+      <div class="service-price">
+        <span class="{% if service.is_free %}price-free{% else %}price-paid{% endif %}">{{ service.price_display }}</span>
+      </div>
+    </div>
+    
+    <div class="service-description">{{ service.description|truncatewords:20 }}</div>
+    
+    <div class="service-details">
+      <span class="service-duration">{{ service.duration_display }}</span>
+      <span class="service-bookings">Max {{ service.max_bookings_per_day }}/day</span>
+      {% if service.requires_approval %}
+        <span class="service-approval">Requires Approval</span>
+      {% endif %}
+      {% if not service.is_active %}
+        <span class="service-inactive">Inactive</span>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="service-actions">
+    <a href="{% url 'core:edit_service' service.id %}" class="btn-icon" title="Edit Service" aria-label="Edit Service">
+      {% include 'partials/icons/edit.html' %}
+    </a>
+    <a href="{% url 'core:manage_service_images' service.id %}" class="btn-icon" title="Manage Images" aria-label="Manage Images">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21,15 16,10 5,21"/>
+      </svg>
+    </a>
+    <a href="{% url 'core:delete_service' service.id %}" class="btn-icon btn-danger" title="Delete Service">
+      {% include 'partials/icons/trash.html' %}
+    </a>
+  </div>
+</div>

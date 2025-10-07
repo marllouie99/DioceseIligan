@@ -1,0 +1,275 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Delete Availability Entry - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="delete-availability-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">Delete Availability Entry</h1>
+        <p class="page-subtitle">Remove this availability entry for {{ church.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Container -->
+  <div class="form-container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Availability Entry Details -->
+    <div class="availability-details">
+      <h2 class="section-title">Availability Entry Details</h2>
+      <div class="details-card">
+        <div class="detail-row">
+          <span class="detail-label">Date:</span>
+          <span class="detail-value">{{ availability.date|date:"F d, Y" }}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Type:</span>
+          <span class="detail-value">
+            {% if availability.is_closed %}
+              <span class="status-badge status-closed">Closed</span>
+            {% else %}
+              <span class="status-badge status-special">Special Hours</span>
+            {% endif %}
+          </span>
+        </div>
+        
+        {% if not availability.is_closed %}
+          <div class="detail-row">
+            <span class="detail-label">Time:</span>
+            <span class="detail-value">{{ availability.start_time|time:"g:i A" }} - {{ availability.end_time|time:"g:i A" }}</span>
+          </div>
+        {% endif %}
+        
+        {% if availability.reason %}
+          <div class="detail-row">
+            <span class="detail-label">Reason:</span>
+            <span class="detail-value">{{ availability.reason }}</span>
+          </div>
+        {% endif %}
+        
+        {% if availability.notes %}
+          <div class="detail-row">
+            <span class="detail-label">Notes:</span>
+            <span class="detail-value">{{ availability.notes }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div class="warning-message">
+      <div class="warning-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="warning-content">
+        <h3>Are you sure you want to delete this availability entry?</h3>
+        <p>This action cannot be undone. Once deleted, this availability entry will be permanently removed and the date will be available for booking again.</p>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <form method="post" class="delete-form">
+      {% csrf_token %}
+      <div class="form-actions">
+        <a href="{% url 'core:manage_church' %}?tab=availability" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger" id="delete-btn">
+          <span class="btn-text">Delete Availability Entry</span>
+          <span class="btn-spinner" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin">
+              <path d="M21 12a9 9 0 11-6.219-8.56"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const deleteForm = document.querySelector('.delete-form');
+  const deleteBtn = document.getElementById('delete-btn');
+  
+  if (deleteForm && deleteBtn) {
+    const btnText = deleteBtn.querySelector('.btn-text');
+    const btnSpinner = deleteBtn.querySelector('.btn-spinner');
+    
+    deleteForm.addEventListener('submit', function(e) {
+      // Show loading state
+      deleteBtn.disabled = true;
+      btnText.textContent = 'Deleting...';
+      btnSpinner.style.display = 'inline-block';
+      deleteBtn.style.opacity = '0.8';
+    });
+  }
+});
+</script>
+
+<style>
+/* Additional styles for delete page */
+.availability-details {
+  margin-bottom: 32px;
+}
+
+.details-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #374151;
+  min-width: 100px;
+}
+
+.detail-value {
+  color: #6b7280;
+  text-align: right;
+  flex: 1;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-closed {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-special {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.warning-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #dc2626;
+}
+
+.warning-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0 0 8px 0;
+}
+
+.warning-content p {
+  color: #7f1d1d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.delete-form .form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.btn-danger:disabled {
+  background: #fca5a5;
+  border-color: #fca5a5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .detail-value {
+    text-align: left;
+  }
+  
+  .delete-form .form-actions {
+    flex-direction: column;
+  }
+  
+  .delete-form .form-actions .btn {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

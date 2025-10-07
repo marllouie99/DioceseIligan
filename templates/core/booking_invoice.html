@@ -1,0 +1,96 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ChurchConnect{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header" style="display:flex; align-items:center; justify-content:space-between;">
+    <h1 style="margin:0;">Appointment Invoice</h1>
+    <div style="display:flex; gap:8px;">
+      <a href="{% if active == 'manage' %}{% url 'core:manage_church' %}?tab=appointments{% else %}{% url 'core:appointments' %}{% endif %}" class="btn btn-secondary">Back</a>
+      <button class="btn btn-primary" onclick="window.print()" {% if not can_print %}disabled{% endif %}>Print</button>
+    </div>
+  </div>
+
+  {% if not can_print %}
+    <div class="message message-warning">This invoice can be printed once the church has reviewed your request.</div>
+  {% endif %}
+
+  <style>
+    @media print {
+      .page-header, .sidebar, .topbar { display: none !important; }
+      .container { padding: 0; }
+      .invoice { box-shadow: none; border: none; }
+    }
+    .invoice { background:#fff; border:1px solid var(--border,#e5e7eb); border-radius:12px; padding:24px; }
+    .row { display:flex; justify-content:space-between; gap:16px; }
+    .meta { color:#6b7280; font-size:14px; }
+    .title { font-size:20px; font-weight:700; margin-bottom:4px; }
+    .label { color:#6b7280; width: 160px; }
+    .value { font-weight:500; }
+  </style>
+
+  <div class="invoice">
+    <div class="row" style="align-items:center;">
+      <div>
+        <div class="title">{{ booking.church.name }}</div>
+        <div class="meta">{{ booking.church.full_address }}</div>
+        <div class="meta">Email: {{ booking.church.email }} • Phone: {{ booking.church.phone }}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="meta">Invoice</div>
+        <div style="font-weight:700;">{{ booking.code }}</div>
+        <div class="meta">Date Issued: {{ booking.status_changed_at|default:booking.created_at|date:'M j, Y' }}</div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="row">
+      <div>
+        <div class="label">Billed To</div>
+        <div class="value">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+        <div class="meta">{{ booking.user.email }}</div>
+      </div>
+      <div>
+        <div class="label">Service</div>
+        <div class="value">{{ booking.service.name }}</div>
+        <div class="meta">{{ booking.service.description|truncatewords:20 }}</div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <div class="label">Appointment Date</div>
+        <div class="value">{{ booking.date|date:'l, F j, Y' }}</div>
+      </div>
+      <div>
+        <div class="label">Time</div>
+        <div class="value">{% if booking.start_time and booking.end_time %}{{ booking.start_time|time:'g:i A' }} - {{ booking.end_time|time:'g:i A' }}{% else %}To be scheduled{% endif %}</div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div>
+      <div class="label">Important</div>
+      <p>Please bring this invoice and any required documents to the church office to complete your booking. The church reserves the right to reschedule in case of conflicts or unforeseen circumstances.</p>
+      {% if booking.service.preparation_notes %}
+        <p><strong>Preparation:</strong> {{ booking.service.preparation_notes }}</p>
+      {% endif %}
+      {% if booking.service.cancellation_policy %}
+        <p><strong>Cancellation Policy:</strong> {{ booking.service.cancellation_policy }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% load static %}
+{# Social Media Settings Section #}
+<div id="social-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Social Media Links</h3>
+      <p class="section-description">Connect your social media accounts</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="social-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Facebook</h4>
+        <p class="setting-description">Facebook page URL</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Link to your Facebook page</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.facebook_url }}
+        {% if form.facebook_url.errors %}
+          <div class="form-error">{{ form.facebook_url.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Instagram</h4>
+        <p class="setting-description">Instagram profile URL</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Link to your Instagram profile</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.instagram_url }}
+        {% if form.instagram_url.errors %}
+          <div class="form-error">{{ form.instagram_url.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">YouTube</h4>
+        <p class="setting-description">YouTube channel URL</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Link to your YouTube channel</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.youtube_url }}
+        {% if form.youtube_url.errors %}
+          <div class="form-error">{{ form.youtube_url.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Twitter</h4>
+        <p class="setting-description">Twitter profile URL</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Link to your Twitter profile</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.twitter_url }}
+        {% if form.twitter_url.errors %}
+          <div class="form-error">{{ form.twitter_url.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

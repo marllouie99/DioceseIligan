@@ -1,0 +1,441 @@
+/* Layout components */
+.app-shell { 
+  display: grid; 
+  grid-template-columns: 1fr; /* content column only; sidebar is fixed */
+  height: 100vh;
+  overflow: hidden; /* prevent body scroll; right column will scroll */
+  padding-left: min(260px, 25vw); /* responsive sidebar space that scales with viewport */
+  max-width: 100vw; /* prevent horizontal overflow */
+  box-sizing: border-box;
+}
+
+.sidebar { 
+  /* Warm Sacred Earth Glassmorphism - Church Theme */
+  background: 
+    /* Subtle wood grain texture */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(218, 165, 32, 0.02) 2px,
+      rgba(218, 165, 32, 0.02) 4px
+    ),
+    linear-gradient(145deg, 
+      rgba(255, 249, 230, 0.25) 0%, 
+      rgba(218, 165, 32, 0.15) 50%, 
+      rgba(160, 82, 45, 0.18) 100%);
+  backdrop-filter: blur(25px);
+  border-right: 1px solid transparent;
+  padding: 18px 14px; 
+  /* Pin to the viewport and scroll independently */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: min(260px, 25vw) !important; /* responsive width that scales with viewport */
+  max-width: 300px !important; /* maximum width to prevent it getting too wide */
+  min-width: 200px !important; /* minimum width to maintain usability */
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1000;
+  box-shadow: 4px 0 20px rgba(160, 82, 45, 0.15);
+}
+
+/* Custom Scrollbar Styling for Sidebar - Warm Sacred Earth Theme */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 249, 230, 0.1);
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, 
+    rgba(218, 165, 32, 0.6) 0%, 
+    rgba(160, 82, 45, 0.7) 50%, 
+    rgba(139, 69, 19, 0.8) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 249, 230, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(101, 67, 33, 0.15),
+    inset 0 1px 0 rgba(255, 249, 230, 0.3);
+  transition: all 0.3s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, 
+    rgba(218, 165, 32, 0.8) 0%, 
+    rgba(160, 82, 45, 0.9) 50%, 
+    rgba(139, 69, 19, 1) 100%);
+  box-shadow: 
+    0 4px 8px rgba(101, 67, 33, 0.25),
+    inset 0 1px 0 rgba(255, 249, 230, 0.4);
+  transform: scaleX(1.2);
+}
+
+.sidebar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, 
+    rgba(139, 69, 19, 0.9) 0%, 
+    rgba(101, 67, 33, 1) 50%, 
+    rgba(139, 69, 19, 1) 100%);
+}
+
+/* Firefox Scrollbar Support */
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160, 82, 45, 0.7) rgba(255, 249, 230, 0.1);
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom,
+    rgba(218, 165, 32, 0.25) 0%,
+    rgba(160, 82, 45, 0.2) 15%,
+    rgba(255, 249, 230, 0.12) 30%,
+    rgba(255, 249, 230, 0.06) 50%,
+    rgba(255, 249, 230, 0.12) 70%,
+    rgba(160, 82, 45, 0.2) 85%,
+    rgba(218, 165, 32, 0.25) 100%);
+  pointer-events: none;
+}
+
+.main { 
+  display: grid; 
+  grid-template-rows: auto 1fr; 
+  /* Make only the right column scroll */
+  height: 100vh;
+  min-height: 0; /* critical for scrolling inside CSS Grid */
+  overflow-y: auto;
+  /* No margin-left; spacing handled by app-shell padding */
+  margin: 0 !important; /* Ensure no unwanted margin */
+  padding-top: 0 !important; /* Ensure no unwanted top padding */
+}
+
+.content { 
+  padding: 16px; 
+  min-height: 0; /* allow content area to shrink within the scroll container */
+}
+
+/* Enhanced Sidebar Styling */
+.sidebar .brand { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  font-weight: 800; 
+  margin: 4px 8px 20px; 
+  font-size: 18px;
+  color: #2D1810;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.logo-badge { 
+  width: 36px; 
+  height: 36px; 
+  border-radius: 12px; 
+  background: linear-gradient(145deg, #DAA520, #A0522D); 
+  color: #FFF9E6; 
+  display: grid; 
+  place-items: center; 
+  font-weight: 800; 
+  font-size: 16px;
+  box-shadow: 
+    0 8px 16px rgba(218, 165, 32, 0.4),
+    0 4px 8px rgba(160, 82, 45, 0.3),
+    inset 0 1px 0 rgba(255, 249, 230, 0.3); 
+  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+  transition: all 0.3s ease;
+}
+
+.logo-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 12px 24px rgba(218, 165, 32, 0.5),
+    0 6px 12px rgba(160, 82, 45, 0.4),
+    inset 0 1px 0 rgba(255, 249, 230, 0.4);
+}
+
+.sidebar hr { 
+  border: 0; 
+  border-top: 1px solid rgba(218, 165, 32, 0.25); 
+  margin: 16px 8px 16px; 
+  background: linear-gradient(90deg, transparent 0%, rgba(218, 165, 32, 0.4) 50%, transparent 100%);
+  height: 1px;
+}
+
+.nav { 
+  list-style: none; 
+  margin: 0; 
+  padding: 8px; 
+}
+
+.nav a { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 12px 16px; 
+  border-radius: 14px; 
+  color: #2D1810; 
+  text-decoration: none; 
+  font-weight: 700; 
+  font-size: 15px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 2px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav a .icon { 
+  width: 20px; 
+  height: 20px; 
+  color: #654321; 
+  fill: currentColor; 
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.6));
+}
+
+/* Hover effects with ultra-subtle glassmorphism */
+.nav a:hover {
+  background: rgba(218, 165, 32, 0.15);
+  color: #654321;
+  transform: translateX(4px);
+  box-shadow: 
+    0 4px 12px rgba(160, 82, 45, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav a:hover .icon {
+  color: #8B4513;
+  transform: scale(1.1);
+}
+
+/* Active state with beautiful gradient and effects */
+.nav a.active,
+.nav a[aria-current="page"] { 
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: #FFF9E6;
+  box-shadow: 
+    0 6px 20px rgba(218, 165, 32, 0.4),
+    0 2px 8px rgba(160, 82, 45, 0.3),
+    inset 0 1px 0 rgba(255, 249, 230, 0.3);
+  transform: translateX(6px);
+}
+
+.nav a.active .icon,
+.nav a[aria-current="page"] .icon {
+  color: #FFF9E6;
+  transform: scale(1.1);
+}
+
+/* Add a subtle shine effect on active items */
+.nav a.active::before,
+.nav a[aria-current="page"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* Safety overrides: ensure sidebar links get click priority and correct stacking */
+.sidebar .nav li { position: relative; }
+.sidebar .nav a { position: relative; z-index: 2; }
+.main { position: relative; z-index: 0; }
+
+.section-label { 
+  font-size: 11px; 
+  color: #6B4226; 
+  letter-spacing: 0.1em; 
+  font-weight: 800; 
+  margin: 24px 12px 12px; 
+  text-transform: uppercase;
+  position: relative;
+  padding-left: 16px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.section-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #A0522D, #DAA520);
+  box-shadow: 0 2px 4px rgba(218, 165, 32, 0.4);
+}
+
+.activity-card { 
+  /* Warm Sacred Earth glassmorphism activity card */
+  background: rgba(255, 249, 230, 0.2); 
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(218, 165, 32, 0.15); 
+  border-radius: 18px; 
+  padding: 16px 20px; 
+  box-shadow: 
+    0 8px 32px rgba(160, 82, 45, 0.1),
+    0 4px 16px rgba(101, 67, 33, 0.05),
+    inset 0 1px 0 rgba(255, 249, 230, 0.2); 
+  margin: 12px; 
+  transition: all 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 249, 230, 0.25);
+  box-shadow: 
+    0 12px 40px rgba(160, 82, 45, 0.15),
+    0 6px 20px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.25);
+}
+
+.activity-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  padding: 12px 0; 
+  border-bottom: 1px solid rgba(218, 165, 32, 0.12); 
+  transition: all 0.3s ease;
+}
+
+.activity-row:last-child { 
+  border-bottom: 0; 
+  padding-bottom: 0;
+}
+
+.activity-row:hover {
+  padding-left: 8px;
+  color: #2D1810;
+}
+
+.activity-row span {
+  font-size: 14px;
+  color: #654321;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.activity-row strong {
+  font-size: 16px;
+  font-weight: 700;
+  color: #A0522D;
+  background: rgba(218, 165, 32, 0.08);
+  padding: 4px 8px;
+  border-radius: 8px;
+  min-width: 28px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(160, 82, 45, 0.12);
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN - MOBILE LAYOUT
+   Critical responsive fixes for mobile devices
+   ============================================================================= */
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  .app-shell {
+    padding-left: 0 !important; /* Remove sidebar padding on mobile */
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%); /* Hide sidebar off-screen by default */
+    transition: transform 0.3s ease;
+    z-index: 9999; /* Higher z-index for mobile overlay */
+    box-shadow: 4px 0 20px rgba(160, 82, 45, 0.25); /* Stronger shadow for mobile overlay */
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0); /* Show sidebar when toggled */
+  }
+  
+  .main {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .content {
+    padding: 12px; /* Reduced padding for mobile */
+  }
+  
+  /* Mobile sidebar toggle overlay */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app-shell {
+    padding-left: min(220px, 22vw) !important; /* Responsive sidebar space for tablets */
+  }
+  
+  .sidebar {
+    width: min(220px, 22vw) !important; /* Responsive sidebar width for tablets */
+  }
+  
+  .content {
+    padding: 14px; /* Slightly reduced padding for tablets */
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .content {
+    padding: 8px; /* Minimal padding for small screens */
+  }
+  
+  .sidebar {
+    width: 280px !important; /* Slightly wider on small screens for better usability */
+  }
+  
+  .sidebar .nav a {
+    padding: 14px 16px; /* Larger touch targets */
+    font-size: 16px; /* Larger text for better readability */
+  }
+  
+  .sidebar .nav a .icon {
+    width: 22px;
+    height: 22px; /* Larger icons for better touch interaction */
+  }
+}

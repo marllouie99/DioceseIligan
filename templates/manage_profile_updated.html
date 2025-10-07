@@ -1,0 +1,13 @@
+{% block extra_js %}
+<!-- Load profile management modules -->
+<script src="{% static 'js/modules/profile-tabs.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/profile-settings.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/profile-forms.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/profile-modals.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/profile-upload.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'js/modules/profile-display-manager.js' %}?v={{ STATIC_VERSION }}"></script>
+<!-- Load main manage profile application -->
+<script src="{% static 'js/manage_profile_new.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}
+
+

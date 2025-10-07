@@ -1,0 +1,1211 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}System Overview • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<style>
+/* Full Width Overview Container */
+.overview-container {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+/* Override dashboard-layout for overview page */
+.dashboard-page .overview-container {
+  display: block;
+}
+
+/* Override any parent overflow constraints */
+.content {
+  overflow: visible !important;
+  min-height: auto !important;
+}
+
+/* Overview Section Styles */
+.overview-section {
+  margin-bottom: 2.5rem;
+  background: #FFF9E6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  padding-bottom: 4rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(218, 165, 32, 0.2);
+  min-height: 900px;
+  height: auto;
+  overflow: visible;
+  display: flow-root; /* establishes BFC so children (including floats) contribute to height */
+  position: relative;
+  isolation: isolate; /* prevent stacking overlap from next section */
+}
+
+.section-header-overview {
+  margin-bottom: 1.5rem;
+  clear: both;
+}
+
+.section-title-overview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-icon {
+  width: 28px;
+  height: 28px;
+  color: #A0522D;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: stretch;
+  grid-auto-rows: minmax(0, auto);
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  height: auto;
+  margin-bottom: 0;
+  overflow: hidden; /* keep any scaled canvas content contained */
+}
+
+.donut-card { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+.donut-card .chart-title { 
+  align-self: flex-start; 
+  margin-bottom: 1rem; 
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-container canvas {
+  max-height: 300px !important;
+  height: 300px !important;
+  width: 100% !important;
+}
+
+.chart-card-full {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  margin-bottom: 0.75rem; /* ensure bottom spacing is inside Users section, not collapsed */
+  width: 100%;
+  position: relative;
+  clear: both;
+}
+
+.chart-container-line {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.chart-container-line canvas {
+  max-height: 280px !important;
+  height: 280px !important;
+  width: 100% !important;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Church Ranking Chart Styles */
+.ranking-chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.ranking-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .ranking-chart-container {
+    height: 300px;
+  }
+}
+
+/* Section Sorting Controls */
+.section-sort-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sort-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.sort-label svg {
+  width: 18px;
+  height: 18px;
+  color: #A0522D;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.sort-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.sort-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sort-btn:hover {
+  background: rgba(160, 82, 45, 0.1);
+  color: #A0522D;
+}
+
+.sort-btn.active {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(160, 82, 45, 0.2);
+}
+
+@media (max-width: 640px) {
+  .section-sort-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .sort-buttons {
+    justify-content: center;
+  }
+}
+
+.circular-progress-container {
+  position: relative;
+  width: clamp(160px, 45%, 220px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 0.75rem;
+}
+
+/* Ensure donut respects its container and scales cleanly */
+.circular-progress-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.circular-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.progress-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.progress-label {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-dot.active {
+  background: #10b981;
+}
+
+.legend-dot.inactive {
+  background: #e5e7eb;
+}
+
+.stat-card-overview {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.stat-card-overview:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-overview.primary .stat-icon-wrapper {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: white;
+}
+
+.stat-card-overview.success .stat-icon-wrapper {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+}
+
+.stat-card-overview.info .stat-icon-wrapper {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: white;
+}
+
+.stat-icon-wrapper svg {
+  width: 28px;
+  height: 28px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2937;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Recent Registrations Card */
+.recent-registrations-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: visible;
+  min-height: auto;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.25rem 0;
+}
+
+.registrations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.registration-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.registration-item:hover {
+  background: #f3f4f6;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9375rem;
+  margin-bottom: 0.125rem;
+}
+
+.user-email {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-date {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.empty-state-small {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+  }
+  
+  .registration-item {
+    flex-wrap: wrap;
+  }
+  
+  .user-date {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding-left: 52px;
+  }
+}
+
+/* Small mobile optimizations */
+@media (max-width: 520px) {
+  /* Shorter bar chart so the donut card is not pushed out of view */
+  .chart-container { height: 220px; }
+  .chart-container canvas { height: 220px !important; }
+
+  /* Slightly larger donut for readability on small screens */
+  .circular-progress-container { width: 200px; }
+
+  /* Section padding tighter on narrow screens to reclaim space */
+  .overview-section { 
+    padding: 1.125rem;
+    height: fit-content !important;
+    min-height: auto !important;
+  }
+  
+  /* Line chart responsive height */
+  .chart-container-line { height: 240px; }
+  .chart-container-line canvas { height: 240px !important; }
+  
+  /* Tighter spacing for full-width chart */
+  .chart-card-full { margin-top: 1rem; }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // User Statistics Bar Chart
+  const userStatsCtx = document.getElementById('userStatsChart');
+  if (userStatsCtx) {
+    new Chart(userStatsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Total Users', 'Active Users', 'New This Month'],
+        datasets: [{
+          label: 'Count',
+          data: [
+            {{ user_stats.total_users|default:0 }},
+            {{ user_stats.active_users|default:0 }},
+            {{ user_stats.new_users_this_month|default:0 }}
+          ],
+          backgroundColor: [
+            'rgba(160, 82, 45, 0.8)',   // Sienna
+            'rgba(16, 185, 129, 0.8)',   // Green
+            'rgba(59, 130, 246, 0.8)'    // Blue
+          ],
+          borderColor: [
+            'rgba(160, 82, 45, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(59, 130, 246, 1)'
+          ],
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                size: 12,
+                weight: '600'
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Active Users Doughnut Chart
+  const activeUsersCtx = document.getElementById('activeUsersChart');
+  if (activeUsersCtx) {
+    const totalUsers = {{ user_stats.total_users|default:0 }};
+    const activeUsers = {{ user_stats.active_users|default:0 }};
+    const inactiveUsers = totalUsers - activeUsers;
+
+    new Chart(activeUsersCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Inactive'],
+        datasets: [{
+          data: [activeUsers, inactiveUsers],
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(229, 231, 235, 0.8)'
+          ],
+          borderColor: [
+            'rgba(16, 185, 129, 1)',
+            'rgba(229, 231, 235, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        radius: '85%',
+        cutout: '72%',
+        layout: { padding: 8 },
+        elements: { arc: { borderWidth: 0 } },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const percentage = totalUsers > 0 ? ((value / totalUsers) * 100).toFixed(1) : 0;
+                return label + ': ' + value + ' (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Daily Active Users Line Chart
+  const dailyActiveUsersCtx = document.getElementById('dailyActiveUsersChart');
+  if (dailyActiveUsersCtx) {
+    new Chart(dailyActiveUsersCtx, {
+      type: 'line',
+      data: {
+        labels: [{% for label in daily_labels %}'{{ label }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+          label: 'Active Users',
+          data: [{% for count in daily_active_users %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+          borderColor: 'rgba(59, 130, 246, 1)',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            },
+            callbacks: {
+              label: function(context) {
+                return 'Active Users: ' + context.parsed.y;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                size: 11
+              },
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Church Statistics Bar Chart
+  const churchStatsCtx = document.getElementById('churchStatsChart');
+  if (churchStatsCtx) {
+    new Chart(churchStatsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Total Churches', 'Verified', 'New This Month'],
+        datasets: [{
+          label: 'Count',
+          data: [
+            {{ church_stats.total_churches|default:0 }},
+            {{ church_stats.verified_churches|default:0 }},
+            {{ church_stats.new_churches_this_month|default:0 }}
+          ],
+          backgroundColor: [
+            'rgba(160, 82, 45, 0.8)',   // Sienna
+            'rgba(16, 185, 129, 0.8)',   // Green
+            'rgba(59, 130, 246, 0.8)'    // Blue
+          ],
+          borderColor: [
+            'rgba(160, 82, 45, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(59, 130, 246, 1)'
+          ],
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                size: 12,
+                weight: '600'
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Verified Churches Doughnut Chart
+  const verifiedChurchesCtx = document.getElementById('verifiedChurchesChart');
+  if (verifiedChurchesCtx) {
+    const totalChurches = {{ church_stats.total_churches|default:0 }};
+    const verifiedChurches = {{ church_stats.verified_churches|default:0 }};
+    const unverifiedChurches = totalChurches - verifiedChurches;
+
+    new Chart(verifiedChurchesCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Verified', 'Unverified'],
+        datasets: [{
+          data: [verifiedChurches, unverifiedChurches],
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(229, 231, 235, 0.8)'
+          ],
+          borderColor: [
+            'rgba(16, 185, 129, 1)',
+            'rgba(229, 231, 235, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        radius: '85%',
+        cutout: '72%',
+        layout: { padding: 8 },
+        elements: { arc: { borderWidth: 0 } },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const percentage = totalChurches > 0 ? ((value / totalChurches) * 100).toFixed(1) : 0;
+                return label + ': ' + value + ' (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Top Churches by Followers Horizontal Bar Chart
+  const churchRankingCtx = document.getElementById('churchRankingChart');
+  if (churchRankingCtx) {
+    const churchNames = [
+      {% for church in top_churches_by_followers %}
+        '{{ church.name|escapejs }}'{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+    
+    const followerCounts = [
+      {% for church in top_churches_by_followers %}
+        {{ church.follower_count }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+    
+    const verifiedStatus = [
+      {% for church in top_churches_by_followers %}
+        {{ church.is_verified|yesno:'true,false' }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+    
+    // Generate colors based on ranking position
+    const backgroundColors = followerCounts.map((_, index) => {
+      if (index === 0) return 'rgba(255, 215, 0, 0.8)'; // Gold
+      if (index === 1) return 'rgba(192, 192, 192, 0.8)'; // Silver
+      if (index === 2) return 'rgba(205, 127, 50, 0.8)'; // Bronze
+      return 'rgba(160, 82, 45, 0.7)'; // Brown for others
+    });
+    
+    const borderColors = followerCounts.map((_, index) => {
+      if (index === 0) return 'rgba(255, 215, 0, 1)';
+      if (index === 1) return 'rgba(192, 192, 192, 1)';
+      if (index === 2) return 'rgba(205, 127, 50, 1)';
+      return 'rgba(160, 82, 45, 1)';
+    });
+    
+    new Chart(churchRankingCtx, {
+      type: 'bar',
+      data: {
+        labels: churchNames,
+        datasets: [{
+          label: 'Followers',
+          data: followerCounts,
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        indexAxis: 'y', // Horizontal bars
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            },
+            callbacks: {
+              label: function(context) {
+                const index = context.dataIndex;
+                const verified = verifiedStatus[index] ? ' ✓ Verified' : '';
+                return 'Followers: ' + context.parsed.x + verified;
+              },
+              afterLabel: function(context) {
+                const index = context.dataIndex;
+                const medals = ['🥇 1st Place', '🥈 2nd Place', '🥉 3rd Place'];
+                if (index < 3) {
+                  return medals[index];
+                }
+                return '#' + (index + 1) + ' Rank';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: {
+                size: 12,
+                weight: '600'
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            title: {
+              display: true,
+              text: 'Number of Followers',
+              font: {
+                size: 13,
+                weight: '700'
+              },
+              color: '#6b7280'
+            }
+          },
+          y: {
+            ticks: {
+              font: {
+                size: 12,
+                weight: '600'
+              },
+              color: '#1f2937',
+              callback: function(value, index) {
+                const label = this.getLabelForValue(value);
+                // Truncate long names
+                if (label.length > 30) {
+                  return label.substring(0, 27) + '...';
+                }
+                return label;
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Section Sorting Functionality
+  const sortButtons = document.querySelectorAll('.sort-btn');
+  const sectionsContainer = document.getElementById('sectionsContainer');
+  const usersSection = document.querySelector('.users-overview-section');
+  const churchesSection = document.querySelector('.churches-overview-section');
+  
+  // Load saved preference from localStorage
+  const savedOrder = localStorage.getItem('sectionOrder') || 'users-first';
+  applySectionOrder(savedOrder);
+  
+  function applySectionOrder(order) {
+    // Update button states
+    sortButtons.forEach(btn => {
+      if (btn.dataset.order === order) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    
+    // Reorder sections
+    if (order === 'users-first') {
+      sectionsContainer.appendChild(usersSection);
+      sectionsContainer.appendChild(churchesSection);
+    } else if (order === 'churches-first') {
+      sectionsContainer.appendChild(churchesSection);
+      sectionsContainer.appendChild(usersSection);
+    }
+  }
+  
+  // Add click handlers to sort buttons
+  sortButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const order = this.dataset.order;
+      localStorage.setItem('sectionOrder', order);
+      applySectionOrder(order);
+    });
+  });
+});
+</script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="overview-container">
+  <h1 class="section-title">System Overview</h1>
+  <p style="color: #6b7280; margin-bottom: 1.5rem;">Comprehensive statistics and insights across the entire ChurchConnect platform</p>
+  
+  <!-- Section Sorting Controls -->
+  <div class="section-sort-controls">
+    <div class="sort-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="6" x2="20" y2="6"/>
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="18" x2="12" y2="18"/>
+      </svg>
+      Section Order:
+    </div>
+    <div class="sort-buttons">
+      <button class="sort-btn active" data-order="users-first">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+        Users First
+      </button>
+      <button class="sort-btn" data-order="churches-first">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Churches First
+      </button>
+    </div>
+  </div>
+  
+  <!-- Sections Container -->
+  <div id="sectionsContainer">
+    
+  <!-- Users Section -->
+  <div class="overview-section users-overview-section">
+      <div class="section-header-overview">
+        <h2 class="section-title-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+            <path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Users
+        </h2>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <!-- User Statistics Bar Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">User Statistics</h3>
+          <div class="chart-container">
+            <canvas id="userStatsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Active Users Percentage (Circular Progress) -->
+        <div class="chart-card donut-card">
+          <h3 class="chart-title">Active Users Rate</h3>
+          <div class="circular-progress-container">
+            <canvas id="activeUsersChart"></canvas>
+            <div class="circular-progress-text">
+              <div class="progress-value">{{ user_stats.active_percentage|default:0 }}%</div>
+              <div class="progress-label">Active</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot active"></span>
+              <span>Active: {{ user_stats.active_users|default:0 }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot inactive"></span>
+              <span>Inactive: {{ user_stats.inactive_users|default:0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Active Users Line Chart -->
+      <div class="chart-card chart-card-full">
+        <h3 class="chart-title">Daily Active Users (Last 14 Days)</h3>
+        <div class="chart-container-line">
+          <canvas id="dailyActiveUsersChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  <!-- Churches Section -->
+  <div class="overview-section churches-overview-section">
+      <div class="section-header-overview">
+        <h2 class="section-title-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Churches
+        </h2>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <!-- Church Statistics Bar Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Church Statistics</h3>
+          <div class="chart-container">
+            <canvas id="churchStatsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Verified Churches Rate (Circular Progress) -->
+        <div class="chart-card donut-card">
+          <h3 class="chart-title">Verification Rate</h3>
+          <div class="circular-progress-container">
+            <canvas id="verifiedChurchesChart"></canvas>
+            <div class="circular-progress-text">
+              <div class="progress-value">{{ church_stats.verified_percentage|default:0 }}%</div>
+              <div class="progress-label">Verified</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot active"></span>
+              <span>Verified: {{ church_stats.verified_churches|default:0 }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot inactive"></span>
+              <span>Unverified: {{ church_stats.unverified_churches|default:0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Churches by Followers Chart -->
+      <div class="chart-card chart-card-full">
+        <h3 class="chart-title">🏆 Top Churches by Followers</h3>
+        <div class="ranking-chart-container">
+          <canvas id="churchRankingChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  
+  </div><!-- End sectionsContainer -->
+</div>
+{% endblock %}

@@ -1,0 +1,323 @@
+<form method="post" enctype="multipart/form-data" class="service-form" id="service-form">
+  {% csrf_token %}
+  
+  <div class="form-sections">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Service Information</h3>
+      <div class="form-grid">
+        <div class="form-group form-group-full">
+          <label for="{{ form.name.id_for_label }}" class="form-label">Service Name *</label>
+          {{ form.name }}
+          <small class="form-help">e.g., Counseling Session, Baptism, Wedding Consultation</small>
+          {% if form.name.errors %}
+            <div class="form-error">{{ form.name.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group form-group-full">
+          <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+          {{ form.description }}
+          <small class="form-help">Describe what this service includes and what people can expect</small>
+          {% if form.description.errors %}
+            <div class="form-error">{{ form.description.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group form-group-full">
+          <label for="{{ form.image.id_for_label }}" class="form-label">Primary Image</label>
+          {{ form.image }}
+          <small class="form-help">Upload a main image that represents this service</small>
+          {% if form.image.errors %}
+            <div class="form-error">{{ form.image.errors.0 }}</div>
+          {% endif %}
+          {% if service and service.image %}
+            <div class="current-image">
+              <p>Current image:</p>
+              <img src="{{ service.image.url }}" alt="Current service image" style="max-width: 200px; max-height: 150px; border-radius: 8px;" loading="lazy" decoding="async">
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group form-group-full">
+          <label for="{{ form.images.id_for_label }}" class="form-label">Additional Images</label>
+          {{ form.images }}
+          <small class="form-help">Upload multiple images to showcase this service (optional)</small>
+          {% if form.images.errors %}
+            <div class="form-error">{{ form.images.errors.0 }}</div>
+          {% endif %}
+          
+          <!-- Image Preview Container -->
+          <div id="image-preview-container" class="image-preview-container" style="display: none;">
+            <h4>Image Preview:</h4>
+            <div id="image-preview-grid" class="image-preview-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="form-section">
+      <h3 class="section-title">Pricing</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-checkbox-label">
+            {{ form.is_free }}
+            <span class="checkbox-text">This service is free</span>
+          </label>
+          {% if form.is_free.errors %}
+            <div class="form-error">{{ form.is_free.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group" id="price-field" style="display: none;">
+          <label for="{{ form.price.id_for_label }}" class="form-label">Price *</label>
+          <div class="price-input-group">
+            <span class="currency-symbol">$</span>
+            {{ form.price }}
+          </div>
+          <small class="form-help">Set the price for this service</small>
+          {% if form.price.errors %}
+            <div class="form-error">{{ form.price.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheduling Section -->
+    <div class="form-section">
+      <h3 class="section-title">Scheduling</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.duration.id_for_label }}" class="form-label">Duration *</label>
+          {{ form.duration }}
+          {% if form.duration.errors %}
+            <div class="form-error">{{ form.duration.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group">
+          <label for="{{ form.max_bookings_per_day.id_for_label }}" class="form-label">Max Bookings Per Day *</label>
+          {{ form.max_bookings_per_day }}
+          <small class="form-help">Maximum number of appointments per day</small>
+          {% if form.max_bookings_per_day.errors %}
+            <div class="form-error">{{ form.max_bookings_per_day.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group">
+          <label for="{{ form.advance_booking_days.id_for_label }}" class="form-label">Advance Booking Days *</label>
+          {{ form.advance_booking_days }}
+          <small class="form-help">How many days in advance can this be booked</small>
+          {% if form.advance_booking_days.errors %}
+            <div class="form-error">{{ form.advance_booking_days.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="form-section">
+      <h3 class="section-title">Settings</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-checkbox-label">
+            {{ form.is_active }}
+            <span class="checkbox-text">Service is active and available for booking</span>
+          </label>
+          {% if form.is_active.errors %}
+            <div class="form-error">{{ form.is_active.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group">
+          <label class="form-checkbox-label">
+            {{ form.requires_approval }}
+            <span class="checkbox-text">Bookings require church approval</span>
+          </label>
+          <small class="form-help">If checked, bookings will need to be approved before confirmation</small>
+          {% if form.requires_approval.errors %}
+            <div class="form-error">{{ form.requires_approval.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions Section -->
+    <div class="form-section">
+      <h3 class="section-title">Instructions & Policies</h3>
+      <div class="form-grid">
+        <div class="form-group form-group-full">
+          <label for="{{ form.preparation_notes.id_for_label }}" class="form-label">Preparation Notes</label>
+          {{ form.preparation_notes }}
+          <small class="form-help">Instructions for people booking this service (e.g., what to bring, how to prepare)</small>
+          {% if form.preparation_notes.errors %}
+            <div class="form-error">{{ form.preparation_notes.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group form-group-full">
+          <label for="{{ form.cancellation_policy.id_for_label }}" class="form-label">Cancellation Policy</label>
+          {{ form.cancellation_policy }}
+          <small class="form-help">Cancellation policy (e.g., 24 hours notice required)</small>
+          {% if form.cancellation_policy.errors %}
+            <div class="form-error">{{ form.cancellation_policy.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button type="submit" class="btn btn-primary" id="submit-btn">
+      <span class="btn-text">
+        {% if action == 'edit' %}Update Service{% else %}Create Service{% endif %}
+      </span>
+      <span class="btn-spinner" style="display: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin">
+          <path d="M21 12a9 9 0 11-6.219-8.56"/>
+        </svg>
+      </span>
+    </button>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const isFreeCheckbox = document.getElementById('id_is_free');
+  const priceField = document.getElementById('price-field');
+  const priceInput = document.getElementById('id_price');
+  
+  // Toggle price field based on is_free checkbox
+  function togglePriceField() {
+    if (isFreeCheckbox.checked) {
+      priceField.style.display = 'none';
+      priceInput.required = false;
+    } else {
+      priceField.style.display = 'block';
+      priceInput.required = true;
+    }
+  }
+  
+  isFreeCheckbox.addEventListener('change', togglePriceField);
+  
+  // Initial state
+  togglePriceField();
+  
+  // Handle multiple image upload preview
+  const imagesInput = document.getElementById('id_images');
+  const previewContainer = document.getElementById('image-preview-container');
+  const previewGrid = document.getElementById('image-preview-grid');
+  
+  if (imagesInput) {
+    imagesInput.addEventListener('change', function(e) {
+      const files = Array.from(e.target.files);
+      
+      // Clear previous previews
+      previewGrid.innerHTML = '';
+      
+      if (files.length > 0) {
+        previewContainer.style.display = 'block';
+        
+        files.forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const previewItem = document.createElement('div');
+              previewItem.className = 'image-preview-item';
+              previewItem.innerHTML = `
+                <img src="${e.target.result}" alt="Preview ${index + 1}" class="preview-image">
+                <div class="preview-overlay">
+                  <span class="preview-number">${index + 1}</span>
+                  <button type="button" class="preview-remove" data-index="${index}">×</button>
+                </div>
+              `;
+              previewGrid.appendChild(previewItem);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      } else {
+        previewContainer.style.display = 'none';
+      }
+    });
+    
+    // Handle image removal
+    previewGrid.addEventListener('click', function(e) {
+      if (e.target.classList.contains('preview-remove')) {
+        const index = parseInt(e.target.dataset.index);
+        const dt = new DataTransfer();
+        const files = Array.from(imagesInput.files);
+        
+        files.forEach((file, i) => {
+          if (i !== index) {
+            dt.items.add(file);
+          }
+        });
+        
+        imagesInput.files = dt.files;
+        
+        // Trigger change event to update preview
+        imagesInput.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+  
+  // Handle form submission
+  const form = document.getElementById('service-form');
+  if (form) {
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+    
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.textContent = 'Saving...';
+      btnSpinner.style.display = 'inline-block';
+      submitBtn.style.opacity = '0.8';
+      
+      // Submit form via AJAX
+      const formData = new FormData(form);
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          showNotification(data.message, 'success');
+          // Close modal and reload page
+          closeModal();
+          location.reload();
+        } else {
+          // Show error message
+          showNotification(data.message, 'error');
+          // Reset button state
+          submitBtn.disabled = false;
+          btnText.textContent = '{% if action == "edit" %}Update Service{% else %}Create Service{% endif %}';
+          btnSpinner.style.display = 'none';
+          submitBtn.style.opacity = '1';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', 'error');
+        // Reset button state
+        submitBtn.disabled = false;
+        btnText.textContent = '{% if action == "edit" %}Update Service{% else %}Create Service{% endif %}';
+        btnSpinner.style.display = 'none';
+        submitBtn.style.opacity = '1';
+      });
+    });
+  }
+});
+</script>

@@ -1,0 +1,545 @@
+/*
+ * Booking Pages Styling - ChurchIligan
+ * Consistent UI design following Warm Sacred Earth theme
+ * Applies to: manage_booking_detail, booking_invoice, and booking-related components
+ */
+
+/* =============================================================================
+   PAGE LAYOUT & STRUCTURE
+   ============================================================================= */
+
+.manage-booking-page,
+.booking-invoice-page {
+  min-height: 100vh;
+  padding: 24px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 32px;
+  padding: 24px 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.header-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.15),
+    0 4px 8px rgba(218, 165, 32, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.header-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #2D1810;
+}
+
+.header-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2D1810;
+  margin: 0 0 8px 0;
+  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #6B4226;
+  margin: 0;
+  font-weight: 400;
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   GRID LAYOUT
+   ============================================================================= */
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* =============================================================================
+   CARD COMPONENTS
+   ============================================================================= */
+
+.card {
+  background: 
+    /* Parchment texture */
+    radial-gradient(ellipse 120px 80px at 25% 30%, rgba(160, 82, 45, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 75% 70%, rgba(139, 69, 19, 0.06) 0%, transparent 75%),
+    /* Paper grain */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.02) 0.5px, transparent 2px),
+    /* Base parchment gradient */
+    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 50%, #FFF9E6 100%);
+  
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 
+    0 20px 40px rgba(139, 69, 19, 0.12),
+    0 10px 20px rgba(160, 82, 45, 0.08),
+    0 5px 10px rgba(101, 67, 33, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(139, 69, 19, 0.1);
+  position: relative;
+}
+
+/* Enhanced inner glow for cards */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 18px;
+  background: radial-gradient(circle at 20% 20%, rgba(218, 165, 32, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* =============================================================================
+   TYPOGRAPHY & CONTENT
+   ============================================================================= */
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2D1810;
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  align-items: flex-start;
+}
+
+.label {
+  width: 160px;
+  color: #6B4226;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.value {
+  font-weight: 500;
+  color: #2D1810;
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Separator styling */
+hr {
+  border: none;
+  height: 2px;
+  background: 
+    linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(139, 69, 19, 0.2) 20%, 
+      rgba(139, 69, 19, 0.3) 50%, 
+      rgba(139, 69, 19, 0.2) 80%, 
+      transparent 100%
+    );
+  margin: 20px 0;
+  border-radius: 1px;
+}
+
+/* =============================================================================
+   STATUS BADGES
+   ============================================================================= */
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: Georgia, "Times New Roman", serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+}
+
+.badge.requested {
+  background: 
+    linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #92400E;
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(245, 158, 11, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.badge.reviewed {
+  background: 
+    linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+  color: #3730A3;
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.badge.approved {
+  background: 
+    linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
+  color: #065F46;
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.badge.completed {
+  background: 
+    linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+  color: #111827;
+  border-color: rgba(107, 114, 128, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(107, 114, 128, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.badge.declined {
+  background: 
+    linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #991B1B;
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.badge.canceled {
+  background: 
+    linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+  color: #6B7280;
+  border-color: rgba(156, 163, 175, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(156, 163, 175, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* =============================================================================
+   FORM ELEMENTS
+   ============================================================================= */
+
+.form-select,
+.form-input {
+  padding: 12px 16px;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #2D1810;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  
+  background: 
+    /* Wood grain texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.03) 0.5px, transparent 2px),
+    /* Warm cream gradient */
+    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+  
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.form-select:focus,
+.form-input:focus {
+  outline: none;
+  border-color: #DAA520;
+  box-shadow: 
+    0 0 0 4px rgba(218, 165, 32, 0.15),
+    0 4px 12px rgba(139, 69, 19, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFBF0 0%, #F9EDD8 100%);
+  
+  transform: translateY(-1px);
+}
+
+/* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.btn {
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: Georgia, "Times New Roman", serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: 
+    /* Wood grain overlay */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.1) 0.5px, transparent 2px),
+    /* Gold gradient */
+    linear-gradient(135deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
+  
+  color: #2D1810;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.15),
+    0 3px 6px rgba(218, 165, 32, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.08) 0.5px, transparent 2px),
+    linear-gradient(135deg, #E6B800 0%, #CC9900 50%, #996F00 100%);
+  
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.2),
+    0 4px 8px rgba(218, 165, 32, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary {
+  background: 
+    /* Paper texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.03) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+  
+  color: #2D1810;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-secondary:hover {
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFBF0 0%, #F9EDD8 100%);
+  
+  border-color: rgba(218, 165, 32, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 12px rgba(139, 69, 19, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #8B4513;
+  border: 2px solid rgba(139, 69, 19, 0.3);
+  
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.06);
+}
+
+.btn-outline:hover {
+  background: 
+    linear-gradient(135deg, rgba(255, 249, 230, 0.4) 0%, rgba(244, 230, 208, 0.2) 100%);
+  border-color: #DAA520;
+  color: #2D1810;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.1);
+}
+
+/* =============================================================================
+   FORM SECTIONS
+   ============================================================================= */
+
+/* Hide/show decline reason functionality */
+#decline-reason-row {
+  flex-direction: column;
+  gap: 8px;
+}
+
+#decline-reason-row .label {
+  width: auto;
+  margin-bottom: 4px;
+}
+
+#decline-reason-row .value {
+  width: 100%;
+}
+
+#decline-reason-custom {
+  margin-top: 8px;
+}
+
+/* Form action buttons */
+.row:has(button) {
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .manage-booking-page,
+  .booking-invoice-page {
+    padding: 16px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .header-actions {
+    width: 100%;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .label {
+    width: auto;
+    font-weight: 700;
+    color: #2D1810;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .page-subtitle {
+    font-size: 15px;
+  }
+  
+  .two-col {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+  
+  .header-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .header-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+  }
+  
+  .badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+/* =============================================================================
+   STATUS ROW STYLING
+   ============================================================================= */
+
+.row:has(.badge) {
+  align-items: center;
+  justify-content: space-between;
+  background: 
+    linear-gradient(135deg, rgba(255, 249, 230, 0.3) 0%, rgba(244, 230, 208, 0.2) 100%);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  margin: 16px 0;
+}
+
+.row:has(.badge) > div:first-child {
+  flex: 1;
+}
+
+.row:has(.badge) > div:last-child {
+  flex-shrink: 0;
+}

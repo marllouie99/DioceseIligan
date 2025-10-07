@@ -1,0 +1,152 @@
+<!-- Booking Modal -->
+<div id="bookingModal" class="booking-modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">Book Appointment</h3>
+      <button type="button" class="modal-close" id="closeBookingModal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="booking-wizard">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-label">Choose date</div>
+          </div>
+          <div class="step" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-label">Choose time</div>
+          </div>
+          <div class="step" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-label">Confirm</div>
+          </div>
+        </div>
+
+        <!-- Service Information Header -->
+        <div class="service-header">
+          <div class="service-title">
+            <h2 id="modalServiceName">Service Name</h2>
+            <p class="service-church" id="modalChurchName">Church Name</p>
+          </div>
+          <div class="service-details">
+            <div class="service-meta" id="modalServiceMeta">
+              <!-- Service metadata will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Booking Information -->
+        <div class="booking-info">
+          <strong>Booking Request:</strong> Choose your preferred date and time. The church will review and confirm your appointment.
+        </div>
+
+        <!-- Profile Warning (will be shown if incomplete) -->
+        <div class="profile-warning" id="profileWarning" style="display: none;">
+          <div class="profile-warning-header">
+            <span>⚠️</span>
+            <span>Complete Profile Required</span>
+          </div>
+          <div class="profile-warning-text">
+            Churches need your contact information to confirm appointments. Please complete these fields:
+          </div>
+          <div class="missing-fields" id="missingFields">
+            <!-- Missing fields will be populated by JavaScript -->
+          </div>
+          <button type="button" class="btn btn-primary" onclick="window.open('/accounts/profile/', '_blank')">Complete Profile</button>
+        </div>
+
+        <form id="modalBookingForm" class="booking-form">
+          <!-- Step 1: Choose Date -->
+          <div class="step-content active" data-step="1">
+            <div class="form-section">
+              <label class="form-label" for="modal_date">Preferred Date</label>
+              <div class="date-input-wrapper">
+                <input type="date" id="modal_date" name="date" class="form-input date-input" required>
+                <div class="date-icon">📅</div>
+              </div>
+              <div class="form-hint" id="dateHint">Choose any available date</div>
+              <div class="form-error" id="dateError" style="display: none;"></div>
+            </div>
+          </div>
+
+          <!-- Step 2: Choose Time -->
+          <div class="step-content" data-step="2">
+            <div class="form-section">
+              <label class="form-label">Preferred Time</label>
+              <p class="form-hint" style="margin-bottom: 16px;">Choose your preferred appointment time. All times are approximate and subject to church availability.</p>
+              <div class="time-slots" id="modalTimeSlots">
+                <!-- Time slots will be populated by JavaScript -->
+              </div>
+              <div class="form-hint" style="margin-top: 16px;">Click on a time slot to select it</div>
+            </div>
+          </div>
+
+          <!-- Step 3: Confirm -->
+          <div class="step-content" data-step="3">
+            <div class="form-section">
+              <h4 class="section-title">Review Your Appointment</h4>
+              <div class="appointment-summary">
+                <div class="summary-item">
+                  <span class="summary-label">Service</span>
+                  <span class="summary-value" id="summaryServiceName">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Church</span>
+                  <span class="summary-value" id="summaryChurchName">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Date</span>
+                  <span class="summary-value" id="modalSummaryDate">Please select a date</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Time</span>
+                  <span class="summary-value" id="modalSummaryTime">Please select a time</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Duration</span>
+                  <span class="summary-value" id="summaryDuration">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Cost</span>
+                  <span class="summary-value" id="summaryPrice">-</span>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <label class="form-label" for="modal_notes">Additional Notes (optional)</label>
+                <textarea id="modal_notes" name="notes" class="form-textarea" 
+                          placeholder="Any special requests or information for the church"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="wizard-actions">
+            <button type="button" id="modalBackBtn" class="btn btn-outline" style="display: none;">Back</button>
+            <div>
+              <button type="button" id="modalCancelBtn" class="btn btn-secondary">Cancel</button>
+              <button type="button" id="modalNextBtn" class="btn btn-primary">Next</button>
+              <button type="button" id="modalSubmitBtn" class="btn btn-primary" style="display: none;">
+                <span class="btn-text">Submit Request</span>
+                <span class="btn-loading" style="display: none;">
+                  <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

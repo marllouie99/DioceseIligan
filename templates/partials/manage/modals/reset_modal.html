@@ -1,0 +1,35 @@
+{% load static %}
+{# Reset Modal #}
+<div id="reset-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content danger">
+    <div class="modal-header">
+      <h3>Reset Settings</h3>
+      <button class="modal-close" type="button" aria-label="Close modal" onclick="closeModal('reset-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="warning-message">
+        {% include 'partials/icons/warning.html' %}
+        <div class="message-text">
+          <strong>Warning: This action cannot be undone</strong>
+          <p>This will reset all your church settings to default values. All customizations will be lost.</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="confirm-reset" required>
+            <span>I understand that this action cannot be undone</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" value="backup">
+            <span>Create backup before reset (recommended)</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('reset-modal')">Cancel</button>
+        <button class="btn btn-danger" onclick="executeReset()">Reset Settings</button>
+      </div>
+    </div>
+  </div>
+</div>

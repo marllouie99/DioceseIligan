@@ -1,0 +1,66 @@
+{% load static %}
+{# Church Preview Section #}
+{% if church %}
+<div class="followers-preview-section">
+  <div class="preview-card">
+    <!-- Cover Image Preview -->
+    <div class="preview-cover-section">
+      {% if church.cover_image %}
+        <img src="{{ church.cover_image.url }}" alt="{{ church.name }} Cover" class="preview-cover-image" loading="lazy" decoding="async">
+      {% else %}
+        <div class="preview-cover-placeholder">
+          {% include 'partials/icons/location.html' %}
+          <span>Cover image</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Profile Section -->
+    <div class="preview-profile-section">
+      <div class="preview-avatar">
+        {% if church.logo %}
+          <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="preview-avatar-image" loading="lazy" decoding="async">
+        {% else %}
+          <div class="preview-avatar-placeholder">
+            {% include 'partials/icons/location.html' %}
+            <span>Profile image</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="preview-info">
+        <div class="preview-name-wrapper">
+          <h3 class="preview-church-name">{{ church.name }}</h3>
+          {% if church.is_verified %}
+            {% include 'partials/verified_badge.html' %}
+          {% endif %}
+        </div>
+        <p class="preview-branding-text">Branding preview</p>
+        <a href="{% url 'core:church_detail' slug=church.slug %}" 
+           class="view-church-btn"
+           title="View Church Details">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          View Church
+        </a>
+      </div>
+
+      <div class="preview-actions">
+        <button class="preview-btn" data-target="id_cover_image">
+          Change cover
+        </button>
+        <button class="preview-btn" data-target="id_logo">
+          Change profile
+        </button>
+        <!-- Confirm/Discard controls (hidden until user selects and crops an image) -->
+        <button type="button" class="preview-btn preview-confirm-btn" data-type="cover" style="display: none; background: #16a34a;">Confirm cover</button>
+        <button type="button" class="preview-btn preview-discard-btn" data-type="cover" style="display: none; background: #ef4444;">Discard</button>
+        <button type="button" class="preview-btn preview-confirm-btn" data-type="logo" style="display: none; background: #16a34a;">Confirm profile</button>
+        <button type="button" class="preview-btn preview-discard-btn" data-type="logo" style="display: none; background: #ef4444;">Discard</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

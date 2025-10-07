@@ -1,0 +1,1010 @@
+/* Manage Church Page - Modern Card Design with Tabs */
+
+/* Page Layout */
+.manage-church-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  background:
+    /* Wood grain texture */
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
+    /* Paper texture patterns */
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
+    /* Main warm gradient */
+    linear-gradient(45deg, #F8F4E6 0%, #F0E2CC 50%, #F8F4E6 100%);
+  min-height: 100vh;
+}
+
+/* Church Profile Card */
+.church-profile-card {
+  background:
+    /* Age spots */
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    /* Fine paper grain */
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    /* Main parchment base */
+    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border-radius: 20px;
+  box-shadow: 
+    0 16px 32px rgba(139, 69, 19, 0.16),
+    0 6px 12px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+  border: 2px solid rgba(139, 69, 19, 0.18);
+  overflow: hidden;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+/* Cover Image Section */
+.church-cover-section {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cover-placeholder svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(139, 69, 19, 0.18) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.church-cover-section:hover .cover-overlay {
+  opacity: 1;
+}
+
+.edit-cover-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255, 249, 230, 0.95);
+  color: #2D1810;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.edit-cover-btn:hover {
+  background: rgba(255, 249, 230, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.15);
+}
+
+.edit-cover-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Church Info Section */
+.church-info-section {
+  padding: 32px;
+  position: relative;
+}
+
+.church-avatar-section {
+  position: absolute;
+  top: -60px;
+  left: 32px;
+  z-index: 2;
+}
+
+.church-avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #DAA520, #A0522D);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 800;
+  border: 4px solid #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #8B4513, #A0522D);
+  color: #fff;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+}
+
+.edit-avatar-btn:hover {
+  background: linear-gradient(145deg, #A0522D, #DAA520);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.35);
+}
+
+.edit-avatar-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Church Details */
+.church-details {
+  margin-top: 40px;
+}
+
+.church-header-info {
+  margin-bottom: 24px;
+}
+
+.church-name {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2D1810;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.church-location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6B4226;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.church-location svg {
+  width: 18px;
+  height: 18px;
+  color: #654321;
+}
+
+.church-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.denomination-badge,
+.size-badge,
+.verified-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.denomination-badge {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.9);
+  color: #6B4226;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.size-badge {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(250, 240, 210, 0.9);
+  color: #654321;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.verified-badge {
+  background: linear-gradient(135deg, #FBE8B5 0%, #F5D88A 100%);
+  color: #2D1810;
+  border: 1px solid rgba(218, 165, 32, 0.4);
+}
+
+.verified-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.church-description {
+  margin-bottom: 24px;
+}
+
+.church-description p {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Church Stats */
+.church-stats {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.7);
+  border-radius: 16px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #DAA520 0%, #A0522D 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF9E6;
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Church Actions */
+.church-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.church-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.church-actions .btn-outline {
+  background: rgba(255, 249, 230, 0.8);
+  color: #2D1810;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+}
+
+.church-actions .btn-outline:hover {
+  background: rgba(255, 249, 230, 1);
+  border-color: rgba(139, 69, 19, 0.3);
+  transform: translateY(-2px);
+}
+
+.church-actions .btn-primary {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: #FFF9E6;
+  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.28);
+}
+
+.church-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(139, 69, 19, 0.35);
+}
+
+.church-actions .btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Management Tabs */
+.management-tabs {
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.7);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.12), 0 8px 16px rgba(101, 67, 33, 0.06);
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+}
+
+/* Tabs Navigation */
+.tabs-nav {
+  display: flex;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.9);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  color: #6B4226;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.tab-btn:hover {
+  background: rgba(218, 165, 32, 0.15);
+  color: #654321;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%);
+  color: #FFF9E6;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #A0522D, #DAA520);
+}
+
+.tab-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Tabs Content */
+.tabs-content {
+  flex: 1;
+  position: relative;
+}
+
+.tab-panel {
+  display: none;
+  padding: 32px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+}
+
+.tab-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2D1810;
+  margin: 0 0 8px 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.tab-header p {
+  color: var(--muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Tab Content Styles */
+.tab-content {
+  min-height: 400px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6B4226;
+  background:
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  border-radius: 16px;
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  color: #8B6F47;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2D1810;
+  margin: 0 0 12px 0;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+/* Service Schedule */
+.service-schedule h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 20px 0;
+}
+
+.service-list {
+  margin-bottom: 24px;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 249, 230, 0.8);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+}
+
+.service-time {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.service-name {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.service-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  background: rgba(255, 249, 230, 0.9);
+  color: #654321;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: rgba(218, 165, 32, 0.2);
+  color: #8B4513;
+  border-color: rgba(139, 69, 19, 0.3);
+}
+
+.btn-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Availability Settings */
+.availability-settings h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 20px 0;
+}
+
+.hours-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.day-hours {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 249, 230, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+}
+
+.day {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.hours {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Content Sections */
+.content-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.content-section {
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
+    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+}
+
+.content-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.content-section p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+/* Donation Stats */
+.donation-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.donation-stats .stat-card {
+  padding: 24px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.85);
+  border-radius: 16px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  text-align: center;
+}
+
+.donation-stats .stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.donation-stats .stat-label {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.donation-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Form Container (Settings Tab) */
+.form-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .manage-church-page {
+    padding: 16px;
+  }
+  
+  .church-info-section {
+    padding: 24px 20px;
+  }
+  
+  .church-avatar-section {
+    position: static;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .church-details {
+    margin-top: 0;
+  }
+  
+  .church-stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .church-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .church-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tabs-nav {
+    flex-direction: column;
+  }
+  
+  .tab-btn {
+    min-width: auto;
+    justify-content: flex-start;
+  }
+  
+  .tab-panel {
+    padding: 20px;
+  }
+  
+  .content-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .donation-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .donation-actions {
+    flex-direction: column;
+  }
+  
+  .donation-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .church-cover-section {
+    height: 200px;
+  }
+  
+  .church-name {
+    font-size: 24px;
+  }
+  
+  .church-badges {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .service-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .service-actions {
+    align-self: flex-end;
+  }
+}
+
+/* Followers Tab Styling */
+.followers-management {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.followers-stats {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
+    rgba(255, 249, 230, 0.85);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 69, 19, 0.18);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.followers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.follower-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
+    rgba(255, 249, 230, 0.9);
+  border: 1px solid rgba(139, 69, 19, 0.18);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.follower-item:hover {
+  background: rgba(255, 249, 230, 1);
+  border-color: rgba(139, 69, 19, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.15);
+}
+
+.follower-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.follower-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.follower-avatar .avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #DAA520, #A0522D);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+}
+
+.follower-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.follower-name {
+  font-weight: 600;
+  color: var(--text, #111827);
+  font-size: 16px;
+}
+
+.follower-time {
+  color: var(--muted, #6b7280);
+  font-size: 14px;
+}
+
+.follower-email {
+  color: var(--muted, #6b7280);
+  font-size: 13px;
+}
+
+.follower-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.follower-joined {
+  color: var(--muted, #6b7280);
+  font-size: 12px;
+  text-align: right;
+}
+
+.followers-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.followers-pagination .btn {
+  padding: 12px 24px;
+  font-weight: 500;
+}
+
+/* Mobile responsiveness for followers */
+@media (max-width: 768px) {
+  .followers-stats {
+    gap: 16px;
+  }
+  
+  .stat-number {
+    font-size: 20px;
+  }
+  
+  .follower-item {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .follower-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .follower-avatar .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .follower-name {
+    font-size: 15px;
+  }
+  
+  .follower-time,
+  .follower-email {
+    font-size: 13px;
+  }
+  
+  .follower-joined {
+    font-size: 11px;
+  }
+}

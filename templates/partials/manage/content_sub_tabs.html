@@ -1,0 +1,165 @@
+{# Unified Content Management #}
+<div class="unified-content-management">
+  {# Analytics Overview Section #}
+  <div class="analytics-overview">
+    <div class="analytics-header">
+      <h3>Content Analytics</h3>
+      <div class="sort-controls">
+        <label for="analytics-sort">Sort by:</label>
+        <select id="analytics-sort" class="sort-dropdown">
+          <option value="default">Default</option>
+          <option value="highest">Highest Values</option>
+          <option value="lowest">Lowest Values</option>
+          <option value="recent">Most Recent</option>
+        </select>
+      </div>
+    </div>
+    <div class="analytics-cards">
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_posts }}</h4>
+          <p>Total Posts</p>
+          <span class="analytics-change">+{{ analytics.posts_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_likes }}</h4>
+          <p>Total Likes</p>
+          <span class="analytics-change">+{{ analytics.likes_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_comments }}</h4>
+          <p>Total Comments</p>
+          <span class="analytics-change">+{{ analytics.comments_last_30_days }} this month</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ analytics.total_views }}</h4>
+          <p>Total Views</p>
+          <span class="analytics-change">+{{ analytics.views_last_30_days }} this month</span>
+        </div>
+      </div>
+    </div>
+    
+    {# Analytics Charts #}
+    <div class="analytics-charts">
+      <div class="charts-grid">
+        {# Most Engaged Post Chart #}
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Most Engaged Post Performance</h4>
+            <p>Detailed engagement metrics for your top performing post</p>
+          </div>
+          <div class="chart-content">
+            <canvas id="mostEngagedChart" width="400" height="200"></canvas>
+            <div class="chart-details">
+              <div class="post-preview">
+                <h5>{{ analytics.most_engaged_post.content|truncatechars:60|default:"No posts available" }}</h5>
+                <div class="engagement-stats">
+                  <span class="stat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                    </svg>
+                    {{ analytics.most_engaged_post.likes_count|default:0 }}
+                  </span>
+                  <span class="stat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    {{ analytics.most_engaged_post.comments_count|default:0 }}
+                  </span>
+                  <span class="stat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    {{ analytics.most_engaged_post.view_count|default:0 }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Top 5 Posts Ranking Chart #}
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Top 5 Most Engaged Posts</h4>
+            <p>Ranking comparison of your best performing content</p>
+          </div>
+          <div class="chart-content">
+            <canvas id="top5PostsChart" width="400" height="200"></canvas>
+            <div class="posts-ranking">
+              {% for post in analytics.top_5_posts %}
+              <div class="ranking-item" data-rank="{{ forloop.counter }}" data-engagement="{{ post.total_engagement|default:0 }}" data-max-engagement="{{ analytics.max_engagement|default:1 }}">
+                <div class="rank-number">{{ forloop.counter }}</div>
+                <div class="post-info">
+                  <p>{{ post.content|truncatechars:40 }}</p>
+                  <div class="engagement-total">
+                    {{ post.total_engagement|default:0 }} engagements
+                  </div>
+                </div>
+                <div class="engagement-bar">
+                  <div class="bar-fill"></div>
+                </div>
+              </div>
+              {% empty %}
+              <div class="no-posts">
+                <p>No posts available for ranking</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {# Posts Management Section #}
+  {% include 'partials/manage/posts_management.html' with posts=posts posts_count=posts_count follower_count=follower_count church=church %}
+  
+  {# Other Content Sections #}
+  <div class="other-content-sections">
+    <div class="content-section">
+      <h3>Media Gallery</h3>
+      <p>Upload and organize photos and videos</p>
+      <button class="btn btn-outline">Manage Media</button>
+    </div>
+    <div class="content-section">
+      <h3>Sermons</h3>
+      <p>Upload and manage sermon recordings</p>
+      <button class="btn btn-outline">Manage Sermons</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+{% load static %}
+{# Services Tab Content #}
+<div class="tab-panel {% if request.GET.tab == 'services' %}active{% endif %}" id="services">
+  <div class="tab-header">
+    <h2>Bookable Services</h2>
+    <p>Manage services that people can book appointments for</p>
+  </div>
+  <div class="tab-content">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          {% if 'service' in message|lower %}
+            <div class="message message-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div class="services-management">
+      <div class="services-header">
+        <h3>Available Services</h3>
+        <a href="{% url 'core:create_service' %}" class="btn btn-primary" aria-label="Create New Service">
+          {% include 'partials/icons/plus.html' %}
+          Create New Service
+        </a>
+      </div>
+      
+      {% if church and church.bookable_services.all %}
+        <div class="services-list">
+          {% for service in church.bookable_services.all %}
+            {% include 'partials/manage/service_card.html' with service=service %}
+          {% endfor %}
+        </div>
+      {% else %}
+        {% include 'partials/manage/empty_services.html' %}
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+{% load static %}
+
+<!-- Lazy loading image template -->
+<img 
+    class="lazy {{ extra_classes|default:'' }}"
+    data-src="{{ image_url }}"
+    src="{% static 'images/placeholder.png' %}"
+    alt="{{ alt_text|default:'' }}"
+    width="{{ width|default:'auto' }}"
+    height="{{ height|default:'auto' }}"
+    loading="lazy"
+    {% if title %}title="{{ title }}"{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
+    {% if onclick %}onclick="{{ onclick }}"{% endif %}
+>
+
+<!-- Fallback for browsers without IntersectionObserver -->
+<noscript>
+    <img 
+        src="{{ image_url }}"
+        alt="{{ alt_text|default:'' }}"
+        width="{{ width|default:'auto' }}"
+        height="{{ height|default:'auto' }}"
+        {% if title %}title="{{ title }}"{% endif %}
+        {% if id %}id="{{ id }}"{% endif %}
+        {% if onclick %}onclick="{{ onclick }}"{% endif %}
+    >
+</noscript>
+

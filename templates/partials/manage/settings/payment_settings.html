@@ -1,0 +1,112 @@
+{% load static %}
+{# Payment Settings Section #}
+<div id="payment-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Payment Settings</h3>
+      <p class="section-description">Configure payment methods for receiving donations</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="payment-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  
+  {# Payment Status Alert #}
+  {% if not church.paypal_email %}
+  <div class="alert alert-warning">
+    <div class="alert-content">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="alert-message">
+        <h4>Payment Setup Required</h4>
+        <p>To enable donations on your posts, you must set up your PayPal email address. Donations will be sent directly to your PayPal account.</p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-success">
+    <div class="alert-content">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <div class="alert-message">
+        <h4>Payment Method Configured</h4>
+        <p>Your PayPal account is set up. You can now enable donations on your posts. Donations will be sent to: <strong>{{ church.paypal_email }}</strong></p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">PayPal Email Address</h4>
+        <p class="setting-description">Email address associated with your PayPal account</p>
+        <div class="setting-status">
+          <span class="status-badge {% if church.paypal_email %}success{% else %}required{% endif %}">
+            {% if church.paypal_email %}Configured{% else %}Required for Donations{% endif %}
+          </span>
+          <span class="status-description">Donations will be sent directly to this PayPal account</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.paypal_email }}
+        {% if form.paypal_email.errors %}
+          <div class="form-error">{{ form.paypal_email.errors.0 }}</div>
+        {% endif %}
+        <div class="setting-help">
+          <strong>Important:</strong> This must be a valid PayPal email address. Make sure you have access to this account.
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">How It Works</h4>
+        <p class="setting-description">Understanding the donation flow</p>
+      </div>
+      <div class="setting-control">
+        <div class="info-box info-box-gray">
+          <ol class="info-list">
+            <li>You set your PayPal email address here</li>
+            <li>Enable donations when creating or editing posts</li>
+            <li>Donors click "Donate" and pay via PayPal</li>
+            <li>Funds are sent directly to your PayPal account</li>
+            <li>You receive email notifications for each donation</li>
+          </ol>
+          <div class="info-box-footer">
+            <p><strong>Note:</strong> Platform fees may apply. Check our <a href="#" class="info-link">donation policy</a> for details.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Setup Instructions</h4>
+        <p class="setting-description">How to get your PayPal email</p>
+      </div>
+      <div class="setting-control">
+        <div class="info-box info-box-blue">
+          <ol class="info-list">
+            <li>Visit <a href="https://www.paypal.com" target="_blank" class="info-link">PayPal.com</a></li>
+            <li>Create a PayPal account if you don't have one</li>
+            <li>For churches, use a PayPal Business account (recommended)</li>
+            <li>Verify your email address with PayPal</li>
+            <li>Copy that email address and paste it above</li>
+          </ol>
+          <div class="info-box-footer">
+            <p><strong>Need help?</strong> Visit our <a href="#" class="info-link">PayPal setup guide</a> for detailed instructions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

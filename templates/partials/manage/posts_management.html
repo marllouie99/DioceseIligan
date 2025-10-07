@@ -1,0 +1,36 @@
+{% load static %}
+{# Posts Management Section #}
+<div class="posts-management">
+  <div class="posts-header">
+    <div class="posts-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ posts_count }}</span>
+        <span class="stat-label">Total Posts</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ follower_count }}</span>
+        <span class="stat-label">Followers</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="showCreatePostModal()">
+      {% include 'partials/icons/plus.html' %}
+      Create New Post
+    </button>
+  </div>
+
+  {% if posts %}
+    <div class="posts-list">
+      {% for post in posts %}
+        {% include 'partials/manage/post_card.html' with post=post church=church %}
+      {% endfor %}
+    </div>
+    
+    {% if posts_count > 20 %}
+      <div class="posts-pagination">
+        <a href="#" class="btn btn-outline">View All Posts</a>
+      </div>
+    {% endif %}
+  {% else %}
+    {% include 'partials/manage/empty_posts.html' with church=church %}
+  {% endif %}
+</div>

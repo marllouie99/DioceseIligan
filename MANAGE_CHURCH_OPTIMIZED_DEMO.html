@@ -1,0 +1,100 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Manage Church - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/manage_church.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="manage-church-page">
+  
+  {# Page Header Section #}
+  {% include 'partials/manage/page_header.html' %}
+  
+  {# Verification Status Banner #}
+  {% include 'partials/manage/verification_banner.html' with church=church latest_verification=latest_verification %}
+  
+  {# Church Preview Section #}
+  {% include 'partials/manage/church_preview.html' with church=church %}
+
+  {# Main Management Interface #}
+  <div class="management-tabs">
+    <div class="tabs-container">
+      {# Tab Navigation #}
+      {% include 'partials/manage/tab_navigation.html' %}
+
+      <div class="tabs-content">
+        {# Appointments Tab #}
+        {% include 'partials/manage/appointments_tab.html' with bookings=bookings booking_counts=booking_counts appt_status=appt_status %}
+        
+        {# Services Tab #}
+        {% include 'partials/manage/services_tab.html' with church=church %}
+        
+        {# Availability Tab #}
+        {% include 'partials/manage/availability_tab.html' with church=church %}
+        
+        {# Events Tab #}
+        {% include 'partials/manage/events_tab.html' %}
+        
+        {# Content Tab #}
+        <div class="tab-panel" id="content">
+          <div class="tab-header">
+            <h2>Posts & Content</h2>
+            <p>Manage your church posts and announcements</p>
+          </div>
+          <div class="tab-content">
+            {# Posts Management Section #}
+            {% include 'partials/manage/posts_management.html' with posts=posts posts_count=posts_count follower_count=follower_count church=church %}
+            
+            {# Other Content Sections #}
+            {% include 'partials/manage/other_content.html' %}
+          </div>
+        </div>
+        
+        {# Other Tabs #}
+        {% include 'partials/manage/donations_tab.html' %}
+        {% include 'partials/manage/settings_tab.html' with church=church form=form verif_form=verif_form decline_reasons=decline_reasons %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Modals #}
+{% include 'partials/manage/modals.html' with church=church %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+<script>
+  // Django URLs for JavaScript
+  window.updateChurchLogoUrl = "{% url 'core:update_church_logo' %}";
+  window.updateChurchCoverUrl = "{% url 'core:update_church_cover' %}";
+  window.createAvailabilityUrl = "{% url 'core:create_availability' %}?date=0";
+  window.manageServiceImagesUrl = "{% url 'core:manage_service_images' 0 %}";
+  window.serviceGalleryUrl = "{% url 'core:service_gallery' 0 %}";
+  window.requestVerificationUrl = "{% url 'core:request_verification' %}";
+  window.createDeclineReasonUrl = "{% url 'core:create_decline_reason' %}";
+</script>
+{% load static %}
+<!-- Load utility modules -->
+<script defer src="{% static 'js/core/tabs.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/forms.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/image-cropper.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/calendar.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/settings.js' %}?v={{ STATIC_VERSION }}"></script>
+<!-- Load main application -->
+<script defer src="{% static 'js/app/manage_church_new.js' %}?v={{ STATIC_VERSION }}"></script>
+<!-- Load post management module -->
+<script defer src="{% static 'js/manage/post-management.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

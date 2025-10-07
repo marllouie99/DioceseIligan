@@ -1,0 +1,1173 @@
+{% extends "layouts/app_base.html" %}
+{% load static %}
+
+{% block title %}Dashboard • ChurchIligan{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}{% include "partials/sidebar.html" %}{% endblock %}
+
+{% block topbar %}{% include "partials/topbar.html" %}{% endblock %}
+
+{% block content %}
+        <!-- Warm Sacred Earth Background for browsers that don't support :has() -->
+        <div class="dashboard-background"></div>
+        
+        {% if not essential_status.is_complete %}
+        <section class="banner">
+          <h3>Complete Essential Info to Request Appointments</h3>
+          <p class="muted">
+            You must complete the required fields before you can request an appointment with a church.
+            Profile completeness: {{ profile_status.percent }}% ({{ profile_status.completed }}/{{ profile_status.total }} fields)
+          </p>
+          <div class="progress">
+            <a class="btn dark" href="{% url 'manage_profile' %}">✦ Complete Profile</a>
+            <div class="progress-bar"><span style="width: {{ profile_status.percent }}%"></span></div>
+          </div>
+          {% if essential_status.missing %}
+          <div class="small" style="margin-top:6px; color:#92400e;">
+            Required missing:
+            {% for item in essential_status.missing|slice:":4" %}
+              <span>{{ item }}{% if not forloop.last %}, {% endif %}</span>
+            {% endfor %}
+            {% if essential_status.missing|length > 4 %}
+              <span>+ {{ essential_status.missing|length|add:"-4" }} more</span>
+            {% endif %}
+          </div>
+          {% endif %}
+        </section>
+        {% endif %}
+
+        <div class="dashboard-layout">
+          <div class="main-content">
+            <!-- Social Media Style Post Creation for Church Owners -->
+            {% if owned_churches and post_form %}
+            <div class="social-post-creation">
+              <div class="post-creation-card">
+                <!-- Church Avatar and Input Bar -->
+                <div class="post-input-section">
+                  <div class="church-avatar">
+                    {% if owned_churches.first %}
+                      {% if owned_churches.first.logo %}
+                        <img src="{{ owned_churches.first.logo.url }}" alt="{{ owned_churches.first.name }}">
+                      {% else %}
+                        <div class="church-avatar-placeholder">
+                          {{ owned_churches.first.name|default:"C"|first|upper }}
+                        </div>
+                      {% endif %}
+                    {% else %}
+                      <div class="church-avatar-placeholder">
+                        C
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="post-input-container">
+                    <input type="text" 
+                           id="post-input-trigger" 
+                           class="post-input-bar" 
+                           placeholder="What's happening at {% if owned_churches.first %}{{ owned_churches.first.name }}{% else %}your church{% endif %}?"
+                           readonly>
+                  </div>
+                </div>
+                
+                <!-- Post Type Buttons -->
+                <div class="post-type-buttons">
+                  <button type="button" class="post-type-btn" data-type="general">
+                    <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span>Update</span>
+                  </button>
+                  
+                  <button type="button" class="post-type-btn" data-type="photo">
+                    <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <span>Photo</span>
+                  </button>
+                  
+                  <button type="button" class="post-type-btn" data-type="event">
+                    <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>Event</span>
+                  </button>
+                  
+                  <button type="button" class="post-type-btn" data-type="prayer">
+                    <svg class="post-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Prayer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Post Creation Modal -->
+            <div id="post-creation-modal" class="post-modal" style="display: none;">
+              <div class="post-modal-content">
+                <div class="post-modal-header">
+                  <h3 class="post-modal-title">Create Post</h3>
+                  <button type="button" class="post-modal-close">&times;</button>
+                </div>
+                
+                <form id="dashboard-post-form" class="post-creation-form" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  
+                  <!-- Church Selection (if multiple churches) -->
+                  {% if owned_churches.count > 1 %}
+                  <div class="form-group">
+                    <label for="church-select" class="form-label">Post as:</label>
+                    <select id="church-select" name="church_id" class="form-select" required>
+                      {% for church in owned_churches %}
+                        <option value="{{ church.id }}">{{ church.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  {% elif owned_churches.first %}
+                  <input type="hidden" name="church_id" value="{{ owned_churches.first.id }}">
+                  {% endif %}
+                  
+                  <!-- Event-Specific Fields -->
+                  <div id="event-fields" class="event-fields" style="display: none;">
+                    <div class="form-group">
+                      <label for="event-title" class="form-label">Event Title <span class="required">*</span></label>
+                      <input type="text" id="event-title" name="event_title" class="form-input event-input" placeholder="Enter event title..." maxlength="200">
+                    </div>
+                    
+                    <div class="form-row">
+                      <div class="form-group form-group-half">
+                        <label for="event-start-date" class="form-label">Start Date & Time <span class="required">*</span></label>
+                        <input type="datetime-local" id="event-start-date" name="event_start_date" class="form-input event-input">
+                      </div>
+                      
+                      <div class="form-group form-group-half">
+                        <label for="event-end-date" class="form-label">End Date & Time <span class="required">*</span></label>
+                        <input type="datetime-local" id="event-end-date" name="event_end_date" class="form-input event-input">
+                      </div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="event-location" class="form-label">Location (Optional)</label>
+                      <input type="text" id="event-location" name="event_location" class="form-input event-input" placeholder="Event venue or address" maxlength="300">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="max-participants" class="form-label">Maximum Participants (Optional)</label>
+                      <input type="number" id="max-participants" name="max_participants" class="form-input event-input" placeholder="Leave blank for unlimited" min="1" max="10000">
+                      <small class="form-help-text">Set a limit on how many people can participate in this event</small>
+                    </div>
+                  </div>
+                  
+                  <!-- Content Input -->
+                  <div class="form-group">
+                    <label id="content-label" class="form-label" style="display: none;">Description</label>
+                    <textarea 
+                      id="post-content"
+                      name="content" 
+                      class="post-textarea" 
+                      placeholder="Share your thoughts, updates, or inspiration..."
+                      maxlength="1000"
+                      rows="4"
+                      required
+                    ></textarea>
+                    <div class="character-count">
+                      <span id="char-count">0</span>/1000
+                    </div>
+                  </div>
+                  
+                  <!-- Image Upload -->
+                  <div class="form-group" id="image-upload-section" style="display: none;">
+                    <div class="image-upload-area">
+                      <input type="file" id="post-image" name="image" accept="image/*" class="file-input">
+                      <label for="post-image" class="file-upload-label">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                        <span class="upload-text">Click to add photo</span>
+                      </label>
+                      <div id="image-preview" class="image-preview" style="display: none;">
+                        <img id="preview-img" src="" alt="Preview">
+                        <button type="button" id="remove-image" class="remove-image-btn">&times;</button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Donation Toggle -->
+                  <div class="form-group donation-toggle-section">
+                    <div class="toggle-wrapper">
+                      <input type="checkbox" id="enable-donation" name="enable_donation" class="toggle-input" 
+                             data-has-paypal="{% if owned_churches.first and owned_churches.first.paypal_email %}true{% else %}false{% endif %}">
+                      <label for="enable-donation" class="toggle-label">
+                        <svg class="donation-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        <span>Enable Donations for this post</span>
+                      </label>
+                    </div>
+                    {% if not owned_churches.first or not owned_churches.first.paypal_email %}
+                    <div class="donation-warning" style="margin-top: 0.5rem; padding: 0.75rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; display: flex; align-items: flex-start; gap: 0.5rem;">
+                      <svg style="width: 16px; height: 16px; color: #f59e0b; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                      </svg>
+                      <div style="font-size: 0.875rem; color: #92400e; line-height: 1.5;">
+                        <strong>Payment setup required:</strong> Set up your PayPal email in <a href="{% url 'core:manage_church' %}#payment-settings" style="color: #92400e; text-decoration: underline; font-weight: 600;">Church Settings → Payment Settings</a> to enable donations.
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Donation Details (Hidden by default) -->
+                  <div id="donation-fields" class="donation-fields" style="display: none;">
+                    <div class="form-group">
+                      <label for="donation-goal" class="form-label">Donation Goal (Optional)</label>
+                      <div class="input-with-prefix">
+                        <span class="input-prefix">₱</span>
+                        <input type="number" id="donation-goal" name="donation_goal" class="form-input" 
+                               placeholder="0.00" min="0" step="0.01">
+                      </div>
+                      <small class="form-hint">Leave empty for no specific goal</small>
+                    </div>
+                  </div>
+                  
+                  <!-- Submit Button -->
+                  <div class="form-actions">
+                    <button type="submit" class="post-submit-btn" disabled>
+                      <span class="submit-text">Share</span>
+                      <span class="submit-loading" style="display: none;">
+                        <svg class="loading-spinner" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  
+                  <div id="post-creation-message" class="form-message" style="display: none;"></div>
+                </form>
+              </div>
+            </div>
+            {% endif %}
+            
+            <h2 class="section-title">Community Feed</h2>
+            <div class="posts-feed">
+              {% if community_feed %}
+                {% for post in community_feed %}
+                  {% include 'partials/post_card.html' with post=post %}
+                {% endfor %}
+              {% else %}
+                <div class="empty-state">
+                  <h3>No posts yet</h3>
+                  <p>When churches share updates, you'll see them here.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="sidebar-content">
+            <div class="sidebar-section">
+              <h3 class="sidebar-title">Upcoming Events</h3>
+              <div class="upcoming-events">
+                {% if upcoming_events %}
+                  {% for event in upcoming_events %}
+                    <div class="event-card">
+                      <div class="event-date-badge">
+                        <div class="event-date-month">{{ event.event_start_date|date:"M" }}</div>
+                        <div class="event-date-day">{{ event.event_start_date|date:"d" }}</div>
+                      </div>
+                      <div class="event-info">
+                        <p class="event-title">{{ event.event_title }}</p>
+                        <p class="event-church">{{ event.church.name }}</p>
+                        <p class="event-time">
+                          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                          {{ event.event_start_date|date:"g:i A" }}
+                        </p>
+                        {% if event.event_location %}
+                        <p class="event-location">
+                          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          {{ event.event_location|truncatewords:5 }}
+                        </p>
+                        {% endif %}
+                      </div>
+                      <a href="{% url 'core:church_detail' event.church.slug %}?tab=posts#post-card-{{ event.id }}" class="event-view-btn">View</a>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="empty-events">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <p class="empty-text">No upcoming events</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Report Post Modal -->
+        <div id="report-post-modal" class="post-modal" style="display: none;">
+          <div class="post-modal-content">
+            <div class="post-modal-header">
+              <h3 class="post-modal-title">Report Post</h3>
+              <button type="button" class="post-modal-close report-modal-close">&times;</button>
+            </div>
+            
+            <form id="report-post-form" class="report-form">
+              {% csrf_token %}
+              <input type="hidden" id="report-post-id" name="post_id">
+              
+              <div class="form-group">
+                <label for="report-reason" class="form-label">Reason for reporting *</label>
+                <select id="report-reason" name="reason" class="form-input" required>
+                  <option value="">Select a reason...</option>
+                  <option value="spam">Spam or misleading</option>
+                  <option value="inappropriate">Inappropriate content</option>
+                  <option value="harassment">Harassment or hate speech</option>
+                  <option value="violence">Violence or dangerous content</option>
+                  <option value="false_info">False information</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="report-description" class="form-label">Additional details *</label>
+                <textarea id="report-description" name="description" class="form-input" rows="4" 
+                          placeholder="Please provide more details about why you're reporting this post..."
+                          maxlength="500" required></textarea>
+                <div class="char-counter">
+                  <span id="report-char-count">0</span>/500
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button type="button" class="btn-secondary report-cancel-btn">Cancel</button>
+                <button type="submit" class="btn-primary report-submit-btn">
+                  <span class="btn-text">Submit Report</span>
+                  <div class="loading-spinner" style="display: none;"></div>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Edit Post Modal (reuses same structure as create post) -->
+        <div id="edit-post-modal" class="post-modal" style="display: none;">
+          <div class="post-modal-content">
+            <div class="post-modal-header">
+              <h3 class="post-modal-title">Edit Post</h3>
+              <button type="button" class="post-modal-close edit-modal-close">&times;</button>
+            </div>
+            
+            <form id="edit-post-form" class="post-creation-form" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" id="edit-post-id" name="post_id">
+              <input type="hidden" id="edit-post-type" name="post_type" value="general">
+              
+              <!-- Event-Specific Fields -->
+              <div id="edit-event-fields" class="event-fields" style="display: none;">
+                <div class="form-group">
+                  <label for="edit-event-title" class="form-label">Event Title</label>
+                  <input type="text" id="edit-event-title" name="event_title" class="form-input event-input"
+                         placeholder="Enter event title..." maxlength="200">
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group form-group-half">
+                    <label for="edit-event-start-date" class="form-label">Start Date</label>
+                    <input type="date" id="edit-event-start-date" name="event_start_date" class="form-input event-input">
+                  </div>
+                  
+                  <div class="form-group form-group-half">
+                    <label for="edit-event-end-date" class="form-label">End Date</label>
+                    <input type="date" id="edit-event-end-date" name="event_end_date" class="form-input event-input">
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group form-group-half">
+                    <label for="edit-event-start-time" class="form-label">Start Time</label>
+                    <input type="time" id="edit-event-start-time" name="event_start_time" class="form-input event-input">
+                  </div>
+                  
+                  <div class="form-group form-group-half">
+                    <label for="edit-event-end-time" class="form-label">End Time</label>
+                    <input type="time" id="edit-event-end-time" name="event_end_time" class="form-input event-input">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="edit-event-location" class="form-label">Location (Optional)</label>
+                  <input type="text" id="edit-event-location" name="event_location" class="form-input event-input"
+                         placeholder="Enter event location..." maxlength="200">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="edit-post-content" class="form-label" id="edit-content-label">What's on your mind?</label>
+                <textarea id="edit-post-content" name="content" class="form-input post-textarea" rows="5"
+                          placeholder="Share your thoughts..." maxlength="1000" required></textarea>
+                <div class="char-counter">
+                  <span id="edit-char-count">0</span>/1000
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Image</label>
+                <input type="file" id="edit-post-image" name="image" accept="image/*" style="display: none;">
+                <div id="edit-image-preview" class="image-preview" style="display: none;">
+                  <img id="edit-preview-img" src="" alt="Preview">
+                  <button type="button" class="remove-image" id="edit-remove-image">&times;</button>
+                </div>
+                <button type="button" class="btn-secondary" id="edit-upload-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  Change Image
+                </button>
+              </div>
+              
+              <div class="form-actions">
+                <button type="button" class="btn-secondary edit-cancel-btn">Cancel</button>
+                <button type="submit" class="btn-primary post-submit-btn">
+                  <span class="btn-text">Update Post</span>
+                  <div class="loading-spinner" style="display: none;"></div>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+{% endblock %}
+
+{% block extra_js %}
+{# CSRF Token for AJAX requests #}
+{% csrf_token %}
+<script>
+  window.csrfToken = '{{ csrf_token }}';
+</script>
+
+<!-- PayPal SDK (Orders API v2) -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}"></script>
+
+<!-- Donation Modal -->
+{% include 'partials/donation_modal.html' %}
+
+<script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/expandable-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/post-view-tracker.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/donation.js' %}?v={{ STATIC_VERSION }}"></script>
+
+{% if owned_churches and post_form %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const postInputTrigger = document.getElementById('post-input-trigger');
+    const postTypeButtons = document.querySelectorAll('.post-type-btn');
+    const modal = document.getElementById('post-creation-modal');
+    const modalClose = document.querySelector('.post-modal-close');
+    const form = document.getElementById('dashboard-post-form');
+    const textArea = document.getElementById('post-content');
+    const charCount = document.getElementById('char-count');
+    const submitBtn = form.querySelector('.post-submit-btn');
+    const fileInput = document.getElementById('post-image');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const removeImageBtn = document.getElementById('remove-image');
+    const messageDiv = document.getElementById('post-creation-message');
+    const imageUploadSection = document.getElementById('image-upload-section');
+    const eventFields = document.getElementById('event-fields');
+    const contentLabel = document.getElementById('content-label');
+    const eventTitleInput = document.getElementById('event-title');
+    const eventStartDateInput = document.getElementById('event-start-date');
+    const eventEndDateInput = document.getElementById('event-end-date');
+    const eventLocationInput = document.getElementById('event-location');
+    const maxParticipantsInput = document.getElementById('max-participants');
+    const donationToggle = document.getElementById('enable-donation');
+    const donationFields = document.getElementById('donation-fields');
+    
+    let currentPostType = 'general';
+    
+    // Open modal when clicking the input bar
+    postInputTrigger.addEventListener('click', function() {
+        openPostModal('general');
+    });
+    
+    // Handle post type button clicks
+    postTypeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postType = this.getAttribute('data-type');
+            openPostModal(postType);
+        });
+    });
+    
+    // Close modal
+    modalClose.addEventListener('click', closePostModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closePostModal();
+        }
+    });
+    
+    // ESC key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display !== 'none') {
+            closePostModal();
+        }
+    });
+    
+    function openPostModal(postType) {
+        currentPostType = postType;
+        modal.style.display = 'flex';
+        
+        const modalContent = document.querySelector('.post-modal-content');
+        
+        // Update placeholder based on post type
+        updatePlaceholderForType(postType);
+        
+        // Handle event-specific fields
+        if (postType === 'event') {
+            eventFields.style.display = 'block';
+            contentLabel.style.display = 'block';
+            imageUploadSection.style.display = 'block';
+            modalContent.classList.add('event-modal');
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const minDateTime = now.toISOString().slice(0, 16);
+            eventStartDateInput.min = minDateTime;
+            eventEndDateInput.min = minDateTime;
+            // Focus on event title
+            setTimeout(() => eventTitleInput.focus(), 100);
+        } else {
+            eventFields.style.display = 'none';
+            contentLabel.style.display = 'none';
+            modalContent.classList.remove('event-modal');
+            // Focus on textarea for non-event posts
+            setTimeout(() => textArea.focus(), 100);
+        }
+        
+        // Show/hide image upload based on type
+        if (postType === 'photo') {
+            imageUploadSection.style.display = 'block';
+        } else if (postType !== 'event') {
+            imageUploadSection.style.display = 'none';
+        }
+    }
+    
+    function closePostModal() {
+        modal.style.display = 'none';
+        // Reset form
+        form.reset();
+        charCount.textContent = '0';
+        imagePreview.style.display = 'none';
+        previewImg.src = '';
+        charCount.style.color = 'inherit';
+        submitBtn.disabled = true;
+        imageUploadSection.style.display = 'none';
+        eventFields.style.display = 'none';
+        contentLabel.style.display = 'none';
+        donationFields.style.display = 'none';
+        donationToggle.checked = false;
+    }
+    
+    function updatePlaceholderForType(postType) {
+        const placeholders = {
+            'general': 'Share your thoughts, updates, or inspiration...',
+            'photo': 'Share a photo with your community...',
+            'event': 'Tell your community about this upcoming event...',
+            'prayer': 'Share a prayer request or praise...'
+        };
+        textArea.placeholder = placeholders[postType] || placeholders['general'];
+    }
+    
+    // Character count
+    textArea.addEventListener('input', function() {
+        const count = this.value.length;
+        charCount.textContent = count;
+        
+        // Enable/disable submit button
+        if (currentPostType === 'event') {
+            // For events, also check required fields
+            const hasTitle = eventTitleInput.value.trim().length > 0;
+            const hasStartDate = eventStartDateInput.value.length > 0;
+            const hasEndDate = eventEndDateInput.value.length > 0;
+            submitBtn.disabled = count === 0 || !hasTitle || !hasStartDate || !hasEndDate;
+        } else {
+            submitBtn.disabled = count === 0;
+        }
+        
+        // Color coding for character count
+        if (count > 900) {
+            charCount.style.color = '#dc2626'; // Red
+        } else if (count > 700) {
+            charCount.style.color = '#d97706'; // Orange
+        } else {
+            charCount.style.color = 'inherit';
+        }
+    });
+    
+    // Event field validation
+    [eventTitleInput, eventStartDateInput, eventEndDateInput].forEach(input => {
+        input.addEventListener('input', function() {
+            if (currentPostType === 'event') {
+                const hasTitle = eventTitleInput.value.trim().length > 0;
+                const hasStartDate = eventStartDateInput.value.length > 0;
+                const hasEndDate = eventEndDateInput.value.length > 0;
+                const hasContent = textArea.value.trim().length > 0;
+                submitBtn.disabled = !hasTitle || !hasStartDate || !hasEndDate || !hasContent;
+            }
+        });
+    });
+    
+    // Validate end date is after start date
+    eventEndDateInput.addEventListener('change', function() {
+        if (eventStartDateInput.value && eventEndDateInput.value) {
+            const startDate = new Date(eventStartDateInput.value);
+            const endDate = new Date(eventEndDateInput.value);
+            if (endDate < startDate) {
+                showMessage('End date must be after start date.', 'error');
+                eventEndDateInput.value = '';
+            }
+        }
+    });
+    
+    // Image preview
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showMessage('Image size must be less than 10MB.', 'error');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Remove image
+    removeImageBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        imagePreview.style.display = 'none';
+        previewImg.src = '';
+    });
+    
+    // Donation toggle
+    if (donationToggle && donationFields) {
+        const hasPayPal = donationToggle.getAttribute('data-has-paypal') === 'true';
+        
+        // Disable checkbox if PayPal not configured
+        if (!hasPayPal) {
+            donationToggle.disabled = true;
+            donationToggle.style.cursor = 'not-allowed';
+            donationToggle.style.opacity = '0.5';
+        }
+        
+        donationToggle.addEventListener('change', function() {
+            // Double-check PayPal configuration
+            if (!hasPayPal) {
+                this.checked = false;
+                showMessage('Please set up your PayPal email in Church Settings first.', 'error');
+                return;
+            }
+            donationFields.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Prevent clicking label if PayPal not configured
+        const donationLabel = document.querySelector('label[for="enable-donation"]');
+        if (donationLabel && !hasPayPal) {
+            donationLabel.style.cursor = 'not-allowed';
+            donationLabel.style.opacity = '0.6';
+        }
+    }
+    
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validation for event posts
+        if (currentPostType === 'event') {
+            if (!eventTitleInput.value.trim()) {
+                showMessage('Please enter an event title.', 'error');
+                return;
+            }
+            if (!eventStartDateInput.value) {
+                showMessage('Please select an event start date.', 'error');
+                return;
+            }
+            if (!eventEndDateInput.value) {
+                showMessage('Please select an event end date.', 'error');
+                return;
+            }
+        }
+        
+        const formData = new FormData(this);
+        
+        // Add post type to form data
+        formData.append('post_type', currentPostType);
+        
+        // Add event fields if it's an event post
+        if (currentPostType === 'event') {
+            formData.append('event_title', eventTitleInput.value.trim());
+            formData.append('event_start_date', eventStartDateInput.value);
+            formData.append('event_end_date', eventEndDateInput.value);
+            formData.append('event_location', eventLocationInput.value.trim());
+            if (maxParticipantsInput.value) {
+                formData.append('max_participants', maxParticipantsInput.value);
+            }
+        }
+        
+        const submitText = submitBtn.querySelector('.submit-text');
+        const submitLoading = submitBtn.querySelector('.submit-loading');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitText.style.display = 'none';
+        submitLoading.style.display = 'inline-flex';
+        
+        try {
+            const response = await fetch('{% url "core:dashboard_create_post" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': window.csrfToken
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showMessage(data.message, 'success');
+                
+                // Close modal and reload page after success
+                setTimeout(() => {
+                    closePostModal();
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showMessage(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Post creation error:', error);
+            showMessage('An error occurred while creating the post.', 'error');
+        } finally {
+            // Reset loading state
+            submitBtn.disabled = textArea.value.length === 0;
+            submitText.style.display = 'inline';
+            submitLoading.style.display = 'none';
+        }
+    });
+    
+    function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = `form-message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        // Hide message after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+{% endif %}
+
+
+
+<!-- Report and Edit Post Modals JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Report Post Modal Elements
+    const reportModal = document.getElementById('report-post-modal');
+    const reportForm = document.getElementById('report-post-form');
+    const reportPostIdInput = document.getElementById('report-post-id');
+    const reportDescription = document.getElementById('report-description');
+    const reportCharCount = document.getElementById('report-char-count');
+    const reportModalClose = document.querySelector('.report-modal-close');
+    const reportCancelBtn = document.querySelector('.report-cancel-btn');
+    const reportSubmitBtn = document.querySelector('.report-submit-btn');
+    
+    // Edit Post Modal Elements
+    const editModal = document.getElementById('edit-post-modal');
+    const editForm = document.getElementById('edit-post-form');
+    const editPostIdInput = document.getElementById('edit-post-id');
+    const editPostTypeInput = document.getElementById('edit-post-type');
+    const editContent = document.getElementById('edit-post-content');
+    const editCharCount = document.getElementById('edit-char-count');
+    const editModalClose = document.querySelector('.edit-modal-close');
+    const editCancelBtn = document.querySelector('.edit-cancel-btn');
+    const editEventFields = document.getElementById('edit-event-fields');
+    const editFileInput = document.getElementById('edit-post-image');
+    const editImagePreview = document.getElementById('edit-image-preview');
+    const editPreviewImg = document.getElementById('edit-preview-img');
+    const editUploadBtn = document.getElementById('edit-upload-btn');
+    const editRemoveImageBtn = document.getElementById('edit-remove-image');
+    
+    // Handle Report Button Clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.report-post-btn')) {
+            const btn = e.target.closest('.report-post-btn');
+            const postId = btn.dataset.postId;
+            
+            // Close the dropdown menu
+            const dropdown = btn.closest('.post-menu-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+                const postCard = dropdown.closest('.post-card');
+                if (postCard) {
+                    postCard.classList.remove('dropdown-open');
+                }
+            }
+            
+            openReportModal(postId);
+        }
+        
+        if (e.target.closest('.edit-post-btn')) {
+            const btn = e.target.closest('.edit-post-btn');
+            const postId = btn.dataset.postId;
+            
+            // Close the dropdown menu
+            const dropdown = btn.closest('.post-menu-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+                const postCard = dropdown.closest('.post-card');
+                if (postCard) {
+                    postCard.classList.remove('dropdown-open');
+                }
+            }
+            
+            openEditModal(postId);
+        }
+    });
+    
+    // Report Modal Functions
+    function openReportModal(postId) {
+        reportPostIdInput.value = postId;
+        reportModal.style.display = 'flex';
+        reportForm.reset();
+        reportCharCount.textContent = '0';
+    }
+    
+    function closeReportModal() {
+        reportModal.style.display = 'none';
+        reportForm.reset();
+        
+        // Small delay to prevent immediate re-opening issues
+        setTimeout(() => {
+            // Ensure all dropdowns are properly closed
+            document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+                dd.classList.remove('show');
+                const card = dd.closest('.post-card');
+                if (card) card.classList.remove('dropdown-open');
+            });
+        }, 100);
+    }
+    
+    // Edit Modal Functions
+    function openEditModal(postId) {
+        // Fetch post data
+        fetch(`/posts/${postId}/data/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': window.csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const post = data.post;
+                
+                // Populate form fields
+                editPostIdInput.value = post.id;
+                editPostTypeInput.value = post.post_type;
+                editContent.value = post.content;
+                editCharCount.textContent = post.content.length;
+                
+                // Handle event fields
+                if (post.post_type === 'event') {
+                    editEventFields.style.display = 'block';
+                    document.getElementById('edit-event-title').value = post.event_title;
+                    document.getElementById('edit-event-start-date').value = post.event_start_date;
+                    document.getElementById('edit-event-end-date').value = post.event_end_date;
+                    document.getElementById('edit-event-start-time').value = post.event_start_time;
+                    document.getElementById('edit-event-end-time').value = post.event_end_time;
+                    document.getElementById('edit-event-location').value = post.event_location;
+                } else {
+                    editEventFields.style.display = 'none';
+                }
+                
+                // Handle image preview
+                if (post.has_image && post.image_url) {
+                    editPreviewImg.src = post.image_url;
+                    editImagePreview.style.display = 'block';
+                } else {
+                    editImagePreview.style.display = 'none';
+                }
+                
+                editModal.style.display = 'flex';
+            } else {
+                alert(data.message || 'Failed to load post data');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching post data:', error);
+            alert('An error occurred while loading the post');
+        });
+    }
+    
+    function closeEditModal() {
+        editModal.style.display = 'none';
+        editForm.reset();
+        editEventFields.style.display = 'none';
+        editImagePreview.style.display = 'none';
+        
+        // Small delay to prevent immediate re-opening issues
+        setTimeout(() => {
+            // Ensure all dropdowns are properly closed
+            document.querySelectorAll('.post-menu-dropdown.show').forEach(dd => {
+                dd.classList.remove('show');
+                const card = dd.closest('.post-card');
+                if (card) card.classList.remove('dropdown-open');
+            });
+        }, 100);
+    }
+    
+    // Report Modal Event Listeners
+    reportModalClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeReportModal();
+    });
+    reportCancelBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeReportModal();
+    });
+    reportModal.addEventListener('click', function(e) {
+        if (e.target === reportModal) {
+            e.stopPropagation();
+            closeReportModal();
+        }
+    });
+    
+    // Edit Modal Event Listeners
+    editModalClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeEditModal();
+    });
+    editCancelBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeEditModal();
+    });
+    editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+            e.stopPropagation();
+            closeEditModal();
+        }
+    });
+    
+    // Character counters
+    if (reportDescription) {
+        reportDescription.addEventListener('input', function() {
+            reportCharCount.textContent = this.value.length;
+        });
+    }
+    
+    if (editContent) {
+        editContent.addEventListener('input', function() {
+            const count = this.value.length;
+            editCharCount.textContent = count;
+            
+            if (count > 900) {
+                editCharCount.style.color = '#dc2626';
+            } else if (count > 700) {
+                editCharCount.style.color = '#f59e0b';
+            } else {
+                editCharCount.style.color = 'inherit';
+            }
+        });
+    }
+    
+    // Edit image upload
+    if (editUploadBtn) {
+        editUploadBtn.addEventListener('click', function() {
+            editFileInput.click();
+        });
+    }
+    
+    if (editFileInput) {
+        editFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Image size must be less than 10MB');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editPreviewImg.src = e.target.result;
+                    editImagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    if (editRemoveImageBtn) {
+        editRemoveImageBtn.addEventListener('click', function() {
+            editFileInput.value = '';
+            editImagePreview.style.display = 'none';
+            editPreviewImg.src = '';
+        });
+    }
+    
+    // Report Form Submission
+    if (reportForm) {
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postId = reportPostIdInput.value;
+            const formData = new FormData(reportForm);
+            
+            // Show loading state
+            reportSubmitBtn.disabled = true;
+            reportSubmitBtn.querySelector('.btn-text').style.display = 'none';
+            reportSubmitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            
+            fetch(`/posts/${postId}/report/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeReportModal();
+                } else {
+                    alert(data.message || 'Failed to submit report');
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting report:', error);
+                alert('An error occurred while submitting your report');
+            })
+            .finally(() => {
+                reportSubmitBtn.disabled = false;
+                reportSubmitBtn.querySelector('.btn-text').style.display = 'inline';
+                reportSubmitBtn.querySelector('.loading-spinner').style.display = 'none';
+            });
+        });
+    }
+    
+    // Edit Form Submission
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postId = editPostIdInput.value;
+            const formData = new FormData(editForm);
+            
+            // Validate event fields if event type
+            const postType = editPostTypeInput.value;
+            if (postType === 'event') {
+                const eventTitle = document.getElementById('edit-event-title').value.trim();
+                const eventStartDate = document.getElementById('edit-event-start-date').value;
+                
+                if (!eventTitle) {
+                    alert('Event title is required for event posts');
+                    return;
+                }
+                if (!eventStartDate) {
+                    alert('Event start date is required for event posts');
+                    return;
+                }
+            }
+            
+            // Show loading state
+            const submitBtn = editForm.querySelector('.post-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            
+            fetch(`/posts/${postId}/update/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeEditModal();
+                    // Reload page to show updated post
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to update post');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating post:', error);
+                alert('An error occurred while updating the post');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.btn-text').style.display = 'inline';
+                submitBtn.querySelector('.loading-spinner').style.display = 'none';
+            });
+        });
+    }
+    
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (reportModal.style.display === 'flex') closeReportModal();
+            if (editModal.style.display === 'flex') closeEditModal();
+        }
+    });
+});
+</script>
+{% endblock %}

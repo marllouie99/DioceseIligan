@@ -1,0 +1,60 @@
+{% load static %}
+{# Individual Post Management Card #}
+<div class="post-management-card" data-post-id="{{ post.id }}" data-likes="{{ post.like_count|default:0 }}" data-comments="{{ post.comment_count|default:0 }}" data-views="{{ post.view_count|default:0 }}" id="post-mgmt-card-{{ post.id|default:'temp' }}">
+  <div class="post-preview">
+    <div class="post-author">
+      <div class="author-avatar">
+        {% if church.logo %}
+          <img src="{{ church.logo.url }}" alt="{{ church.name }}" loading="lazy" decoding="async">
+        {% else %}
+          <div class="avatar-placeholder">{{ church.initial }}</div>
+        {% endif %}
+      </div>
+      <div class="author-info">
+        <div class="author-name">{{ church.name }}</div>
+        <div class="post-date">{{ post.created_at|timesince }} ago</div>
+      </div>
+    </div>
+    
+    <div class="post-content-preview">
+      <div class="post-text">{{ post.content|linebreaks }}</div>
+      {% if post.image %}
+        <div class="post-image-preview">
+          <img src="{{ post.image.url }}" alt="Post image" loading="lazy" decoding="async">
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="post-actions">
+    <div class="post-stats">
+      <span class="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+        </svg>
+        {{ post.like_count }}
+      </span>
+      <span class="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+        {{ post.comment_count }}
+      </span>
+      <span class="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span class="view-count">{{ post.view_count }}</span>
+      </span>
+    </div>
+    <div class="action-buttons">
+      <button class="btn-icon" title="Edit Post" onclick="editPost({{ post.id }})">
+        {% include 'partials/icons/edit.html' %}
+      </button>
+      <button class="btn-icon btn-danger" title="Delete Post" onclick="deletePost({{ post.id }})">
+        {% include 'partials/icons/trash.html' %}
+      </button>
+    </div>
+  </div>
+</div>

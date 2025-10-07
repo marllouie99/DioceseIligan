@@ -1,0 +1,124 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Manage Church - ChurchConnect{% endblock %}
+
+{% block body_class %}page-manage-church{% endblock %}
+
+{% block extra_css %}
+  <!-- Centralized Warm Sacred Earth Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="{% static 'css/pages/manage-church.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+{# Church Management Page #}
+<div class="manage-church-page warm-sacred-earth page-container">
+  {# Page Header #}
+  {% include 'partials/manage/page_header.html' %}
+  
+  {# Verification Status Banner #}
+  {% include 'partials/manage/verification_banner.html' with church=church latest_verification=latest_verification %}
+  
+  {# Church Preview Section #}
+  {% include 'partials/manage/church_preview.html' with church=church %}
+  
+  {# Main Management Interface #}
+  <div class="management-tabs">
+    <div class="tabs-container">
+      {# Tab Navigation #}
+      {% include 'partials/manage/tab_navigation.html' %}
+      
+      <div class="tabs-content">
+        {# Appointments Tab #}
+        {% include 'partials/manage/appointments_tab.html' with bookings=bookings booking_counts=booking_counts appt_status=appt_status %}
+
+        {# Services Tab #}
+        {% include 'partials/manage/services_tab.html' with church=church %}
+
+        {# Availability Tab #}
+        {% include 'partials/manage/availability_tab.html' with church=church %}
+
+        {# Events Tab #}
+        {% include 'partials/manage/events_tab.html' with event_posts=event_posts event_posts_count=event_posts_count follower_count=follower_count church=church %}
+
+        {# Content Tab #}
+        {% include 'partials/manage/content_tab.html' with analytics=analytics follower_count=follower_count posts=posts posts_count=posts_count church=church %}
+
+        {# Donations Tab #}
+        {% include 'partials/manage/donations_tab.html' %}
+
+        {# Followers Tab #}
+        {% include 'partials/manage/followers_tab.html' with recent_followers=recent_followers follower_count=follower_count %}
+
+        {# Settings Tab #}
+        {% include 'partials/manage/settings_tab.html' with church=church form=form verif_form=verif_form decline_reasons=decline_reasons %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Modal Dialogs #}
+{% include 'partials/manage/modals.html' with church=church %}
+
+{% endblock %}
+
+{% block extra_js %}
+{# CSRF Token for AJAX requests #}
+{% csrf_token %}
+<script>
+  // Make CSRF token available for AJAX requests
+  window.csrfToken = '{{ csrf_token }}';
+</script>
+
+{# External Libraries #}
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+{# Django URL Configuration #}
+<script>
+  window.djangoUrls = {
+    updateChurchLogo: "{% url 'core:update_church_logo' %}",
+    updateChurchCover: "{% url 'core:update_church_cover' %}",
+    createAvailability: "{% url 'core:create_availability' %}?date=0",
+    manageServiceImages: "{% url 'core:manage_service_images' 0 %}",
+    serviceGallery: "{% url 'core:service_gallery' 0 %}",
+    requestVerification: "{% url 'core:request_verification' %}",
+    createDeclineReason: "{% url 'core:create_decline_reason' %}"
+  };
+  // Legacy URL variable for backward compatibility
+  window.createDeclineReasonUrl = "{% url 'core:create_decline_reason' %}";
+</script>
+
+{# Core Modules #}
+<script defer src="{% static 'js/core/tabs.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/forms.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/image-cropper.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/calendar.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/core/settings.js' %}?v={{ STATIC_VERSION }}"></script>
+
+{# Application Modules #}
+<script defer src="{% static 'js/app/manage_church_new.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/manage/post-management.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/expandable-posts.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/components/post-view-tracker.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/followers.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/sticky-tabs.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/settings-navigation.js' %}?v={{ STATIC_VERSION }}"></script>
+<script defer src="{% static 'js/settings-section-edit.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

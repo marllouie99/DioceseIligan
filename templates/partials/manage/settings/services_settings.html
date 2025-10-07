@@ -1,0 +1,68 @@
+{% load static %}
+{# Services Settings Section #}
+<div id="services-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Service Information</h3>
+      <p class="section-description">Information about your church services</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="services-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Service Times</h4>
+        <p class="setting-description">Regular service schedule</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">When people can attend services</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.service_times }}
+        {% if form.service_times.errors %}
+          <div class="form-error">{{ form.service_times.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Ministries</h4>
+        <p class="setting-description">Church ministries and programs</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Programs and ministries offered</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.ministries }}
+        {% if form.ministries.errors %}
+          <div class="form-error">{{ form.ministries.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Special Programs</h4>
+        <p class="setting-description">Special events and programs</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Seasonal or special programs</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.special_programs }}
+        {% if form.special_programs.errors %}
+          <div class="form-error">{{ form.special_programs.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

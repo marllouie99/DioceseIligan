@@ -1,0 +1,586 @@
+/*
+ * Notifications Page Styling - ChurchIligan
+ * Warm Sacred Earth Theme Integration
+ * Version: 1.0
+ */
+
+/* =============================================================================
+   PAGE LAYOUT & STRUCTURE
+   ============================================================================= */
+
+.notifications-page {
+    min-height: 100vh;
+    padding: 24px;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #2D1810;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 32px;
+    padding: 24px 0;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+    max-width: 1000px;
+    margin: 0 auto 2rem auto;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header-content h1,
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2D1810;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #DAA520 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-subtitle {
+    color: #6B4226;
+    font-size: 1.1rem;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Header Actions */
+.header-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.95rem;
+}
+
+.header-actions .btn-secondary {
+    background: 
+        /* Wood grain texture */
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
+        /* Base gradient */
+        linear-gradient(135deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
+    color: #2D1810;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    box-shadow: 
+        0 8px 16px rgba(139, 69, 19, 0.15),
+        0 4px 8px rgba(218, 165, 32, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.header-actions .btn-secondary:hover {
+    background: 
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.08) 0.5px, transparent 2px),
+        linear-gradient(135deg, #B8860B 0%, #8B6914 50%, #654321 100%);
+    border-color: rgba(139, 69, 19, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 24px rgba(139, 69, 19, 0.2),
+        0 6px 12px rgba(218, 165, 32, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* =============================================================================
+   FILTER TABS
+   ============================================================================= */
+
+.notifications-filters {
+    margin-bottom: 2rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 12px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #6B4226;
+    background: 
+        /* Paper texture */
+        radial-gradient(ellipse 60px 40px at 25% 30%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+        /* Wood grain */
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+        /* Base parchment */
+        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+    border: 2px solid rgba(139, 69, 19, 0.2);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-family: Georgia, "Times New Roman", serif;
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.08);
+}
+
+.filter-tab:hover {
+    color: #2D1810;
+    background: 
+        radial-gradient(ellipse 80px 60px at 25% 30%, rgba(160, 82, 45, 0.12) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.04) 0.5px, transparent 2px),
+        linear-gradient(135deg, #F4E6D0 0%, #EDD9C4 100%);
+    border-color: rgba(139, 69, 19, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.12);
+}
+
+.filter-tab.active {
+    color: #2D1810;
+    background: 
+        radial-gradient(ellipse 100px 80px at 25% 30%, rgba(218, 165, 32, 0.15) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.06) 0.5px, transparent 2px),
+        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    border-color: #8B4513;
+    font-weight: 600;
+    box-shadow: 
+        0 8px 16px rgba(139, 69, 19, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* =============================================================================
+   NOTIFICATIONS LIST
+   ============================================================================= */
+
+.notifications-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notification-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: 1rem 1.25rem;
+    padding: 24px 28px;
+    background: 
+        /* Age spots */
+        radial-gradient(ellipse 100px 60px at 20% 25%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 80px 120px at 80% 75%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
+        /* Paper grain */
+        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
+        repeating-linear-gradient(67deg, rgba(160, 82, 45, 0.015) 0.8px, transparent 2.5px),
+        /* Base parchment gradient */
+        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 50%, #FFF9E6 100%);
+    border: 2px solid rgba(139, 69, 19, 0.15);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 
+        0 16px 32px rgba(139, 69, 19, 0.08),
+        0 8px 16px rgba(160, 82, 45, 0.06),
+        0 4px 8px rgba(101, 67, 33, 0.04);
+}
+
+/* Inner glow effect */
+.notification-item::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: linear-gradient(135deg, 
+        rgba(255, 249, 230, 0.8) 0%, 
+        rgba(244, 230, 208, 0.6) 50%, 
+        rgba(255, 249, 230, 0.8) 100%);
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.notification-item > * {
+    position: relative;
+    z-index: 1;
+}
+
+.notification-item:hover {
+    border-color: rgba(139, 69, 19, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 24px 48px rgba(139, 69, 19, 0.12),
+        0 12px 24px rgba(160, 82, 45, 0.08),
+        0 6px 12px rgba(101, 67, 33, 0.06);
+}
+
+.notification-item.unread {
+    background: 
+        /* Enhanced age spots for unread */
+        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(218, 165, 32, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 100px 140px at 85% 80%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+        /* Paper grain */
+        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.03) 0.8px, transparent 2.5px),
+        repeating-linear-gradient(67deg, rgba(218, 165, 32, 0.02) 0.8px, transparent 2.5px),
+        /* Enhanced base gradient */
+        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 30%, #EDD9C4 70%, #F4E6D0 100%);
+    border-color: rgba(218, 165, 32, 0.3);
+}
+
+.notification-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
+    border-radius: 0 3px 3px 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 2px 0 8px rgba(218, 165, 32, 0.3);
+}
+
+.notification-item.unread .notification-indicator {
+    opacity: 1;
+}
+
+/* =============================================================================
+   NOTIFICATION COMPONENTS
+   ============================================================================= */
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: 
+        radial-gradient(ellipse 20px 15px at 70% 30%, rgba(218, 165, 32, 0.2) 0%, transparent 60%),
+        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2D1810;
+    box-shadow: 
+        0 6px 12px rgba(139, 69, 19, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.notification-icon .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    filter: drop-shadow(0 1px 2px rgba(139, 69, 19, 0.2));
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 1rem;
+}
+
+.notification-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2D1810;
+    margin: 0;
+    line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+}
+
+.notification-time {
+    font-size: 0.9rem;
+    color: #8B6F47;
+    white-space: nowrap;
+    font-style: italic;
+}
+
+.notification-message {
+    color: #4A3728;
+    line-height: 1.6;
+    margin: 8px 0 12px 0;
+    font-size: 1rem;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.notification-actions .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.notification-actions .btn-outline {
+    background: transparent;
+    color: #8B4513;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+}
+
+.notification-actions .btn-outline:hover {
+    background: 
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
+        linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    color: #FFF9E6;
+    border-color: #8B4513;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+}
+
+.notification-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notification-dot {
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 2px 4px rgba(218, 165, 32, 0.3);
+    animation: gentlePulse 2s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.mark-read-btn {
+    padding: 6px 12px;
+    background: 
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+        linear-gradient(135deg, #F4E6D0 0%, #EDD9C4 100%);
+    border: 2px solid rgba(139, 69, 19, 0.2);
+    border-radius: 999px;
+    color: #8B4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.mark-read-btn:hover {
+    background: 
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
+        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    color: #2D1810;
+    border-color: rgba(139, 69, 19, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
+}
+
+/* =============================================================================
+   EMPTY STATE
+   ============================================================================= */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6B4226;
+    background: 
+        radial-gradient(ellipse 150px 100px at 50% 50%, rgba(160, 82, 45, 0.04) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.01) 0.5px, transparent 2px),
+        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.empty-icon {
+    width: 5rem;
+    height: 5rem;
+    margin: 0 auto 1.5rem;
+    color: #8B6F47;
+    background: 
+        radial-gradient(ellipse 30px 20px at 70% 30%, rgba(218, 165, 32, 0.15) 0%, transparent 60%),
+        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(139, 69, 19, 0.1);
+}
+
+.empty-icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #2D1810;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2D1810;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 968px) {
+    .notifications-page {
+        padding: 20px;
+    }
+    
+    .notifications-header {
+        padding: 20px 0;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .notifications-page {
+        padding: 16px;
+    }
+    
+    .notifications-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+        padding: 16px 0;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .filter-tabs {
+        gap: 8px;
+    }
+    
+    .filter-tab {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    
+    .notification-item {
+        padding: 20px;
+    }
+    
+    .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .notification-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .notification-icon .icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .notifications-page {
+        padding: 12px;
+    }
+    
+    .page-title {
+        font-size: 1.6rem;
+    }
+    
+    .notification-item {
+        padding: 16px;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+    }
+    
+    .notification-actions-right {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+}
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+/* Animation for new notifications */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification-item.new {
+    animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Priority-based styling */
+.notification-item.priority-urgent {
+    border-left-color: #DC2626;
+    background: 
+        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 70%),
+        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
+        linear-gradient(135deg, #FFF9E6 0%, #FEF2F2 30%, #F4E6D0 100%);
+}
+
+.notification-item.priority-high {
+    border-left-color: #F59E0B;
+    background: 
+        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 70%),
+        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
+        linear-gradient(135deg, #FFF9E6 0%, #FFFBEB 30%, #F4E6D0 100%);
+}
+
+.notification-item.priority-low {
+    border-left-color: #8B6F47;
+    background: 
+        radial-gradient(ellipse 100px 60px at 15% 20%, rgba(139, 111, 71, 0.04) 0%, transparent 70%),
+        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.015) 0.8px, transparent 2.5px),
+        linear-gradient(135deg, #FFF9E6 0%, #F9F7F4 50%, #F4E6D0 100%);
+}

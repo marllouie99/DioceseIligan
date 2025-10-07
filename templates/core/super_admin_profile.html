@@ -1,0 +1,78 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Super Admin Profile • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<!-- Warm Sacred Earth Background -->
+<div class="dashboard-background"></div>
+
+<div class="dashboard-layout">
+  <div class="main-content">
+    <h1 class="section-title">Super Admin Profile</h1>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Account Information</h3>
+      <div class="activity-feed">
+        <div class="activity-item">
+          <p class="activity-text"><strong>Username:</strong> {{ admin_info.username }}</p>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Email:</strong> {{ admin_info.email }}</p>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Joined:</strong></p>
+          <span class="activity-time">{% if admin_info.date_joined %}{{ admin_info.date_joined|date:'M d, Y H:i' }}{% else %}-{% endif %}</span>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Last Login:</strong></p>
+          <span class="activity-time">{% if admin_info.last_login %}{{ admin_info.last_login|date:'M d, Y H:i' }}{% else %}-{% endif %}</span>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Status:</strong></p>
+          <span class="activity-time">{% if admin_info.is_active %}Active{% else %}Inactive{% endif %} • {% if admin_info.is_staff %}Staff{% else %}Not staff{% endif %} • {% if admin_info.is_superuser %}Superuser{% else %}User{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="sidebar-content">
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Admin Privileges</h3>
+      <div class="activity-feed">
+        <div class="activity-item">
+          <p class="activity-text"><strong>Groups:</strong></p>
+          <span class="activity-time">{% if admin_privileges.groups %}{{ admin_privileges.groups|join:', ' }}{% else %}-{% endif %}</span>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Direct Permissions:</strong></p>
+          <span class="activity-time">{{ admin_privileges.direct_permissions_count }}</span>
+        </div>
+        <div class="activity-item">
+          <p class="activity-text"><strong>Group Permissions:</strong></p>
+          <span class="activity-time">{{ admin_privileges.group_permissions_count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

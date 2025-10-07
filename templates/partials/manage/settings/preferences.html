@@ -1,0 +1,68 @@
+{% load static %}
+{# Preferences Settings Section #}
+<div id="preferences-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Church Preferences</h3>
+      <p class="section-description">Configure church visibility and display preferences</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="preferences-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Church Visibility</h4>
+        <p class="setting-description">Control who can see your church</p>
+        <div class="setting-status">
+          <span class="status-badge active">Required</span>
+          <span class="status-description">Public visibility settings</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.visibility }}
+        {% if form.visibility.errors %}
+          <div class="form-error">{{ form.visibility.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Show Member Count</h4>
+        <p class="setting-description">Display follower count publicly</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Whether to show your follower count</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.show_member_count }}
+        {% if form.show_member_count.errors %}
+          <div class="form-error">{{ form.show_member_count.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Allow Reviews</h4>
+        <p class="setting-description">Allow people to leave reviews</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Enable/disable review system</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.allow_reviews }}
+        {% if form.allow_reviews.errors %}
+          <div class="form-error">{{ form.allow_reviews.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

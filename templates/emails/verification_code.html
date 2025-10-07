@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurchConnect - Email Verification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .email-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-badge {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 60px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .verification-code {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1e293b;
+            letter-spacing: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .code-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .instructions h3 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .instructions p {
+            margin: 0;
+            color: #1e40af;
+            font-size: 14px;
+        }
+        .warning {
+            background: #fef3cd;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .warning p {
+            margin: 0;
+            color: #92400e;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .support-link {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .support-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <div class="logo-badge">CC</div>
+            <h1>ChurchConnect</h1>
+            <p class="subtitle">Complete your registration</p>
+        </div>
+
+        <div class="verification-code">
+            <div class="code-label">Your verification code is:</div>
+            <div class="code">{{ code }}</div>
+        </div>
+
+        <div class="instructions">
+            <h3>📱 How to verify your email:</h3>
+            <p>1. Return to the ChurchConnect registration page<br>
+               2. Enter this 6-digit code when prompted<br>
+               3. Complete your account setup</p>
+        </div>
+
+        <div class="warning">
+            <p>⏰ This code expires in 15 minutes for security reasons</p>
+        </div>
+
+        <p>Welcome to ChurchConnect! We're excited to help you connect with your church community. If you didn't request this verification code, please ignore this email.</p>
+
+        <div class="footer">
+            <p>Need help? Contact our support team at <a href="mailto:support@churchconnect.com" class="support-link">support@churchconnect.com</a></p>
+            <p style="margin-top: 15px;">© 2025 ChurchConnect. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

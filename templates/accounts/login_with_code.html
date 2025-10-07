@@ -1,0 +1,498 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login with Code - ChurchConnect</title>
+    <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}?v={{ STATIC_VERSION }}">
+<style>
+    /* Warm Sacred Earth Variables - Match Landing Page */
+    :root {
+        --bg-start: #8B4513; /* Saddle Brown */
+        --bg-end: #654321; /* Dark Brown */
+        --bg-medium: #A0522D; /* Sienna */
+        --text: #1A0F0A; /* Much darker brown for high contrast */
+        --text-light: #FFF9E6; /* Cream white for dark backgrounds */
+        --muted: #3D2817; /* Darker medium brown for better contrast */
+        --muted-2: #5A3D2A; /* Darker light brown for better contrast */
+        --border: rgba(139, 69, 19, 0.12); /* Subtle brown border */
+        --card-bg: #FFF8DC; /* Cornsilk */
+        --pill-bg: #F5F5DC; /* Beige */
+        --pill-border: #D2B48C; /* Tan */
+        --btn-start: #A0522D; /* Sienna */
+        --btn-end: #8B4513; /* Saddle Brown */
+        --brand: #8B4513; /* Darker brown for better contrast */
+        --accent-gold: #B8860B; /* Darker gold for better contrast */
+        --cream: #FDF5E6; /* Old Lace */
+        --warm-white: #FFF9E6; /* Cream White */
+    }
+
+    body {
+        font-family: Georgia, "Times New Roman", serif; /* Traditional church font */
+    }
+
+    .login-code-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        /* Full Warm Sacred Earth Background - Match Landing Page */
+        background:
+            /* Wood grain texture overlay */
+            repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(139, 69, 19, 0.03) 2px,
+                rgba(139, 69, 19, 0.03) 4px
+            ),
+            /* Paper texture pattern */
+            radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.06) 0%, transparent 50%),
+            /* Warm glow effects */
+            radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.12) 0%, rgba(218, 165, 32, 0.04) 40%, transparent 70%),
+            radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.08) 0%, rgba(139, 69, 19, 0.04) 50%, transparent 80%),
+            radial-gradient(90% 60% at 80% 80%, rgba(101, 67, 33, 0.9) 0%, rgba(139, 69, 19, 0.6) 40%, transparent 80%),
+            /* Main warm brown gradient */
+            linear-gradient(45deg, var(--bg-end) 0%, #7a5230 25%, var(--bg-medium) 50%, #b8834a 75%, var(--bg-start) 100%);
+        background-attachment: fixed;
+    }
+
+    .login-code-card {
+        /* Enhanced glassmorphism card - Match Landing Page */
+        background: 
+            /* Parchment texture base */
+            radial-gradient(ellipse 200px 120px at 30% 40%, rgba(218, 165, 32, 0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 180px 100px at 70% 60%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
+            /* Fine wood grain texture */
+            repeating-linear-gradient(90deg, 
+                rgba(139, 69, 19, 0.03) 0px, 
+                transparent 1px, 
+                rgba(160, 82, 45, 0.02) 2px, 
+                transparent 3px),
+            /* Card base with warm tones */
+            linear-gradient(135deg, 
+                rgba(255, 249, 230, 0.95) 0%, 
+                rgba(253, 245, 230, 0.92) 50%, 
+                rgba(255, 248, 220, 0.95) 100%);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px;
+        padding: 48px;
+        /* Multi-layer shadow system */
+        box-shadow: 
+            0 32px 64px rgba(139, 69, 19, 0.25),
+            0 16px 32px rgba(160, 82, 45, 0.15),
+            0 8px 16px rgba(101, 67, 33, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6),
+            inset 0 -1px 0 rgba(139, 69, 19, 0.1);
+        border: 1px solid rgba(218, 165, 32, 0.2);
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Add inner glow effect */
+    .login-code-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            circle at 50% 0%, 
+            rgba(218, 165, 32, 0.1) 0%, 
+            transparent 50%
+        );
+        border-radius: 24px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .login-code-header {
+        margin-bottom: 36px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .login-code-icon {
+        width: 88px;
+        height: 88px;
+        /* Enhanced gold gradient with warm glow */
+        background: 
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+            linear-gradient(135deg, var(--accent-gold) 0%, #8B7D00 25%, #DAA520 50%, #B8860B 75%, #8B6F00 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 42px;
+        color: var(--text-light);
+        /* Multi-layer shadow system */
+        box-shadow: 
+            0 16px 32px rgba(218, 165, 32, 0.4),
+            0 8px 16px rgba(139, 69, 19, 0.3),
+            0 4px 8px rgba(101, 67, 33, 0.2),
+            inset 0 2px 4px rgba(255, 255, 255, 0.3),
+            inset 0 -2px 4px rgba(139, 69, 19, 0.2);
+        /* Warm glow effect */
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Add shimmer effect to icon */
+    .login-code-icon::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: conic-gradient(
+            transparent, 
+            rgba(218, 165, 32, 0.4), 
+            transparent, 
+            rgba(184, 134, 11, 0.3), 
+            transparent
+        );
+        border-radius: 50%;
+        z-index: -1;
+        animation: rotate 3s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .login-code-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 12px;
+        font-family: Georgia, "Times New Roman", serif;
+        text-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+        letter-spacing: -0.5px;
+    }
+
+    .login-code-subtitle {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.6;
+        margin-bottom: 0;
+        font-weight: 400;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+        text-align: left;
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--text);
+        font-size: 15px;
+        font-family: Georgia, "Times New Roman", serif;
+        text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        font-size: 16px;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        /* Enhanced parchment texture background */
+        background: 
+            /* Subtle aging spots */
+            radial-gradient(ellipse 40px 25px at 20% 30%, rgba(160, 82, 45, 0.04) 0%, transparent 70%),
+            radial-gradient(ellipse 30px 20px at 80% 70%, rgba(139, 69, 19, 0.03) 0%, transparent 70%),
+            /* Fine wood grain texture */
+            repeating-linear-gradient(90deg, 
+                rgba(139, 69, 19, 0.03) 0px, 
+                transparent 1px, 
+                rgba(160, 82, 45, 0.02) 2px, 
+                transparent 3px),
+            /* Base warm cream background */
+            linear-gradient(135deg, 
+                var(--warm-white) 0%, 
+                var(--card-bg) 50%, 
+                var(--cream) 100%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+            inset 0 2px 4px rgba(139, 69, 19, 0.08),
+            0 1px 2px rgba(139, 69, 19, 0.05);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-gold);
+        /* Enhanced focus state with warm glow */
+        box-shadow: 
+            0 0 0 4px rgba(218, 165, 32, 0.15),
+            0 0 20px rgba(218, 165, 32, 0.1),
+            inset 0 2px 4px rgba(139, 69, 19, 0.05);
+        background: 
+            radial-gradient(ellipse 40px 25px at 20% 30%, rgba(218, 165, 32, 0.06) 0%, transparent 70%),
+            radial-gradient(ellipse 30px 20px at 80% 70%, rgba(184, 134, 11, 0.04) 0%, transparent 70%),
+            repeating-linear-gradient(90deg, 
+                rgba(139, 69, 19, 0.02) 0px, 
+                transparent 1px, 
+                rgba(218, 165, 32, 0.02) 2px, 
+                transparent 3px),
+            linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                var(--warm-white) 50%, 
+                var(--cream) 100%);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 18px 24px;
+        border: none;
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 17px;
+        font-weight: 600;
+        font-family: Georgia, "Times New Roman", serif;
+        cursor: pointer;
+        margin-bottom: 24px;
+        /* Enhanced button background */
+        background: 
+            /* Subtle highlight */
+            radial-gradient(ellipse 100px 50px at 50% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
+            /* Wood grain texture */
+            repeating-linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1) 0px, 
+                transparent 1px, 
+                rgba(0, 0, 0, 0.05) 2px, 
+                transparent 3px),
+            /* Main gradient */
+            linear-gradient(135deg, var(--btn-start) 0%, var(--bg-medium) 25%, var(--btn-end) 50%, var(--bg-end) 100%);
+        /* Multi-layer shadow */
+        box-shadow: 
+            0 8px 16px rgba(139, 69, 19, 0.3),
+            0 4px 8px rgba(101, 67, 33, 0.2),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3),
+            inset 0 -1px 2px rgba(139, 69, 19, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary:hover {
+        background: 
+            radial-gradient(ellipse 120px 60px at 50% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 60%),
+            repeating-linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.15) 0px, 
+                transparent 1px, 
+                rgba(0, 0, 0, 0.03) 2px, 
+                transparent 3px),
+            linear-gradient(135deg, var(--bg-medium) 0%, var(--btn-start) 25%, var(--bg-end) 50%, var(--btn-end) 100%);
+        transform: translateY(-2px);
+        box-shadow: 
+            0 12px 24px rgba(139, 69, 19, 0.4),
+            0 6px 12px rgba(101, 67, 33, 0.3),
+            inset 0 1px 2px rgba(255, 255, 255, 0.4),
+            inset 0 -1px 2px rgba(139, 69, 19, 0.1);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 
+            0 4px 8px rgba(139, 69, 19, 0.3),
+            0 2px 4px rgba(101, 67, 33, 0.2),
+            inset 0 1px 2px rgba(255, 255, 255, 0.2),
+            inset 0 -1px 2px rgba(139, 69, 19, 0.3);
+    }
+
+    .back-to-login {
+        color: var(--brand);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        font-family: Georgia, "Times New Roman", serif;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        display: inline-block;
+        padding: 8px 0;
+    }
+
+    .back-to-login:hover {
+        color: var(--accent-gold);
+        text-decoration: none;
+        text-shadow: 0 2px 4px rgba(218, 165, 32, 0.3);
+        transform: translateX(-2px);
+    }
+
+    .back-to-login::before {
+        content: '←';
+        margin-right: 6px;
+        transition: transform 0.3s ease;
+    }
+
+    .back-to-login:hover::before {
+        transform: translateX(-2px);
+    }
+
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-size: 15px;
+        font-family: Georgia, "Times New Roman", serif;
+        position: relative;
+        z-index: 2;
+        /* Enhanced shadow and texture */
+        box-shadow: 
+            0 4px 8px rgba(139, 69, 19, 0.1),
+            inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .alert-danger {
+        background: 
+            radial-gradient(ellipse 60px 40px at 30% 40%, rgba(220, 38, 38, 0.08) 0%, transparent 70%),
+            linear-gradient(135deg, 
+                rgba(254, 242, 242, 0.95) 0%, 
+                rgba(252, 226, 226, 0.9) 100%);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        color: #991b1b;
+        border-left: 4px solid #dc2626;
+    }
+
+    .alert-success {
+        background: 
+            radial-gradient(ellipse 60px 40px at 30% 40%, rgba(34, 197, 94, 0.08) 0%, transparent 70%),
+            linear-gradient(135deg, 
+                rgba(240, 253, 244, 0.95) 0%, 
+                rgba(220, 252, 231, 0.9) 100%);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: #14532d;
+        border-left: 4px solid #16a34a;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0 0 0;
+    }
+
+    .errorlist li {
+        color: #991b1b;
+        font-size: 14px;
+        font-family: Georgia, "Times New Roman", serif;
+        background: 
+            radial-gradient(ellipse 40px 25px at 20% 30%, rgba(220, 38, 38, 0.06) 0%, transparent 70%),
+            linear-gradient(135deg, 
+                rgba(254, 242, 242, 0.9) 0%, 
+                rgba(252, 226, 226, 0.85) 100%);
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        border-left: 3px solid #dc2626;
+        box-shadow: 
+            0 2px 4px rgba(220, 38, 38, 0.1),
+            inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 480px) {
+        .login-code-card {
+            padding: 32px 24px;
+            margin: 16px;
+            border-radius: 20px;
+        }
+        
+        .login-code-icon {
+            width: 72px;
+            height: 72px;
+            font-size: 36px;
+        }
+        
+        .login-code-title {
+            font-size: 28px;
+        }
+        
+        .form-control {
+            padding: 14px 16px;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            padding: 16px 20px;
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="login-code-container">
+    <div class="login-code-card">
+        <div class="login-code-header">
+            <div class="login-code-icon">🔑</div>
+            <h1 class="login-code-title">Login with Code</h1>
+            <p class="login-code-subtitle">
+                Enter your email address and we'll send you a secure login code.
+            </p>
+        </div>
+
+        <!-- Display Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Send Login Code
+            </button>
+
+            <a href="{% url 'landing' %}" class="back-to-login">
+                ← Back to Sign In
+            </a>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Auto-focus the email input
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.querySelector('#id_email');
+        if (emailInput) {
+            emailInput.focus();
+        }
+    });
+</script>
+</body>
+</html>

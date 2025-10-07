@@ -1,0 +1,487 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Discover Churches - ChurchConnect{% endblock %}
+
+{% block extra_css %}
+  <!-- Centralized Warm Sacred Earth Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="{% static 'css/pages/discover.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="discover-page warm-sacred-earth">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Discover Churches</h1>
+      <p class="page-subtitle">Find and connect with churches in your community</p>
+    </div>
+    <div class="header-actions">
+      {% if essential_status.is_complete %}
+        <a href="{% url 'core:create_church' %}" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14m7-7H5"/>
+          </svg>
+          Create Church
+        </a>
+      {% else %}
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          onclick="alert('Please complete your essential profile information (Full Name, Phone, Address, Date of Birth) before creating a church.'); window.location.href='{% url 'manage_profile' %}';"
+          title="Complete your profile to create a church"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14m7-7H5"/>
+          </svg>
+          Create Church
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="search-section">
+    <form method="get" class="search-form">
+      <div class="search-container">
+        <div class="search-bar">
+          <div class="search-input-group">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" name="query" placeholder="Search churches, denominations, or locations..." value="{{ request.GET.query }}" class="search-input" id="searchInput">
+            <button type="button" class="clear-btn" id="clearSearch" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <button type="submit" class="search-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <button type="button" class="filter-toggle-btn" id="filterToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+          </svg>
+          Filters
+        </button>
+      </div>
+      
+      <div class="filters" id="filtersPanel" style="display: none;">
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label for="{{ search_form.denomination.id_for_label }}" class="filter-label">Denomination</label>
+            <select name="denomination" id="{{ search_form.denomination.id_for_label }}" class="filter-select">
+              <option value="">All Denominations</option>
+              {% for value, label in search_form.denomination.field.choices %}
+                <option value="{{ value }}" {% if request.GET.denomination == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="{{ search_form.city.id_for_label }}" class="filter-label">City</label>
+            <input type="text" name="city" id="{{ search_form.city.id_for_label }}" placeholder="Enter city..." value="{{ request.GET.city }}" class="filter-input">
+          </div>
+          <div class="filter-group">
+            <label for="{{ search_form.size.id_for_label }}" class="filter-label">Church Size</label>
+            <select name="size" id="{{ search_form.size.id_for_label }}" class="filter-select">
+              <option value="">All Sizes</option>
+              {% for value, label in search_form.size.field.choices %}
+                <option value="{{ value }}" {% if request.GET.size == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+            </svg>
+            Apply Filters
+          </button>
+          <a href="{% url 'core:discover' %}" class="btn btn-outline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+            </svg>
+            Clear All
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary">
+    <p class="results-count">{{ total_churches }} church{{ total_churches|pluralize }} found</p>
+  </div>
+
+  <!-- Churches Grid -->
+  <div class="churches-grid">
+    {% for church in churches %}
+      <div class="church-card" data-church-id="{{ church.id }}">
+        {% if church.cover_image %}
+        <div class="church-cover">
+          <img src="{{ church.cover_image.url }}" alt="{{ church.name }} Cover" loading="lazy" decoding="async">
+        </div>
+        {% else %}
+        <div class="church-cover cover-placeholder">
+          <span class="cover-placeholder-text">Cover image</span>
+        </div>
+        {% endif %}
+        <!-- Church Header with Avatar and Info -->
+        <div class="church-header">
+          <div class="church-avatar">
+            {% if church.logo %}
+              <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
+            {% else %}
+              <div class="avatar-placeholder">{{ church.initial }}</div>
+            {% endif %}
+          </div>
+          <div class="church-info">
+            <h3 class="church-name">{{ church.name }}</h3>
+            <p class="church-location">{{ church.city }}, {{ church.state }}</p>
+            <div class="church-badges">
+              <span class="denomination-badge">{{ church.get_denomination_display }}</span>
+              {% if church.is_verified %}
+                <span class="verified-badge">Verified</span>
+              {% else %}
+                <span class="not-verified-badge">Not Verified</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Church Content -->
+        <div class="church-content">
+          <p class="church-description">{{ church.description|truncatewords:20 }}</p>
+          
+          <div class="church-details">
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              <span>{{ church.followers_count }} followers</span>
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{{ church.member_count }} members</span>
+            </div>
+            <div class="detail-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>{{ church.created_at|timesince }} ago</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Church Actions -->
+        <div class="church-actions">
+          {% if church.slug %}
+          <a href="{% url 'core:church_detail' church.slug %}" class="btn btn-outline">
+          {% else %}
+          <a href="#" class="btn btn-outline disabled" title="Church details not available">
+          {% endif %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            View Details
+          </a>
+          <button class="follow-btn {% if church.id in user_followed_churches %}following{% endif %}" 
+                  data-church-id="{{ church.id }}"
+                  data-action="{% if church.id in user_followed_churches %}unfollow{% else %}follow{% endif %}">
+            {% if church.id in user_followed_churches %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              Following
+            {% else %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              Follow
+            {% endif %}
+          </button>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <h3>No churches found</h3>
+        <p>Try adjusting your search criteria or create a new church listing.</p>
+        {% if essential_status.is_complete %}
+          <a href="{% url 'core:create_church' %}" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14m7-7H5"/>
+            </svg>
+            Create Church
+          </a>
+        {% else %}
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            onclick="alert('Please complete your essential profile information before creating a church.'); window.location.href='{% url 'manage_profile' %}';"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14m7-7H5"/>
+            </svg>
+            Create Church
+          </button>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if churches.has_other_pages %}
+    <div class="pagination">
+      {% if churches.has_previous %}
+        <a href="?page={{ churches.previous_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.denomination %}&denomination={{ request.GET.denomination }}{% endif %}{% if request.GET.city %}&city={{ request.GET.city }}{% endif %}{% if request.GET.size %}&size={{ request.GET.size }}{% endif %}" class="pagination-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15,18 9,12 15,6"/>
+          </svg>
+          Previous
+        </a>
+      {% endif %}
+      
+      <span class="pagination-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Page {{ churches.number }} of {{ churches.paginator.num_pages }}
+      </span>
+      
+      {% if churches.has_next %}
+        <a href="?page={{ churches.next_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.denomination %}&denomination={{ request.GET.denomination }}{% endif %}{% if request.GET.city %}&city={{ request.GET.city }}{% endif %}{% if request.GET.size %}&size={{ request.GET.size }}{% endif %}" class="pagination-btn">
+          Next
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9,18 15,12 9,6"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% csrf_token %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearSearch');
+  const filterToggle = document.getElementById('filterToggle');
+  const filtersPanel = document.getElementById('filtersPanel');
+  
+  // Show/hide clear button based on input
+  searchInput.addEventListener('input', function() {
+    if (this.value.length > 0) {
+      clearBtn.style.display = 'flex';
+    } else {
+      clearBtn.style.display = 'none';
+    }
+  });
+  
+  // Clear search input
+  clearBtn.addEventListener('click', function() {
+    searchInput.value = '';
+    clearBtn.style.display = 'none';
+    searchInput.focus();
+  });
+  
+  // Toggle filters panel
+  filterToggle.addEventListener('click', function() {
+    if (filtersPanel.style.display === 'none' || filtersPanel.style.display === '') {
+      filtersPanel.style.display = 'block';
+      this.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+        </svg>
+        Hide Filters
+      `;
+    } else {
+      filtersPanel.style.display = 'none';
+      this.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+        </svg>
+        Filters
+      `;
+    }
+  });
+  
+  // Show filters panel if there are active filters
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasFilters = urlParams.get('denomination') || urlParams.get('city') || urlParams.get('size');
+  if (hasFilters) {
+    filtersPanel.style.display = 'block';
+    filterToggle.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+      </svg>
+      Hide Filters
+    `;
+  }
+  
+  // Show clear button if there's existing search text
+  if (searchInput.value.length > 0) {
+    clearBtn.style.display = 'flex';
+  }
+
+  // Handle follow/unfollow buttons
+  const followButtons = document.querySelectorAll('.follow-btn');
+  
+  followButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const churchId = this.dataset.churchId;
+      const action = this.dataset.action;
+      const url = action === 'follow' ? 
+        `/app/follow-church/${churchId}/` :
+        `/app/unfollow-church/${churchId}/`;
+      
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Following...';
+      this.disabled = true;
+      
+      // Get CSRF token
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+      if (!csrfToken) {
+        console.error('CSRF token not found');
+        showNotification('Security token not found. Please refresh the page.', 'error');
+        this.disabled = false;
+        this.innerHTML = originalText;
+        return;
+      }
+
+      console.log('Follow button clicked:', {
+        churchId: churchId,
+        action: action,
+        url: url,
+        csrfToken: csrfToken.value
+      });
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken.value,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => {
+        console.log('Response status:', response.status, response.statusText);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+          // Update button state
+          if (data.action === 'followed') {
+            this.dataset.action = 'unfollow';
+            this.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              Following
+            `;
+            this.classList.add('following');
+          } else {
+            this.dataset.action = 'follow';
+            this.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+              Follow
+            `;
+            this.classList.remove('following');
+          }
+          
+          // Update follower count
+          const churchCard = this.closest('.church-card');
+          const followerCountElement = churchCard.querySelector('.detail-item span');
+          if (followerCountElement && followerCountElement.textContent.includes('followers')) {
+            followerCountElement.textContent = `${data.follower_count} followers`;
+          }
+          
+          // Show success message
+          showNotification(data.message, 'success');
+        } else {
+          showNotification(data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', 'error');
+        // Restore original button state on error
+        this.innerHTML = originalText;
+      })
+      .finally(() => {
+        this.disabled = false;
+      });
+    });
+  });
+});
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+</script>
+{% endblock %}

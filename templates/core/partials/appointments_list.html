@@ -1,0 +1,55 @@
+{% comment %}
+Partial for appointments list in Manage Church → Appointments tab.
+Requires: bookings (iterable of Booking), each with b.service, b.user, and optional b.is_conflict
+{% endcomment %}
+
+{% if bookings %}
+  <div class="booking-list">
+    {% for b in bookings %}
+      <div class="booking-row">
+        <div>
+          <div class="booking-title">{{ b.service.name }}</div>
+          <div class="booking-sub">ID: {{ b.code }}</div>
+          <div class="booking-user">
+            <div class="booking-user-avatar">
+              {% if b.user.profile and b.user.profile.profile_image %}
+                <img src="{{ b.user.profile.profile_image.url }}" alt="{{ b.user.get_full_name|default:b.user.username }}" loading="lazy" decoding="async">
+              {% else %}
+                <span class="avatar-initial">{{ b.user.get_full_name|default:b.user.username|slice:":1"|upper }}</span>
+              {% endif %}
+            </div>
+            <div class="booking-user-meta">
+              <div class="booking-user-name">{{ b.user.get_full_name|default:b.user.username }}</div>
+              <div class="booking-sub">{{ b.user.email }}</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="booking-title">{{ b.date|date:'M j, Y' }}</div>
+          <div class="booking-sub">{% if b.start_time and b.end_time %}{{ b.start_time|time:'g:i A' }} - {{ b.end_time|time:'g:i A' }}{% else %}No time set{% endif %}</div>
+          <div class="booking-sub">
+            <span class="badge {{ b.status }}">{{ b.get_status_display }}</span>
+            {% if b.is_conflict %}<span class="badge conflict">Conflict</span>{% endif %}
+          </div>
+          {% if b.status == 'declined' and b.decline_reason %}
+            <div class="booking-sub">Declined: {{ b.decline_reason }}</div>
+          {% endif %}
+        </div>
+        <div>
+          <a href="{% url 'core:manage_booking' b.id %}" class="btn btn-outline">View</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <h3>No Appointments</h3>
+    <p>When people request appointments, they will show up here.</p>
+  </div>
+{% endif %}

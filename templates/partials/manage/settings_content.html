@@ -1,0 +1,43 @@
+{% load static %}
+{# Settings Content Area #}
+<div class="settings-content">
+  <div class="settings-container">
+    <form method="post" enctype="multipart/form-data" class="church-form" id="church-update-form">
+      {% csrf_token %}
+
+      {# Basic Information Section #}
+      {% include 'partials/manage/settings/basic_info.html' with form=form %}
+      
+      {# Contact Information Section #}
+      {% include 'partials/manage/settings/contact_info.html' with form=form %}
+      
+      {# Location Information Section #}
+      {% include 'partials/manage/settings/location_info.html' with form=form %}
+      
+      {# Leadership Information Section #}
+      {% include 'partials/manage/settings/leadership_info.html' with form=form %}
+      
+      {# Media Settings Section #}
+      {% include 'partials/manage/settings/media_settings.html' with form=form %}
+      
+      {# Services Settings Section #}
+      {% include 'partials/manage/settings/services_settings.html' with form=form %}
+      
+      {# Social Media Settings Section #}
+      {% include 'partials/manage/settings/social_settings.html' with form=form %}
+      
+      {# Payment Settings Section #}
+      {% include 'partials/manage/settings/payment_settings.html' with form=form church=church %}
+      
+      {# Preferences Settings Section #}
+      {% include 'partials/manage/settings/preferences.html' with form=form %}
+      
+      {# Decline Reasons Settings Section #}
+      {% include 'partials/manage/settings/decline_reasons.html' with decline_reasons=decline_reasons %}
+      
+      {# Verification Settings Section #}
+      {% include 'partials/manage/settings/verification.html' with verif_form=verif_form %}
+
+    </form>
+  </div>
+</div>

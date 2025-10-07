@@ -1,0 +1,213 @@
+/* 
+ * Profile Page - Page-Specific Styles
+ * Only unique styles for profile page
+ * Version: 1.0
+ */
+
+/* =============================================================================
+   PROFILE NAVIGATION TABS
+   Unique to profile page
+   ============================================================================= */
+
+.profile-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background:
+    /* Subtle parchment texture */
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.01) 0px, rgba(160, 82, 45, 0.01) 1px, transparent 1px, transparent 12px),
+    linear-gradient(135deg, var(--warm-white) 0%, #F4E6D0 50%, var(--warm-white) 100%);
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  box-shadow: 
+    0 8px 24px rgba(139, 69, 19, 0.1),
+    0 4px 8px rgba(101, 67, 33, 0.05),
+    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* =============================================================================
+   TAB CONTENT AREAS
+   Unique to profile page
+   ============================================================================= */
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Profile content uses .parchment-card from components/cards.css */
+
+/* =============================================================================
+   SETTINGS TAB ALIGNMENT FIX
+   Ensure settings sidebar and content area align perfectly
+   ============================================================================= */
+
+.profile-page .settings-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Force perfect alignment for both columns */
+.profile-page .settings-layout > .settings-sidebar,
+.profile-page .settings-layout > .settings-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: start !important;
+}
+
+/* Settings sidebar card */
+.profile-page .settings-sidebar {
+  padding: 24px !important;
+  margin: 0 !important;
+  position: relative;
+  top: 0 !important;
+}
+
+/* Ensure header has no negative margins */
+.profile-page .settings-nav-header {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.profile-page .settings-nav-header h3 {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Settings content wrappers - zero spacing */
+.profile-page .settings-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  top: 0 !important;
+}
+
+.profile-page .settings-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Settings section card - align with sidebar by adjusting position */
+.profile-page .settings-section {
+  padding: 24px !important;
+  margin-top: 0 !important;
+  margin-bottom: 24px;
+  position: relative;
+  top: -5px !important; /* Adjust upward to align with sidebar */
+}
+
+/* =============================================================================
+   PROFILE INFORMATION GRID
+   Unique to profile page
+   ============================================================================= */
+
+.profile-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Info items use .info-card from components/cards.css */
+
+.info-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-family-primary);
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* =============================================================================
+   STATS GRID
+   Unique to profile page
+   ============================================================================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Stats cards use .stat-card from components/cards.css */
+
+/* =============================================================================
+   ACTION BUTTONS GROUP
+   Unique to profile page
+   ============================================================================= */
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   Mobile-specific adjustments
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .profile-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .nav-tab {
+    justify-content: center;
+  }
+  
+  .profile-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-nav {
+    padding: 0.75rem;
+  }
+  
+  .nav-tab {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}

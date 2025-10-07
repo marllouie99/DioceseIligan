@@ -1,0 +1,85 @@
+{% load static %}
+{# Location Information Settings Section #}
+<div id="location-settings" class="settings-section">
+  <div class="section-header">
+    <div class="section-header-content">
+      <h3 class="section-title">Location Information</h3>
+      <p class="section-description">Set your church's physical location</p>
+    </div>
+    <button type="button" class="edit-section-btn" data-section="location-settings" title="Edit section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="settings-grid">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Street Address</h4>
+        <p class="setting-description">Full street address of your church</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Helps people find your church</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.street_address }}
+        {% if form.street_address.errors %}
+          <div class="form-error">{{ form.street_address.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">City</h4>
+        <p class="setting-description">City where your church is located</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Used for location-based searches</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.city }}
+        {% if form.city.errors %}
+          <div class="form-error">{{ form.city.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">State/Province</h4>
+        <p class="setting-description">State or province</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Regional location information</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.state }}
+        {% if form.state.errors %}
+          <div class="form-error">{{ form.state.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <h4 class="setting-title">Country</h4>
+        <p class="setting-description">Country where your church is located</p>
+        <div class="setting-status">
+          <span class="status-badge optional">Optional</span>
+          <span class="status-description">Country location information</span>
+        </div>
+      </div>
+      <div class="setting-control">
+        {{ form.country }}
+        {% if form.country.errors %}
+          <div class="form-error">{{ form.country.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
