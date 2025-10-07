@@ -30,6 +30,8 @@ services:
         value: ""
       - key: EMAIL_HOST_PASSWORD
         value: ""
+      - key: STATIC_VERSION
+        value: "1"
 
 databases:
   - name: churchiligan-db
