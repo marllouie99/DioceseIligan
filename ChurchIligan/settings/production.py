@@ -18,10 +18,11 @@ X_FRAME_OPTIONS = 'DENY'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Cache configuration for production
+# Use local memory cache for Render free tier (no Redis available)
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': env('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
 }
 
