@@ -31,6 +31,7 @@ def _send_verification_email_worker(email, code):
     """
     Worker function to send verification email (runs in background thread)
     """
+    import sys
     try:
         subject = 'ChurchConnect - Verify Your Email'
         
@@ -48,6 +49,10 @@ def _send_verification_email_worker(email, code):
         logger.info(f"SMTP settings - Host: {settings.EMAIL_HOST}, Port: {settings.EMAIL_PORT}, User: {settings.EMAIL_HOST_USER}")
         
         try:
+            # Force immediate flush of stdout/stderr
+            sys.stdout.flush()
+            sys.stderr.flush()
+            
             send_mail(
                 subject=subject,
                 message=plain_message,
@@ -56,16 +61,27 @@ def _send_verification_email_worker(email, code):
                 html_message=html_message,
                 fail_silently=False,
             )
-            logger.info(f"Verification email sent successfully to {email}")
+            success_msg = f"✓ Verification email sent successfully to {email}"
+            logger.info(success_msg)
+            print(success_msg)
+            sys.stdout.flush()
         except Exception as smtp_error:
-            logger.error(f"SMTP failed: {smtp_error}")
+            error_msg = f"✗ SMTP failed: {smtp_error}"
+            logger.error(error_msg)
+            print(error_msg, file=sys.stderr)
             # Print code to console as fallback
-            print(f"=== EMAIL SEND FAILED - VERIFICATION CODE FOR {email}: {code} ===")
+            fallback_msg = f"=== EMAIL SEND FAILED - VERIFICATION CODE FOR {email}: {code} ==="
+            print(fallback_msg)
             logger.error(f"VERIFICATION CODE FOR {email}: {code}")
+            sys.stdout.flush()
+            sys.stderr.flush()
         
     except Exception as e:
-        logger.error(f"Failed to send verification email to {email}: {str(e)}")
+        error_msg = f"Failed to send verification email to {email}: {str(e)}"
+        logger.error(error_msg)
         print(f"=== EMAIL EXCEPTION - VERIFICATION CODE FOR {email}: {code} ===")
+        sys.stdout.flush()
+        sys.stderr.flush()
 
 
 def send_verification_email(email, code):

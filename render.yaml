@@ -41,7 +41,7 @@ services:
       - key: EMAIL_TIMEOUT
         value: "10"
       - key: DEFAULT_FROM_EMAIL
-        value: "ChurchConnect <979d0a001@smtp-brevo.com>"
+        value: "ChurchConnect <marllouie4@gmail.com>"
       - key: STATIC_VERSION
         value: "1"
 
