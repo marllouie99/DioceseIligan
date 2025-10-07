@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 # PayPal Configuration
 PAYPAL_MODE = config('PAYPAL_MODE', default='sandbox')
-PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
-PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET')
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
+PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='')
 PAYPAL_BASE_URL = 'https://api-m.sandbox.paypal.com' if PAYPAL_MODE == 'sandbox' else 'https://api-m.paypal.com'
 
 PAYPAL_CURRENCY = config('PAYPAL_CURRENCY', default='PHP')
