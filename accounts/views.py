@@ -267,9 +267,8 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             event.is_bookmarked = event.is_bookmarked_by(request.user)
 
     # Get PayPal configuration for donation integration
-    from decouple import config
-    PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
-    PAYPAL_CURRENCY = config('PAYPAL_CURRENCY', default='PHP')
+    PAYPAL_CLIENT_ID = getattr(settings, 'PAYPAL_CLIENT_ID', '')
+    PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
     
     context = {
         'profile_status': profile_status,

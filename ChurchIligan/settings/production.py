@@ -45,6 +45,12 @@ GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID', default='')
 GOOGLE_OAUTH_CLIENT_SECRET = env('GOOGLE_OAUTH_CLIENT_SECRET', default='')
 GOOGLE_OAUTH_REDIRECT_URI = env('GOOGLE_OAUTH_REDIRECT_URI', default='')
 
+# PayPal configuration
+PAYPAL_CLIENT_ID = env('PAYPAL_CLIENT_ID', default='')
+PAYPAL_CLIENT_SECRET = env('PAYPAL_CLIENT_SECRET', default='')
+PAYPAL_MODE = env('PAYPAL_MODE', default='sandbox')  # 'sandbox' or 'live'
+PAYPAL_CURRENCY = env('PAYPAL_CURRENCY', default='PHP')
+
 # Logging for production
 LOGGING['handlers']['file'] = {
     'class': 'logging.FileHandler',

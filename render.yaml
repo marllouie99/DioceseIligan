@@ -56,6 +56,14 @@ services:
         value: "marllouie4@gmail.com"
       - key: DJANGO_SUPERUSER_PASSWORD
         value: "admin123secure"
+      - key: PAYPAL_CLIENT_ID
+        value: ""
+      - key: PAYPAL_CLIENT_SECRET
+        value: ""
+      - key: PAYPAL_MODE
+        value: "sandbox"
+      - key: PAYPAL_CURRENCY
+        value: "PHP"
 
 databases:
   - name: churchiligan-db

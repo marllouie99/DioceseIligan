@@ -81,9 +81,9 @@ def _app_context(request):
         ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:3]
 
     # PayPal configuration for donation integration
-    from decouple import config
-    PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
-    PAYPAL_CURRENCY = config('PAYPAL_CURRENCY', default='PHP')
+    from django.conf import settings
+    PAYPAL_CLIENT_ID = getattr(settings, 'PAYPAL_CLIENT_ID', '')
+    PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
     
     return {
         'user_display_name': user_display_name,
