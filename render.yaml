@@ -35,9 +35,9 @@ services:
       - key: EMAIL_USE_TLS
         value: "True"
       - key: EMAIL_HOST_USER
-        sync: false  # Set this in Render Dashboard (your Gmail address)
+        value: "marllouie4@gmail.com"
       - key: EMAIL_HOST_PASSWORD
-        sync: false  # Set this in Render Dashboard (Gmail App Password)
+        value: "idcj jedy dicx ychg"
       - key: STATIC_VERSION
         value: "1"
 
