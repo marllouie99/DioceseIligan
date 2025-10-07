@@ -15,6 +15,7 @@ import json
 import logging
 from django.contrib.staticfiles import finders
 from django.templatetags.static import static as static_url
+import os
 
 from .forms import LoginForm, SignupForm, ProfileForm, EmailVerificationForm, ForgotPasswordForm, PasswordResetCodeForm, SetNewPasswordForm, LoginWithCodeForm, LoginCodeVerificationForm
 from .models import Profile, UserActivity
@@ -131,11 +132,26 @@ def static_debug(request: HttpRequest) -> JsonResponse:
     }
     for path in targets:
         abs_path = finders.find(path)
+        root_path = os.path.normpath(os.path.join(str(settings.STATIC_ROOT), path))
         data['results'][path] = {
             'found_by_finders': bool(abs_path),
             'abs_path': abs_path,
             'served_url': static_url(path),
+            'exists_in_STATIC_ROOT': os.path.exists(root_path),
+            'static_root_path': root_path,
+            'size_in_STATIC_ROOT': (os.path.getsize(root_path) if os.path.exists(root_path) else None),
         }
+    # include directory listings for quick visibility (first 50 entries)
+    listing = []
+    try:
+        for root, dirs, files in os.walk(str(settings.STATIC_ROOT)):
+            rel = os.path.relpath(root, str(settings.STATIC_ROOT))
+            listing.append({'dir': rel, 'files': sorted(files)[:20]})
+            if len(listing) >= 5:
+                break
+    except Exception:
+        pass
+    data['sample_listing'] = listing
     return JsonResponse(data)
 
 def logout_view(request: HttpRequest) -> HttpResponse:
