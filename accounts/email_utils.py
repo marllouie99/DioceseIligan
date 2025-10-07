@@ -24,49 +24,15 @@ def send_verification_email(email, code):
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Send email via Brevo SMTP (temporary override)
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
-        
-        try:
-            # Brevo SMTP configuration
-            smtp_server = 'smtp-relay.brevo.com'
-            port = 587
-            smtp_username = '979d0a001@smtp-brevo.com'
-            smtp_password = 'OrM1ztRFCjEm2bks'
-            sender_email = 'Church Iligan Connect <marllouie4@gmail.com>'
-            
-            # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = sender_email
-            msg['To'] = email
-            
-            # Add both plain text and HTML parts
-            part1 = MIMEText(plain_message, 'plain')
-            part2 = MIMEText(html_message, 'html')
-            msg.attach(part1)
-            msg.attach(part2)
-            
-            # Send via SMTP
-            server = smtplib.SMTP(smtp_server, port)
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-            server.quit()
-            
-        except Exception as smtp_error:
-            logger.error(f"Brevo SMTP failed: {smtp_error}, falling back to Django send_mail")
-            # Fallback to Django's send_mail if SMTP fails
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
-            )
+        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            html_message=html_message,
+            fail_silently=False,
+        )
         
         logger.info(f"Verification email sent successfully to {email}")
         return True
@@ -136,49 +102,15 @@ def send_password_reset_email(email, code):
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Send email via Brevo SMTP (temporary override)
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
-        
-        try:
-            # Brevo SMTP configuration
-            smtp_server = 'smtp-relay.brevo.com'
-            port = 587
-            smtp_username = '979d0a001@smtp-brevo.com'
-            smtp_password = 'OrM1ztRFCjEm2bks'
-            sender_email = 'Church Iligan Connect <marllouie4@gmail.com>'
-            
-            # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = sender_email
-            msg['To'] = email
-            
-            # Add both plain text and HTML parts
-            part1 = MIMEText(plain_message, 'plain')
-            part2 = MIMEText(html_message, 'html')
-            msg.attach(part1)
-            msg.attach(part2)
-            
-            # Send via SMTP
-            server = smtplib.SMTP(smtp_server, port)
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-            server.quit()
-            
-        except Exception as smtp_error:
-            logger.error(f"Brevo SMTP failed: {smtp_error}, falling back to Django send_mail")
-            # Fallback to Django's send_mail if SMTP fails
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
-            )
+        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            html_message=html_message,
+            fail_silently=False,
+        )
         
         logger.info(f"Password reset email sent successfully to {email}")
         return True
@@ -248,49 +180,15 @@ def send_login_code_email(email, code):
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Send email via Brevo SMTP (temporary override)
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
-        
-        try:
-            # Brevo SMTP configuration
-            smtp_server = 'smtp-relay.brevo.com'
-            port = 587
-            smtp_username = '979d0a001@smtp-brevo.com'
-            smtp_password = 'OrM1ztRFCjEm2bks'
-            sender_email = 'Church Iligan Connect <marllouie4@gmail.com>'
-            
-            # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = sender_email
-            msg['To'] = email
-            
-            # Add both plain text and HTML parts
-            part1 = MIMEText(plain_message, 'plain')
-            part2 = MIMEText(html_message, 'html')
-            msg.attach(part1)
-            msg.attach(part2)
-            
-            # Send via SMTP
-            server = smtplib.SMTP(smtp_server, port)
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-            server.quit()
-            
-        except Exception as smtp_error:
-            logger.error(f"Brevo SMTP failed: {smtp_error}, falling back to Django send_mail")
-            # Fallback to Django's send_mail if SMTP fails
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
-            )
+        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            html_message=html_message,
+            fail_silently=False,
+        )
         
         logger.info(f"Login code email sent successfully to {email}")
         return True
@@ -372,54 +270,18 @@ def send_church_verification_approved_email(user_email, user_name, church_name, 
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Send email via Brevo SMTP
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
+        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
         
-        try:
-            # Brevo SMTP configuration
-            smtp_server = 'smtp-relay.brevo.com'
-            port = 587
-            smtp_username = '979d0a001@smtp-brevo.com'
-            smtp_password = 'OrM1ztRFCjEm2bks'
-            sender_email = 'Church Iligan Connect <marllouie4@gmail.com>'
-            
-            # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = sender_email
-            msg['To'] = user_email
-            
-            # Add both plain text and HTML parts
-            part1 = MIMEText(plain_message, 'plain')
-            part2 = MIMEText(html_message, 'html')
-            msg.attach(part1)
-            msg.attach(part2)
-            
-            # Send via SMTP
-            server = smtplib.SMTP(smtp_server, port)
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-            server.quit()
-            
-            logger.info(f"Church verification approved email sent successfully to {user_email}")
-            return True
-            
-        except Exception as smtp_error:
-            logger.error(f"Brevo SMTP failed: {smtp_error}, falling back to Django send_mail")
-            # Fallback to Django's send_mail if SMTP fails
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user_email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-            logger.info(f"Church verification approved email sent successfully to {user_email} via fallback")
-            return True
+        logger.info(f"Church verification approved email sent successfully to {user_email}")
+        return True
         
     except Exception as e:
         logger.error(f"Failed to send church verification approved email to {user_email}: {str(e)}")
@@ -450,54 +312,18 @@ def send_church_verification_rejected_email(user_email, church_name, rejection_n
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Send email via Brevo SMTP
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
+        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
         
-        try:
-            # Brevo SMTP configuration
-            smtp_server = 'smtp-relay.brevo.com'
-            port = 587
-            smtp_username = '979d0a001@smtp-brevo.com'
-            smtp_password = 'OrM1ztRFCjEm2bks'
-            sender_email = 'Church Iligan Connect <marllouie4@gmail.com>'
-            
-            # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = sender_email
-            msg['To'] = user_email
-            
-            # Add both plain text and HTML parts
-            part1 = MIMEText(plain_message, 'plain')
-            part2 = MIMEText(html_message, 'html')
-            msg.attach(part1)
-            msg.attach(part2)
-            
-            # Send via SMTP
-            server = smtplib.SMTP(smtp_server, port)
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-            server.quit()
-            
-            logger.info(f"Church verification rejected email sent successfully to {user_email}")
-            return True
-            
-        except Exception as smtp_error:
-            logger.error(f"Brevo SMTP failed: {smtp_error}, falling back to Django send_mail")
-            # Fallback to Django's send_mail if SMTP fails
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user_email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-            logger.info(f"Church verification rejected email sent successfully to {user_email} via fallback")
-            return True
+        logger.info(f"Church verification rejected email sent successfully to {user_email}")
+        return True
         
     except Exception as e:
         logger.error(f"Failed to send church verification rejected email to {user_email}: {str(e)}")
