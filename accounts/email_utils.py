@@ -26,10 +26,9 @@ def send_email_async(func):
     return wrapper
 
 
-@send_email_async
 def _send_verification_email_worker(email, code):
     """
-    Worker function to send verification email (runs in background thread)
+    Worker function to send verification email (runs synchronously for reliability)
     """
     import sys
     try:
@@ -65,6 +64,7 @@ def _send_verification_email_worker(email, code):
             logger.info(success_msg)
             print(success_msg)
             sys.stdout.flush()
+            return True
         except Exception as smtp_error:
             error_msg = f"✗ SMTP failed: {smtp_error}"
             logger.error(error_msg)
@@ -75,6 +75,7 @@ def _send_verification_email_worker(email, code):
             logger.error(f"VERIFICATION CODE FOR {email}: {code}")
             sys.stdout.flush()
             sys.stderr.flush()
+            return False
         
     except Exception as e:
         error_msg = f"Failed to send verification email to {email}: {str(e)}"
@@ -82,16 +83,16 @@ def _send_verification_email_worker(email, code):
         print(f"=== EMAIL EXCEPTION - VERIFICATION CODE FOR {email}: {code} ===")
         sys.stdout.flush()
         sys.stderr.flush()
+        return False
 
 
 def send_verification_email(email, code):
     """
-    Send verification email with the provided code (async)
-    Returns immediately while email is sent in background thread
+    Send verification email with the provided code (synchronous for reliability)
+    Returns True if sent successfully, False otherwise
     """
     logger.info(f"Queuing verification email to {email}")
-    _send_verification_email_worker(email, code)
-    return True
+    return _send_verification_email_worker(email, code)
 
 
 def send_verification_code(email):
