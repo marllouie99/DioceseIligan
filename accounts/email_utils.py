@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from .models import EmailVerification, PasswordReset, LoginCode
+from .brevo_email import send_email_via_brevo_api
 import logging
 import threading
 from functools import wraps
@@ -48,23 +49,26 @@ def _send_verification_email_worker(email, code):
         logger.info(f"SMTP settings - Host: {settings.EMAIL_HOST}, Port: {settings.EMAIL_PORT}, User: {settings.EMAIL_HOST_USER}")
         
         try:
-            # Force immediate flush of stdout/stderr
-            sys.stdout.flush()
-            sys.stderr.flush()
-            
-            send_mail(
+            # Use Brevo HTTP API instead of SMTP (works on Render free tier)
+            success = send_email_via_brevo_api(
+                to_email=email,
                 subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
+                html_content=html_message,
+                plain_content=plain_message
             )
-            success_msg = f"✓ Verification email sent successfully to {email}"
-            logger.info(success_msg)
-            print(success_msg)
-            sys.stdout.flush()
-            return True
+            
+            if success:
+                success_msg = f"✓ Verification email sent successfully to {email}"
+                logger.info(success_msg)
+                print(success_msg)
+                sys.stdout.flush()
+                return True
+            else:
+                error_msg = f"✗ Failed to send email via Brevo API to {email}"
+                logger.error(error_msg)
+                print(f"=== EMAIL SEND FAILED - VERIFICATION CODE FOR {email}: {code} ===")
+                logger.error(f"VERIFICATION CODE FOR {email}: {code}")
+                return False
         except Exception as smtp_error:
             error_msg = f"✗ SMTP failed: {smtp_error}"
             logger.error(error_msg)

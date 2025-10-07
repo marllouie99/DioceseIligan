@@ -19,16 +19,16 @@ python-decouple==3.8
 requests==2.32.3
 
 # Development dependencies (uncomment for development)
-# django-debug-toolbar==4.4.6
-# django-extensions==3.2.3
-# black==24.10.0
-# flake8==7.1.1
+django-debug-toolbar==4.4.6
+django-extensions==3.2.3
+black==24.10.0
+flake8==7.1.1
 
-# Static files handling for production
+# Security
 whitenoise==6.6.0
 
-# WSGI server for production
+# Server
 gunicorn==22.0.0
 
-# Email service (optional - for Brevo API)
-# sib-api-v3-sdk==7.6.0
+# Email (Brevo API)
+sib-api-v3-sdk==7.6.0
