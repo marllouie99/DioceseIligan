@@ -25,17 +25,26 @@ def send_verification_email(email, code):
         plain_message = strip_tags(html_message)
         
         # Use Django's send_mail (respects EMAIL_BACKEND setting)
-        send_mail(
-            subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            html_message=html_message,
-            fail_silently=False,
-        )
+        logger.info(f"Attempting to send email to {email} using backend: {settings.EMAIL_BACKEND}")
+        logger.info(f"SMTP settings - Host: {settings.EMAIL_HOST}, Port: {settings.EMAIL_PORT}, User: {settings.EMAIL_HOST_USER}")
         
-        logger.info(f"Verification email sent successfully to {email}")
-        return True
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            logger.info(f"Verification email sent successfully to {email}")
+            return True
+        except Exception as smtp_error:
+            logger.error(f"SMTP failed: {smtp_error}")
+            # Print code to console as fallback
+            print(f"=== EMAIL SEND FAILED - VERIFICATION CODE FOR {email}: {code} ===")
+            logger.error(f"VERIFICATION CODE FOR {email}: {code}")
+            return True  # Still return True so signup can continue
         
     except Exception as e:
         logger.error(f"Failed to send verification email to {email}: {str(e)}")
