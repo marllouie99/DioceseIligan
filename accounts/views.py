@@ -13,6 +13,8 @@ from django.contrib.messages import get_messages
 from django.core.cache import cache
 import json
 import logging
+from django.contrib.staticfiles import finders
+from django.templatetags.static import static as static_url
 
 from .forms import LoginForm, SignupForm, ProfileForm, EmailVerificationForm, ForgotPasswordForm, PasswordResetCodeForm, SetNewPasswordForm, LoginWithCodeForm, LoginCodeVerificationForm
 from .models import Profile, UserActivity
@@ -110,6 +112,31 @@ def landing(request: HttpRequest) -> HttpResponse:
     
     return render(request, 'landing.html', context)
 
+
+def static_debug(request: HttpRequest) -> JsonResponse:
+    """Simple runtime diagnostics for static files without shell access."""
+    targets = [
+        'css/pages/landing.css',
+        'js/landing.js',
+        'js/hero-carousel.js',
+        'js/utils/clock-sync.js',
+        'admin/css/base.css',
+    ]
+    data = {
+        'STATIC_URL': settings.STATIC_URL,
+        'STATIC_ROOT': str(settings.STATIC_ROOT),
+        'STATICFILES_DIRS': list(settings.STATICFILES_DIRS),
+        'DEBUG': settings.DEBUG,
+        'results': {}
+    }
+    for path in targets:
+        abs_path = finders.find(path)
+        data['results'][path] = {
+            'found_by_finders': bool(abs_path),
+            'abs_path': abs_path,
+            'served_url': static_url(path),
+        }
+    return JsonResponse(data)
 
 def logout_view(request: HttpRequest) -> HttpResponse:
     logout(request)

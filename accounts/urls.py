@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.landing, name='landing'),
+    # Runtime static diagnostics (safe to keep for student project; can remove later)
+    path('__static_debug__', views.static_debug, name='static_debug'),
     path('verify-email/', views.verify_email, name='verify_email'),
     path('resend-code/', views.resend_verification_code, name='resend_verification_code'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),

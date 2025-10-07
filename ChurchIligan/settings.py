@@ -117,8 +117,8 @@ STATIC_VERSION = env('STATIC_VERSION', default=str(int(time.time())))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Static and media settings
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [str(BASE_DIR / 'static')]
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
