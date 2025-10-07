@@ -20,3 +20,6 @@ ls -la staticfiles/css/pages 2>/dev/null || true
 ls -la staticfiles/js 2>/dev/null || true
 ls -la staticfiles/js/utils 2>/dev/null || true
 python manage.py migrate
+
+# Create superuser if environment variables are set
+python manage.py create_superuser_with_env || true

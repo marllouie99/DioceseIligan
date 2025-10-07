@@ -50,6 +50,12 @@ services:
         value: "https://churchiligan.onrender.com/google/callback/"
       - key: STATIC_VERSION
         value: "1"
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: "admin"
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: "marllouie4@gmail.com"
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: "admin123secure"
 
 databases:
   - name: churchiligan-db
