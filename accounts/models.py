@@ -28,32 +28,21 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
-        # Debug: Check what storage is being used
-        import logging
-        from django.conf import settings
-        logger = logging.getLogger(__name__)
-        logger.error(f"[Profile Save] DEFAULT_FILE_STORAGE: {settings.DEFAULT_FILE_STORAGE}")
-        if hasattr(self.profile_image, 'storage'):
-            logger.error(f"[Profile Save] profile_image.storage: {self.profile_image.storage}")
-        
         # Optimize profile image before saving
         if self.profile_image:
             # Only optimize if not already optimized (avoid repeated processing and name growth)
             name = getattr(self.profile_image, 'name', '') or ''
             base = os.path.splitext(os.path.basename(name))[0]
             if '_optimized' not in base:
-                self.profile_image = optimize_image(self.profile_image, max_size=(400, 400))
-            
-            # Debug: Check storage after optimization
-            if hasattr(self.profile_image, 'storage'):
-                logger.error(f"[Profile Save After Optimize] profile_image.storage: {self.profile_image.storage}")
-                logger.error(f"[Profile Save After Optimize] profile_image.name: {self.profile_image.name}")
+                optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
+                
+                # IMPORTANT: Use save() method to ensure correct storage backend is used
+                # This forces Django to use DEFAULT_FILE_STORAGE (Cloudinary in production)
+                original_name = self.profile_image.name
+                self.profile_image.delete(save=False)  # Delete old file without saving
+                self.profile_image.save(optimized_content.name, optimized_content, save=False)
         
         super().save(*args, **kwargs)
-        
-        # Debug: Check final URL
-        if self.profile_image:
-            logger.error(f"[Profile Saved] profile_image.url: {self.profile_image.url}")
 
 
 class EmailVerification(models.Model):
