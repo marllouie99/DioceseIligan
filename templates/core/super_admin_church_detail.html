@@ -1,5 +1,5 @@
 {% extends 'layouts/app_base.html' %}
-{% load static %}
+{% load static media_extras %}
 
 {% block title %}{{ church.name }} - Church Details • ChurchConnect{% endblock %}
 
@@ -159,7 +159,7 @@
     <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 1.5rem;">
       <div style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; border: 3px solid rgba(139, 69, 19, 0.3); box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2); flex-shrink: 0; overflow: hidden;">
         {% if church.logo %}
-        <img src="{{ church.logo.url }}" alt="{{ church.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+        <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" style="width: 100%; height: 100%; object-fit: cover;">
         {% else %}
         {{ church.name.0|upper }}
         {% endif %}

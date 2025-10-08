@@ -1,4 +1,4 @@
-{% load static %}
+{% load static media_extras %}
 {# Church Preview Section #}
 {% if church %}
 <div class="followers-preview-section">
@@ -6,7 +6,7 @@
     <!-- Cover Image Preview -->
     <div class="preview-cover-section">
       {% if church.cover_image %}
-        <img src="{{ church.cover_image.url }}" alt="{{ church.name }} Cover" class="preview-cover-image" loading="lazy" decoding="async">
+        <img src="{{ church.cover_image|storage_url }}" alt="{{ church.name }} Cover" class="preview-cover-image" loading="lazy" decoding="async">
       {% else %}
         <div class="preview-cover-placeholder">
           {% include 'partials/icons/location.html' %}
@@ -19,7 +19,7 @@
     <div class="preview-profile-section">
       <div class="preview-avatar">
         {% if church.logo %}
-          <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="preview-avatar-image" loading="lazy" decoding="async">
+          <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" class="preview-avatar-image" loading="lazy" decoding="async">
         {% else %}
           <div class="preview-avatar-placeholder">
             {% include 'partials/icons/location.html' %}

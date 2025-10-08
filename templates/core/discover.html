@@ -1,5 +1,5 @@
 {% extends 'layouts/app_base.html' %}
-{% load static %}
+{% load static media_extras %}
 
 {% block title %}Discover Churches - ChurchConnect{% endblock %}
 
@@ -143,7 +143,7 @@
       <div class="church-card" data-church-id="{{ church.id }}">
         {% if church.cover_image %}
         <div class="church-cover">
-          <img src="{{ church.cover_image.url }}" alt="{{ church.name }} Cover" loading="lazy" decoding="async">
+          <img src="{{ church.cover_image|storage_url }}" alt="{{ church.name }} Cover" loading="lazy" decoding="async">
         </div>
         {% else %}
         <div class="church-cover cover-placeholder">
@@ -154,7 +154,7 @@
         <div class="church-header">
           <div class="church-avatar">
             {% if church.logo %}
-              <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
+              <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
             {% else %}
               <div class="avatar-placeholder">{{ church.initial }}</div>
             {% endif %}

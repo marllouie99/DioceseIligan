@@ -1,5 +1,5 @@
 {% extends 'layouts/app_base.html' %}
-{% load static %}
+{% load static media_extras %}
 
 {% block title %}Following - ChurchConnect{% endblock %}
 
@@ -42,7 +42,7 @@
         <div class="church-header">
           <div class="church-avatar">
             {% if church.logo %}
-              <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
+              <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" class="avatar-image" loading="lazy" decoding="async">
             {% else %}
               <div class="avatar-placeholder">{{ church.initial }}</div>
             {% endif %}

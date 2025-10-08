@@ -1,7 +1,8 @@
+{% load media_extras %}
 <div class="church-header">
   <div class="church-cover">
     {% if church.cover_image %}
-      <img src="{{ church.cover_image.url }}" alt="{{ church.name }}" class="cover-image" width="1600" height="220" decoding="async">
+      <img src="{{ church.cover_image|storage_url }}" alt="{{ church.name }}" class="cover-image" width="1600" height="220" decoding="async">
     {% else %}
       <div class="cover-placeholder">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -15,7 +16,7 @@
   <div class="church-info">
     <div class="church-avatar">
       {% if church.logo %}
-        <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="avatar-image" width="96" height="96" decoding="async">
+        <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" class="avatar-image" width="96" height="96" decoding="async">
       {% else %}
         <div class="avatar-placeholder">{{ church.initial }}</div>
       {% endif %}

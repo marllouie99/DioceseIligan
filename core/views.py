@@ -46,7 +46,10 @@ from .forms import (
     PostForm,
     ChurchVerificationUploadForm,
 )
-from .utils import get_user_display_data, get_essential_profile_status
+from .utils import get_user_display_data, get_essential_profile_status, optimize_image
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
 from django.utils import timezone
 from .notifications import create_booking_notification, NotificationTemplates
 
@@ -696,8 +699,18 @@ def update_church_logo(request):
     import logging, traceback
     logger = logging.getLogger(__name__)
     try:
-        church.logo = file_obj
+        # Optimize and save explicitly under churches/logos/
+        try:
+            optimized = optimize_image(file_obj, max_size=(400, 400), quality=85, format='JPEG')
+        except Exception:
+            logger.exception("[Update Logo] optimize_image failed; saving original")
+            file_obj.seek(0)
+            optimized = ContentFile(file_obj.read(), name=os.path.basename(getattr(file_obj, 'name', 'logo.jpg') or 'logo.jpg'))
+
+        # Assign optimized content directly; upload_to will handle path
+        church.logo = optimized
         church.save(update_fields=['logo'])
+
         # Build URL via field storage (Cloudinary in production)
         try:
             logo_url = church.logo.storage.url(church.logo.name)
@@ -705,7 +718,6 @@ def update_church_logo(request):
             logger.exception("[Update Logo] URL build error")
             logo_url = church.logo.url if getattr(church, 'logo', None) else None
         # Debug logging
-        from django.core.files.storage import default_storage
         logger.info(f"[Update Logo] Default storage: {default_storage.__class__.__name__}")
         try:
             field_storage_name = church.logo.storage.__class__.__name__ if church.logo else 'None'
@@ -746,8 +758,18 @@ def update_church_cover(request):
     import logging, traceback
     logger = logging.getLogger(__name__)
     try:
-        church.cover_image = file_obj
+        # Optimize and save explicitly under churches/covers/
+        try:
+            optimized = optimize_image(file_obj, max_size=(1280, 720), quality=85, format='JPEG')
+        except Exception:
+            logger.exception("[Update Cover] optimize_image failed; saving original")
+            file_obj.seek(0)
+            optimized = ContentFile(file_obj.read(), name=os.path.basename(getattr(file_obj, 'name', 'cover.jpg') or 'cover.jpg'))
+
+        # Assign optimized content directly; upload_to will handle path
+        church.cover_image = optimized
         church.save(update_fields=['cover_image'])
+
         # Build URL via field storage
         try:
             cover_url = church.cover_image.storage.url(church.cover_image.name)
@@ -755,7 +777,6 @@ def update_church_cover(request):
             logger.exception("[Update Cover] URL build error")
             cover_url = church.cover_image.url if getattr(church, 'cover_image', None) else None
         # Debug logging
-        from django.core.files.storage import default_storage
         logger.info(f"[Update Cover] Default storage: {default_storage.__class__.__name__}")
         try:
             field_storage_name = church.cover_image.storage.__class__.__name__ if church.cover_image else 'None'
