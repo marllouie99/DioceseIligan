@@ -51,6 +51,18 @@ PAYPAL_CLIENT_SECRET = env('PAYPAL_CLIENT_SECRET', default='')
 PAYPAL_MODE = env('PAYPAL_MODE', default='sandbox')  # 'sandbox' or 'live'
 PAYPAL_CURRENCY = env('PAYPAL_CURRENCY', default='PHP')
 
+# Cloudinary configuration for media storage (prevents file loss on Render deployments)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': env('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
+}
+
+# Use Cloudinary for media files if configured
+if CLOUDINARY_STORAGE['CLOUD_NAME']:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_URL = env('CLOUDINARY_URL', default='')
+
 # Logging for production
 LOGGING['handlers']['file'] = {
     'class': 'logging.FileHandler',

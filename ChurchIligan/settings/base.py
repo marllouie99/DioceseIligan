@@ -33,7 +33,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',  # Must be before django.contrib.staticfiles
     'django.contrib.staticfiles',
+    'cloudinary',  # Cloudinary for media storage
     'imagekit',  # Image optimization library
     'core',
     'accounts',
