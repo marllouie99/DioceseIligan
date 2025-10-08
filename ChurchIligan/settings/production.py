@@ -2,6 +2,9 @@
 Production settings for ChurchIligan project.
 """
 from .base import *
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Security settings
 DEBUG = False
@@ -60,10 +63,21 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
 }
 
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+    secure=True
+)
+
 # Use Cloudinary for media files if configured
 if CLOUDINARY_STORAGE['CLOUD_NAME']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_URL = env('CLOUDINARY_URL', default='')
+    print(f"[Cloudinary] Configured with cloud_name: {CLOUDINARY_STORAGE['CLOUD_NAME']}")
+    print(f"[Cloudinary] DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+else:
+    print("[Cloudinary] WARNING: Cloudinary not configured - CLOUDINARY_CLOUD_NAME is empty!")
 
 # Logging for production
 LOGGING['handlers']['file'] = {
