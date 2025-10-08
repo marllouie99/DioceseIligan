@@ -74,10 +74,12 @@ cloudinary.config(
 # Use Cloudinary for media files if configured
 if CLOUDINARY_STORAGE['CLOUD_NAME']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    print(f"[Cloudinary] Configured with cloud_name: {CLOUDINARY_STORAGE['CLOUD_NAME']}")
-    print(f"[Cloudinary] DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+    print(f"[Cloudinary] ✓ Configured with cloud_name: {CLOUDINARY_STORAGE['CLOUD_NAME']}")
+    print(f"[Cloudinary] ✓ API_KEY: {CLOUDINARY_STORAGE['API_KEY'][:10]}...")
+    print(f"[Cloudinary] ✓ DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
 else:
-    print("[Cloudinary] WARNING: Cloudinary not configured - CLOUDINARY_CLOUD_NAME is empty!")
+    print("[Cloudinary] ✗ WARNING: Cloudinary not configured - CLOUDINARY_CLOUD_NAME is empty!")
+    print(f"[Cloudinary] ✗ CLOUD_NAME value: '{CLOUDINARY_STORAGE['CLOUD_NAME']}'")
 
 # Logging for production
 LOGGING['handlers']['file'] = {

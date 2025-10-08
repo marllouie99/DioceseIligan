@@ -320,6 +320,9 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
             
             # Check if this is an AJAX request
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Refresh profile from database to get updated image path (Cloudinary)
+                profile.refresh_from_db()
+                
                 # Get updated user display data
                 user_display_name, user_initial = get_user_display_data(request.user, profile)
                 
@@ -336,6 +339,13 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
                     ),
                     'user_initial': user_initial,
                 }
+                
+                # Debug logging for Cloudinary verification
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.info(f"[Profile Save] Storage backend: {default_storage.__class__.__name__}")
+                logger.info(f"[Profile Save] Image name: {profile.profile_image.name if profile.profile_image else 'None'}")
+                logger.info(f"[Profile Save] Image URL: {profile_data.get('profile_image')}")
                 
                 # Cache the updated profile data
                 _set_cached_profile_data(request.user.id, profile_data)
