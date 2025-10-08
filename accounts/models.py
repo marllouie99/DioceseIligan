@@ -28,23 +28,32 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
-        # Optimize profile image before saving
-        if self.profile_image and hasattr(self.profile_image, 'file'):
+        # Only optimize image if it's a NEW upload (not an existing DB path)
+        if self.profile_image:
             from django.core.files.storage import default_storage
+            from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
             
-            # Only optimize if not already optimized (avoid repeated processing and name growth)
-            name = getattr(self.profile_image, 'name', '') or ''
-            base = os.path.splitext(os.path.basename(name))[0]
-            
-            if '_optimized' not in base:
-                optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
+            try:
+                # Only process if it's an actual uploaded file (not a database path)
+                # This will raise an exception if the file doesn't exist (old DB path)
+                is_new_upload = isinstance(self.profile_image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
                 
-                # CRITICAL: Use default_storage.save() directly to force Cloudinary usage
-                # Don't add "profiles/" prefix - optimized_content.name already has it
-                saved_name = default_storage.save(optimized_content.name, optimized_content)
-                
-                # Update the field with the saved filename
-                self.profile_image.name = saved_name
+                if is_new_upload:
+                    # Only optimize if not already optimized
+                    name = getattr(self.profile_image, 'name', '') or ''
+                    base = os.path.splitext(os.path.basename(name))[0]
+                    
+                    if '_optimized' not in base:
+                        optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
+                        
+                        # CRITICAL: Use default_storage.save() directly to force Cloudinary usage
+                        saved_name = default_storage.save(optimized_content.name, optimized_content)
+                        
+                        # Update the field with the saved filename
+                        self.profile_image.name = saved_name
+            except (FileNotFoundError, IOError):
+                # Old image path that doesn't exist - skip processing
+                pass
         
         super().save(*args, **kwargs)
 
