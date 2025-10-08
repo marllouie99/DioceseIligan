@@ -28,21 +28,37 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
+        import logging
+        from django.conf import settings
+        from django.core.files.storage import default_storage
+        
+        logger = logging.getLogger(__name__)
+        logger.error(f"[Profile.save] Starting save - DEFAULT_FILE_STORAGE: {settings.DEFAULT_FILE_STORAGE}")
+        
         # Optimize profile image before saving
-        if self.profile_image:
+        if self.profile_image and hasattr(self.profile_image, 'file'):
             # Only optimize if not already optimized (avoid repeated processing and name growth)
             name = getattr(self.profile_image, 'name', '') or ''
             base = os.path.splitext(os.path.basename(name))[0]
+            logger.error(f"[Profile.save] Image name: {name}, base: {base}")
+            
             if '_optimized' not in base:
-                optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
-                
-                # IMPORTANT: Use save() method to ensure correct storage backend is used
-                # This forces Django to use DEFAULT_FILE_STORAGE (Cloudinary in production)
-                original_name = self.profile_image.name
-                self.profile_image.delete(save=False)  # Delete old file without saving
-                self.profile_image.save(optimized_content.name, optimized_content, save=False)
+                try:
+                    logger.error("[Profile.save] Optimizing image...")
+                    optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
+                    
+                    # Save using field's save method which uses the field's storage backend
+                    logger.error(f"[Profile.save] Saving optimized image: {optimized_content.name}")
+                    self.profile_image.save(optimized_content.name, optimized_content, save=False)
+                    logger.error(f"[Profile.save] Image saved successfully!")
+                except Exception as e:
+                    logger.error(f"[Profile.save] ERROR optimizing image: {e}", exc_info=True)
         
         super().save(*args, **kwargs)
+        
+        # Log final URL
+        if self.profile_image:
+            logger.error(f"[Profile.save] Final image URL: {self.profile_image.url}")
 
 
 class EmailVerification(models.Model):
