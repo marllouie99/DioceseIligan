@@ -693,18 +693,19 @@ def update_church_logo(request):
     if getattr(file_obj, 'size', 0) > max_size:
         return JsonResponse({'success': False, 'message': 'File too large (max 10MB).'}, status=400)
 
+    import logging, traceback
+    logger = logging.getLogger(__name__)
     try:
         church.logo = file_obj
         church.save(update_fields=['logo'])
         # Build URL via field storage (Cloudinary in production)
         try:
             logo_url = church.logo.storage.url(church.logo.name)
-        except Exception:
+        except Exception as url_err:
+            logger.exception("[Update Logo] URL build error")
             logo_url = church.logo.url if getattr(church, 'logo', None) else None
         # Debug logging
-        import logging
         from django.core.files.storage import default_storage
-        logger = logging.getLogger(__name__)
         logger.info(f"[Update Logo] Default storage: {default_storage.__class__.__name__}")
         try:
             field_storage_name = church.logo.storage.__class__.__name__ if church.logo else 'None'
@@ -714,7 +715,8 @@ def update_church_logo(request):
         logger.info(f"[Update Logo] Name: {church.logo.name if church.logo else 'None'}")
         logger.info(f"[Update Logo] URL: {logo_url}")
         return JsonResponse({'success': True, 'url': logo_url, 'message': 'Logo updated successfully.'})
-    except Exception:
+    except Exception as e:
+        logger.exception("[Update Logo] Failed")
         return JsonResponse({'success': False, 'message': 'Failed to save logo.'}, status=500)
 
 
@@ -741,18 +743,19 @@ def update_church_cover(request):
     if getattr(file_obj, 'size', 0) > max_size:
         return JsonResponse({'success': False, 'message': 'File too large (max 10MB).'}, status=400)
 
+    import logging, traceback
+    logger = logging.getLogger(__name__)
     try:
         church.cover_image = file_obj
         church.save(update_fields=['cover_image'])
         # Build URL via field storage
         try:
             cover_url = church.cover_image.storage.url(church.cover_image.name)
-        except Exception:
+        except Exception as url_err:
+            logger.exception("[Update Cover] URL build error")
             cover_url = church.cover_image.url if getattr(church, 'cover_image', None) else None
         # Debug logging
-        import logging
         from django.core.files.storage import default_storage
-        logger = logging.getLogger(__name__)
         logger.info(f"[Update Cover] Default storage: {default_storage.__class__.__name__}")
         try:
             field_storage_name = church.cover_image.storage.__class__.__name__ if church.cover_image else 'None'
@@ -762,7 +765,8 @@ def update_church_cover(request):
         logger.info(f"[Update Cover] Name: {church.cover_image.name if church.cover_image else 'None'}")
         logger.info(f"[Update Cover] URL: {cover_url}")
         return JsonResponse({'success': True, 'url': cover_url, 'message': 'Cover image updated successfully.'})
-    except Exception:
+    except Exception as e:
+        logger.exception("[Update Cover] Failed")
         return JsonResponse({'success': False, 'message': 'Failed to save cover image.'}, status=500)
 
 

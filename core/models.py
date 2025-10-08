@@ -136,7 +136,6 @@ class Church(models.Model):
         
         # Optimize and normalize images before saving
         from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-        from django.core.files.storage import default_storage
         
         if self.logo:
             try:
@@ -145,9 +144,8 @@ class Church(models.Model):
                 is_new_upload = isinstance(getattr(self.logo, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
                 if is_new_upload and '_optimized' not in logo_base:
                     optimized = optimize_image(self.logo, max_size=(400, 400))
-                    # Save under churches/logos/ and assign name directly to avoid duplicate segments
-                    saved = default_storage.save(f"churches/logos/{optimized.name}", optimized)
-                    self.logo.name = saved
+                    # Assign optimized content; upload_to will prefix correctly on save
+                    self.logo = optimized
             except Exception:
                 pass
             # Normalize stored name (strip leading media/ and collapse duplicate paths)
@@ -168,8 +166,8 @@ class Church(models.Model):
                 is_new_upload = isinstance(getattr(self.cover_image, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
                 if is_new_upload and '_optimized' not in cover_base:
                     optimized = optimize_image(self.cover_image, max_size=(800, 600))
-                    saved = default_storage.save(f"churches/covers/{optimized.name}", optimized)
-                    self.cover_image.name = saved
+                    # Assign optimized content; upload_to will prefix correctly on save
+                    self.cover_image = optimized
             except Exception:
                 pass
             # Normalize stored name
