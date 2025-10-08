@@ -5,20 +5,17 @@ set -o errexit
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Clear old collected static files to prevent stale paths
+# Collect static files
+echo "=== Collecting static files ==="
 python manage.py collectstatic --no-input --clear
 
-# Diagnostics: verify static files exist and are collected (will not fail build)
-echo "[Diagnostics] Checking static file discovery via 'findstatic'" || true
-python manage.py findstatic css/pages/landing.css -v 2 || true
-python manage.py findstatic js/landing.js -v 2 || true
-python manage.py findstatic js/hero-carousel.js -v 2 || true
-python manage.py findstatic js/utils/clock-sync.js -v 2 || true
+# Verify static files were collected
+echo "=== Verifying static files were collected ==="
+ls -lh staticfiles/ || echo "staticfiles/ directory not found!"
+ls -lh staticfiles/css/ || echo "staticfiles/css/ directory not found!"
+ls -lh staticfiles/js/ || echo "staticfiles/js/ directory not found!"
 
-echo "[Diagnostics] Checking collected files in STATIC_ROOT" || true
-ls -la staticfiles/css/pages 2>/dev/null || true
-ls -la staticfiles/js 2>/dev/null || true
-ls -la staticfiles/js/utils 2>/dev/null || true
+echo "=== Running migrations ==="
 python manage.py migrate
 
 # Create superuser if environment variables are set
