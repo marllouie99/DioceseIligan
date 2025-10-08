@@ -14,8 +14,8 @@ X_FRAME_OPTIONS = 'DENY'
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
 
-# Static files for production
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# Static files for production - use WhiteNoise for compression and caching
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Cache configuration for production
 # Use local memory cache for Render free tier (no Redis available)
