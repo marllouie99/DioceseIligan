@@ -53,13 +53,11 @@ services:
       - key: DJANGO_SUPERUSER_USERNAME
         value: "admin"
       - key: DJANGO_SUPERUSER_EMAIL
-        value: "marllouie4@gmail.com"
+        value: "asusadmin@gmail.com"
       - key: DJANGO_SUPERUSER_PASSWORD
-        value: "admin123secure"
-      - key: PAYPAL_CLIENT_ID
-        value: ""
-      - key: PAYPAL_CLIENT_SECRET
-        value: ""
+        value: "ramdar143"
+      # PayPal credentials (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET) must be set in Render Dashboard
+      # DO NOT commit credentials to git for security
       - key: PAYPAL_MODE
         value: "sandbox"
       - key: PAYPAL_CURRENCY
