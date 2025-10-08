@@ -64,6 +64,13 @@ services:
         value: "sandbox"
       - key: PAYPAL_CURRENCY
         value: "PHP"
+      # Cloudinary configuration for media storage
+      - key: CLOUDINARY_CLOUD_NAME
+        value: "dqmgbrxgv"
+      - key: CLOUDINARY_API_KEY
+        value: "794325529773894"
+      - key: CLOUDINARY_API_SECRET
+        value: "-zTa6wf0Qup0hwDd-1bBMPM4PaI"
 
 databases:
   - name: churchiligan-db
