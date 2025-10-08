@@ -84,31 +84,32 @@
   // Make CSRF token available for AJAX requests
   window.csrfToken = '{{ csrf_token }}';
 </script>
-
 {# External Libraries #}
 <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 {# Django URL Configuration #}
-<script>
-  window.djangoUrls = {
-    updateChurchLogo: "{% url 'core:update_church_logo' %}",
-    updateChurchCover: "{% url 'core:update_church_cover' %}",
-    createAvailability: "{% url 'core:create_availability' %}?date=0",
-    manageServiceImages: "{% url 'core:manage_service_images' 0 %}",
-    serviceGallery: "{% url 'core:service_gallery' 0 %}",
-    requestVerification: "{% url 'core:request_verification' %}",
-    createDeclineReason: "{% url 'core:create_decline_reason' %}"
-  };
-  // Legacy URL variable for backward compatibility
-  window.createDeclineReasonUrl = "{% url 'core:create_decline_reason' %}";
-</script>
+  <script>
+    window.djangoUrls = {
+      updateChurchLogo: "{% url 'core:update_church_logo' %}",
+      updateChurchCover: "{% url 'core:update_church_cover' %}",
+      createAvailability: "{% url 'core:create_availability' %}?date=0",
+      manageServiceImages: "{% url 'core:manage_service_images' 0 %}",
+      serviceGallery: "{% url 'core:service_gallery' 0 %}",
+      requestVerification: "{% url 'core:request_verification' %}",
+      createDeclineReason: "{% url 'core:create_decline_reason' %}"
+    };
+    // Backwards compatibility for existing JS that expects globals
+    window.manageServiceImagesUrl = window.djangoUrls.manageServiceImages;
+    window.serviceGalleryUrl = window.djangoUrls.serviceGallery;
+    // Legacy URL variable for backward compatibility
+    window.createDeclineReasonUrl = "{% url 'core:create_decline_reason' %}";
+  </script>
 
 {# Core Modules #}
 <script defer src="{% static 'js/core/tabs.js' %}?v={{ STATIC_VERSION }}"></script>
 <script defer src="{% static 'js/core/forms.js' %}?v={{ STATIC_VERSION }}"></script>
 <script defer src="{% static 'js/core/image-cropper.js' %}?v={{ STATIC_VERSION }}"></script>
-<script defer src="{% static 'js/core/calendar.js' %}?v={{ STATIC_VERSION }}"></script>
 <script defer src="{% static 'js/core/settings.js' %}?v={{ STATIC_VERSION }}"></script>
 
 {# Application Modules #}

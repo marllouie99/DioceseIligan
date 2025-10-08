@@ -1485,12 +1485,20 @@ class ChurchManagementApp {
 
 // Global utility functions
 function openImageGallery(serviceId) {
-  const base = window.manageServiceImagesUrl;
+  const base = window.manageServiceImagesUrl || (window.djangoUrls && window.djangoUrls.manageServiceImages);
+  if (!base) {
+    console.warn('manageServiceImages URL is not defined');
+    return;
+  }
   window.location.href = base.replace('/0/', `/${serviceId}/`);
 }
 
 function openPhotoGallery(serviceId) {
-  const base = window.serviceGalleryUrl;
+  const base = window.serviceGalleryUrl || (window.djangoUrls && window.djangoUrls.serviceGallery);
+  if (!base) {
+    console.warn('serviceGallery URL is not defined');
+    return;
+  }
   window.location.href = base.replace('/0/', `/${serviceId}/`);
 }
 

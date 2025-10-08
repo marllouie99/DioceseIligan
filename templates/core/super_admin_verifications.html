@@ -1,5 +1,5 @@
 {% extends 'layouts/app_base.html' %}
-{% load static %}
+{% load static media_extras %}
 
 {% block title %}Church Management • ChurchConnect{% endblock %}
 
@@ -1154,7 +1154,7 @@
               <td>
                 <div class="church-name-cell">
                   {% if church.logo %}
-                  <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="church-mini-logo">
+                  <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" class="church-mini-logo">
                   {% else %}
                   <div class="church-mini-placeholder">{{ church.initial }}</div>
                   {% endif %}
@@ -1355,7 +1355,7 @@
                 <td>
                   <div class="church-name-cell">
                     {% if req.church.logo %}
-                    <img src="{{ req.church.logo.url }}" alt="{{ req.church.name }}" class="church-mini-logo">
+                    <img src="{{ req.church.logo|storage_url }}" alt="{{ req.church.name }}" class="church-mini-logo">
                     {% else %}
                     <div class="church-mini-placeholder">{{ req.church.name|first }}</div>
                     {% endif %}
