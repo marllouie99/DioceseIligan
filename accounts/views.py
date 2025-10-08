@@ -299,6 +299,16 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         profile = request.user.profile
     except Profile.DoesNotExist:
         profile = Profile.objects.create(user=request.user)
+    # Compute a robust image URL via the active storage backend (Cloudinary in prod)
+    try:
+        from django.core.files.storage import default_storage
+        profile_image_url = (
+            default_storage.url(profile.profile_image.name)
+            if getattr(profile, 'profile_image', None) and getattr(profile.profile_image, 'name', '')
+            else None
+        )
+    except Exception:
+        profile_image_url = None
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile, user=request.user)
@@ -318,7 +328,12 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
                     'display_name': user_display_name,
                     'email': request.user.email,
                     'bio': profile.bio or '',
-                    'profile_image': profile.profile_image.url if profile.profile_image else None,
+                    # Use storage-derived URL (Cloudinary in prod)
+                    'profile_image': (
+                        default_storage.url(profile.profile_image.name)
+                        if getattr(profile, 'profile_image', None) and getattr(profile.profile_image, 'name', '')
+                        else None
+                    ),
                     'user_initial': user_initial,
                 }
                 
@@ -397,6 +412,7 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
     context = {
         'form': form,
         'profile': profile,
+        'profile_image_url': profile_image_url,
         'user_display_name': user_display_name,
         'user_initial': user_initial,
         'active': 'profile',

@@ -64,7 +64,9 @@
   <div class="profile-card">
     <div class="profile-avatar-section">
       <div class="profile-avatar">
-        {% if profile.profile_image %}
+        {% if profile_image_url %}
+          <img src="{{ profile_image_url }}" alt="Profile Picture" class="avatar-image" decoding="async">
+        {% elif profile.profile_image %}
           <img src="{{ profile.profile_image.url }}" alt="Profile Picture" class="avatar-image" decoding="async">
         {% else %}
           <div class="avatar-placeholder">{{ user_initial }}</div>
