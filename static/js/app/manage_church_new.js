@@ -412,9 +412,13 @@ class ChurchManagementApp {
     this.modules.imageCropper = new window.ImageCropper();
     this.modules.imageCropper.init();
 
-    // Initialize Calendar Manager
-    this.modules.calendar = new window.CalendarManager();
-    this.modules.calendar.init();
+    // Initialize Calendar Manager (guard if module not loaded)
+    if (typeof window.CalendarManager === 'function') {
+      this.modules.calendar = new window.CalendarManager();
+      this.modules.calendar.init();
+    } else {
+      console.warn('CalendarManager not available. Skipping calendar initialization.');
+    }
 
     // Initialize Settings Manager (defer until settings tab is active)
     this.modules.settings = new window.SettingsManager();
