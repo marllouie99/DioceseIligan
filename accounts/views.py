@@ -91,11 +91,9 @@ def landing(request: HttpRequest) -> HttpResponse:
         active_tab = 'signup'
 
     # Check if Google OAuth is configured
-    # TEMPORARY: Hardcode directly in view for testing
-    client_id = '1053022434620-53ddgsjm3docsougushcna2a5hoqe0vd.apps.googleusercontent.com'
-    client_secret = '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'
+    client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', '')
+    client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', '')
     
-    # Google OAuth debug removed for production
     google_oauth_configured = (
         client_id and 
         client_secret and
