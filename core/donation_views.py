@@ -16,20 +16,21 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.db.models import Sum
-from decouple import config
 
 from .models import Post, Donation
 
 logger = logging.getLogger(__name__)
 
 # PayPal Configuration
-PAYPAL_MODE = config('PAYPAL_MODE', default='sandbox')
-PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
-PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='')
+PAYPAL_MODE = getattr(settings, 'PAYPAL_MODE', 'sandbox')
+PAYPAL_CLIENT_ID = getattr(settings, 'PAYPAL_CLIENT_ID', '')
+PAYPAL_CLIENT_SECRET = getattr(settings, 'PAYPAL_CLIENT_SECRET', '')
 PAYPAL_BASE_URL = 'https://api-m.sandbox.paypal.com' if PAYPAL_MODE == 'sandbox' else 'https://api-m.paypal.com'
 
-PAYPAL_CURRENCY = config('PAYPAL_CURRENCY', default='PHP')
-SITE_URL = config('SITE_URL', default='http://127.0.0.1:8000')
+PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
+SITE_URL = getattr(settings, 'ALLOWED_HOSTS', ['localhost'])[0]
+if not SITE_URL.startswith('http'):
+    SITE_URL = f'https://{SITE_URL}' if 'onrender.com' in SITE_URL else f'http://{SITE_URL}'
 
 
 def get_paypal_access_token():
