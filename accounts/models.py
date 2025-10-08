@@ -28,37 +28,26 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
-        import logging
-        from django.conf import settings
-        from django.core.files.storage import default_storage
-        
-        logger = logging.getLogger(__name__)
-        logger.error(f"[Profile.save] Starting save - DEFAULT_FILE_STORAGE: {settings.DEFAULT_FILE_STORAGE}")
-        
         # Optimize profile image before saving
         if self.profile_image and hasattr(self.profile_image, 'file'):
+            from django.core.files.storage import default_storage
+            
             # Only optimize if not already optimized (avoid repeated processing and name growth)
             name = getattr(self.profile_image, 'name', '') or ''
             base = os.path.splitext(os.path.basename(name))[0]
-            logger.error(f"[Profile.save] Image name: {name}, base: {base}")
             
             if '_optimized' not in base:
-                try:
-                    logger.error("[Profile.save] Optimizing image...")
-                    optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
-                    
-                    # Save using field's save method which uses the field's storage backend
-                    logger.error(f"[Profile.save] Saving optimized image: {optimized_content.name}")
-                    self.profile_image.save(optimized_content.name, optimized_content, save=False)
-                    logger.error(f"[Profile.save] Image saved successfully!")
-                except Exception as e:
-                    logger.error(f"[Profile.save] ERROR optimizing image: {e}", exc_info=True)
+                optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
+                
+                # CRITICAL: Use default_storage.save() directly to force Cloudinary usage
+                # FieldFile.save() uses cached storage, but default_storage.save() uses current settings
+                filename = f"profiles/{optimized_content.name}"
+                saved_name = default_storage.save(filename, optimized_content)
+                
+                # Update the field with the saved filename
+                self.profile_image.name = saved_name
         
         super().save(*args, **kwargs)
-        
-        # Log final URL
-        if self.profile_image:
-            logger.error(f"[Profile.save] Final image URL: {self.profile_image.url}")
 
 
 class EmailVerification(models.Model):
