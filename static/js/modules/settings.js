@@ -231,15 +231,20 @@ class SettingsManager {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      // Only operate inside settings layout; otherwise, skip gracefully
       const settingItem = input.closest('.setting-item');
+      if (!settingItem) {
+        return; // Not a settings card/file input
+      }
       const settingInfo = settingItem.querySelector('.setting-info');
-      
+      if (!settingInfo) {
+        return;
+      }
       // Remove existing preview
       const existingPreview = settingInfo.querySelector('.current-media-preview');
       if (existingPreview) {
         existingPreview.remove();
       }
-      
       // Create new preview
       const preview = document.createElement('div');
       preview.className = 'current-media-preview';

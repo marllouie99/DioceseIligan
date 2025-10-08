@@ -110,7 +110,6 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = '/static/'
-# Version string appended to static file URLs to bust browser caches
 STATIC_VERSION = env('STATIC_VERSION', default=str(int(time.time())))
 
 # Default primary key field type
@@ -119,7 +118,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Static and media settings
 STATICFILES_DIRS = [str(BASE_DIR / 'static')]
 STATIC_ROOT = str(BASE_DIR / 'staticfiles')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Django-imagekit compatibility with Django 5.2+
@@ -140,6 +139,20 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+# Cloudinary storage in production (if configured)
+_cloud_name = env('CLOUDINARY_CLOUD_NAME', default='').strip()
+_cloud_key = env('CLOUDINARY_API_KEY', default='').strip()
+_cloud_secret = env('CLOUDINARY_API_SECRET', default='').strip()
+if not DEBUG and _cloud_name and _cloud_key and _cloud_secret:
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': _cloud_name,
+        'API_KEY': _cloud_key,
+        'API_SECRET': _cloud_secret,
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STORAGES["default"]["BACKEND"] = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Auth redirects
 LOGIN_URL = '/'

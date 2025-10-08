@@ -44,7 +44,7 @@ class ProfileAvatarModule {
    * @private
    */
   getElements() {
-    this.uploadBtn = document.getElementById('avatar-upload-btn');
+    this.uploadBtn = document.getElementById('avatar-upload-btn') || document.querySelector('.avatar-upload-btn');
     this.fileInput = document.getElementById('id_profile_image');
     this.avatarImg = document.querySelector('.avatar-image');
   }
@@ -178,7 +178,7 @@ class ProfileAvatarModule {
     if (window.showNotification) {
       window.showNotification(message, type);
     } else {
-      : ${message}`);
+      console.log(`${type}: ${message}`);
     }
   }
 

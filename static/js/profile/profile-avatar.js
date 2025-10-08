@@ -46,7 +46,7 @@ class ProfileAvatarModule {
    * @private
    */
   getElements() {
-    this.uploadBtn = document.getElementById('avatar-upload-btn');
+    this.uploadBtn = document.getElementById('avatar-upload-btn') || document.querySelector('.avatar-upload-btn');
     this.fileInput = document.getElementById('id_profile_image');
     this.avatarImg = document.querySelector('.avatar-image');
   }

@@ -44,7 +44,7 @@ class ProfileFormModule {
    * @private
    */
   getElements() {
-    this.form = document.getElementById('profile-form');
+    this.form = document.getElementById('profile-form') || document.getElementById('profile-edit-form');
     this.submitBtn = this.form ? this.form.querySelector('button[type="submit"]') : null;
   }
 

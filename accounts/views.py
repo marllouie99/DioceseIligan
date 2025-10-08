@@ -303,7 +303,7 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
     try:
         from django.core.files.storage import default_storage
         profile_image_url = (
-            default_storage.url(profile.profile_image.name)
+            profile.profile_image.storage.url(profile.profile_image.name)
             if getattr(profile, 'profile_image', None) and getattr(profile.profile_image, 'name', '')
             else None
         )
@@ -333,7 +333,7 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
                     'bio': profile.bio or '',
                     # Use storage-derived URL (Cloudinary in prod)
                     'profile_image': (
-                        default_storage.url(profile.profile_image.name)
+                        profile.profile_image.storage.url(profile.profile_image.name)
                         if getattr(profile, 'profile_image', None) and getattr(profile.profile_image, 'name', '')
                         else None
                     ),
@@ -343,7 +343,12 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
                 # Debug logging for Cloudinary verification
                 import logging
                 logger = logging.getLogger(__name__)
-                logger.info(f"[Profile Save] Storage backend: {default_storage.__class__.__name__}")
+                logger.info(f"[Profile Save] Default storage: {default_storage.__class__.__name__}")
+                try:
+                    field_storage_name = profile.profile_image.storage.__class__.__name__ if profile.profile_image else 'None'
+                except Exception:
+                    field_storage_name = 'Unknown'
+                logger.info(f"[Profile Save] Field storage: {field_storage_name}")
                 logger.info(f"[Profile Save] Image name: {profile.profile_image.name if profile.profile_image else 'None'}")
                 logger.info(f"[Profile Save] Image URL: {profile_data.get('profile_image')}")
                 

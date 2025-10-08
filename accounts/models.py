@@ -58,11 +58,25 @@ class Profile(models.Model):
                     if '_optimized' not in base:
                         from django.core.files.storage import default_storage
                         optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
-                        saved_name = default_storage.save(optimized_content.name, optimized_content)
+                        # Save under profiles/ to respect upload_to while avoiding double prefixes
+                        saved_name = default_storage.save(f"profiles/{optimized_content.name}", optimized_content)
                         self.profile_image.name = saved_name
             except (FileNotFoundError, IOError):
                 # Old image path that doesn't exist - skip processing
                 pass
+        
+        # Normalize any erroneous stored names like leading 'media/' or duplicated 'profiles/'
+        try:
+            if getattr(self, 'profile_image', None) and getattr(self.profile_image, 'name', ''):
+                normalized = self.profile_image.name.replace('\\', '/').lstrip('/')
+                if normalized.startswith('media/'):
+                    normalized = normalized[len('media/'):]
+                # Collapse repeated 'profiles/' segments
+                while normalized.startswith('profiles/profiles/'):
+                    normalized = normalized[len('profiles/'):]
+                self.profile_image.name = normalized
+        except Exception:
+            pass
         
         super().save(*args, **kwargs)
 
