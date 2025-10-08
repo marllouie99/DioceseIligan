@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.core.files.storage import default_storage
 import os
 import random
 import string
@@ -18,7 +17,7 @@ class Profile(models.Model):
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    profile_image = models.ImageField(upload_to='profiles/', storage=default_storage, null=True, blank=True)
+    profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,6 +28,14 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
+        # Debug: Check what storage is being used
+        import logging
+        from django.conf import settings
+        logger = logging.getLogger(__name__)
+        logger.error(f"[Profile Save] DEFAULT_FILE_STORAGE: {settings.DEFAULT_FILE_STORAGE}")
+        if hasattr(self.profile_image, 'storage'):
+            logger.error(f"[Profile Save] profile_image.storage: {self.profile_image.storage}")
+        
         # Optimize profile image before saving
         if self.profile_image:
             # Only optimize if not already optimized (avoid repeated processing and name growth)
@@ -36,7 +43,17 @@ class Profile(models.Model):
             base = os.path.splitext(os.path.basename(name))[0]
             if '_optimized' not in base:
                 self.profile_image = optimize_image(self.profile_image, max_size=(400, 400))
+            
+            # Debug: Check storage after optimization
+            if hasattr(self.profile_image, 'storage'):
+                logger.error(f"[Profile Save After Optimize] profile_image.storage: {self.profile_image.storage}")
+                logger.error(f"[Profile Save After Optimize] profile_image.name: {self.profile_image.name}")
+        
         super().save(*args, **kwargs)
+        
+        # Debug: Check final URL
+        if self.profile_image:
+            logger.error(f"[Profile Saved] profile_image.url: {self.profile_image.url}")
 
 
 class EmailVerification(models.Model):
