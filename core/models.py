@@ -134,17 +134,54 @@ class Church(models.Model):
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         
-        # Optimize images before saving
+        # Optimize and normalize images before saving
+        from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+        from django.core.files.storage import default_storage
+        
         if self.logo:
-            logo_name = getattr(self.logo, 'name', '') or ''
-            logo_base = os.path.splitext(os.path.basename(logo_name))[0]
-            if '_optimized' not in logo_base:
-                self.logo = optimize_image(self.logo, max_size=(400, 400))
+            try:
+                logo_name = getattr(self.logo, 'name', '') or ''
+                logo_base = os.path.splitext(os.path.basename(logo_name))[0]
+                is_new_upload = isinstance(getattr(self.logo, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
+                if is_new_upload and '_optimized' not in logo_base:
+                    optimized = optimize_image(self.logo, max_size=(400, 400))
+                    # Save under churches/logos/ and assign name directly to avoid duplicate segments
+                    saved = default_storage.save(f"churches/logos/{optimized.name}", optimized)
+                    self.logo.name = saved
+            except Exception:
+                pass
+            # Normalize stored name (strip leading media/ and collapse duplicate paths)
+            try:
+                n = (self.logo.name or '').replace('\\', '/').lstrip('/')
+                if n.startswith('media/'):
+                    n = n[len('media/'):]
+                while n.startswith('churches/logos/churches/logos/'):
+                    n = n[len('churches/logos/') :]
+                self.logo.name = n
+            except Exception:
+                pass
+        
         if self.cover_image:
-            cover_name = getattr(self.cover_image, 'name', '') or ''
-            cover_base = os.path.splitext(os.path.basename(cover_name))[0]
-            if '_optimized' not in cover_base:
-                self.cover_image = optimize_image(self.cover_image, max_size=(800, 600))
+            try:
+                cover_name = getattr(self.cover_image, 'name', '') or ''
+                cover_base = os.path.splitext(os.path.basename(cover_name))[0]
+                is_new_upload = isinstance(getattr(self.cover_image, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
+                if is_new_upload and '_optimized' not in cover_base:
+                    optimized = optimize_image(self.cover_image, max_size=(800, 600))
+                    saved = default_storage.save(f"churches/covers/{optimized.name}", optimized)
+                    self.cover_image.name = saved
+            except Exception:
+                pass
+            # Normalize stored name
+            try:
+                n = (self.cover_image.name or '').replace('\\', '/').lstrip('/')
+                if n.startswith('media/'):
+                    n = n[len('media/'):]
+                while n.startswith('churches/covers/churches/covers/'):
+                    n = n[len('churches/covers/') :]
+                self.cover_image.name = n
+            except Exception:
+                pass
         super().save(*args, **kwargs)
     
     @property

@@ -696,7 +696,24 @@ def update_church_logo(request):
     try:
         church.logo = file_obj
         church.save(update_fields=['logo'])
-        return JsonResponse({'success': True, 'url': church.logo.url, 'message': 'Logo updated successfully.'})
+        # Build URL via field storage (Cloudinary in production)
+        try:
+            logo_url = church.logo.storage.url(church.logo.name)
+        except Exception:
+            logo_url = church.logo.url if getattr(church, 'logo', None) else None
+        # Debug logging
+        import logging
+        from django.core.files.storage import default_storage
+        logger = logging.getLogger(__name__)
+        logger.info(f"[Update Logo] Default storage: {default_storage.__class__.__name__}")
+        try:
+            field_storage_name = church.logo.storage.__class__.__name__ if church.logo else 'None'
+        except Exception:
+            field_storage_name = 'Unknown'
+        logger.info(f"[Update Logo] Field storage: {field_storage_name}")
+        logger.info(f"[Update Logo] Name: {church.logo.name if church.logo else 'None'}")
+        logger.info(f"[Update Logo] URL: {logo_url}")
+        return JsonResponse({'success': True, 'url': logo_url, 'message': 'Logo updated successfully.'})
     except Exception:
         return JsonResponse({'success': False, 'message': 'Failed to save logo.'}, status=500)
 
@@ -727,7 +744,24 @@ def update_church_cover(request):
     try:
         church.cover_image = file_obj
         church.save(update_fields=['cover_image'])
-        return JsonResponse({'success': True, 'url': church.cover_image.url, 'message': 'Cover image updated successfully.'})
+        # Build URL via field storage
+        try:
+            cover_url = church.cover_image.storage.url(church.cover_image.name)
+        except Exception:
+            cover_url = church.cover_image.url if getattr(church, 'cover_image', None) else None
+        # Debug logging
+        import logging
+        from django.core.files.storage import default_storage
+        logger = logging.getLogger(__name__)
+        logger.info(f"[Update Cover] Default storage: {default_storage.__class__.__name__}")
+        try:
+            field_storage_name = church.cover_image.storage.__class__.__name__ if church.cover_image else 'None'
+        except Exception:
+            field_storage_name = 'Unknown'
+        logger.info(f"[Update Cover] Field storage: {field_storage_name}")
+        logger.info(f"[Update Cover] Name: {church.cover_image.name if church.cover_image else 'None'}")
+        logger.info(f"[Update Cover] URL: {cover_url}")
+        return JsonResponse({'success': True, 'url': cover_url, 'message': 'Cover image updated successfully.'})
     except Exception:
         return JsonResponse({'success': False, 'message': 'Failed to save cover image.'}, status=500)
 

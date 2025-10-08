@@ -73,6 +73,14 @@ cloudinary.config(
 
 # Use Cloudinary for media files if configured
 if CLOUDINARY_STORAGE['CLOUD_NAME']:
+    # Important for Django 5.2+: STORAGES overrides DEFAULT_FILE_STORAGE
+    try:
+        STORAGES["default"]["BACKEND"] = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    except Exception:
+        STORAGES = {
+            "default": {"BACKEND": 'cloudinary_storage.storage.MediaCloudinaryStorage'},
+            "staticfiles": STORAGES.get("staticfiles", {"BACKEND": 'django.contrib.staticfiles.storage.StaticFilesStorage'}),
+        }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     print(f"[Cloudinary] ✓ Configured with cloud_name: {CLOUDINARY_STORAGE['CLOUD_NAME']}")
     print(f"[Cloudinary] ✓ API_KEY: {CLOUDINARY_STORAGE['API_KEY'][:10]}...")
