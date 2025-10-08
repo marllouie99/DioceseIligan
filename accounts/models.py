@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.conf import settings
 import os
 import random
 import string
@@ -11,9 +12,14 @@ User = get_user_model()
 
 
 def get_profile_storage():
-    """Return the configured default storage (lazy evaluation for Cloudinary)."""
-    from django.core.files.storage import default_storage
-    return default_storage
+    """Return Cloudinary storage in production, FileSystemStorage otherwise."""
+    # Import here to avoid circular imports and ensure settings are loaded
+    if settings.DEBUG:
+        from django.core.files.storage import FileSystemStorage
+        return FileSystemStorage()
+    else:
+        from cloudinary_storage.storage import MediaCloudinaryStorage
+        return MediaCloudinaryStorage()
 
 
 class Profile(models.Model):
@@ -23,7 +29,7 @@ class Profile(models.Model):
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    # Use callable to ensure storage is evaluated after settings are loaded
+    # Use callable that checks DEBUG setting to determine storage backend
     profile_image = models.ImageField(upload_to='profiles/', storage=get_profile_storage, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
