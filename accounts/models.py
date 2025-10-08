@@ -40,9 +40,8 @@ class Profile(models.Model):
                 optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
                 
                 # CRITICAL: Use default_storage.save() directly to force Cloudinary usage
-                # FieldFile.save() uses cached storage, but default_storage.save() uses current settings
-                filename = f"profiles/{optimized_content.name}"
-                saved_name = default_storage.save(filename, optimized_content)
+                # Don't add "profiles/" prefix - optimized_content.name already has it
+                saved_name = default_storage.save(optimized_content.name, optimized_content)
                 
                 # Update the field with the saved filename
                 self.profile_image.name = saved_name
