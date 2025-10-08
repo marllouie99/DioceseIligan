@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.files.storage import default_storage
 import os
 import random
 import string
@@ -17,7 +18,8 @@ class Profile(models.Model):
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    # Explicitly use default_storage to ensure Cloudinary in production
+    profile_image = models.ImageField(upload_to='profiles/', storage=default_storage, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
