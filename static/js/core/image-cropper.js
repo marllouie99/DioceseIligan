@@ -25,8 +25,13 @@ class ImageCropper {
    * Initialize image preview inputs
    */
   initializeImagePreviews() {
+    // Settings page inputs
     const logoInput = document.getElementById('id_logo');
     const coverInput = document.getElementById('id_cover_image');
+    
+    // Preview section inputs
+    const previewLogoInput = document.getElementById('preview_logo_input');
+    const previewCoverInput = document.getElementById('preview_cover_input');
     
     if (logoInput) {
       logoInput.addEventListener('change', (e) => {
@@ -39,6 +44,24 @@ class ImageCropper {
     
     if (coverInput) {
       coverInput.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          this.openCropper('cover', f);
+        }
+      });
+    }
+    
+    if (previewLogoInput) {
+      previewLogoInput.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          this.openCropper('logo', f);
+        }
+      });
+    }
+    
+    if (previewCoverInput) {
+      previewCoverInput.addEventListener('change', (e) => {
         const f = e.target.files && e.target.files[0];
         if (f) {
           this.openCropper('cover', f);

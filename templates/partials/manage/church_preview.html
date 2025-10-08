@@ -48,10 +48,14 @@
       </div>
 
       <div class="preview-actions">
-        <button class="preview-btn" data-target="id_cover_image">
+        <!-- Hidden file inputs for image upload -->
+        <input type="file" id="preview_logo_input" accept="image/*" style="display: none;">
+        <input type="file" id="preview_cover_input" accept="image/*" style="display: none;">
+        
+        <button class="preview-btn" data-target="preview_cover_input">
           Change cover
         </button>
-        <button class="preview-btn" data-target="id_logo">
+        <button class="preview-btn" data-target="preview_logo_input">
           Change profile
         </button>
         <!-- Confirm/Discard controls (hidden until user selects and crops an image) -->
