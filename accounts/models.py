@@ -41,14 +41,13 @@ class Profile(models.Model):
         return self.display_name or self.user.get_username()
     
     def save(self, *args, **kwargs):
-        # Only optimize image if it's a NEW upload (not an existing DB path)
-        if self.profile_image:
-            from django.core.files.storage import default_storage
+        # Skip image optimization for Cloudinary (it handles optimization automatically)
+        # Only optimize for local storage
+        if self.profile_image and settings.DEBUG:
             from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
             
             try:
                 # Only process if it's an actual uploaded file (not a database path)
-                # This will raise an exception if the file doesn't exist (old DB path)
                 is_new_upload = isinstance(self.profile_image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
                 
                 if is_new_upload:
@@ -57,12 +56,9 @@ class Profile(models.Model):
                     base = os.path.splitext(os.path.basename(name))[0]
                     
                     if '_optimized' not in base:
+                        from django.core.files.storage import default_storage
                         optimized_content = optimize_image(self.profile_image, max_size=(400, 400))
-                        
-                        # CRITICAL: Use default_storage.save() directly to force Cloudinary usage
                         saved_name = default_storage.save(optimized_content.name, optimized_content)
-                        
-                        # Update the field with the saved filename
                         self.profile_image.name = saved_name
             except (FileNotFoundError, IOError):
                 # Old image path that doesn't exist - skip processing
