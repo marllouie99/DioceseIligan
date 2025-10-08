@@ -31,6 +31,13 @@ class LoginForm(forms.Form):
         except User.DoesNotExist:
             # Fallback: treat as username
             user = authenticate(username=identifier, password=password)
+        except User.MultipleObjectsReturned:
+            # Multiple users with same email - try to authenticate with each
+            users = User.objects.filter(email__iexact=identifier)
+            for user_obj in users:
+                user = authenticate(username=user_obj.get_username(), password=password)
+                if user:
+                    break
 
         if not user:
             raise forms.ValidationError('Invalid credentials. Please check your email/username and password.')
