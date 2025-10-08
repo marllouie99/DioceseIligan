@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.core.files.storage import default_storage
 import os
 import random
 import string
@@ -11,6 +10,12 @@ from core.utils import optimize_image
 User = get_user_model()
 
 
+def get_profile_storage():
+    """Return the configured default storage (lazy evaluation for Cloudinary)."""
+    from django.core.files.storage import default_storage
+    return default_storage
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     display_name = models.CharField(max_length=150, blank=True)
@@ -18,8 +23,8 @@ class Profile(models.Model):
     address = models.TextField(blank=True)
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    # Explicitly use default_storage to ensure Cloudinary in production
-    profile_image = models.ImageField(upload_to='profiles/', storage=default_storage, null=True, blank=True)
+    # Use callable to ensure storage is evaluated after settings are loaded
+    profile_image = models.ImageField(upload_to='profiles/', storage=get_profile_storage, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
