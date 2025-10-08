@@ -528,7 +528,9 @@ class SettingsManager {
     const reader = new FileReader();
     reader.onload = (e) => {
       const settingItem = input.closest('.setting-item');
+      if (!settingItem) return; // Not in a setting item context
       const settingInfo = settingItem.querySelector('.setting-info');
+      if (!settingInfo) return; // No setting info element
       
       // Remove existing preview
       const existingPreview = settingInfo.querySelector('.current-media-preview');

@@ -35,8 +35,21 @@ def serve_static_from_root(request, path):
         raise Http404("Static file not found")
     return FileResponse(open(requested, 'rb'))
 
+# Serve media files in production (similar to static files)
+def serve_media_from_root(request, path):
+    root = settings.MEDIA_ROOT
+    # Normalize and prevent path traversal
+    requested = os.path.normpath(os.path.join(root, path))
+    root_norm = os.path.normpath(root)
+    if not requested.startswith(root_norm):
+        raise Http404("Invalid path")
+    if not os.path.isfile(requested):
+        raise Http404("Media file not found")
+    return FileResponse(open(requested, 'rb'))
+
 urlpatterns = [
     re_path(r'^static/(?P<path>.*)$', serve_static_from_root),
+    re_path(r'^media/(?P<path>.*)$', serve_media_from_root),
     path('admin/', admin.site.urls),
     # Django built-in auth views (password reset, login helpers, etc.)
     path('accounts/', include('django.contrib.auth.urls')),
