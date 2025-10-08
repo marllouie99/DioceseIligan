@@ -178,6 +178,35 @@ class ImageCropper {
   }
 
   /**
+   * Zoom the cropper
+   * @param {number} delta - Zoom delta
+   */
+  cropperZoom(delta) {
+    if (this.cropper) {
+      this.cropper.zoom(delta);
+    }
+  }
+
+  /**
+   * Rotate the cropper
+   * @param {number} deg - Rotation degrees
+   */
+  cropperRotate(deg) {
+    if (this.cropper) {
+      this.cropper.rotate(deg);
+    }
+  }
+
+  /**
+   * Reset the cropper
+   */
+  cropperReset() {
+    if (this.cropper) {
+      this.cropper.reset();
+    }
+  }
+
+  /**
    * Stage cropped image for confirmation
    * @param {string} type - Type of image
    * @param {File} file - Cropped file
@@ -496,3 +525,19 @@ class ImageCropper {
 
 // Export for use in main application
 window.ImageCropper = ImageCropper;
+
+// Auto-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.imageCropperInstance) {
+    window.imageCropperInstance = new ImageCropper();
+    window.imageCropperInstance.init();
+    console.log('ImageCropper initialized');
+    
+    // Expose methods as global functions for inline onclick handlers
+    window.closeCropper = () => window.imageCropperInstance.closeCropper();
+    window.cropperZoom = (delta) => window.imageCropperInstance.cropperZoom(delta);
+    window.cropperRotate = (deg) => window.imageCropperInstance.cropperRotate(deg);
+    window.cropperReset = () => window.imageCropperInstance.cropperReset();
+    window.confirmCrop = () => window.imageCropperInstance.confirmCrop();
+  }
+});
