@@ -18,8 +18,22 @@ X_FRAME_OPTIONS = 'DENY'
 # CSRF_COOKIE_SECURE = True
 
 # Static files for production - use WhiteNoise
-# Using CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
-# to avoid issues with manifest generation in production
+# For Django 5.2+, STORAGES takes precedence over STATICFILES_STORAGE
+# Make sure "staticfiles" storage uses WhiteNoise in production
+try:
+    STORAGES["staticfiles"]["BACKEND"] = 'whitenoise.storage.CompressedStaticFilesStorage'
+except Exception:
+    try:
+        STORAGES
+    except NameError:
+        STORAGES = {}
+    STORAGES = {
+        **{
+            "default": STORAGES.get("default", {"BACKEND": 'django.core.files.storage.FileSystemStorage'}),
+        },
+        **STORAGES,
+        "staticfiles": {"BACKEND": 'whitenoise.storage.CompressedStaticFilesStorage'},
+    }
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Cache configuration for production

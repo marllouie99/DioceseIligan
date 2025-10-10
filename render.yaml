@@ -36,8 +36,9 @@ services:
         value: "True"
       - key: EMAIL_HOST_USER
         value: "979d0a001@smtp-brevo.com"
-      - key: EMAIL_HOST_PASSWORD
-        value: "OrM1ztRFCjEm2bks"
+      # IMPORTANT: Do NOT commit SMTP passwords. Set this in Render Dashboard instead.
+      # - key: EMAIL_HOST_PASSWORD
+      #   value: "<set-in-render-dashboard>"
       - key: EMAIL_TIMEOUT
         value: "10"
       - key: DEFAULT_FROM_EMAIL
