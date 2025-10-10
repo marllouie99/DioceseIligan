@@ -5,8 +5,9 @@ Quick test for Brevo API email sending
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
-# Your Brevo API key
-BREVO_API_KEY = "xkeysib-c682c49e5d1e314451da615b7fa04b149f1dd2fade128415e1656744490e-DtDQNBvwyBnxMrSd"
+# Your Brevo API key (read from environment for security)
+import os
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
 
 def test_brevo_api():
     print("=" * 60)
@@ -15,6 +16,9 @@ def test_brevo_api():
     
     try:
         # Configure API client
+        if not BREVO_API_KEY:
+            print("❌ BREVO_API_KEY is not set in environment. Aborting.")
+            return
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = BREVO_API_KEY
         
@@ -33,7 +37,8 @@ def test_brevo_api():
         # Create test email
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
             to=[{"email": to_email}],
-            sender={"name": "ChurchConnect", "email": "marllouie4@gmail.com"},
+            # Use a verified Brevo sender email
+            sender={"name": "ChurchConnect", "email": "979d0a001@smtp-brevo.com"},
             subject="ChurchConnect - Test Email from Brevo API",
             html_content="""
             <html>
