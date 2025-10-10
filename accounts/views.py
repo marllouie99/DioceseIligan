@@ -1113,9 +1113,21 @@ def google_callback(request):
         
         # Check if user exists
         from django.contrib.auth.models import User
+        from .models import Profile
+        
         try:
             user = User.objects.get(email=email)
-            # User exists, log them in
+            # User exists, ensure they have a profile
+            try:
+                profile = user.profile
+            except Profile.DoesNotExist:
+                # Create profile if it doesn't exist
+                Profile.objects.create(
+                    user=user,
+                    display_name=name
+                )
+            
+            # Log them in
             login(request, user)
             
             # Log activity
@@ -1140,11 +1152,10 @@ def google_callback(request):
                 last_name=' '.join(name.split(' ')[1:]) if name and len(name.split(' ')) > 1 else ''
             )
             
-            # Create profile
-            from .models import Profile
+            # Create profile for new user
             Profile.objects.create(
                 user=user,
-                display_name=name  # Use display_name field that exists in the model
+                display_name=name
             )
             
             # Log them in
