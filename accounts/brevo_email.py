@@ -48,6 +48,9 @@ def send_email_via_brevo_api(to_email, subject, html_content, plain_content=None
             sender_name = "ChurchConnect"
             sender_email = from_email
         
+        # Debug logging
+        logger.info(f"Brevo sender: name='{sender_name}', email='{sender_email}'")
+        
         # Create email object
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
             to=[{"email": to_email}],
@@ -65,6 +68,7 @@ def send_email_via_brevo_api(to_email, subject, html_content, plain_content=None
         
     except ApiException as e:
         logger.error(f"✗ Brevo API error: {e}")
+        logger.error(f"✗ Brevo API response body: {e.body if hasattr(e, 'body') else 'No body'}")
         return False
     except Exception as e:
         logger.error(f"✗ Failed to send email via Brevo API: {str(e)}")

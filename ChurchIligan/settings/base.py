@@ -159,6 +159,12 @@ IMAGE_FORMAT = 'JPEG'
 # Email configuration (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# Default email settings (can be overridden in development/production)
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='ChurchConnect <979d0a001@smtp-brevo.com>')
+
+# Brevo API key for HTTP-based email (used by email_utils.py)
+BREVO_API_KEY = env('BREVO_API_KEY', default='')
+
 # Logging configuration
 LOGGING = {
     'version': 1,

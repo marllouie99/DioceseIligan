@@ -41,7 +41,9 @@ services:
       - key: EMAIL_TIMEOUT
         value: "10"
       - key: DEFAULT_FROM_EMAIL
-        value: "ChurchConnect <marllouie4@gmail.com>"
+        value: "ChurchConnect <979d0a001@smtp-brevo.com>"
+      # BREVO_API_KEY must be set in Render Dashboard for security
+      # DO NOT commit API keys to git
       - key: GOOGLE_OAUTH_CLIENT_ID
         value: "1053022434620-53ddgsjm3docsougushcna2a5hoqe0vd.apps.googleusercontent.com"
       - key: GOOGLE_OAUTH_CLIENT_SECRET

@@ -40,7 +40,7 @@ EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_TIMEOUT = env.int('EMAIL_TIMEOUT', default=30)
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER or 'webmaster@localhost')
+# DEFAULT_FROM_EMAIL is set in base.py and loaded from environment
 
 # Brevo API key for HTTP-based email (works better on restricted hosts like Render)
 BREVO_API_KEY = env('BREVO_API_KEY', default='')
