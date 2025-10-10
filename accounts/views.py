@@ -91,14 +91,17 @@ def landing(request: HttpRequest) -> HttpResponse:
         active_tab = 'signup'
 
     # Check if Google OAuth is configured
-    client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', '')
-    client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', '')
+    client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', '').strip()
+    client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', '').strip()
+    redirect_uri = getattr(settings, 'GOOGLE_OAUTH_REDIRECT_URI', '').strip()
     
-    google_oauth_configured = (
+    # OAuth is configured if all three values are present and not empty
+    google_oauth_configured = bool(
         client_id and 
         client_secret and
-        'demo_client_id_not_configured' not in client_id and
-        'demo_client_secret_not_configured' not in client_secret
+        redirect_uri and
+        len(client_id) > 10 and  # Valid client IDs are much longer
+        len(client_secret) > 10  # Valid secrets are much longer
     )
 
     context = {
