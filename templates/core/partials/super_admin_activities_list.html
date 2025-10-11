@@ -1,0 +1,81 @@
+{% if activities %}
+  <div class="activity-table">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Activity</th>
+          <th>Status</th>
+          <th>IP Address</th>
+          <th>Device/Browser</th>
+          <th>Details</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for activity in activities %}
+          <tr>
+            <td>
+              <div>
+                <strong>{{ activity.display_name }}</strong>
+                <br>
+                <small class="text-muted">{{ activity.email }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="activity-type">{{ activity.get_activity_type_display }}</span>
+              {% if activity.verification_code %}
+                <br><small class="text-muted">Code: {{ activity.verification_code }}</small>
+              {% endif %}
+            </td>
+            <td>
+              <span class="{% if activity.success %}status-success{% else %}status-failed{% endif %}">{{ activity.status_display }}</span>
+            </td>
+            <td>
+              <code>{{ activity.ip_address }}</code>
+              {% if activity.country %}
+                <br><small class="text-muted">{{ activity.city }}{% if activity.city %}, {% endif %}{{ activity.country }}</small>
+              {% endif %}
+            </td>
+            <td>
+              <div class="device-info">
+                {% if activity.browser_info %}
+                  <div title="{{ activity.user_agent }}">{{ activity.browser_info }}</div>
+                  {% if activity.os_info %}<small class="text-muted">{{ activity.os_info }}</small>{% endif %}
+                {% else %}
+                  <div title="{{ activity.user_agent }}">{{ activity.device_info|default:"Unknown" }}</div>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              {% if activity.details %}
+                <small class="text-muted">{{ activity.details|truncatechars:50 }}</small>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              <div>{{ activity.created_at|date:'M j, Y' }}</div>
+              <small class="text-muted">{{ activity.created_at|time:'g:i A' }}</small>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if activities.has_other_pages %}
+      <div class="pagination">
+        {% if activities.has_previous %}
+          <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.previous_page_number }}">&laquo; Previous</a>
+        {% endif %}
+        <span class="current">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span>
+        {% if activities.has_next %}
+          <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.next_page_number }}">Next &raquo;</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No user activities found for the selected filters.</p>
+  </div>
+{% endif %}

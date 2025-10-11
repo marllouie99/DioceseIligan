@@ -1,0 +1,65 @@
+{% if login_codes %}
+  <div class="activity-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Code</th>
+          <th>Status</th>
+          <th>Attempts</th>
+          <th>IP Address</th>
+          <th>Device Info</th>
+          <th>Created</th>
+          <th>Expires</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lc in login_codes %}
+          <tr>
+            <td><strong>{{ lc.email }}</strong></td>
+            <td><code>{{ lc.code }}</code></td>
+            <td>
+              {% if lc.is_used %}
+                <span class="verification-status verification-used">Used</span>
+              {% elif lc.expires_at < now %}
+                <span class="verification-status verification-expired">Expired</span>
+              {% else %}
+                <span class="verification-status verification-unused">Pending</span>
+              {% endif %}
+            </td>
+            <td><span class="{% if lc.attempts >= 5 %}text-danger{% elif lc.attempts >= 3 %}text-warning{% endif %}">{{ lc.attempts }}/5</span></td>
+            <td>{% if lc.ip_address %}<code>{{ lc.ip_address }}</code>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+            <td>
+              <div class="device-info">
+                {% if lc.device_info %}
+                  <div title="{{ lc.user_agent }}">{{ lc.device_info }}</div>
+                {% elif lc.user_agent %}
+                  <div title="{{ lc.user_agent }}">{{ lc.user_agent|truncatechars:30 }}</div>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </div>
+            </td>
+            <td><div>{{ lc.created_at|date:'M j, Y' }}</div><small class="text-muted">{{ lc.created_at|time:'g:i A' }}</small></td>
+            <td><div>{{ lc.expires_at|date:'M j, Y' }}</div><small class="text-muted">{{ lc.expires_at|time:'g:i A' }}</small></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if login_codes.has_other_pages %}
+      <div class="pagination">
+        {% if login_codes.has_previous %}
+          <a href="?{{ request.GET.urlencode }}&login_codes_page={{ login_codes.previous_page_number }}">&laquo; Previous</a>
+        {% endif %}
+        <span class="current">Page {{ login_codes.number }} of {{ login_codes.paginator.num_pages }}</span>
+        {% if login_codes.has_next %}
+          <a href="?{{ request.GET.urlencode }}&login_codes_page={{ login_codes.next_page_number }}">Next &raquo;</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No login codes found for the selected filters.</p>
+  </div>
+{% endif %}

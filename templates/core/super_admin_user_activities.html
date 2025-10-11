@@ -78,7 +78,7 @@
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .activity-table table {
@@ -98,6 +98,8 @@
   padding: 1rem;
   border-bottom: 1px solid #f1f3f4;
 }
+.activity-table .pagination { margin: 0; padding: 0.75rem 1rem; border-top: 1px solid #f1f3f4; display: flex; justify-content: center; gap: 0.5rem; background: #fff; }
+.activity-table .pagination .current { background: transparent; color: #6b7280; border: 0; padding: 0; }
 
 .status-success {
   color: #059669;
@@ -161,7 +163,75 @@
   color: white;
   border-color: #3b82f6;
 }
+.overview-container { max-width: 100%; width: 100%; padding: 0; overflow: visible; }
+.overview-section { margin-bottom: 2rem; background: #FFF9E6; border-radius: 12px; padding: 1.5rem; padding-bottom: 3.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(218,165,32,0.2); overflow: hidden; display: flow-root; position: relative; isolation: isolate; min-height: 900px; height: auto; }
+.charts-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:1.5rem; margin-bottom:1.5rem; align-items:stretch; grid-auto-rows: minmax(0, auto); width:100%; }
+@media (max-width:1024px){ .charts-grid{ grid-template-columns:1fr; } }
+.chart-card { background:#fff; border-radius:12px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 1px 3px rgba(0,0,0,0.1); position:relative; }
+.chart-container { position:relative; height: 260px; }
+.chart-container canvas { width:100% !important; height:100% !important; display:block; }
+.chart-card-full { grid-column: 1 / -1; margin-top:0; margin-bottom:0.75rem; width:100%; position:relative; clear:both; }
+.chart-card-full .chart-container { height: 320px; }
+@media (max-width: 520px) { .chart-card-full .chart-container { height: 280px; } }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dailyCtx = document.getElementById('dailyActivityChart');
+    if (dailyCtx) {
+      const labels = [
+        {% for l in charts.daily_labels %}'{{ l }}'{% if not forloop.last %},{% endif %}{% endfor %}
+      ];
+      const counts = [
+        {% for c in charts.daily_activity_counts %}{{ c }}{% if not forloop.last %},{% endif %}{% endfor %}
+      ];
+      new Chart(dailyCtx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Activities', data: counts, borderColor: 'rgba(59, 130, 246, 1)', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 3, fill: true, tension: 0.35, pointRadius: 3 }]},
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+      });
+    }
+
+    const typeCtx = document.getElementById('activityTypeChart');
+    if (typeCtx) {
+      const labels = [
+        {% for l in charts.activity_type_labels %}'{{ l }}'{% if not forloop.last %},{% endif %}{% endfor %}
+      ];
+      const counts = [
+        {% for c in charts.activity_type_counts %}{{ c }}{% if not forloop.last %},{% endif %}{% endfor %}
+      ];
+      new Chart(typeCtx, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data: counts, backgroundColor: ['rgba(160,82,45,.8)','rgba(218,165,32,.8)','rgba(59,130,246,.8)','rgba(16,185,129,.8)','rgba(244,114,182,.8)','rgba(99,102,241,.8)','rgba(251,146,60,.8)','rgba(34,197,94,.8)','rgba(239,68,68,.8)','rgba(14,165,233,.8)','rgba(20,184,166,.8)','rgba(234,179,8,.8)'], borderWidth: 0 }]},
+        options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom' } } }
+      });
+    }
+
+    const codesCtx = document.getElementById('codesMixChart');
+    if (codesCtx) {
+      const used = {{ charts.codes_mix.used|default:0 }};
+      const expired = {{ charts.codes_mix.expired|default:0 }};
+      const unused = {{ charts.codes_mix.unused|default:0 }};
+      new Chart(codesCtx, {
+        type: 'doughnut',
+        data: { labels: ['Used','Expired','Pending'], datasets: [{ data: [used, expired, unused], backgroundColor: ['rgba(16,185,129,.85)','rgba(239,68,68,.85)','rgba(245,158,11,.85)'], borderWidth: 0 }]},
+        options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom' } } }
+      });
+    }
+
+    const sectionEl = document.querySelector('.overview-section');
+    function adjustOverviewHeight(){
+      if (!sectionEl) return;
+      const h = sectionEl.scrollHeight;
+      sectionEl.style.minHeight = Math.max(h, 600) + 'px';
+    }
+    adjustOverviewHeight();
+    window.addEventListener('resize', adjustOverviewHeight);
+  });
+</script>
 {% endblock %}
 
 {% block sidebar %}
@@ -249,10 +319,36 @@
       <div class="stat-value">{{ stats.expired_verifications }}</div>
       <div class="stat-label">Expired Codes</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_login_codes }}</div>
+      <div class="stat-label">Login Codes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_password_resets }}</div>
+      <div class="stat-label">Password Reset Codes</div>
+    </div>
+  </div>
+
+  <!-- Overview Charts -->
+  <div class="overview-section">
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">Daily Activities (Last 14 Days)</h3>
+        <div class="chart-container"><canvas id="dailyActivityChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-title">Activity Types Distribution</h3>
+        <div class="chart-container"><canvas id="activityTypeChart"></canvas></div>
+      </div>
+      <div class="chart-card chart-card-full">
+        <h3 class="chart-title">Codes Usage Overview</h3>
+        <div class="chart-container"><canvas id="codesMixChart"></canvas></div>
+      </div>
+    </div>
   </div>
 
   <!-- User Activities Table -->
-  <div class="panel">
+  <div class="panel" data-partial-section="activities">
     <div class="panel-header">
       <div class="section-title">User Activities</div>
       <div class="panel-actions">
@@ -260,6 +356,7 @@
       </div>
     </div>
 
+    <div class="panel-body" data-partial-target>
     {% if activities %}
       <div class="activity-table">
         <table>
@@ -326,31 +423,29 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
 
-      <!-- Pagination for activities -->
-      {% if activities.has_other_pages %}
-        <div class="pagination">
-          {% if activities.has_previous %}
-            <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.previous_page_number }}">&laquo; Previous</a>
-          {% endif %}
-          
-          <span class="current">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span>
-          
-          {% if activities.has_next %}
-            <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.next_page_number }}">Next &raquo;</a>
-          {% endif %}
-        </div>
-      {% endif %}
+        {% if activities.has_other_pages %}
+          <div class="pagination">
+            {% if activities.has_previous %}
+              <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.previous_page_number }}">&laquo; Previous</a>
+            {% endif %}
+            <span class="current">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span>
+            {% if activities.has_next %}
+              <a href="?{{ request.GET.urlencode }}&activities_page={{ activities.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
     {% else %}
       <div class="empty-state">
         <p>No user activities found for the selected filters.</p>
       </div>
     {% endif %}
+    </div>
   </div>
 
   <!-- Email Verification Codes Table -->
-  <div class="panel">
+  <div class="panel" data-partial-section="verifications">
     <div class="panel-header">
       <div class="section-title">Email Verification Codes</div>
       <div class="panel-actions">
@@ -358,6 +453,7 @@
       </div>
     </div>
 
+    <div class="panel-body" data-partial-target>
     {% if verifications %}
       <div class="activity-table">
         <table>
@@ -426,27 +522,183 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
 
-      <!-- Pagination for verifications -->
-      {% if verifications.has_other_pages %}
-        <div class="pagination">
-          {% if verifications.has_previous %}
-            <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.previous_page_number }}">&laquo; Previous</a>
-          {% endif %}
-          
-          <span class="current">Page {{ verifications.number }} of {{ verifications.paginator.num_pages }}</span>
-          
-          {% if verifications.has_next %}
-            <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.next_page_number }}">Next &raquo;</a>
-          {% endif %}
-        </div>
-      {% endif %}
+        {% if verifications.has_other_pages %}
+          <div class="pagination">
+            {% if verifications.has_previous %}
+              <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.previous_page_number }}">&laquo; Previous</a>
+            {% endif %}
+            <span class="current">Page {{ verifications.number }} of {{ verifications.paginator.num_pages }}</span>
+            {% if verifications.has_next %}
+              <a href="?{{ request.GET.urlencode }}&verifications_page={{ verifications.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
     {% else %}
       <div class="empty-state">
         <p>No verification codes found for the selected filters.</p>
       </div>
     {% endif %}
+    </div>
+  </div>
+
+  <!-- Login Codes Table -->
+  <div class="panel" data-partial-section="login_codes">
+    <div class="panel-header">
+      <div class="section-title">Login Codes</div>
+      <div class="panel-actions">
+        <span class="badge">{{ login_codes|length }} of {{ stats.total_login_codes }} total</span>
+      </div>
+    </div>
+
+    <div class="panel-body" data-partial-target>
+    {% if login_codes %}
+      <div class="activity-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Attempts</th>
+              <th>IP Address</th>
+              <th>Device Info</th>
+              <th>Created</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lc in login_codes %}
+              <tr>
+                <td><strong>{{ lc.email }}</strong></td>
+                <td><code>{{ lc.code }}</code></td>
+                <td>
+                  {% if lc.is_used %}
+                    <span class="verification-status verification-used">Used</span>
+                  {% elif lc.expires_at < now %}
+                    <span class="verification-status verification-expired">Expired</span>
+                  {% else %}
+                    <span class="verification-status verification-unused">Pending</span>
+                  {% endif %}
+                </td>
+                <td><span class="{% if lc.attempts >= 5 %}text-danger{% elif lc.attempts >= 3 %}text-warning{% endif %}">{{ lc.attempts }}/5</span></td>
+                <td>{% if lc.ip_address %}<code>{{ lc.ip_address }}</code>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                <td>
+                  <div class="device-info">
+                    {% if lc.device_info %}
+                      <div title="{{ lc.user_agent }}">{{ lc.device_info }}</div>
+                    {% elif lc.user_agent %}
+                      <div title="{{ lc.user_agent }}">{{ lc.user_agent|truncatechars:30 }}</div>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td><div>{{ lc.created_at|date:'M j, Y' }}</div><small class="text-muted">{{ lc.created_at|time:'g:i A' }}</small></td>
+                <td><div>{{ lc.expires_at|date:'M j, Y' }}</div><small class="text-muted">{{ lc.expires_at|time:'g:i A' }}</small></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if login_codes.has_other_pages %}
+          <div class="pagination">
+            {% if login_codes.has_previous %}
+              <a href="?{{ request.GET.urlencode }}&login_codes_page={{ login_codes.previous_page_number }}">&laquo; Previous</a>
+            {% endif %}
+            <span class="current">Page {{ login_codes.number }} of {{ login_codes.paginator.num_pages }}</span>
+            {% if login_codes.has_next %}
+              <a href="?{{ request.GET.urlencode }}&login_codes_page={{ login_codes.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No login codes found for the selected filters.</p>
+      </div>
+    {% endif %}
+    </div>
+  </div>
+
+  <!-- Password Reset Codes Table -->
+  <div class="panel" data-partial-section="password_resets">
+    <div class="panel-header">
+      <div class="section-title">Password Reset Codes</div>
+      <div class="panel-actions">
+        <span class="badge">{{ password_resets|length }} of {{ stats.total_password_resets }} total</span>
+      </div>
+    </div>
+
+    <div class="panel-body" data-partial-target>
+    {% if password_resets %}
+      <div class="activity-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Attempts</th>
+              <th>IP Address</th>
+              <th>Device Info</th>
+              <th>Created</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pr in password_resets %}
+              <tr>
+                <td><strong>{{ pr.email }}</strong></td>
+                <td><code>{{ pr.code }}</code></td>
+                <td>
+                  {% if pr.is_used %}
+                    <span class="verification-status verification-used">Used</span>
+                  {% elif pr.expires_at < now %}
+                    <span class="verification-status verification-expired">Expired</span>
+                  {% else %}
+                    <span class="verification-status verification-unused">Pending</span>
+                  {% endif %}
+                </td>
+                <td><span class="{% if pr.attempts >= 5 %}text-danger{% elif pr.attempts >= 3 %}text-warning{% endif %}">{{ pr.attempts }}/5</span></td>
+                <td>{% if pr.ip_address %}<code>{{ pr.ip_address }}</code>{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                <td>
+                  <div class="device-info">
+                    {% if pr.device_info %}
+                      <div title="{{ pr.user_agent }}">{{ pr.device_info }}</div>
+                    {% elif pr.user_agent %}
+                      <div title="{{ pr.user_agent }}">{{ pr.user_agent|truncatechars:30 }}</div>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td><div>{{ pr.created_at|date:'M j, Y' }}</div><small class="text-muted">{{ pr.created_at|time:'g:i A' }}</small></td>
+                <td><div>{{ pr.expires_at|date:'M j, Y' }}</div><small class="text-muted">{{ pr.expires_at|time:'g:i A' }}</small></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if password_resets.has_other_pages %}
+          <div class="pagination">
+            {% if password_resets.has_previous %}
+              <a href="?{{ request.GET.urlencode }}&password_resets_page={{ password_resets.previous_page_number }}">&laquo; Previous</a>
+            {% endif %}
+            <span class="current">Page {{ password_resets.number }} of {{ password_resets.paginator.num_pages }}</span>
+            {% if password_resets.has_next %}
+              <a href="?{{ request.GET.urlencode }}&password_resets_page={{ password_resets.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No password reset codes found for the selected filters.</p>
+      </div>
+    {% endif %}
+    </div>
   </div>
 
   <!-- JavaScript for auto-submit filters -->
@@ -459,6 +711,28 @@
         select.addEventListener('change', function() {
           form.submit();
         });
+      });
+
+      document.addEventListener('click', function(evt) {
+        const link = evt.target.closest('.panel .pagination a');
+        if (!link) return;
+        const panel = link.closest('.panel[data-partial-section]');
+        if (!panel) return;
+        evt.preventDefault();
+        const section = panel.getAttribute('data-partial-section');
+        const target = panel.querySelector('[data-partial-target]');
+        if (!section || !target) { window.location.href = link.href; return; }
+        const url = new URL(link.getAttribute('href'), window.location.href);
+        url.searchParams.set('partial', section);
+        fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then(r => r.text())
+          .then(html => {
+            target.innerHTML = html;
+            url.searchParams.delete('partial');
+            window.history.replaceState({}, '', url.toString());
+            try { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+          })
+          .catch(() => { window.location.href = link.href; });
       });
     });
   </script>

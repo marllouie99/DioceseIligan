@@ -3289,7 +3289,7 @@ def super_admin_user_activities(request):
         return redirect('dashboard')
 
     # Import the models from accounts
-    from accounts.models import UserActivity, EmailVerification
+    from accounts.models import UserActivity, EmailVerification, PasswordReset, LoginCode
 
     # Get filter parameters
     activity_type_filter = request.GET.get('activity_type', '')
@@ -3336,10 +3336,15 @@ def super_admin_user_activities(request):
 
     # Get email verifications with additional tracking info
     verifications_qs = EmailVerification.objects.all()
+    # Get password resets and login codes
+    password_resets_qs = PasswordReset.objects.all()
+    login_codes_qs = LoginCode.objects.all()
     
-    # Apply date filter to verifications
+    # Apply date filter to verifications and code datasets
     if days > 0:
         verifications_qs = verifications_qs.filter(created_at__gte=cutoff_date)
+        password_resets_qs = password_resets_qs.filter(created_at__gte=cutoff_date)
+        login_codes_qs = login_codes_qs.filter(created_at__gte=cutoff_date)
     
     # Apply search filter to verifications
     if search_query:
@@ -3348,9 +3353,19 @@ def super_admin_user_activities(request):
             Q(code__icontains=search_query) |
             Q(ip_address__icontains=search_query)
         )
+        password_resets_qs = password_resets_qs.filter(
+            Q(email__icontains=search_query) |
+            Q(code__icontains=search_query) |
+            Q(ip_address__icontains=search_query)
+        )
+        login_codes_qs = login_codes_qs.filter(
+            Q(email__icontains=search_query) |
+            Q(code__icontains=search_query) |
+            Q(ip_address__icontains=search_query)
+        )
 
     # Pagination for activities
-    activities_paginator = Paginator(activities_qs, 50)  # 50 per page
+    activities_paginator = Paginator(activities_qs, 5)
     activities_page = request.GET.get('activities_page', 1)
     try:
         activities = activities_paginator.page(activities_page)
@@ -3358,12 +3373,28 @@ def super_admin_user_activities(request):
         activities = activities_paginator.page(1)
 
     # Pagination for verifications  
-    verifications_paginator = Paginator(verifications_qs, 50)  # 50 per page
+    verifications_paginator = Paginator(verifications_qs, 5)
     verifications_page = request.GET.get('verifications_page', 1)
     try:
         verifications = verifications_paginator.page(verifications_page)
     except:
         verifications = verifications_paginator.page(1)
+
+    # Pagination for password resets
+    password_resets_paginator = Paginator(password_resets_qs, 5)
+    password_resets_page = request.GET.get('password_resets_page', 1)
+    try:
+        password_resets = password_resets_paginator.page(password_resets_page)
+    except:
+        password_resets = password_resets_paginator.page(1)
+
+    # Pagination for login codes
+    login_codes_paginator = Paginator(login_codes_qs, 5)
+    login_codes_page = request.GET.get('login_codes_page', 1)
+    try:
+        login_codes = login_codes_paginator.page(login_codes_page)
+    except:
+        login_codes = login_codes_paginator.page(1)
 
     # Activity type choices for filter dropdown
     activity_type_choices = UserActivity.ACTIVITY_TYPE_CHOICES
@@ -3381,17 +3412,59 @@ def super_admin_user_activities(request):
     unused_verifications = verifications_qs.filter(is_used=False).count()
     expired_verifications = verifications_qs.filter(expires_at__lt=timezone.now()).count()
 
+    # Password reset stats
+    total_password_resets = password_resets_qs.count()
+    used_password_resets = password_resets_qs.filter(is_used=True).count()
+    expired_password_resets = password_resets_qs.filter(expires_at__lt=timezone.now()).count()
+    unused_password_resets = max(total_password_resets - used_password_resets - expired_password_resets, 0)
+
+    # Login code stats
+    total_login_codes = login_codes_qs.count()
+    used_login_codes = login_codes_qs.filter(is_used=True).count()
+    expired_login_codes = login_codes_qs.filter(expires_at__lt=timezone.now()).count()
+    unused_login_codes = max(total_login_codes - used_login_codes - expired_login_codes, 0)
+
     # Recent activity breakdown
     activity_breakdown = {}
     for activity_type, display_name in activity_type_choices:
         count = activities_qs.filter(activity_type=activity_type).count()
         activity_breakdown[display_name] = count
 
+    from datetime import timedelta
+    from django.db.models.functions import TruncDate
+    today = timezone.now().date()
+    chart_days = 14
+    daily_labels = []
+    daily_activity_counts = []
+    daily_counts_qs = (
+        activities_qs
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(c=Count('id'))
+    )
+    daily_count_map = {row['day']: row['c'] for row in daily_counts_qs}
+    for i in range(chart_days - 1, -1, -1):
+        day = today - timedelta(days=i)
+        daily_labels.append(day.strftime('%b %d'))
+        daily_activity_counts.append(daily_count_map.get(day, 0))
+
+    type_counts_qs = activities_qs.values('activity_type').annotate(c=Count('id'))
+    type_counts_map = {row['activity_type']: row['c'] for row in type_counts_qs}
+    activity_type_labels = [label for _, label in activity_type_choices]
+    activity_type_counts = [type_counts_map.get(code, 0) for code, label in activity_type_choices]
+
+    codes_total_all = total_verifications + total_password_resets + total_login_codes
+    codes_used_all = used_verifications + used_password_resets + used_login_codes
+    codes_expired_all = expired_verifications + expired_password_resets + expired_login_codes
+    codes_unused_all = max(codes_total_all - codes_used_all - codes_expired_all, 0)
+
     ctx = {
         'active': 'super_admin_activities',
         'page_title': 'User Activity Registration',
         'activities': activities,
         'verifications': verifications,
+        'password_resets': password_resets,
+        'login_codes': login_codes,
         'activity_type_choices': activity_type_choices,
         'now': timezone.now(),
         'current_filters': {
@@ -3408,10 +3481,42 @@ def super_admin_user_activities(request):
             'used_verifications': used_verifications,
             'unused_verifications': unused_verifications,
             'expired_verifications': expired_verifications,
+            'total_password_resets': total_password_resets,
+            'used_password_resets': used_password_resets,
+            'unused_password_resets': unused_password_resets,
+            'expired_password_resets': expired_password_resets,
+            'total_login_codes': total_login_codes,
+            'used_login_codes': used_login_codes,
+            'unused_login_codes': unused_login_codes,
+            'expired_login_codes': expired_login_codes,
         },
         'activity_breakdown': activity_breakdown,
+        'charts': {
+            'daily_labels': daily_labels,
+            'daily_activity_counts': daily_activity_counts,
+            'activity_type_labels': activity_type_labels,
+            'activity_type_counts': activity_type_counts,
+            'codes_mix': {
+                'total': codes_total_all,
+                'used': codes_used_all,
+                'expired': codes_expired_all,
+                'unused': codes_unused_all,
+            },
+        },
     }
     ctx.update(_app_context(request))
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        partial = (request.GET.get('partial') or '').strip()
+        if partial == 'activities':
+            return render(request, 'core/partials/super_admin_activities_list.html', ctx)
+        if partial == 'verifications':
+            return render(request, 'core/partials/super_admin_verifications_list.html', ctx)
+        if partial == 'login_codes':
+            return render(request, 'core/partials/super_admin_login_codes_list.html', ctx)
+        if partial == 'password_resets':
+            return render(request, 'core/partials/super_admin_password_resets_list.html', ctx)
+
     return render(request, 'core/super_admin_user_activities.html', ctx)
 
 
