@@ -46,8 +46,11 @@ CACHES = {
 }
 
 # Email configuration for production
+# NOTE: We use Brevo HTTP API instead of SMTP because Render blocks SMTP ports
+# The email sending is handled by accounts/brevo_email.py using the Brevo API
+# SMTP settings below are kept for Django's send_mail() compatibility but won't be used
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp-relay.brevo.com')
 EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
@@ -56,8 +59,16 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_TIMEOUT = env.int('EMAIL_TIMEOUT', default=30)
 # DEFAULT_FROM_EMAIL is set in base.py and loaded from environment
 
-# Brevo API key for HTTP-based email (works better on restricted hosts like Render)
+# Brevo API key for HTTP-based email (REQUIRED - works on Render free tier)
+# Get your key from: https://app.brevo.com/settings/keys/api
 BREVO_API_KEY = env('BREVO_API_KEY', default='')
+
+# Verify Brevo is configured
+if not BREVO_API_KEY:
+    print("⚠️  WARNING: BREVO_API_KEY not set! Emails will NOT be sent.")
+    print("⚠️  Set BREVO_API_KEY in your Render environment variables.")
+else:
+    print(f"✓ Brevo API configured: {BREVO_API_KEY[:15]}...")
 
 # Google OAuth configuration
 GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID', default='')
