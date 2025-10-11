@@ -1107,8 +1107,14 @@
         dropdown.innerHTML = '';
         select.innerHTML = '<option value="">Select...</option>';
         
+        // Clear and rebuild code map
+        Object.keys(codeMap).forEach(key => delete codeMap[key]);
+        
         // Add options
         options.forEach(option => {
+            // Store code in map immediately
+            codeMap[option.name] = option.code;
+            
             // Add to hidden select (for form submission)
             const selectOption = document.createElement('option');
             selectOption.value = option.name;
@@ -1129,9 +1135,6 @@
                 
                 // Update hidden select
                 select.value = this.dataset.value;
-                
-                // Store code in map
-                codeMap[this.dataset.value] = this.dataset.code;
                 
                 // Close dropdown
                 wrapper.classList.remove('active');
@@ -1172,7 +1175,7 @@
                 
                 // Set saved value if exists
                 const savedRegion = '{{ profile.region|escapejs }}';
-                if (savedRegion) {
+                if (savedRegion && regionCodeMap[savedRegion]) {
                     regionComponent.input.value = savedRegion;
                     regionSelect.value = savedRegion;
                     await loadProvinces(regionCodeMap[savedRegion]);
@@ -1184,6 +1187,11 @@
     }
     
     async function loadProvinces(regionCode) {
+        if (!regionCode || regionCode === 'undefined') {
+            console.error('Invalid region code:', regionCode);
+            return;
+        }
+        
         try {
             provinceComponent.input.value = 'Loading...';
             provinceComponent.input.disabled = true;
@@ -1196,7 +1204,7 @@
                 
                 // Set saved value if exists
                 const savedProvince = '{{ profile.province|escapejs }}';
-                if (savedProvince) {
+                if (savedProvince && provinceCodeMap[savedProvince]) {
                     provinceComponent.input.value = savedProvince;
                     provinceSelect.value = savedProvince;
                     await loadCities(provinceCodeMap[savedProvince]);
@@ -1209,6 +1217,11 @@
     }
     
     async function loadCities(provinceCode) {
+        if (!provinceCode || provinceCode === 'undefined') {
+            console.error('Invalid province code:', provinceCode);
+            return;
+        }
+        
         try {
             cityComponent.input.value = 'Loading...';
             cityComponent.input.disabled = true;
@@ -1221,7 +1234,7 @@
                 
                 // Set saved value if exists
                 const savedCity = '{{ profile.city_municipality|escapejs }}';
-                if (savedCity) {
+                if (savedCity && cityCodeMap[savedCity]) {
                     cityComponent.input.value = savedCity;
                     citySelect.value = savedCity;
                     await loadBarangays(cityCodeMap[savedCity]);
@@ -1234,6 +1247,11 @@
     }
     
     async function loadBarangays(cityCode) {
+        if (!cityCode || cityCode === 'undefined') {
+            console.error('Invalid city code:', cityCode);
+            return;
+        }
+        
         try {
             barangayComponent.input.value = 'Loading...';
             barangayComponent.input.disabled = true;

@@ -53,7 +53,7 @@ def get_provinces(request):
     """Get provinces by region code"""
     region_code = request.GET.get('region_code')
     
-    if not region_code:
+    if not region_code or region_code == 'undefined':
         return JsonResponse({'success': False, 'error': 'region_code is required'}, status=400)
     
     cache_key = f'ph_provinces_{region_code}'
