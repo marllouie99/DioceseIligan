@@ -849,8 +849,8 @@ def login_code_verify(request: HttpRequest) -> HttpResponse:
                     user = User.objects.get(email=email)
                     login(request, user)
                     
-                    # Clear session data
-                    del request.session['login_code_email']
+                    # Clear session data (use pop to avoid KeyError)
+                    request.session.pop('login_code_email', None)
                     
                     # Log successful login
                     UserActivity.objects.create(
