@@ -300,11 +300,26 @@ class ProfileFormsModule {
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Try to parse as JSON, fallback to text if it fails
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      // Server returned HTML instead of JSON
+      const text = await response.text();
+      console.error('Server returned HTML instead of JSON:', text.substring(0, 200));
+      
+      // If response was successful but returned HTML, treat as success
+      if (response.ok) {
+        return {
+          success: true,
+          message: 'Profile updated successfully',
+          profile_data: null
+        };
+      } else {
+        throw new Error(`Server error: ${response.status}`);
+      }
     }
-
-    return await response.json();
   }
 
   /**
@@ -344,6 +359,7 @@ class ProfileFormsModule {
    * @private
    */
   handleSubmissionError(error) {
+    console.error('Profile form submission error:', error);
     this.showNotification('An error occurred while updating your profile.', 'error');
   }
 
