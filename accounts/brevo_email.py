@@ -27,7 +27,10 @@ def send_email_via_brevo_api(to_email, subject, html_content, plain_content=None
         # Get Brevo API key from settings
         brevo_api_key = getattr(settings, 'BREVO_API_KEY', None)
         if not brevo_api_key:
-            logger.error("BREVO_API_KEY not configured in settings")
+            logger.error("✗ BREVO_API_KEY not configured in settings")
+            logger.error("✗ Please set BREVO_API_KEY environment variable on your hosting platform")
+            logger.error("✗ Get your API key from: https://app.brevo.com/settings/keys/api")
+            print("✗ EMAIL FAILED: BREVO_API_KEY not configured. Check your environment variables.")
             return False
         
         # Configure API client
