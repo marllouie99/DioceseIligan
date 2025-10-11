@@ -371,10 +371,16 @@ class ProfileFormsModule {
    * @private
    */
   showLoadingState(submitBtn, btnText, btnSpinner) {
-    submitBtn.disabled = true;
-    btnText.textContent = 'Saving...';
-    btnSpinner.style.display = 'inline-block';
-    submitBtn.style.opacity = '0.8';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.8';
+    }
+    if (btnText) {
+      btnText.textContent = 'Saving...';
+    }
+    if (btnSpinner) {
+      btnSpinner.style.display = 'inline-block';
+    }
   }
 
   /**
