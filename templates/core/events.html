@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
@@ -148,5 +149,18 @@
 {% endblock %}
 
 {% block extra_js %}
-  {# Reuse existing JS for post actions (loaded in app_base) #}
+  {# CSRF Token for AJAX requests #}
+  {% csrf_token %}
+  <script>
+    window.csrfToken = '{{ csrf_token }}';
+  </script>
+
+  {# PayPal SDK (Orders API v2) #}
+  {% if PAYPAL_CLIENT_ID %}
+  <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}"></script>
+  {% endif %}
+
+  {# Donation Modal and handler #}
+  {% include 'partials/donation_modal.html' %}
+  <script defer src="{% static 'js/components/donation.js' %}?v={{ STATIC_VERSION }}"></script>
 {% endblock %}
