@@ -369,10 +369,16 @@ class ProfileFormsModule {
    * @private
    */
   hideLoadingState(submitBtn, btnText, btnSpinner) {
-    submitBtn.disabled = false;
-    btnText.textContent = 'Save Changes';
-    btnSpinner.style.display = 'none';
-    submitBtn.style.opacity = '1';
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+    if (btnText) {
+      btnText.textContent = 'Save Changes';
+    }
+    if (btnSpinner) {
+      btnSpinner.style.display = 'none';
+    }
   }
 
   /**

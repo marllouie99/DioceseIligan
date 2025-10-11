@@ -379,14 +379,19 @@ class ProfileModalsModule {
     if (!form) return;
 
     const submitBtn = form.querySelector('#profile-save-btn');
+    if (!submitBtn) return;
+    
     const btnText = submitBtn.querySelector('.btn-text');
     const btnSpinner = submitBtn.querySelector('.btn-spinner');
     
-    if (submitBtn) {
-      submitBtn.disabled = false;
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    
+    if (btnText) {
       btnText.textContent = 'Save Changes';
+    }
+    if (btnSpinner) {
       btnSpinner.style.display = 'none';
-      submitBtn.style.opacity = '1';
     }
   }
 
