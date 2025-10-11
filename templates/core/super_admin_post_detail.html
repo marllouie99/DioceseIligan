@@ -1,0 +1,201 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Post Details • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin.css' %}?v={{ STATIC_VERSION }}">
+<style>
+  .overview-container { max-width: 100%; width: 100%; padding: 0; overflow: visible; }
+  .overview-section { margin-bottom: 2rem; padding: 0; display: flow-root; position: relative; isolation: isolate; overflow: visible; background: transparent; border: 0; box-shadow: none; }
+  
+  .container-inner { width: 100%; max-width: 1200px; margin: 0 auto; background: #FFF9E6; border-radius: 12px; padding: 1.5rem 1.5rem 3rem; border: 1px solid rgba(218,165,32,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+  .title { font-size:1.5rem; font-weight:800; color:#111827; margin:0; }
+  .sub { color:#6b7280; }
+  .pill { display:inline-block; padding:.25rem .5rem; border-radius:9999px; font-size:.75rem; font-weight:700; border:1px solid #e5e7eb; }
+  .pill.active { background:#DCFCE7; color:#166534; border-color:rgba(34,197,94,.2); }
+  .pill.inactive { background:#FEF3C7; color:#92400e; border-color:rgba(245,158,11,.2); }
+
+  .grid { display:grid; grid-template-columns: 2fr 1fr; gap:1rem; align-items:start; grid-auto-rows: minmax(0, auto); }
+  @media (max-width: 1024px){ .grid { grid-template-columns: 1fr; } }
+  .card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .section-title { font-size:1.125rem; font-weight:800; color:#111827; margin:0 0 .75rem 0; }
+  .post-content-text { white-space:pre-wrap; color:#111827; }
+  .meta { display:flex; flex-wrap:wrap; gap:.5rem .75rem; margin-top:.75rem; color:#6b7280; font-size:.875rem; }
+  .image { width:100%; height:auto; max-height:320px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb; margin-top:.75rem; display:block; }
+
+  .stats { display:grid; grid-template-columns: repeat(4, 1fr); gap:.75rem; }
+  @media (max-width:640px){ .stats{ grid-template-columns: repeat(2, 1fr);} }
+  .stat { display:flex; align-items:center; gap:.75rem; padding:.75rem; border:1px solid #e5e7eb; border-radius:10px; }
+  .stat .v { font-size:1.25rem; font-weight:800; color:#111827; }
+  .stat .l { color:#6b7280; font-size:.8rem; font-weight:700; }
+
+  .chart { position:relative; height:260px; }
+  .table { width:100%; border-collapse:collapse; }
+  .table th { text-align:left; padding:.5rem .75rem; font-size:.75rem; color:#654321; background:linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%); }
+  .table td { padding:.75rem; border-top:1px solid #f3f4f6; }
+
+  .list { display:flex; flex-direction:column; gap:.5rem; }
+  .comment { padding:.75rem; border:1px solid #e5e7eb; border-radius:10px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const dailyCtx = document.getElementById('dailyChart');
+    if (dailyCtx) {
+      new Chart(dailyCtx, {
+        type: 'line',
+        data: {
+          labels: [{% for l in daily.labels %}'{{ l }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+          datasets: [
+            { label: 'Views', data: [{% for v in daily.views %}{{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}], borderColor: 'rgba(59,130,246,1)', backgroundColor:'rgba(59,130,246,.1)', fill:true, tension:.3 },
+            { label: 'Likes', data: [{% for v in daily.likes %}{{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}], borderColor: 'rgba(16,185,129,1)', backgroundColor:'rgba(16,185,129,.1)', fill:true, tension:.3 },
+            { label: 'Comments', data: [{% for v in daily.comments %}{{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}], borderColor: 'rgba(160,82,45,1)', backgroundColor:'rgba(160,82,45,.1)', fill:true, tension:.3 }
+          ]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="overview-container">
+  <div class="overview-section">
+  <div class="container-inner">
+  <div class="header">
+    <div>
+      <h1 class="title">Post Details</h1>
+      <div class="sub">{{ post.church.name }} • {{ post.get_post_type_display }} {% if post.is_active %}<span class="pill active">Active</span>{% else %}<span class="pill inactive">Inactive</span>{% endif %}</div>
+    </div>
+    <div>
+      <a href="{% url 'core:super_admin_posts' %}" class="btn btn-outline">Back to Posts</a>
+    </div>
+  </div>
+
+  <div class="stats" style="margin-bottom:1rem;">
+    <div class="stat"><div class="v">{{ counts.views }}</div><div class="l">Views</div></div>
+    <div class="stat"><div class="v">{{ counts.likes }}</div><div class="l">Likes</div></div>
+    <div class="stat"><div class="v">{{ counts.comments }}</div><div class="l">Comments</div></div>
+    <div class="stat"><div class="v">{{ counts.bookmarks }}</div><div class="l">Bookmarks</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2 class="section-title">Content</h2>
+      <div class="post-content-text">{{ post.content }}</div>
+      {% if post.image %}<img class="image" src="{{ post.image.url }}" alt="Post image" />{% endif %}
+      {% if post.post_type == 'event' %}
+      <div class="meta">
+        <div><strong>Title:</strong> {{ post.event_title|default:'-' }}</div>
+        <div><strong>Start:</strong> {{ post.event_start_date|date:'Y-m-d H:i'|default:'-' }}</div>
+        <div><strong>End:</strong> {{ post.event_end_date|date:'Y-m-d H:i'|default:'-' }}</div>
+        <div><strong>Location:</strong> {{ post.event_location|default:'-' }}</div>
+      </div>
+      {% endif %}
+      {% if post.enable_donation %}
+      <div class="meta">
+        <div><strong>Donation Goal:</strong> {{ post.donation_goal|default:'-' }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Donations</h2>
+      <div class="stats" style="grid-template-columns: repeat(2, 1fr); margin-bottom:.75rem;">
+        <div class="stat"><div class="v">{{ donations.total_amount }}</div><div class="l">Total Amount</div></div>
+        <div class="stat"><div class="v">{{ donations.total_count }}</div><div class="l">Total Donations</div></div>
+      </div>
+      <div>
+        <table class="table">
+          <thead><tr><th>Top Donors</th><th>Amount</th></tr></thead>
+          <tbody>
+            {% if donations.top_donors %}
+              {% for d in donations.top_donors %}
+                <tr><td>{{ d.get_full_name|default:d.username }}</td><td>{{ d.total_donated }}</td></tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="2" style="color:#9ca3af; text-align:center;">No donors yet</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <h2 class="section-title">Daily Activity (Last 14 Days)</h2>
+    <div class="chart"><canvas id="dailyChart"></canvas></div>
+  </div>
+
+  <div class="grid" style="margin-top:1rem;">
+    <div class="card">
+      <h2 class="section-title">Reports</h2>
+      <div class="stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom:.75rem;">
+        <div class="stat"><div class="v">{{ reports.status_counts.pending }}</div><div class="l">Pending</div></div>
+        <div class="stat"><div class="v">{{ reports.status_counts.reviewed }}</div><div class="l">Reviewed</div></div>
+        <div class="stat"><div class="v">{{ reports.status_counts.dismissed }}</div><div class="l">Dismissed</div></div>
+        <div class="stat"><div class="v">{{ reports.status_counts.action_taken }}</div><div class="l">Action Taken</div></div>
+      </div>
+      <table class="table">
+        <thead><tr><th>User</th><th>Reason</th><th>Description</th><th>Created</th><th>Status</th></tr></thead>
+        <tbody>
+          {% if reports.list %}
+            {% for r in reports.list %}
+            <tr>
+              <td>{{ r.user.get_full_name|default:r.user.username }}</td>
+              <td>{{ r.get_reason_display }}</td>
+              <td>{{ r.description|truncatechars:120 }}</td>
+              <td>{{ r.created_at|date:'Y-m-d H:i' }}</td>
+              <td>{{ r.get_status_display }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" style="color:#9ca3af; text-align:center;">No reports</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Recent Comments</h2>
+      <div class="list">
+        {% if recent_comments %}
+          {% for c in recent_comments %}
+            <div class="comment">
+              <div style="font-weight:700;">{{ c.user.get_full_name|default:c.user.username }}</div>
+              <div style="color:#6b7280; font-size:.8rem;">{{ c.created_at|date:'Y-m-d H:i' }}</div>
+              <div style="margin-top:.25rem;">{{ c.content }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="color:#9ca3af;">No comments yet</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+</div>
+{% endblock %}

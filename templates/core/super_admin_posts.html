@@ -1,0 +1,301 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Posts Management • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<style>
+  .overview-container { max-width: 100%; width: 100%; padding: 0; overflow: visible; }
+  .overview-section { margin-bottom: 2rem; background: #FFF9E6; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid rgba(218,165,32,0.2); }
+  .section-title-overview { display:flex; align-items:center; gap:.5rem; font-weight:700; font-size:1.5rem; color:#111827; margin:0; }
+  .section-icon { width:24px; height:24px; }
+  .charts-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:1.5rem; align-items:stretch; }
+  @media (max-width:1024px){ .charts-grid{ grid-template-columns:1fr; } }
+  .chart-card { background:#fff; border-radius:12px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .chart-container { position:relative; height: 280px; }
+  .chart-container canvas { width:100% !important; height:100% !important; display:block; }
+  .chart-card-full { grid-column: 1 / -1; }
+
+  .stats-cards-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:1rem; margin-top:1rem; }
+  @media (max-width:768px){ .stats-cards-grid{ grid-template-columns:1fr; } }
+  .stat-card { display:flex; align-items:center; gap:1rem; padding:1rem; background:#fff; border:1px solid #e5e7eb; border-radius:10px; }
+  .stat-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: rgba(160,82,45,0.1); color:#A0522D; }
+  .stat-icon svg { width:20px; height:20px; }
+  .stat-value { font-size:1.5rem; font-weight:800; color:#111827; line-height:1; }
+  .stat-label { font-size:.85rem; color:#6b7280; font-weight:600; }
+
+  .management-section { margin-top: 2rem; background:#fff; border-radius:12px; padding:1.5rem; border:1px solid #e5e7eb; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .management-header { margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #f3f4f6; }
+  .management-title { font-size:1.25rem; font-weight:700; color:#111827; margin:0; display:flex; align-items:center; gap:.5rem; }
+  .filters-form { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin:1rem 0; }
+  .search-box { position:relative; flex:1; min-width:260px; }
+  .search-box input { width:100%; padding:.625rem .75rem .625rem 2.5rem; border:1px solid #e5e7eb; border-radius:8px; font-size:.875rem; }
+  .search-box svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:#9ca3af; }
+  .filter-select, .order-select { padding:.625rem .75rem; border:1px solid #e5e7eb; border-radius:8px; font-size:.875rem; background:#fff; min-width:160px; }
+  .btn-filter { background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color:#fff; border:none; padding:.625rem 1rem; border-radius:8px; font-weight:700; }
+  .btn-clear { padding:.625rem 1rem; border-radius:8px; border:1px solid #e5e7eb; background:#f3f4f6; color:#6b7280; font-weight:700; text-decoration:none; }
+
+  .table-wrapper { overflow-x:auto; border:1px solid #e5e7eb; border-radius:8px; }
+  table.posts-table { width:100%; border-collapse:collapse; font-size:.875rem; }
+  table.posts-table thead { background: linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%); }
+  table.posts-table th { padding:.75rem 1rem; text-align:left; font-weight:700; color:#654321; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; }
+  table.posts-table td { padding:1rem; border-top:1px solid #f3f4f6; vertical-align:middle; }
+  .badge { display:inline-block; padding:.25rem .5rem; border-radius:9999px; font-size:.75rem; font-weight:700; }
+  .badge.active { background:#DCFCE7; color:#166534; border:1px solid rgba(34,197,94,.2); }
+  .badge.inactive { background:#FEF3C7; color:#92400e; border:1px solid rgba(245,158,11,.2); }
+  .badge.type { background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%); color:#654321; border:1px solid rgba(218,165,32,.2); }
+  .actions { display:flex; gap:.5rem; }
+  .action-btn { display:inline-flex; align-items:center; justify-content:center; padding:.5rem .75rem; border-radius:6px; border:1px solid #e5e7eb; background:#fff; color:#374151; text-decoration:none; }
+  .action-btn.danger { background:#ef4444; color:#fff; border-color:#ef4444; }
+  .action-btn.toggle { background:#8B4513; color:#fff; border-color:#8B4513; }
+  .content-excerpt { color:#374151; max-width:380px; overflow:hidden; text-overflow:ellipsis; }
+
+  .pagination { display:flex; justify-content:space-between; align-items:center; padding-top:1rem; margin-top:1rem; border-top:1px solid #f3f4f6; flex-wrap:wrap; gap:1rem; }
+  .page-btn { display:inline-flex; align-items:center; gap:.375rem; padding:.5rem .875rem; border:1px solid #e5e7eb; border-radius:6px; background:#fff; color:#374151; font-size:.875rem; text-decoration:none; }
+  .page-btn:hover { background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color:#fff; border-color:#8B4513; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const postsStatsCtx = document.getElementById('postsStatsChart');
+    if (postsStatsCtx) {
+      new Chart(postsStatsCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Posts','Last 30 Days','Last 7 Days'],
+          datasets: [{
+            label: 'Count',
+            data: [
+              {{ analytics.total_posts|default:0 }},
+              {{ analytics.posts_last_30_days|default:0 }},
+              {{ analytics.posts_last_7_days|default:0 }}
+            ],
+            backgroundColor: ['rgba(160,82,45,.8)','rgba(16,185,129,.8)','rgba(59,130,246,.8)'],
+            borderColor: ['rgba(160,82,45,1)','rgba(16,185,129,1)','rgba(59,130,246,1)'],
+            borderWidth: 2, borderRadius: 8, borderSkipped: false,
+          }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{beginAtZero:true, ticks:{precision:0}} } }
+      });
+    }
+
+    const postTypesCtx = document.getElementById('postTypesChart');
+    if (postTypesCtx) {
+      new Chart(postTypesCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['General','Photo','Event','Prayer'],
+          datasets: [{
+            data: [
+              {{ analytics.type_counts.general|default:0 }},
+              {{ analytics.type_counts.photo|default:0 }},
+              {{ analytics.type_counts.event|default:0 }},
+              {{ analytics.type_counts.prayer|default:0 }}
+            ],
+            backgroundColor: [
+              'rgba(160,82,45,.8)',
+              'rgba(218,165,32,.8)',
+              'rgba(59,130,246,.8)',
+              'rgba(16,185,129,.8)'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, cutout: '68%', plugins:{ legend:{ position:'bottom' } } }
+      });
+    }
+
+    const topPostsCtx = document.getElementById('topPostsEngagementChart');
+    if (topPostsCtx) {
+      const labels = [
+        {% for p in analytics.top_5_posts %}
+          '{{ p.church.name|escapejs }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ];
+      const data = [
+        {% for p in analytics.top_5_posts %}
+          {{ p.total_engagement|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ];
+      new Chart(topPostsCtx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ label: 'Engagement', data: data, backgroundColor: 'rgba(160,82,45,.8)', borderColor:'rgba(160,82,45,1)', borderWidth:2, borderRadius:8, borderSkipped:false }]},
+        options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{ beginAtZero:true, ticks:{precision:0} } } }
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="overview-container">
+  <h1 class="section-title">Posts Management</h1>
+  <p style="color:#6b7280; margin-bottom:1.5rem;">Monitor engagement and manage posts across all churches</p>
+
+  <div class="overview-section">
+    <div style="margin-bottom:1rem;">
+      <h2 class="section-title-overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 8h10M7 12h7"/></svg>
+        Posts Analytics
+      </h2>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">Posts Overview</h3>
+        <div class="chart-container"><canvas id="postsStatsChart"></canvas></div>
+        <div class="stats-cards-grid">
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/></svg></div><div><div class="stat-value">{{ analytics.total_posts }}</div><div class="stat-label">Total Posts</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M12 3v18"/></svg></div><div><div class="stat-value">{{ analytics.engagement.total_views }}</div><div class="stat-label">Total Views</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div><div><div class="stat-value">{{ analytics.engagement.total_likes }}</div><div class="stat-label">Total Likes</div></div></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title">Post Types Distribution</h3>
+        <div class="chart-container"><canvas id="postTypesChart"></canvas></div>
+        <div class="stats-cards-grid">
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><div class="stat-value">{{ reports_stats.pending }}</div><div class="stat-label">Pending Reports</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="stat-value">{{ reports_stats.total_reports }}</div><div class="stat-label">Total Reports</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div><div class="stat-value">{{ analytics.donations.total_amount }}</div><div class="stat-label">Donations (Completed)</div></div></div>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card-full">
+        <h3 class="chart-title">Top Posts by Engagement</h3>
+        <div class="chart-container"><canvas id="topPostsEngagementChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="management-section">
+    <div class="management-header">
+      <h3 class="management-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 8h10M7 12h7"/></svg>
+        Posts Directory
+      </h3>
+    </div>
+
+    <form method="get" class="filters-form">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search posts or church..." />
+      </div>
+      <select name="type" class="filter-select">
+        <option value="">All Types</option>
+        <option value="general" {% if post_type_filter == 'general' %}selected{% endif %}>General</option>
+        <option value="photo" {% if post_type_filter == 'photo' %}selected{% endif %}>Photo</option>
+        <option value="event" {% if post_type_filter == 'event' %}selected{% endif %}>Event</option>
+        <option value="prayer" {% if post_type_filter == 'prayer' %}selected{% endif %}>Prayer</option>
+      </select>
+      <select name="status" class="filter-select">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+      </select>
+      <select name="reported" class="filter-select">
+        <option value="">Any Reports</option>
+        <option value="pending" {% if reported_filter == 'pending' %}selected{% endif %}>Pending Only</option>
+        <option value="any" {% if reported_filter == 'any' %}selected{% endif %}>Any Report</option>
+      </select>
+      <select name="order" class="order-select">
+        <option value="-created_at" {% if order == '-created_at' %}selected{% endif %}>Newest</option>
+        <option value="created_at" {% if order == 'created_at' %}selected{% endif %}>Oldest</option>
+        <option value="-view_count" {% if order == '-view_count' %}selected{% endif %}>Most Viewed</option>
+        <option value="-likes_count" {% if order == '-likes_count' %}selected{% endif %}>Most Liked</option>
+        <option value="-comments_count" {% if order == '-comments_count' %}selected{% endif %}>Most Commented</option>
+      </select>
+      <button type="submit" class="btn-filter">Apply Filters</button>
+      {% if search_query or post_type_filter or status_filter or reported_filter or order %}
+        <a href="?" class="btn-clear">Clear</a>
+      {% endif %}
+    </form>
+
+    <div class="table-wrapper">
+      <table class="posts-table">
+        <thead>
+          <tr>
+            <th>Post</th>
+            <th>Church</th>
+            <th>Type</th>
+            <th>Likes</th>
+            <th>Comments</th>
+            <th>Views</th>
+            <th>Reports</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if posts %}
+            {% for p in posts %}
+            <tr>
+              <td>
+                <div class="content-excerpt">{{ p.content|default:'-'|truncatechars:90 }}</div>
+              </td>
+              <td>{{ p.church.name }}</td>
+              <td><span class="badge type">{{ p.get_post_type_display }}</span></td>
+              <td>{{ p.likes_count|default:p.likes.count }}</td>
+              <td>{{ p.comments_count|default:p.comments.count }}</td>
+              <td>{{ p.view_count }}</td>
+              <td>{{ p.pending_reports_count|default:0 }}</td>
+              <td>
+                {% if p.is_active %}<span class="badge active">Active</span>{% else %}<span class="badge inactive">Inactive</span>{% endif %}
+              </td>
+              <td>{{ p.created_at|date:'Y-m-d H:i' }}</td>
+              <td>
+                <div class="actions">
+                  <a class="action-btn" href="{% url 'core:super_admin_post_detail' p.id %}">View</a>
+                  <form method="post" action="{% url 'core:super_admin_toggle_post_active' p.id %}">
+                    {% csrf_token %}
+                    <button class="action-btn toggle" type="submit">{% if p.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                  </form>
+                  <form method="post" action="{% url 'core:super_admin_delete_post' p.id %}" onsubmit="return confirm('Delete this post?');">
+                    {% csrf_token %}
+                    <button class="action-btn danger" type="submit">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="10" style="text-align:center; color:#9ca3af; padding:2rem;">No posts found</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info">Page {{ posts.number }} of {{ posts.paginator.num_pages }} ({{ posts.paginator.count }} items)</div>
+      <div class="pagination-controls">
+        {% if posts.has_previous %}
+          <a class="page-btn" href="?page={{ posts.previous_page_number }}&search={{ search_query }}&type={{ post_type_filter }}&status={{ status_filter }}&reported={{ reported_filter }}&order={{ order }}">Prev</a>
+        {% endif %}
+        {% if posts.has_next %}
+          <a class="page-btn" href="?page={{ posts.next_page_number }}&search={{ search_query }}&type={{ post_type_filter }}&status={{ status_filter }}&reported={{ reported_filter }}&order={{ order }}">Next</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

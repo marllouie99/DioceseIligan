@@ -28,6 +28,7 @@ from .models import (
     PostBookmark,
     PostComment,
     PostView,
+    PostReport,
     ChurchVerificationRequest,
     ChurchVerificationDocument,
     Notification,
@@ -3412,6 +3413,307 @@ def super_admin_user_activities(request):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_user_activities.html', ctx)
+
+
+# Super Admin - Posts Management
+@login_required
+def super_admin_posts(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    # Filters
+    search = (request.GET.get('search') or '').strip()
+    post_type = (request.GET.get('type') or '').strip()
+    status_filter = (request.GET.get('status') or '').strip()  # active|inactive|''
+    reported_filter = (request.GET.get('reported') or '').strip()  # pending|any|''
+    order = (request.GET.get('order') or '-created_at').strip()
+
+    # Base queryset with annotations to avoid N+1 issues
+    posts_qs = (
+        Post.objects.select_related('church')
+        .annotate(
+            likes_count=Count('likes', distinct=True),
+            comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True),
+            bookmarks_count=Count('bookmarks', distinct=True),
+            pending_reports_count=Count('reports', filter=Q(reports__status='pending'), distinct=True),
+        )
+    )
+
+    if search:
+        posts_qs = posts_qs.filter(Q(content__icontains=search) | Q(church__name__icontains=search))
+    if post_type:
+        posts_qs = posts_qs.filter(post_type=post_type)
+    if status_filter == 'active':
+        posts_qs = posts_qs.filter(is_active=True)
+    elif status_filter == 'inactive':
+        posts_qs = posts_qs.filter(is_active=False)
+    if reported_filter == 'pending':
+        posts_qs = posts_qs.filter(reports__status='pending')
+    elif reported_filter == 'any':
+        posts_qs = posts_qs.filter(reports__isnull=False)
+
+    posts_qs = posts_qs.distinct()
+
+    allowed_orders = {
+        '-created_at', 'created_at',
+        '-likes_count', 'likes_count',
+        '-comments_count', 'comments_count',
+        '-view_count', 'view_count',
+    }
+    if order not in allowed_orders:
+        order = '-created_at'
+    posts_qs = posts_qs.order_by(order)
+
+    # Pagination
+    paginator = Paginator(posts_qs, 20)
+    page_number = request.GET.get('page')
+    posts_page = paginator.get_page(page_number)
+
+    # Analytics
+    from datetime import timedelta
+    from django.db.models import Sum
+    today = timezone.now().date()
+    last_30_days = today - timedelta(days=30)
+    last_7_days = today - timedelta(days=7)
+
+    total_posts = Post.objects.count()
+    posts_last_30_days = Post.objects.filter(created_at__date__gte=last_30_days).count()
+    posts_last_7_days = Post.objects.filter(created_at__date__gte=last_7_days).count()
+
+    type_dist = Post.objects.values('post_type').annotate(count=Count('id'))
+    type_map = {row['post_type']: row['count'] for row in type_dist}
+    type_counts = {
+        'general': type_map.get('general', 0),
+        'photo': type_map.get('photo', 0),
+        'event': type_map.get('event', 0),
+        'prayer': type_map.get('prayer', 0),
+    }
+
+    total_likes = PostLike.objects.count()
+    total_comments = PostComment.objects.filter(is_active=True).count()
+    total_views = Post.objects.aggregate(total_views=Sum('view_count'))['total_views'] or 0
+
+    likes_last_30_days = PostLike.objects.filter(created_at__date__gte=last_30_days).count()
+    comments_last_30_days = PostComment.objects.filter(is_active=True, created_at__date__gte=last_30_days).count()
+    views_last_30_days = PostView.objects.filter(viewed_at__date__gte=last_30_days).count()
+
+    # Donations summary
+    from decimal import Decimal
+    donations_qs = Donation.objects.filter(payment_status='completed')
+    donations_total_count = donations_qs.count()
+    donations_total_amount = donations_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+
+    # Reports summary
+    from .models import PostReport
+    total_reports = PostReport.objects.count()
+    pending_reports = PostReport.objects.filter(status='pending').count()
+    reviewed_reports = PostReport.objects.filter(status='reviewed').count()
+    dismissed_reports = PostReport.objects.filter(status='dismissed').count()
+    action_taken_reports = PostReport.objects.filter(status='action_taken').count()
+    top_report_reasons = list(
+        PostReport.objects.values('reason').annotate(count=Count('id')).order_by('-count')[:5]
+    )
+
+    # Top posts by engagement
+    analytics_posts_qs = (
+        Post.objects.filter(is_active=True)
+        .annotate(
+            likes_count=Count('likes', distinct=True),
+            comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True),
+        )
+        .annotate(
+            total_engagement=ExpressionWrapper(
+                F('view_count') + F('likes_count') + F('comments_count'),
+                output_field=IntegerField(),
+            )
+        )
+    )
+    top_5_posts = list(analytics_posts_qs.select_related('church').order_by('-total_engagement', '-created_at')[:5])
+    max_engagement = top_5_posts[0].total_engagement if top_5_posts else 0
+
+    ctx = {
+        'active': 'super_admin_posts',
+        'page_title': 'Posts Management',
+        'posts': posts_page,
+        'search_query': search,
+        'post_type_filter': post_type,
+        'status_filter': status_filter,
+        'reported_filter': reported_filter,
+        'order': order,
+        'analytics': {
+            'total_posts': total_posts,
+            'posts_last_30_days': posts_last_30_days,
+            'posts_last_7_days': posts_last_7_days,
+            'type_counts': type_counts,
+            'engagement': {
+                'total_likes': total_likes,
+                'total_comments': total_comments,
+                'total_views': total_views,
+                'likes_last_30_days': likes_last_30_days,
+                'comments_last_30_days': comments_last_30_days,
+                'views_last_30_days': views_last_30_days,
+            },
+            'donations': {
+                'total_donations': donations_total_count,
+                'total_amount': donations_total_amount,
+            },
+            'top_5_posts': top_5_posts,
+            'max_engagement': max_engagement,
+        },
+        'reports_stats': {
+            'total_reports': total_reports,
+            'pending': pending_reports,
+            'reviewed': reviewed_reports,
+            'dismissed': dismissed_reports,
+            'action_taken': action_taken_reports,
+            'top_reasons': top_report_reasons,
+        },
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_posts.html', ctx)
+
+
+@login_required
+def super_admin_post_detail(request, post_id):
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    post = get_object_or_404(Post.objects.select_related('church'), id=post_id)
+
+    likes_count = PostLike.objects.filter(post=post).count()
+    comments_count = PostComment.objects.filter(post=post, is_active=True).count()
+    bookmarks_count = PostBookmark.objects.filter(post=post).count()
+    views_count = getattr(post, 'view_count', 0)
+
+    from datetime import timedelta
+    today = timezone.now().date()
+    daily_labels = []
+    daily_views = []
+    daily_likes = []
+    daily_comments = []
+    for i in range(13, -1, -1):
+        day = today - timedelta(days=i)
+        daily_labels.append(day.strftime('%b %d'))
+        daily_views.append(PostView.objects.filter(post=post, viewed_at__date=day).count())
+        daily_likes.append(PostLike.objects.filter(post=post, created_at__date=day).count())
+        daily_comments.append(PostComment.objects.filter(post=post, is_active=True, created_at__date=day).count())
+
+    donations = Donation.objects.filter(post=post, payment_status='completed').select_related('donor', 'donor__profile')
+    from decimal import Decimal
+    from django.db.models import Sum
+    donations_total_amount = donations.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    donations_total_count = donations.count()
+    top_donors_data = {}
+    for d in donations:
+        if d.donor_id:
+            top_donors_data.setdefault(d.donor_id, Decimal('0.00'))
+            top_donors_data[d.donor_id] += d.amount
+    top_donor_ids = sorted(top_donors_data, key=top_donors_data.get, reverse=True)[:5]
+    top_donors = []
+    if top_donor_ids:
+        users = {u.id: u for u in User.objects.select_related('profile').filter(id__in=top_donor_ids)}
+        for uid in top_donor_ids:
+            u = users.get(uid)
+            if u:
+                setattr(u, 'total_donated', top_donors_data.get(uid))
+                top_donors.append(u)
+
+    reports = list(PostReport.objects.filter(post=post).select_related('user').order_by('-created_at')[:20])
+    reports_status_counts = {
+        'pending': PostReport.objects.filter(post=post, status='pending').count(),
+        'reviewed': PostReport.objects.filter(post=post, status='reviewed').count(),
+        'dismissed': PostReport.objects.filter(post=post, status='dismissed').count(),
+        'action_taken': PostReport.objects.filter(post=post, status='action_taken').count(),
+    }
+    reasons_dist_qs = PostReport.objects.filter(post=post).values('reason').annotate(c=Count('id')).order_by('-c')
+    reasons_distribution = list(reasons_dist_qs[:5])
+
+    recent_comments = list(
+        PostComment.objects.filter(post=post, is_active=True).select_related('user', 'user__profile').order_by('-created_at')[:10]
+    )
+
+    ctx = {
+        'active': 'super_admin_posts',
+        'page_title': 'Post Details',
+        'post': post,
+        'counts': {
+            'likes': likes_count,
+            'comments': comments_count,
+            'bookmarks': bookmarks_count,
+            'views': views_count,
+        },
+        'daily': {
+            'labels': daily_labels,
+            'views': daily_views,
+            'likes': daily_likes,
+            'comments': daily_comments,
+        },
+        'donations': {
+            'total_amount': donations_total_amount,
+            'total_count': donations_total_count,
+            'top_donors': top_donors,
+        },
+        'reports': {
+            'list': reports,
+            'status_counts': reports_status_counts,
+            'reasons': reasons_distribution,
+        },
+        'recent_comments': recent_comments,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_post_detail.html', ctx)
+
+
+@login_required
+@require_POST
+def super_admin_toggle_post_active(request, post_id):
+    if not request.user.is_superuser:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Forbidden'}, status=403)
+        messages.error(request, 'You do not have permission to perform this action.')
+        return redirect('core:super_admin_posts')
+
+    try:
+        post = get_object_or_404(Post, id=post_id)
+        post.is_active = not post.is_active
+        post.save(update_fields=['is_active', 'updated_at'])
+        msg = 'Post activated.' if post.is_active else 'Post deactivated.'
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': msg, 'is_active': post.is_active})
+        messages.success(request, msg)
+        return redirect(request.META.get('HTTP_REFERER') or 'core:super_admin_posts')
+    except Exception:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Failed to toggle post.'}, status=500)
+        messages.error(request, 'Failed to toggle post.')
+        return redirect('core:super_admin_posts')
+
+
+@login_required
+@require_POST
+def super_admin_delete_post(request, post_id):
+    if not request.user.is_superuser:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Forbidden'}, status=403)
+        messages.error(request, 'You do not have permission to perform this action.')
+        return redirect('core:super_admin_posts')
+
+    try:
+        post = get_object_or_404(Post, id=post_id)
+        post_type = post.post_type
+        post.delete()
+        msg = f'{"Event" if post_type == "event" else "Post"} deleted successfully.'
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': msg})
+        messages.success(request, msg)
+        return redirect(request.META.get('HTTP_REFERER') or 'core:super_admin_posts')
+    except Exception:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Failed to delete post.'}, status=500)
+        messages.error(request, 'Failed to delete post.')
+        return redirect('core:super_admin_posts')
 
 
 # Service Review Views

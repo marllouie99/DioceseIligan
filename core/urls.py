@@ -23,6 +23,10 @@ urlpatterns = [
     path('super-admin/profile/', views.super_admin_profile, name='super_admin_profile'),
     path('super-admin/toggle-mode/', views.toggle_super_admin_mode, name='toggle_super_admin_mode'),
     path('super-admin/user-activities/', views.super_admin_user_activities, name='super_admin_user_activities'),
+    path('super-admin/posts/', views.super_admin_posts, name='super_admin_posts'),
+    path('super-admin/posts/<int:post_id>/', views.super_admin_post_detail, name='super_admin_post_detail'),
+    path('super-admin/posts/<int:post_id>/toggle-active/', views.super_admin_toggle_post_active, name='super_admin_toggle_post_active'),
+    path('super-admin/posts/<int:post_id>/delete/', views.super_admin_delete_post, name='super_admin_delete_post'),
     
     # Media updates (AJAX)
     path('settings/update-logo/', views.update_church_logo, name='update_church_logo'),
