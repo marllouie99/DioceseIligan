@@ -26,7 +26,18 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     display_name = models.CharField(max_length=150, blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    address = models.TextField(blank=True)
+    
+    # Philippine Address Fields (structured)
+    region = models.CharField(max_length=200, blank=True, help_text="Region (e.g., Region X - Northern Mindanao)")
+    province = models.CharField(max_length=200, blank=True, help_text="Province")
+    city_municipality = models.CharField(max_length=200, blank=True, help_text="City or Municipality")
+    barangay = models.CharField(max_length=200, blank=True, help_text="Barangay")
+    street_address = models.CharField(max_length=300, blank=True, help_text="Street, Building, Unit No.")
+    postal_code = models.CharField(max_length=10, blank=True, help_text="Postal/ZIP Code")
+    
+    # Legacy address field (for backward compatibility)
+    address = models.TextField(blank=True, help_text="Full address (legacy field)")
+    
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     # Use callable that checks DEBUG setting to determine storage backend

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import ph_address_api
 
 urlpatterns = [
     path('', views.landing, name='landing'),
@@ -20,6 +21,11 @@ urlpatterns = [
     path('google/callback/', views.google_callback, name='google_callback'),
     # API endpoints
     path('api/server-time/', views.server_time, name='server_time'),
+    # Philippine Address API
+    path('api/ph-regions/', ph_address_api.get_regions, name='ph_regions'),
+    path('api/ph-provinces/', ph_address_api.get_provinces, name='ph_provinces'),
+    path('api/ph-cities/', ph_address_api.get_cities_municipalities, name='ph_cities'),
+    path('api/ph-barangays/', ph_address_api.get_barangays, name='ph_barangays'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.manage_profile, name='manage_profile'),
     path('logout/', views.logout_view, name='app_logout'),

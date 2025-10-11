@@ -803,12 +803,43 @@
                   {% endif %}
                 </div>
                 
-                <div class="form-group form-group-full{% if essential_missing_map.address %} is-missing{% endif %}">
-                  <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
-                  {{ form.address }}
-                  {% if form.address.errors %}
-                    <div class="form-error">{{ form.address.errors.0 }}</div>
-                  {% endif %}
+                <!-- Philippine Address Fields -->
+                <div class="form-group">
+                  <label for="id_region" class="form-label">Region</label>
+                  <select id="id_region" name="region" class="form-control">
+                    <option value="">Select Region</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="id_province" class="form-label">Province</label>
+                  <select id="id_province" name="province" class="form-control" disabled>
+                    <option value="">Select Province</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="id_city_municipality" class="form-label">City / Municipality</label>
+                  <select id="id_city_municipality" name="city_municipality" class="form-control" disabled>
+                    <option value="">Select City/Municipality</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="id_barangay" class="form-label">Barangay</label>
+                  <select id="id_barangay" name="barangay" class="form-control" disabled>
+                    <option value="">Select Barangay</option>
+                  </select>
+                </div>
+                
+                <div class="form-group form-group-full">
+                  <label for="id_street_address" class="form-label">Street Address (House/Building No., Street Name)</label>
+                  <input type="text" id="id_street_address" name="street_address" class="form-control" placeholder="e.g., 123 Rizal Street, Unit 4B">
+                </div>
+                
+                <div class="form-group">
+                  <label for="id_postal_code" class="form-label">Postal Code</label>
+                  <input type="text" id="id_postal_code" name="postal_code" class="form-control" placeholder="e.g., 9000" maxlength="10">
                 </div>
               </div>
             </div>
@@ -875,6 +906,196 @@
 <script src="{% static 'js/manage_profile_new.js' %}?v={{ STATIC_VERSION }}"></script>
 
 <script>
+// Philippine Address Cascading Dropdowns
+(function() {
+    const regionSelect = document.getElementById('id_region');
+    const provinceSelect = document.getElementById('id_province');
+    const citySelect = document.getElementById('id_city_municipality');
+    const barangaySelect = document.getElementById('id_barangay');
+    
+    let regionCodeMap = {};
+    let provinceCodeMap = {};
+    let cityCodeMap = {};
+    
+    // Load regions on page load
+    async function loadRegions() {
+        try {
+            const response = await fetch('/api/ph-regions/');
+            const data = await response.json();
+            
+            if (data.success) {
+                regionSelect.innerHTML = '<option value="">Select Region</option>';
+                data.data.forEach(region => {
+                    const option = document.createElement('option');
+                    option.value = region.name;
+                    option.textContent = region.name;
+                    option.dataset.code = region.code;
+                    regionSelect.appendChild(option);
+                    regionCodeMap[region.name] = region.code;
+                });
+                
+                // Set saved value if exists
+                const savedRegion = '{{ profile.region|escapejs }}';
+                if (savedRegion) {
+                    regionSelect.value = savedRegion;
+                    await loadProvinces(regionCodeMap[savedRegion]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load regions:', error);
+        }
+    }
+    
+    async function loadProvinces(regionCode) {
+        try {
+            provinceSelect.disabled = true;
+            provinceSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            const response = await fetch(`/api/ph-provinces/?region_code=${regionCode}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                data.data.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.name;
+                    option.textContent = province.name;
+                    option.dataset.code = province.code;
+                    provinceSelect.appendChild(option);
+                    provinceCodeMap[province.name] = province.code;
+                });
+                provinceSelect.disabled = false;
+                
+                // Set saved value if exists
+                const savedProvince = '{{ profile.province|escapejs }}';
+                if (savedProvince) {
+                    provinceSelect.value = savedProvince;
+                    await loadCities(provinceCodeMap[savedProvince]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load provinces:', error);
+            provinceSelect.innerHTML = '<option value="">Error loading provinces</option>';
+        }
+    }
+    
+    async function loadCities(provinceCode) {
+        try {
+            citySelect.disabled = true;
+            citySelect.innerHTML = '<option value="">Loading...</option>';
+            
+            const response = await fetch(`/api/ph-cities/?province_code=${provinceCode}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+                data.data.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.name;
+                    option.textContent = city.name;
+                    option.dataset.code = city.code;
+                    citySelect.appendChild(option);
+                    cityCodeMap[city.name] = city.code;
+                });
+                citySelect.disabled = false;
+                
+                // Set saved value if exists
+                const savedCity = '{{ profile.city_municipality|escapejs }}';
+                if (savedCity) {
+                    citySelect.value = savedCity;
+                    await loadBarangays(cityCodeMap[savedCity]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load cities:', error);
+            citySelect.innerHTML = '<option value="">Error loading cities</option>';
+        }
+    }
+    
+    async function loadBarangays(cityCode) {
+        try {
+            barangaySelect.disabled = true;
+            barangaySelect.innerHTML = '<option value="">Loading...</option>';
+            
+            const response = await fetch(`/api/ph-barangays/?city_code=${cityCode}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                data.data.forEach(barangay => {
+                    const option = document.createElement('option');
+                    option.value = barangay.name;
+                    option.textContent = barangay.name;
+                    barangaySelect.appendChild(option);
+                });
+                barangaySelect.disabled = false;
+                
+                // Set saved value if exists
+                const savedBarangay = '{{ profile.barangay|escapejs }}';
+                if (savedBarangay) {
+                    barangaySelect.value = savedBarangay;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load barangays:', error);
+            barangaySelect.innerHTML = '<option value="">Error loading barangays</option>';
+        }
+    }
+    
+    // Event listeners
+    regionSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const regionCode = selectedOption.dataset.code;
+        
+        // Reset dependent dropdowns
+        provinceSelect.innerHTML = '<option value="">Select Province</option>';
+        provinceSelect.disabled = true;
+        citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+        citySelect.disabled = true;
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        barangaySelect.disabled = true;
+        
+        if (regionCode) {
+            loadProvinces(regionCode);
+        }
+    });
+    
+    provinceSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const provinceCode = selectedOption.dataset.code;
+        
+        // Reset dependent dropdowns
+        citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+        citySelect.disabled = true;
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        barangaySelect.disabled = true;
+        
+        if (provinceCode) {
+            loadCities(provinceCode);
+        }
+    });
+    
+    citySelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const cityCode = selectedOption.dataset.code;
+        
+        // Reset dependent dropdown
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        barangaySelect.disabled = true;
+        
+        if (cityCode) {
+            loadBarangays(cityCode);
+        }
+    });
+    
+    // Set saved street address and postal code
+    document.getElementById('id_street_address').value = '{{ profile.street_address|escapejs }}';
+    document.getElementById('id_postal_code').value = '{{ profile.postal_code|escapejs }}';
+    
+    // Initialize on page load
+    loadRegions();
+})();
+
 // Initialize profile system with error handling
 document.addEventListener('DOMContentLoaded', function() {
     try {

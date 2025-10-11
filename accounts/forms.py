@@ -169,9 +169,24 @@ class ProfileForm(forms.Form):
     phone = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
         'placeholder': 'Enter your phone number'
     }))
+    
+    # Philippine Address Fields
+    region = forms.CharField(max_length=200, required=False)
+    province = forms.CharField(max_length=200, required=False)
+    city_municipality = forms.CharField(max_length=200, required=False)
+    barangay = forms.CharField(max_length=200, required=False)
+    street_address = forms.CharField(max_length=300, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'House/Building No., Street Name'
+    }))
+    postal_code = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'e.g., 9000'
+    }))
+    
+    # Legacy address field (for backward compatibility)
     address = forms.CharField(required=False, widget=forms.Textarea(attrs={
         'placeholder': 'Enter your address', 'rows': 3
     }))
+    
     bio = forms.CharField(required=False, widget=forms.Textarea(attrs={
         'placeholder': 'Tell us about yourself', 'rows': 4
     }))
@@ -193,6 +208,12 @@ class ProfileForm(forms.Form):
         if self.profile:
             self.fields['display_name'].initial = self.profile.display_name
             self.fields['phone'].initial = self.profile.phone
+            self.fields['region'].initial = self.profile.region
+            self.fields['province'].initial = self.profile.province
+            self.fields['city_municipality'].initial = self.profile.city_municipality
+            self.fields['barangay'].initial = self.profile.barangay
+            self.fields['street_address'].initial = self.profile.street_address
+            self.fields['postal_code'].initial = self.profile.postal_code
             self.fields['address'].initial = self.profile.address
             self.fields['bio'].initial = self.profile.bio
             self.fields['date_of_birth'].initial = self.profile.date_of_birth
@@ -249,6 +270,31 @@ class ProfileForm(forms.Form):
             
         if self.profile.phone != self.cleaned_data['phone']:
             self.profile.phone = self.cleaned_data['phone']
+            profile_changed = True
+        
+        # Update Philippine address fields
+        if self.profile.region != self.cleaned_data['region']:
+            self.profile.region = self.cleaned_data['region']
+            profile_changed = True
+            
+        if self.profile.province != self.cleaned_data['province']:
+            self.profile.province = self.cleaned_data['province']
+            profile_changed = True
+            
+        if self.profile.city_municipality != self.cleaned_data['city_municipality']:
+            self.profile.city_municipality = self.cleaned_data['city_municipality']
+            profile_changed = True
+            
+        if self.profile.barangay != self.cleaned_data['barangay']:
+            self.profile.barangay = self.cleaned_data['barangay']
+            profile_changed = True
+            
+        if self.profile.street_address != self.cleaned_data['street_address']:
+            self.profile.street_address = self.cleaned_data['street_address']
+            profile_changed = True
+            
+        if self.profile.postal_code != self.cleaned_data['postal_code']:
+            self.profile.postal_code = self.cleaned_data['postal_code']
             profile_changed = True
             
         if self.profile.address != self.cleaned_data['address']:
