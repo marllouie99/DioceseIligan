@@ -12,6 +12,24 @@
   <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
   <!-- Page-specific styles -->
   <link rel="stylesheet" href="{% static 'css/pages/profile.css' %}?v={{ STATIC_VERSION }}">
+  <style>
+    /* Philippine Address Select Styling */
+    .address-select-wrapper {
+      position: relative;
+    }
+    .address-select-wrapper .address-search {
+      margin-bottom: 0.5rem;
+    }
+    .address-select-wrapper select {
+      width: 100%;
+    }
+    .address-select-wrapper select option {
+      padding: 0.5rem;
+    }
+    .address-select-wrapper select option:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
 {% endblock %}
 
 {% block sidebar %}
@@ -806,34 +824,42 @@
                 <!-- Philippine Address Fields -->
                 <div class="form-group">
                   <label for="id_region" class="form-label">Region</label>
-                  <input type="text" id="id_region_search" class="form-control" placeholder="Search region..." style="margin-bottom: 0.5rem;">
-                  <select id="id_region" name="region" class="form-control" size="5" style="height: auto;">
-                    <option value="">Select Region</option>
-                  </select>
+                  <div class="address-select-wrapper">
+                    <input type="text" id="id_region_search" class="form-control address-search" placeholder="Type to search region...">
+                    <select id="id_region" name="region" class="form-control">
+                      <option value="">Select Region</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_province" class="form-label">Province</label>
-                  <input type="text" id="id_province_search" class="form-control" placeholder="Search province..." style="margin-bottom: 0.5rem;" disabled>
-                  <select id="id_province" name="province" class="form-control" size="5" style="height: auto;" disabled>
-                    <option value="">Select Province</option>
-                  </select>
+                  <div class="address-select-wrapper">
+                    <input type="text" id="id_province_search" class="form-control address-search" placeholder="Type to search province..." disabled>
+                    <select id="id_province" name="province" class="form-control" disabled>
+                      <option value="">Select Province</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_city_municipality" class="form-label">City / Municipality</label>
-                  <input type="text" id="id_city_search" class="form-control" placeholder="Search city..." style="margin-bottom: 0.5rem;" disabled>
-                  <select id="id_city_municipality" name="city_municipality" class="form-control" size="5" style="height: auto;" disabled>
-                    <option value="">Select City/Municipality</option>
-                  </select>
+                  <div class="address-select-wrapper">
+                    <input type="text" id="id_city_search" class="form-control address-search" placeholder="Type to search city..." disabled>
+                    <select id="id_city_municipality" name="city_municipality" class="form-control" disabled>
+                      <option value="">Select City/Municipality</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_barangay" class="form-label">Barangay</label>
-                  <input type="text" id="id_barangay_search" class="form-control" placeholder="Search barangay..." style="margin-bottom: 0.5rem;" disabled>
-                  <select id="id_barangay" name="barangay" class="form-control" size="5" style="height: auto;" disabled>
-                    <option value="">Select Barangay</option>
-                  </select>
+                  <div class="address-select-wrapper">
+                    <input type="text" id="id_barangay_search" class="form-control address-search" placeholder="Type to search barangay..." disabled>
+                    <select id="id_barangay" name="barangay" class="form-control" disabled>
+                      <option value="">Select Barangay</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div class="form-group form-group-full">
@@ -1093,22 +1119,66 @@
         }
     });
     
-    // Search functionality for dropdowns
+    // Enhanced search functionality for dropdowns
     function setupSearch(searchInputId, selectId) {
         const searchInput = document.getElementById(searchInputId);
         const select = document.getElementById(selectId);
+        let allOptions = [];
+        
+        // Store all options when they're loaded
+        const observer = new MutationObserver(() => {
+            if (select.options.length > 1) {
+                allOptions = Array.from(select.options).slice(1); // Skip "Select..." option
+            }
+        });
+        observer.observe(select, { childList: true });
         
         searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const options = select.options;
+            const searchTerm = this.value.toLowerCase().trim();
             
-            for (let i = 1; i < options.length; i++) { // Skip first "Select..." option
-                const optionText = options[i].textContent.toLowerCase();
+            if (!searchTerm) {
+                // Show all options if search is empty
+                Array.from(select.options).forEach(option => {
+                    option.style.display = '';
+                });
+                return;
+            }
+            
+            // Filter options
+            let hasVisibleOptions = false;
+            Array.from(select.options).forEach((option, index) => {
+                if (index === 0) return; // Skip "Select..." option
+                
+                const optionText = option.textContent.toLowerCase();
                 if (optionText.includes(searchTerm)) {
-                    options[i].style.display = '';
+                    option.style.display = '';
+                    hasVisibleOptions = true;
                 } else {
-                    options[i].style.display = 'none';
+                    option.style.display = 'none';
                 }
+            });
+            
+            // Auto-select if only one match
+            if (hasVisibleOptions) {
+                const visibleOptions = Array.from(select.options).filter(
+                    (opt, idx) => idx > 0 && opt.style.display !== 'none'
+                );
+                if (visibleOptions.length === 1) {
+                    select.value = visibleOptions[0].value;
+                    // Trigger change event
+                    select.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+        
+        // Clear search when dropdown changes
+        select.addEventListener('change', function() {
+            if (this.value) {
+                searchInput.value = '';
+                // Show all options again
+                Array.from(this.options).forEach(option => {
+                    option.style.display = '';
+                });
             }
         });
     }
