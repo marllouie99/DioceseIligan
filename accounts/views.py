@@ -314,6 +314,10 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         profile_image_url = None
 
     if request.method == 'POST':
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Profile update POST data: {request.POST}")
+        
         form = ProfileForm(request.POST, request.FILES, instance=profile, user=request.user)
         if form.is_valid():
             form.save()
@@ -368,12 +372,15 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
                 messages.success(request, 'Your profile has been updated successfully!')
                 return redirect('manage_profile')
         else:
+            # Log form errors
+            logger.error(f"Profile form validation failed: {form.errors}")
+            
             # Check if this is an AJAX request
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': False,
                     'errors': form.errors
-                })
+                }, status=400)
             else:
                 messages.error(request, 'Please correct the errors below.')
     else:
