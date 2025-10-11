@@ -105,11 +105,16 @@ def create_donation_order(request, post_id):
                     "currency_code": PAYPAL_CURRENCY,
                     "value": str(amount)
                 },
-                "description": f"Donation to {post.church.name}"
+                "description": f"Donation to {post.church.name}",
+                "payee": {
+                    "email_address": post.church.paypal_email
+                }
             }],
             "application_context": {
-                "brand_name": "ChurchIligan",
-                "shipping_preference": "NO_SHIPPING"
+                "brand_name": "ChurchConnect",
+                "shipping_preference": "NO_SHIPPING",
+                "return_url": f"{SITE_URL}/app/donations/success/{post_id}/",
+                "cancel_url": f"{SITE_URL}/app/post/{post_id}/"
             }
         }
         
