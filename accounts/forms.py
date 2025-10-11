@@ -224,6 +224,14 @@ class ProfileForm(forms.Form):
         if self.user and User.objects.filter(email__iexact=email).exclude(pk=self.user.pk).exists():
             raise forms.ValidationError('An account with this email already exists.')
         return email
+    
+    def clean_postal_code(self):
+        postal_code = self.cleaned_data.get('postal_code', '').strip()
+        if postal_code and not postal_code.isdigit():
+            raise forms.ValidationError('Postal code must contain only numbers.')
+        if postal_code and len(postal_code) != 4:
+            raise forms.ValidationError('Postal code must be exactly 4 digits.')
+        return postal_code
 
     def save(self, commit=True):
         if not self.user or not self.profile:

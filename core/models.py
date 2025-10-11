@@ -64,12 +64,20 @@ class Church(models.Model):
     )
     website = models.URLField(blank=True, null=True, help_text="Church website URL")
     
-    # Location
-    address = models.TextField(help_text="Street address")
-    city = models.CharField(max_length=100, help_text="City")
-    state = models.CharField(max_length=100, help_text="State/Province")
+    # Location - Philippine Address Structure
+    region = models.CharField(max_length=200, blank=True, help_text="Region (e.g., Region X - Northern Mindanao)")
+    province = models.CharField(max_length=200, blank=True, help_text="Province")
+    city_municipality = models.CharField(max_length=200, blank=True, help_text="City or Municipality")
+    barangay = models.CharField(max_length=200, blank=True, help_text="Barangay")
+    street_address = models.CharField(max_length=300, blank=True, help_text="Street, Building, Unit No.")
+    postal_code = models.CharField(max_length=4, blank=True, help_text="4-digit Postal/ZIP code")
+    
+    # Legacy location fields (for backward compatibility)
+    address = models.TextField(blank=True, help_text="Street address (legacy)")
+    city = models.CharField(max_length=100, blank=True, help_text="City (legacy)")
+    state = models.CharField(max_length=100, blank=True, help_text="State/Province (legacy)")
     country = models.CharField(max_length=100, default="Philippines", help_text="Country")
-    postal_code = models.CharField(max_length=20, help_text="Postal/ZIP code")
+    
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Latitude for mapping")
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Longitude for mapping")
     
@@ -184,8 +192,31 @@ class Church(models.Model):
     
     @property
     def full_address(self):
-        """Return formatted full address."""
-        return f"{self.address}, {self.city}, {self.state} {self.postal_code}, {self.country}"
+        """Return formatted full address using new Philippine address structure."""
+        # Use new structured address if available
+        if self.region or self.province or self.city_municipality:
+            parts = []
+            if self.street_address:
+                parts.append(self.street_address)
+            if self.barangay:
+                parts.append(f"Brgy. {self.barangay}")
+            if self.city_municipality:
+                parts.append(self.city_municipality)
+            if self.province:
+                parts.append(self.province)
+            if self.region:
+                parts.append(self.region)
+            if self.postal_code:
+                parts.append(self.postal_code)
+            if self.country:
+                parts.append(self.country)
+            return ", ".join(parts) if parts else "No address provided"
+        
+        # Fallback to legacy address format
+        if self.address or self.city or self.state:
+            return f"{self.address}, {self.city}, {self.state} {self.postal_code}, {self.country}"
+        
+        return "No address provided"
     
     @property
     def initial(self):

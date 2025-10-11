@@ -806,28 +806,32 @@
                 <!-- Philippine Address Fields -->
                 <div class="form-group">
                   <label for="id_region" class="form-label">Region</label>
-                  <select id="id_region" name="region" class="form-control">
+                  <input type="text" id="id_region_search" class="form-control" placeholder="Search region..." style="margin-bottom: 0.5rem;">
+                  <select id="id_region" name="region" class="form-control" size="5" style="height: auto;">
                     <option value="">Select Region</option>
                   </select>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_province" class="form-label">Province</label>
-                  <select id="id_province" name="province" class="form-control" disabled>
+                  <input type="text" id="id_province_search" class="form-control" placeholder="Search province..." style="margin-bottom: 0.5rem;" disabled>
+                  <select id="id_province" name="province" class="form-control" size="5" style="height: auto;" disabled>
                     <option value="">Select Province</option>
                   </select>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_city_municipality" class="form-label">City / Municipality</label>
-                  <select id="id_city_municipality" name="city_municipality" class="form-control" disabled>
+                  <input type="text" id="id_city_search" class="form-control" placeholder="Search city..." style="margin-bottom: 0.5rem;" disabled>
+                  <select id="id_city_municipality" name="city_municipality" class="form-control" size="5" style="height: auto;" disabled>
                     <option value="">Select City/Municipality</option>
                   </select>
                 </div>
                 
                 <div class="form-group">
                   <label for="id_barangay" class="form-label">Barangay</label>
-                  <select id="id_barangay" name="barangay" class="form-control" disabled>
+                  <input type="text" id="id_barangay_search" class="form-control" placeholder="Search barangay..." style="margin-bottom: 0.5rem;" disabled>
+                  <select id="id_barangay" name="barangay" class="form-control" size="5" style="height: auto;" disabled>
                     <option value="">Select Barangay</option>
                   </select>
                 </div>
@@ -839,7 +843,8 @@
                 
                 <div class="form-group">
                   <label for="id_postal_code" class="form-label">Postal Code</label>
-                  <input type="text" id="id_postal_code" name="postal_code" class="form-control" placeholder="e.g., 9000" maxlength="10">
+                  <input type="text" id="id_postal_code" name="postal_code" class="form-control" placeholder="e.g., 9000" maxlength="4" pattern="[0-9]{4}" title="Please enter a 4-digit postal code">
+                  <small class="form-text text-muted">4-digit postal code</small>
                 </div>
               </div>
             </div>
@@ -1088,12 +1093,81 @@
         }
     });
     
+    // Search functionality for dropdowns
+    function setupSearch(searchInputId, selectId) {
+        const searchInput = document.getElementById(searchInputId);
+        const select = document.getElementById(selectId);
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const options = select.options;
+            
+            for (let i = 1; i < options.length; i++) { // Skip first "Select..." option
+                const optionText = options[i].textContent.toLowerCase();
+                if (optionText.includes(searchTerm)) {
+                    options[i].style.display = '';
+                } else {
+                    options[i].style.display = 'none';
+                }
+            }
+        });
+    }
+    
+    // Setup search for all dropdowns
+    setupSearch('id_region_search', 'id_region');
+    setupSearch('id_province_search', 'id_province');
+    setupSearch('id_city_search', 'id_city_municipality');
+    setupSearch('id_barangay_search', 'id_barangay');
+    
+    // Postal code validation
+    const postalCodeInput = document.getElementById('id_postal_code');
+    postalCodeInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+    });
+    
     // Set saved street address and postal code
     document.getElementById('id_street_address').value = '{{ profile.street_address|escapejs }}';
     document.getElementById('id_postal_code').value = '{{ profile.postal_code|escapejs }}';
     
     // Initialize on page load
     loadRegions();
+})();
+
+// Display formatted address in profile overview
+(function() {
+    const region = '{{ profile.region|escapejs }}';
+    const province = '{{ profile.province|escapejs }}';
+    const city = '{{ profile.city_municipality|escapejs }}';
+    const barangay = '{{ profile.barangay|escapejs }}';
+    const street = '{{ profile.street_address|escapejs }}';
+    const postal = '{{ profile.postal_code|escapejs }}';
+    
+    if (region || province || city || barangay || street) {
+        const addressParts = [];
+        if (street) addressParts.push(street);
+        if (barangay) addressParts.push('Brgy. ' + barangay);
+        if (city) addressParts.push(city);
+        if (province) addressParts.push(province);
+        if (region) addressParts.push(region);
+        if (postal) addressParts.push(postal);
+        
+        const formattedAddress = addressParts.join(', ');
+        
+        // Find and update address display in overview
+        const profileMeta = document.querySelector('.profile-meta');
+        if (profileMeta && formattedAddress) {
+            const addressElement = document.createElement('div');
+            addressElement.className = 'profile-meta';
+            addressElement.innerHTML = `
+                <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>${formattedAddress}</span>
+            `;
+            profileMeta.parentNode.insertBefore(addressElement, profileMeta.nextSibling);
+        }
+    }
 })();
 
 // Initialize profile system with error handling
