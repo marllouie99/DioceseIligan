@@ -143,11 +143,11 @@ def has_recent_verification(email, minutes=2):
     ).exists()
 
 
-@send_email_async
 def _send_password_reset_email_worker(email, code):
     """
-    Worker function to send password reset email (runs in background thread)
+    Worker function to send password reset email (synchronous using Brevo API)
     """
+    import sys
     try:
         subject = 'ChurchConnect - Password Reset Code'
         
@@ -160,34 +160,42 @@ def _send_password_reset_email_worker(email, code):
         # Create plain text version
         plain_message = strip_tags(html_message)
         
-        # Use Django's send_mail (respects EMAIL_BACKEND setting)
+        # Use Brevo HTTP API instead of SMTP (works on Render)
         try:
-            send_mail(
+            success = send_email_via_brevo_api(
+                to_email=email,
                 subject=subject,
-                message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
+                html_content=html_message,
+                plain_content=plain_message
             )
-            logger.info(f"Password reset email sent successfully to {email}")
-        except Exception as smtp_error:
-            logger.error(f"SMTP failed for password reset: {smtp_error}")
+            
+            if success:
+                logger.info(f"Password reset email sent successfully to {email} via Brevo API")
+                return True
+            else:
+                logger.error(f"Failed to send password reset via Brevo API to {email}")
+                print(f"=== EMAIL SEND FAILED - PASSWORD RESET CODE FOR {email}: {code} ===")
+                sys.stdout.flush()
+                return False
+        except Exception as api_error:
+            logger.error(f"Brevo API failed for password reset: {api_error}")
             print(f"=== EMAIL SEND FAILED - PASSWORD RESET CODE FOR {email}: {code} ===")
+            sys.stdout.flush()
+            return False
         
     except Exception as e:
         logger.error(f"Failed to send password reset email to {email}: {str(e)}")
         print(f"=== EMAIL EXCEPTION - PASSWORD RESET CODE FOR {email}: {code} ===")
+        return False
 
 
 def send_password_reset_email(email, code):
     """
-    Send password reset email with the provided code (async)
-    Returns immediately while email is sent in background thread
+    Send password reset email with the provided code (synchronous for reliability)
+    Returns True if sent successfully, False otherwise
     """
-    logger.info(f"Queuing password reset email to {email}")
-    _send_password_reset_email_worker(email, code)
-    return True
+    logger.info(f"Sending password reset email to {email}")
+    return _send_password_reset_email_worker(email, code)
 
 
 def send_password_reset_code(email):
