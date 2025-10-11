@@ -1,4 +1,4 @@
-﻿{% extends 'layouts/app_base.html' %}
+{% extends 'layouts/app_base.html' %}
 {% load static %}
 
 {% block title %}System Overview â€¢ ChurchConnect{% endblock %}
@@ -197,7 +197,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // User Statistics Bar Chart
   const userStatsCtx = document.getElementById('userStatsChart');
   if (userStatsCtx) {
-    ['Active Users', 'Inactive Users', 'New This Month'],
+    new Chart(userStatsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Total Users', 'Active Users', 'New This Month'],
         datasets: [{
           label: 'Count',
           data: [
@@ -268,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
 
   // Active Users Doughnut Chart
   const activeUsersCtx = document.getElementById('activeUsersChart');
@@ -409,7 +413,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Church Statistics Bar Chart
   const churchStatsCtx = document.getElementById('churchStatsChart');
   if (churchStatsCtx) {
-    ['Verified', 'Unverified', 'New This Month'],
+    new Chart(churchStatsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Total Churches', 'Verified', 'New This Month'],
         datasets: [{
           label: 'Count',
           data: [
@@ -481,6 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+
   // Verified Churches Doughnut Chart
   const verifiedChurchesCtx = document.getElementById('verifiedChurchesChart');
   if (verifiedChurchesCtx) {
@@ -534,7 +542,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Top Churches by Followers Horizontal Bar Chart
   const churchRankingCtx = document.getElementById('churchRankingChart');
   if (churchRankingCtx) {
     const churchNames = [
@@ -606,12 +613,12 @@ document.addEventListener('DOMContentLoaded', function() {
             callbacks: {
               label: function(context) {
                 const index = context.dataIndex;
-                const verified = verifiedStatus[index] ? ' âœ“ Verified' : '';
+                const verified = verifiedStatus[index] ? ' “ Verified' : '';
                 return 'Followers: ' + context.parsed.x + verified;
               },
               afterLabel: function(context) {
                 const index = context.dataIndex;
-                const medals = ['ðŸ¥‡ 1st Place', 'ðŸ¥ˆ 2nd Place', 'ðŸ¥‰ 3rd Place'];
+                const medals = ['🥇 1st Place', '🥈 2nd Place', '🥉 3rd Place'];
                 if (index < 3) {
                   return medals[index];
                 }
@@ -752,12 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   
   <!-- Sections Container -->
-    <div class="chart-card chart-card-full">
-    <h3 class="chart-title">Platform Growth This Month</h3>
-    <div class="chart-container">
-      <canvas id="platformGrowthChart"></canvas>
-    </div>
-  </div>
+  <div id="sectionsContainer">
     
   <!-- Users Section -->
   <div class="overview-section users-overview-section">
@@ -863,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       <!-- Top Churches by Followers Chart -->
       <div class="chart-card chart-card-full">
-        <h3 class="chart-title">ðŸ† Top Churches by Followers</h3>
+        <h3 class="chart-title">🏆 Top Churches by Followers</h3>
         <div class="ranking-chart-container">
           <canvas id="churchRankingChart"></canvas>
         </div>
@@ -874,6 +876,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div><!-- End sectionsContainer -->
 </div>
 {% endblock %}
+
+
+
+
+
+
 
 
 
