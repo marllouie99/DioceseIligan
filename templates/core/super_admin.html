@@ -197,10 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // User Statistics Bar Chart
   const userStatsCtx = document.getElementById('userStatsChart');
   if (userStatsCtx) {
-    new Chart(userStatsCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Total Users', 'Active Users', 'New This Month'],
+    ['Active Users', 'Inactive Users', 'New This Month'],
         datasets: [{
           label: 'Count',
           data: [
@@ -412,10 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Church Statistics Bar Chart
   const churchStatsCtx = document.getElementById('churchStatsChart');
   if (churchStatsCtx) {
-    new Chart(churchStatsCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Total Churches', 'Verified', 'New This Month'],
+    ['Verified', 'Unverified', 'New This Month'],
         datasets: [{
           label: 'Count',
           data: [
@@ -758,7 +752,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   
   <!-- Sections Container -->
-  <div id="sectionsContainer">
+    <div class="chart-card chart-card-full">
+    <h3 class="chart-title">Platform Growth This Month</h3>
+    <div class="chart-container">
+      <canvas id="platformGrowthChart"></canvas>
+    </div>
+  </div>
     
   <!-- Users Section -->
   <div class="overview-section users-overview-section">
@@ -875,5 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div><!-- End sectionsContainer -->
 </div>
 {% endblock %}
+
+
 
 
