@@ -13,21 +13,99 @@
   <!-- Page-specific styles -->
   <link rel="stylesheet" href="{% static 'css/pages/profile.css' %}?v={{ STATIC_VERSION }}">
   <style>
-    /* Philippine Address Select Styling */
-    .address-select-wrapper {
+    /* Searchable Dropdown Styling */
+    .searchable-select {
       position: relative;
-    }
-    .address-select-wrapper .address-search {
-      margin-bottom: 0.5rem;
-    }
-    .address-select-wrapper select {
       width: 100%;
     }
-    .address-select-wrapper select option {
-      padding: 0.5rem;
+    
+    .searchable-select-input {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.3s ease;
     }
-    .address-select-wrapper select option:hover {
-      background-color: #f0f0f0;
+    
+    .searchable-select-input:focus {
+      outline: none;
+      border-color: #DAA520;
+      box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+    }
+    
+    .searchable-select-input:disabled {
+      background: #f5f5f5;
+      cursor: not-allowed;
+      color: #999;
+    }
+    
+    .searchable-select-arrow {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    
+    .searchable-select.active .searchable-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    
+    .searchable-select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-top: 0.25rem;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    
+    .searchable-select.active .searchable-select-dropdown {
+      display: block;
+    }
+    
+    .searchable-select-option {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .searchable-select-option:hover {
+      background: #f8f9fa;
+    }
+    
+    .searchable-select-option.selected {
+      background: #DAA520;
+      color: white;
+    }
+    
+    .searchable-select-option.hidden {
+      display: none;
+    }
+    
+    .searchable-select-no-results {
+      padding: 1rem;
+      text-align: center;
+      color: #999;
+      font-style: italic;
+    }
+    
+    /* Hide the actual select element */
+    .searchable-select select {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 {% endblock %}
@@ -824,9 +902,13 @@
                 <!-- Philippine Address Fields -->
                 <div class="form-group">
                   <label for="id_region" class="form-label">Region</label>
-                  <div class="address-select-wrapper">
-                    <input type="text" id="id_region_search" class="form-control address-search" placeholder="Type to search region...">
-                    <select id="id_region" name="region" class="form-control">
+                  <div class="searchable-select" id="region-wrapper">
+                    <input type="text" class="searchable-select-input" placeholder="Select or search region..." autocomplete="off">
+                    <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                    </svg>
+                    <div class="searchable-select-dropdown"></div>
+                    <select id="id_region" name="region" style="display: none;">
                       <option value="">Select Region</option>
                     </select>
                   </div>
@@ -834,9 +916,13 @@
                 
                 <div class="form-group">
                   <label for="id_province" class="form-label">Province</label>
-                  <div class="address-select-wrapper">
-                    <input type="text" id="id_province_search" class="form-control address-search" placeholder="Type to search province..." disabled>
-                    <select id="id_province" name="province" class="form-control" disabled>
+                  <div class="searchable-select" id="province-wrapper">
+                    <input type="text" class="searchable-select-input" placeholder="Select region first..." autocomplete="off" disabled>
+                    <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                    </svg>
+                    <div class="searchable-select-dropdown"></div>
+                    <select id="id_province" name="province" style="display: none;" disabled>
                       <option value="">Select Province</option>
                     </select>
                   </div>
@@ -844,9 +930,13 @@
                 
                 <div class="form-group">
                   <label for="id_city_municipality" class="form-label">City / Municipality</label>
-                  <div class="address-select-wrapper">
-                    <input type="text" id="id_city_search" class="form-control address-search" placeholder="Type to search city..." disabled>
-                    <select id="id_city_municipality" name="city_municipality" class="form-control" disabled>
+                  <div class="searchable-select" id="city-wrapper">
+                    <input type="text" class="searchable-select-input" placeholder="Select province first..." autocomplete="off" disabled>
+                    <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                    </svg>
+                    <div class="searchable-select-dropdown"></div>
+                    <select id="id_city_municipality" name="city_municipality" style="display: none;" disabled>
                       <option value="">Select City/Municipality</option>
                     </select>
                   </div>
@@ -854,9 +944,13 @@
                 
                 <div class="form-group">
                   <label for="id_barangay" class="form-label">Barangay</label>
-                  <div class="address-select-wrapper">
-                    <input type="text" id="id_barangay_search" class="form-control address-search" placeholder="Type to search barangay..." disabled>
-                    <select id="id_barangay" name="barangay" class="form-control" disabled>
+                  <div class="searchable-select" id="barangay-wrapper">
+                    <input type="text" class="searchable-select-input" placeholder="Select city first..." autocomplete="off" disabled>
+                    <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                    </svg>
+                    <div class="searchable-select-dropdown"></div>
+                    <select id="id_barangay" name="barangay" style="display: none;" disabled>
                       <option value="">Select Barangay</option>
                     </select>
                   </div>
@@ -937,7 +1031,7 @@
 <script src="{% static 'js/manage_profile_new.js' %}?v={{ STATIC_VERSION }}"></script>
 
 <script>
-// Philippine Address Cascading Dropdowns
+// Philippine Address Cascading Dropdowns with Searchable Select
 (function() {
     const regionSelect = document.getElementById('id_region');
     const provinceSelect = document.getElementById('id_province');
@@ -948,6 +1042,125 @@
     let provinceCodeMap = {};
     let cityCodeMap = {};
     
+    // Initialize searchable select component
+    function initSearchableSelect(wrapperId, selectId) {
+        const wrapper = document.getElementById(wrapperId);
+        const input = wrapper.querySelector('.searchable-select-input');
+        const dropdown = wrapper.querySelector('.searchable-select-dropdown');
+        const select = document.getElementById(selectId);
+        
+        // Toggle dropdown on input click
+        input.addEventListener('click', function() {
+            if (!this.disabled) {
+                wrapper.classList.toggle('active');
+            }
+        });
+        
+        // Search functionality
+        input.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const options = dropdown.querySelectorAll('.searchable-select-option');
+            let hasVisible = false;
+            
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    option.classList.remove('hidden');
+                    hasVisible = true;
+                } else {
+                    option.classList.add('hidden');
+                }
+            });
+            
+            // Show "no results" message
+            let noResults = dropdown.querySelector('.searchable-select-no-results');
+            if (!hasVisible && options.length > 0) {
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.className = 'searchable-select-no-results';
+                    noResults.textContent = 'No results found';
+                    dropdown.appendChild(noResults);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) {
+                wrapper.classList.remove('active');
+            }
+        });
+        
+        return { wrapper, input, dropdown, select };
+    }
+    
+    // Populate dropdown options
+    function populateDropdown(wrapperId, selectId, options, codeMap) {
+        const wrapper = document.getElementById(wrapperId);
+        const input = wrapper.querySelector('.searchable-select-input');
+        const dropdown = wrapper.querySelector('.searchable-select-dropdown');
+        const select = document.getElementById(selectId);
+        
+        // Clear existing options
+        dropdown.innerHTML = '';
+        select.innerHTML = '<option value="">Select...</option>';
+        
+        // Add options
+        options.forEach(option => {
+            // Add to hidden select (for form submission)
+            const selectOption = document.createElement('option');
+            selectOption.value = option.name;
+            selectOption.textContent = option.name;
+            selectOption.dataset.code = option.code;
+            select.appendChild(selectOption);
+            
+            // Add to visible dropdown
+            const dropdownOption = document.createElement('div');
+            dropdownOption.className = 'searchable-select-option';
+            dropdownOption.textContent = option.name;
+            dropdownOption.dataset.value = option.name;
+            dropdownOption.dataset.code = option.code;
+            
+            dropdownOption.addEventListener('click', function() {
+                // Update input value
+                input.value = this.textContent;
+                
+                // Update hidden select
+                select.value = this.dataset.value;
+                
+                // Store code in map
+                codeMap[this.dataset.value] = this.dataset.code;
+                
+                // Close dropdown
+                wrapper.classList.remove('active');
+                
+                // Trigger change event
+                select.dispatchEvent(new Event('change'));
+                
+                // Update selected state
+                dropdown.querySelectorAll('.searchable-select-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+            
+            dropdown.appendChild(dropdownOption);
+        });
+        
+        // Enable the input
+        input.disabled = false;
+        input.placeholder = `Select or search...`;
+        select.disabled = false;
+    }
+    
+    // Initialize all searchable selects
+    const regionComponent = initSearchableSelect('region-wrapper', 'id_region');
+    const provinceComponent = initSearchableSelect('province-wrapper', 'id_province');
+    const cityComponent = initSearchableSelect('city-wrapper', 'id_city_municipality');
+    const barangayComponent = initSearchableSelect('barangay-wrapper', 'id_barangay');
+    
     // Load regions on page load
     async function loadRegions() {
         try {
@@ -955,19 +1168,12 @@
             const data = await response.json();
             
             if (data.success) {
-                regionSelect.innerHTML = '<option value="">Select Region</option>';
-                data.data.forEach(region => {
-                    const option = document.createElement('option');
-                    option.value = region.name;
-                    option.textContent = region.name;
-                    option.dataset.code = region.code;
-                    regionSelect.appendChild(option);
-                    regionCodeMap[region.name] = region.code;
-                });
+                populateDropdown('region-wrapper', 'id_region', data.data, regionCodeMap);
                 
                 // Set saved value if exists
                 const savedRegion = '{{ profile.region|escapejs }}';
                 if (savedRegion) {
+                    regionComponent.input.value = savedRegion;
                     regionSelect.value = savedRegion;
                     await loadProvinces(regionCodeMap[savedRegion]);
                 }
@@ -979,112 +1185,97 @@
     
     async function loadProvinces(regionCode) {
         try {
-            provinceSelect.disabled = true;
-            provinceSelect.innerHTML = '<option value="">Loading...</option>';
+            provinceComponent.input.value = 'Loading...';
+            provinceComponent.input.disabled = true;
             
             const response = await fetch(`/api/ph-provinces/?region_code=${regionCode}`);
             const data = await response.json();
             
             if (data.success) {
-                provinceSelect.innerHTML = '<option value="">Select Province</option>';
-                data.data.forEach(province => {
-                    const option = document.createElement('option');
-                    option.value = province.name;
-                    option.textContent = province.name;
-                    option.dataset.code = province.code;
-                    provinceSelect.appendChild(option);
-                    provinceCodeMap[province.name] = province.code;
-                });
-                provinceSelect.disabled = false;
+                populateDropdown('province-wrapper', 'id_province', data.data, provinceCodeMap);
                 
                 // Set saved value if exists
                 const savedProvince = '{{ profile.province|escapejs }}';
                 if (savedProvince) {
+                    provinceComponent.input.value = savedProvince;
                     provinceSelect.value = savedProvince;
                     await loadCities(provinceCodeMap[savedProvince]);
                 }
             }
         } catch (error) {
             console.error('Failed to load provinces:', error);
-            provinceSelect.innerHTML = '<option value="">Error loading provinces</option>';
+            provinceComponent.input.value = 'Error loading';
         }
     }
     
     async function loadCities(provinceCode) {
         try {
-            citySelect.disabled = true;
-            citySelect.innerHTML = '<option value="">Loading...</option>';
+            cityComponent.input.value = 'Loading...';
+            cityComponent.input.disabled = true;
             
             const response = await fetch(`/api/ph-cities/?province_code=${provinceCode}`);
             const data = await response.json();
             
             if (data.success) {
-                citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
-                data.data.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city.name;
-                    option.textContent = city.name;
-                    option.dataset.code = city.code;
-                    citySelect.appendChild(option);
-                    cityCodeMap[city.name] = city.code;
-                });
-                citySelect.disabled = false;
+                populateDropdown('city-wrapper', 'id_city_municipality', data.data, cityCodeMap);
                 
                 // Set saved value if exists
                 const savedCity = '{{ profile.city_municipality|escapejs }}';
                 if (savedCity) {
+                    cityComponent.input.value = savedCity;
                     citySelect.value = savedCity;
                     await loadBarangays(cityCodeMap[savedCity]);
                 }
             }
         } catch (error) {
             console.error('Failed to load cities:', error);
-            citySelect.innerHTML = '<option value="">Error loading cities</option>';
+            cityComponent.input.value = 'Error loading';
         }
     }
     
     async function loadBarangays(cityCode) {
         try {
-            barangaySelect.disabled = true;
-            barangaySelect.innerHTML = '<option value="">Loading...</option>';
+            barangayComponent.input.value = 'Loading...';
+            barangayComponent.input.disabled = true;
             
             const response = await fetch(`/api/ph-barangays/?city_code=${cityCode}`);
             const data = await response.json();
             
             if (data.success) {
-                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-                data.data.forEach(barangay => {
-                    const option = document.createElement('option');
-                    option.value = barangay.name;
-                    option.textContent = barangay.name;
-                    barangaySelect.appendChild(option);
-                });
-                barangaySelect.disabled = false;
+                populateDropdown('barangay-wrapper', 'id_barangay', data.data, {});
                 
                 // Set saved value if exists
                 const savedBarangay = '{{ profile.barangay|escapejs }}';
                 if (savedBarangay) {
+                    barangayComponent.input.value = savedBarangay;
                     barangaySelect.value = savedBarangay;
                 }
             }
         } catch (error) {
             console.error('Failed to load barangays:', error);
-            barangaySelect.innerHTML = '<option value="">Error loading barangays</option>';
+            barangayComponent.input.value = 'Error loading';
         }
     }
     
-    // Event listeners
+    // Event listeners for cascading
     regionSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const regionCode = selectedOption.dataset.code;
+        const regionCode = regionCodeMap[this.value];
         
         // Reset dependent dropdowns
-        provinceSelect.innerHTML = '<option value="">Select Province</option>';
-        provinceSelect.disabled = true;
-        citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
-        citySelect.disabled = true;
-        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-        barangaySelect.disabled = true;
+        provinceComponent.input.value = '';
+        provinceComponent.input.placeholder = 'Select province first...';
+        provinceComponent.input.disabled = true;
+        provinceComponent.dropdown.innerHTML = '';
+        
+        cityComponent.input.value = '';
+        cityComponent.input.placeholder = 'Select city first...';
+        cityComponent.input.disabled = true;
+        cityComponent.dropdown.innerHTML = '';
+        
+        barangayComponent.input.value = '';
+        barangayComponent.input.placeholder = 'Select barangay first...';
+        barangayComponent.input.disabled = true;
+        barangayComponent.dropdown.innerHTML = '';
         
         if (regionCode) {
             loadProvinces(regionCode);
@@ -1092,14 +1283,18 @@
     });
     
     provinceSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const provinceCode = selectedOption.dataset.code;
+        const provinceCode = provinceCodeMap[this.value];
         
         // Reset dependent dropdowns
-        citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
-        citySelect.disabled = true;
-        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-        barangaySelect.disabled = true;
+        cityComponent.input.value = '';
+        cityComponent.input.placeholder = 'Select city first...';
+        cityComponent.input.disabled = true;
+        cityComponent.dropdown.innerHTML = '';
+        
+        barangayComponent.input.value = '';
+        barangayComponent.input.placeholder = 'Select barangay first...';
+        barangayComponent.input.disabled = true;
+        barangayComponent.dropdown.innerHTML = '';
         
         if (provinceCode) {
             loadCities(provinceCode);
@@ -1107,87 +1302,18 @@
     });
     
     citySelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const cityCode = selectedOption.dataset.code;
+        const cityCode = cityCodeMap[this.value];
         
         // Reset dependent dropdown
-        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-        barangaySelect.disabled = true;
+        barangayComponent.input.value = '';
+        barangayComponent.input.placeholder = 'Select barangay first...';
+        barangayComponent.input.disabled = true;
+        barangayComponent.dropdown.innerHTML = '';
         
         if (cityCode) {
             loadBarangays(cityCode);
         }
     });
-    
-    // Enhanced search functionality for dropdowns
-    function setupSearch(searchInputId, selectId) {
-        const searchInput = document.getElementById(searchInputId);
-        const select = document.getElementById(selectId);
-        let allOptions = [];
-        
-        // Store all options when they're loaded
-        const observer = new MutationObserver(() => {
-            if (select.options.length > 1) {
-                allOptions = Array.from(select.options).slice(1); // Skip "Select..." option
-            }
-        });
-        observer.observe(select, { childList: true });
-        
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                // Show all options if search is empty
-                Array.from(select.options).forEach(option => {
-                    option.style.display = '';
-                });
-                return;
-            }
-            
-            // Filter options
-            let hasVisibleOptions = false;
-            Array.from(select.options).forEach((option, index) => {
-                if (index === 0) return; // Skip "Select..." option
-                
-                const optionText = option.textContent.toLowerCase();
-                if (optionText.includes(searchTerm)) {
-                    option.style.display = '';
-                    hasVisibleOptions = true;
-                } else {
-                    option.style.display = 'none';
-                }
-            });
-            
-            // Auto-select if only one match
-            if (hasVisibleOptions) {
-                const visibleOptions = Array.from(select.options).filter(
-                    (opt, idx) => idx > 0 && opt.style.display !== 'none'
-                );
-                if (visibleOptions.length === 1) {
-                    select.value = visibleOptions[0].value;
-                    // Trigger change event
-                    select.dispatchEvent(new Event('change'));
-                }
-            }
-        });
-        
-        // Clear search when dropdown changes
-        select.addEventListener('change', function() {
-            if (this.value) {
-                searchInput.value = '';
-                // Show all options again
-                Array.from(this.options).forEach(option => {
-                    option.style.display = '';
-                });
-            }
-        });
-    }
-    
-    // Setup search for all dropdowns
-    setupSearch('id_region_search', 'id_region');
-    setupSearch('id_province_search', 'id_province');
-    setupSearch('id_city_search', 'id_city_municipality');
-    setupSearch('id_barangay_search', 'id_barangay');
     
     // Postal code validation
     const postalCodeInput = document.getElementById('id_postal_code');
