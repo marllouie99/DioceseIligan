@@ -872,12 +872,77 @@ def unfollow_church(request, church_id):
 
 @login_required
 def events(request):
+    """
+    Events page:
+    - Main feed (1 column): upcoming event posts from churches the user follows
+    - Right sidebar: other upcoming events from churches the user is NOT following
+    """
+    now = timezone.now()
+
+    # Get followed church IDs
+    followed_ids = list(
+        ChurchFollow.objects.filter(user=request.user).values_list('church_id', flat=True)
+    )
+
+    # Common filter for upcoming, active event posts
+    base_filter = {
+        'is_active': True,
+        'post_type': 'event',
+        'church__is_active': True,
+        'event_start_date__gte': now,
+    }
+
+    # Main events feed: from followed churches
+    events_qs = (
+        Post.objects.filter(**base_filter, church_id__in=followed_ids)
+        .select_related('church')
+    )
+
+    # Annotate like/bookmark flags and counts (avoid N+1)
+    if request.user.is_authenticated:
+        events_qs = events_qs.annotate(
+            is_liked=Exists(
+                PostLike.objects.filter(user=request.user, post_id=OuterRef('pk'))
+            ),
+            is_bookmarked=Exists(
+                PostBookmark.objects.filter(user=request.user, post_id=OuterRef('pk'))
+            ),
+        )
+    else:
+        events_qs = events_qs.annotate(
+            is_liked=Value(False, output_field=BooleanField()),
+            is_bookmarked=Value(False, output_field=BooleanField()),
+        )
+
+    events_qs = events_qs.annotate(
+        likes_count=Count('likes', distinct=True),
+        comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True),
+    ).order_by('event_start_date', '-created_at')
+
+    # Paginate main feed (1 column list)
+    paginator = Paginator(events_qs, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Sidebar: other upcoming events from non-followed churches
+    # Use a small limit for quick sidebar rendering
+    other_events = (
+        Post.objects.filter(**base_filter)
+        .exclude(church_id__in=followed_ids or [-1])
+        .select_related('church')
+        .order_by('event_start_date')[:5]
+    )
+
     ctx = {
         'active': 'events',
         'page_title': 'Events',
+        'events': page_obj,
+        'other_events': list(other_events),
+        'total_events': paginator.count,
+        'followed_count': len(followed_ids),
     }
     ctx.update(_app_context(request))
-    return render(request, 'app/page.html', ctx)
+    return render(request, 'core/events.html', ctx)
 
 
 @login_required

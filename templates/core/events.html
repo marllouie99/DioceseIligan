@@ -1,0 +1,152 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Events - ChurchConnect{% endblock %}
+
+{% block body_class %}page-events{% endblock %}
+
+{% block extra_css %}
+  <!-- Centralized Warm Sacred Earth Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="events-page warm-sacred-earth page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Events</h1>
+      <p class="page-subtitle">Upcoming events from churches you follow</p>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+    <!-- Main: 1 column event feed -->
+    <div class="main-content">
+      {% if total_events %}
+        <div class="results-summary">
+          <p class="results-count">{{ total_events }} upcoming event{{ total_events|pluralize }} from followed churches</p>
+        </div>
+      {% endif %}
+
+      <div class="posts-feed">
+        {% if events and events|length %}
+          {% for post in events %}
+            {% include 'partials/post_card.html' with post=post %}
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <h3>No upcoming events</h3>
+            <p>Follow more churches to see their events here.</p>
+            <a href="{% url 'core:discover' %}" class="btn btn-primary">Discover Churches</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if events and events.has_other_pages %}
+        <div class="pagination">
+          {% if events.has_previous %}
+            <a href="?page={{ events.previous_page_number }}" class="pagination-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15,18 9,12 15,6"/>
+              </svg>
+              Previous
+            </a>
+          {% endif %}
+          <span class="pagination-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Page {{ events.number }} of {{ events.paginator.num_pages }}
+          </span>
+          {% if events.has_next %}
+            <a href="?page={{ events.next_page_number }}" class="pagination-btn">
+              Next
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,18 15,12 9,6"/>
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar: other upcoming events -->
+    <div class="sidebar-content">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Other Upcoming Events</h3>
+        <div class="upcoming-events">
+          {% if other_events %}
+            {% for event in other_events %}
+              <div class="event-card">
+                <div class="event-date-badge">
+                  <div class="event-date-month">{{ event.event_start_date|date:"M" }}</div>
+                  <div class="event-date-day">{{ event.event_start_date|date:"d" }}</div>
+                </div>
+                <div class="event-info">
+                  <p class="event-title">{{ event.event_title|default:"Event" }}</p>
+                  <p class="event-church">{{ event.church.name }}</p>
+                  <p class="event-time">
+                    <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ event.event_start_date|date:"M d, Y • g:i A" }}
+                  </p>
+                  {% if event.event_location %}
+                  <p class="event-location">
+                    <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {{ event.event_location|truncatewords:8 }}
+                  </p>
+                  {% endif %}
+                </div>
+                <a href="{% url 'core:church_detail' event.church.slug %}?tab=posts#post-card-{{ event.id }}" class="event-view-btn">View</a>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-events">
+              <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <p class="empty-text">No other events at the moment</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {# Reuse existing JS for post actions (loaded in app_base) #}
+{% endblock %}
