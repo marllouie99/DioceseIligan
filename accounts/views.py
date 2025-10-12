@@ -267,6 +267,18 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             event.is_liked = event.is_liked_by(request.user)
             event.is_bookmarked = event.is_bookmarked_by(request.user)
 
+    # Get followed churches for sidebar (limit to 5)
+    followed_churches_list = []
+    followed_churches_count = 0
+    if request.user.is_authenticated:
+        followed_churches_queryset = Church.objects.filter(
+            followers__user=request.user,
+            is_active=True
+        ).select_related().order_by('-followers__followed_at')
+        
+        followed_churches_count = followed_churches_queryset.count()
+        followed_churches_list = list(followed_churches_queryset[:5])
+    
     # Get PayPal configuration for donation integration
     PAYPAL_CLIENT_ID = getattr(settings, 'PAYPAL_CLIENT_ID', '')
     PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
@@ -284,6 +296,8 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         'post_form': post_form,
         'recent_activities': recent_activities,
         'upcoming_events': upcoming_events,
+        'followed_churches_list': followed_churches_list,
+        'followed_churches_count': followed_churches_count,
         'active': 'home',
         'is_admin_mode': bool(request.session.get('super_admin_mode', False)) if getattr(request.user, 'is_superuser', False) else False,
         'PAYPAL_CLIENT_ID': PAYPAL_CLIENT_ID,
