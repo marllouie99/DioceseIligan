@@ -978,6 +978,7 @@ body {
   position: relative;
   width: 100px;
   height: 100px;
+  overflow: visible; /* ensure overlay controls like the camera button are visible */
 }
 
 .avatar-image {
@@ -1004,10 +1005,10 @@ body {
 
 .avatar-upload-btn {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
+  bottom: 6px; /* keep inside the avatar circle */
+  right: 6px;  /* keep inside the avatar circle */
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #fff;
   color: var(--text);
@@ -1016,7 +1017,8 @@ body {
   place-items: center;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 2; /* lift above neighboring content */
 }
 
 .avatar-upload-btn:hover {
@@ -1026,8 +1028,8 @@ body {
 }
 
 .avatar-upload-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 .profile-details {
@@ -1063,28 +1065,37 @@ body {
 .profile-email {
   color: var(--muted);
   font-size: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .profile-bio {
   color: var(--muted);
   font-style: italic;
   font-size: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.5;
 }
 
 .profile-meta {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px; /* clearer separation between rows */
   color: var(--muted);
   font-size: 14px;
+  margin-top: 8px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
 }
 
 .meta-icon {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }
 
 .profile-actions {

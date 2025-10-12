@@ -24,7 +24,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="discover-page warm-sacred-earth">
+<div class="discover-page warm-sacred-earth page-container">
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-content">
@@ -132,13 +132,14 @@
     </form>
   </div>
 
-  <!-- Results Summary -->
-  <div class="results-summary">
-    <p class="results-count">{{ total_churches }} church{{ total_churches|pluralize }} found</p>
-  </div>
+  <!-- Results Summary and Churches Grid Container -->
+  <div class="results-container">
+    <div class="results-summary">
+      <p class="results-count">{{ total_churches }} church{{ total_churches|pluralize }} found</p>
+    </div>
 
-  <!-- Churches Grid -->
-  <div class="churches-grid">
+    <!-- Churches Grid -->
+    <div class="churches-grid">
     {% for church in churches %}
       <div class="church-card" data-church-id="{{ church.id }}">
         {% if church.cover_image %}
@@ -186,13 +187,6 @@
                 <path d="M16 3.13a4 4 0 010 7.75"/>
               </svg>
               <span>{{ church.followers_count }} followers</span>
-            </div>
-            <div class="detail-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span>{{ church.member_count }} members</span>
             </div>
             <div class="detail-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -268,6 +262,7 @@
         {% endif %}
       </div>
     {% endfor %}
+    </div>
   </div>
 
   <!-- Pagination -->
