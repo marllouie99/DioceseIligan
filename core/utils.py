@@ -118,7 +118,7 @@ def get_essential_profile_status(user, profile):
     Essentials are the minimal fields required to request an appointment:
     - Full Name (or Display Name)
     - Phone Number
-    - Address
+    - Address (structured fields: region, province, city, barangay OR legacy address field)
     - Date of Birth
 
     Returns a dict with:
@@ -138,10 +138,23 @@ def get_essential_profile_status(user, profile):
         display_name = ''
     name_ok = bool(full_name or display_name)
 
+    # Address can be either structured fields or legacy address field
+    address_ok = False
+    try:
+        # Check if structured address fields are filled (at least region and city)
+        region = (getattr(profile, 'region', '') or '').strip()
+        city = (getattr(profile, 'city_municipality', '') or '').strip()
+        legacy_address = (getattr(profile, 'address', '') or '').strip()
+        
+        # Address is OK if either structured fields have region+city OR legacy address exists
+        address_ok = bool((region and city) or legacy_address)
+    except Exception:
+        address_ok = False
+
     essentials = [
         ('Full Name', name_ok),
         ('Phone Number', bool(getattr(profile, 'phone', None))),
-        ('Address', bool(getattr(profile, 'address', None))),
+        ('Address', address_ok),
         ('Date of Birth', bool(getattr(profile, 'date_of_birth', None))),
     ]
 
