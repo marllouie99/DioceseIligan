@@ -161,106 +161,6 @@
     opacity: 0;
     pointer-events: none;
   }
-
-  /* Service Times Builder */
-  .service-times-builder {
-    background: rgba(255, 255, 255, 0.5);
-    border: 2px solid rgba(124, 58, 237, 0.1);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 12px;
-  }
-  
-  .service-day {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: white;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    transition: all 0.2s ease;
-  }
-  
-  .service-day:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
-  
-  .service-day-checkbox {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-  }
-  
-  .service-day-label {
-    min-width: 100px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  
-  .service-time-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  
-  .service-time-input:disabled {
-    background: #f5f5f5;
-    cursor: not-allowed;
-  }
-  
-  .add-time-btn {
-    padding: 6px 12px;
-    background: var(--brand);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s ease;
-  }
-  
-  .add-time-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
-  
-  .add-time-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-  }
-  
-  .remove-time-btn {
-    padding: 4px 8px;
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-  }
-  
-  .remove-time-btn:hover {
-    background: #dc2626;
-  }
-  
-  .service-times-preview {
-    margin-top: 12px;
-    padding: 12px;
-    background: rgba(124, 58, 237, 0.05);
-    border-radius: 8px;
-    font-size: 14px;
-    color: var(--text);
-  }
-  
-  .service-times-preview strong {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--brand);
-  }
 </style>
 {% endblock %}
 
@@ -464,21 +364,19 @@
         <!-- Service Information Section -->
         <div class="form-section search-section">
           <h2 class="section-title">Service Information</h2>
-          <div class="form-group form-group-full">
-            <label class="form-label">Service Times *</label>
-            <div class="service-times-builder" id="service-times-builder">
-              <!-- Days will be dynamically generated -->
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="{{ form.service_times.id_for_label }}" class="form-label">Service Times *</label>
+              {{ form.service_times }}
+              <small class="form-help">Enter your service schedule (one per line)<br>
+              Examples:<br>
+              • Sunday 9:00 AM, 11:00 AM<br>
+              • Wednesday 7:00 PM<br>
+              • Saturday 6:00 PM</small>
+              {% if form.service_times.errors %}
+                <div class="form-error">{{ form.service_times.errors.0 }}</div>
+              {% endif %}
             </div>
-            <div class="service-times-preview" id="service-times-preview" style="display: none;">
-              <strong>Preview:</strong>
-              <div id="preview-text"></div>
-            </div>
-            <!-- Hidden textarea for form submission -->
-            {{ form.service_times }}
-            <small class="form-help">Select days and add service times</small>
-            {% if form.service_times.errors %}
-              <div class="form-error">{{ form.service_times.errors.0 }}</div>
-            {% endif %}
           </div>
         </div>
 
@@ -600,179 +498,6 @@ document.addEventListener('DOMContentLoaded', function() {
       reader.readAsDataURL(file);
     }
   }
-
-  // Service Times Builder
-  (function() {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const builder = document.getElementById('service-times-builder');
-    const hiddenTextarea = document.getElementById('id_service_times');
-    const preview = document.getElementById('service-times-preview');
-    const previewText = document.getElementById('preview-text');
-    
-    // Hide the original textarea
-    if (hiddenTextarea) {
-      hiddenTextarea.style.display = 'none';
-    }
-    
-    const serviceTimes = {};
-    
-    // Initialize service times structure
-    days.forEach(day => {
-      serviceTimes[day] = {
-        enabled: false,
-        times: []
-      };
-    });
-    
-    // Build UI
-    function buildUI() {
-      builder.innerHTML = '';
-      
-      days.forEach(day => {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'service-day';
-        dayDiv.dataset.day = day;
-        
-        // Checkbox
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'service-day-checkbox';
-        checkbox.checked = serviceTimes[day].enabled;
-        checkbox.addEventListener('change', () => toggleDay(day, checkbox.checked));
-        
-        // Label
-        const label = document.createElement('span');
-        label.className = 'service-day-label';
-        label.textContent = day;
-        
-        // Times container
-        const timesContainer = document.createElement('div');
-        timesContainer.style.flex = '1';
-        timesContainer.style.display = 'flex';
-        timesContainer.style.flexDirection = 'column';
-        timesContainer.style.gap = '8px';
-        
-        // Add time button
-        const addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.className = 'add-time-btn';
-        addBtn.textContent = '+ Add Time';
-        addBtn.disabled = !serviceTimes[day].enabled;
-        addBtn.addEventListener('click', () => addTime(day));
-        
-        dayDiv.appendChild(checkbox);
-        dayDiv.appendChild(label);
-        dayDiv.appendChild(timesContainer);
-        dayDiv.appendChild(addBtn);
-        
-        builder.appendChild(dayDiv);
-        
-        // Render existing times
-        renderTimes(day);
-      });
-    }
-    
-    function toggleDay(day, enabled) {
-      serviceTimes[day].enabled = enabled;
-      if (!enabled) {
-        serviceTimes[day].times = [];
-      } else if (serviceTimes[day].times.length === 0) {
-        serviceTimes[day].times.push('');
-      }
-      buildUI();
-      updateHiddenField();
-    }
-    
-    function addTime(day) {
-      serviceTimes[day].times.push('');
-      renderTimes(day);
-      updateHiddenField();
-    }
-    
-    function removeTime(day, index) {
-      serviceTimes[day].times.splice(index, 1);
-      renderTimes(day);
-      updateHiddenField();
-    }
-    
-    function renderTimes(day) {
-      const dayDiv = builder.querySelector(`[data-day="${day}"]`);
-      if (!dayDiv) return;
-      
-      const timesContainer = dayDiv.querySelector('div');
-      timesContainer.innerHTML = '';
-      
-      serviceTimes[day].times.forEach((time, index) => {
-        const timeRow = document.createElement('div');
-        timeRow.style.display = 'flex';
-        timeRow.style.gap = '8px';
-        timeRow.style.alignItems = 'center';
-        
-        const input = document.createElement('input');
-        input.type = 'time';
-        input.className = 'service-time-input';
-        input.value = time;
-        input.disabled = !serviceTimes[day].enabled;
-        input.addEventListener('change', (e) => {
-          serviceTimes[day].times[index] = e.target.value;
-          updateHiddenField();
-        });
-        
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-time-btn';
-        removeBtn.textContent = '×';
-        removeBtn.addEventListener('click', () => removeTime(day, index));
-        
-        timeRow.appendChild(input);
-        if (serviceTimes[day].times.length > 1) {
-          timeRow.appendChild(removeBtn);
-        }
-        
-        timesContainer.appendChild(timeRow);
-      });
-    }
-    
-    function updateHiddenField() {
-      const lines = [];
-      
-      days.forEach(day => {
-        if (serviceTimes[day].enabled && serviceTimes[day].times.length > 0) {
-          const times = serviceTimes[day].times
-            .filter(t => t)
-            .map(t => formatTime(t))
-            .join(', ');
-          
-          if (times) {
-            lines.push(`${day} ${times}`);
-          }
-        }
-      });
-      
-      const result = lines.join('\\n');
-      hiddenTextarea.value = result;
-      
-      // Update preview
-      if (result) {
-        previewText.innerHTML = result.replace(/\\n/g, '<br>');
-        preview.style.display = 'block';
-      } else {
-        preview.style.display = 'none';
-      }
-    }
-    
-    function formatTime(time24) {
-      if (!time24) return '';
-      const [hours, minutes] = time24.split(':');
-      const h = parseInt(hours);
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      const h12 = h % 12 || 12;
-      return `${h12}:${minutes} ${ampm}`;
-    }
-    
-    // Initialize
-    buildUI();
-  })();
 
   // Philippine Address Cascading Dropdowns with Searchable Select
   (function() {

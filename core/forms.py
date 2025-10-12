@@ -211,8 +211,8 @@ class ChurchCreateForm(forms.ModelForm):
             # Service Information
             'service_times': forms.Textarea(attrs={
                 'class': 'form-textarea',
-                'placeholder': 'Service times (e.g., Sunday 9:00 AM, 11:00 AM\nWednesday 7:00 PM)',
-                'rows': 3,
+                'placeholder': 'Sunday 9:00 AM, 11:00 AM\nWednesday 7:00 PM\nSaturday 6:00 PM',
+                'rows': 4,
                 'required': True
             }),
             
