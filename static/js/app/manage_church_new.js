@@ -892,7 +892,217 @@ class ChurchManagementApp {
     this.renderAppointmentsTrendChart();
     this.renderFollowersGrowthChart();
     this.renderFollowersEngagementChart();
+    this.renderServiceBookingsTrendChart();
+    this.renderServicePerformanceChart();
     this.renderEngagementBars();
+  }
+
+  /**
+   * Render service bookings trend chart (Line chart for last 30 days)
+   */
+  renderServiceBookingsTrendChart() {
+    const canvas = document.getElementById('serviceBookingsTrendChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Get data from data attribute
+    let bookingsData = [];
+    try {
+      const dataAttr = canvas.getAttribute('data-labels');
+      bookingsData = dataAttr ? JSON.parse(dataAttr) : [];
+    } catch (e) {
+      console.error('Error parsing service bookings data:', e);
+      return;
+    }
+
+    if (bookingsData.length === 0 || bookingsData.every(d => d.count === 0)) {
+      this.showEmptyChartState(canvas);
+      return;
+    }
+
+    // Destroy existing instance
+    try { this.chartInstances.serviceBookingsTrend?.destroy(); } catch (_) {}
+    
+    // Remove any existing empty states and show canvas
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    const labels = bookingsData.map(d => d.date);
+    const data = bookingsData.map(d => d.count);
+
+    this.chartInstances.serviceBookingsTrend = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Bookings',
+          data: data,
+          borderColor: 'rgba(218, 165, 32, 1)',
+          backgroundColor: 'rgba(218, 165, 32, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: 'rgba(218, 165, 32, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return context.parsed.y + ' booking' + (context.parsed.y !== 1 ? 's' : '');
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              font: { family: 'Georgia, serif' },
+              color: '#6B4226'
+            },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+              font: { family: 'Georgia, serif', size: 10 },
+              color: '#6B4226'
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Render service performance chart (Horizontal bar chart)
+   */
+  renderServicePerformanceChart() {
+    const canvas = document.getElementById('servicePerformanceChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Get data from the ranking items
+    const rankingItems = document.querySelectorAll('.services-ranking .ranking-item');
+    if (rankingItems.length === 0) {
+      this.showEmptyChartState(canvas);
+      return;
+    }
+
+    const labels = [];
+    const data = [];
+    
+    rankingItems.forEach(item => {
+      const nameEl = item.querySelector('.post-info p');
+      const countEl = item.querySelector('.engagement-total');
+      if (nameEl && countEl) {
+        labels.push(nameEl.textContent.trim());
+        const countText = countEl.textContent.trim();
+        const count = parseInt(countText.match(/\d+/)?.[0] || '0');
+        data.push(count);
+      }
+    });
+
+    if (data.length === 0 || data.every(d => d === 0)) {
+      this.showEmptyChartState(canvas);
+      return;
+    }
+
+    // Destroy existing instance
+    try { this.chartInstances.servicePerformance?.destroy(); } catch (_) {}
+    
+    // Remove any existing empty states and show canvas
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    this.chartInstances.servicePerformance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Bookings',
+          data: data,
+          backgroundColor: [
+            'rgba(218, 165, 32, 0.7)',
+            'rgba(184, 134, 11, 0.7)',
+            'rgba(160, 82, 45, 0.7)',
+            'rgba(139, 69, 19, 0.7)',
+            'rgba(101, 67, 33, 0.7)'
+          ],
+          borderColor: [
+            'rgba(218, 165, 32, 1)',
+            'rgba(184, 134, 11, 1)',
+            'rgba(160, 82, 45, 1)',
+            'rgba(139, 69, 19, 1)',
+            'rgba(101, 67, 33, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return context.parsed.x + ' booking' + (context.parsed.x !== 1 ? 's' : '');
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              font: { family: 'Georgia, serif' },
+              color: '#6B4226'
+            },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          y: {
+            ticks: {
+              font: { family: 'Georgia, serif', size: 11 },
+              color: '#6B4226'
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
   }
 
   /**

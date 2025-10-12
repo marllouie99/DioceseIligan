@@ -22,14 +22,53 @@
 .page-header {
   margin-bottom: 32px;
   padding: 24px 0;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
+}
+
+/* Back Button */
+.back-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.03) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 12px;
+  color: #2D1810;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(139, 69, 19, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.back-button:hover {
+  background: 
+    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFBF0 0%, #F9EDD8 100%);
+  border-color: rgba(218, 165, 32, 0.3);
+  transform: translateX(-2px);
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .header-icon {
@@ -400,14 +439,119 @@
   background: rgba(197, 48, 48, 1);
 }
 
+.preview-remove-primary {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(197, 48, 48, 0.9);
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.preview-remove-primary:hover {
+  background: rgba(197, 48, 48, 1);
+}
+
+/* Primary Image Badge */
+.primary-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+  color: #2D1810;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 4px 8px rgba(139, 69, 19, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  z-index: 10;
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Image Actions Buttons */
+.image-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-view-btn,
+.preview-delete-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.preview-view-btn {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+}
+
+.preview-view-btn:hover {
+  background: rgba(37, 99, 235, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.preview-delete-btn {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.preview-delete-btn:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.preview-view-btn svg,
+.preview-delete-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Empty State Styling */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: 
+    linear-gradient(135deg, rgba(255, 249, 230, 0.3) 0%, rgba(244, 230, 208, 0.2) 100%);
+  border-radius: 12px;
+  border: 2px dashed rgba(139, 69, 19, 0.2);
+}
+
 /* =============================================================================
    FORM ACTIONS
    ============================================================================= */
 
 .form-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
-  justify-content: flex-end;
   margin-top: 32px;
   padding-top: 24px;
   border-top: 2px solid rgba(139, 69, 19, 0.1);

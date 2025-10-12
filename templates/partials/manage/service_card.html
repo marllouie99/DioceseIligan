@@ -29,9 +29,6 @@
   <div class="service-info">
     <div class="service-header">
       <div class="service-name">{{ service.name }}</div>
-      <div class="service-price">
-        <span class="{% if service.is_free %}price-free{% else %}price-paid{% endif %}">{{ service.price_display }}</span>
-      </div>
     </div>
     
     <div class="service-description">{{ service.description|truncatewords:20 }}</div>
@@ -42,6 +39,7 @@
       {% if service.requires_approval %}
         <span class="service-approval">Requires Approval</span>
       {% endif %}
+      <span class="service-price {% if service.is_free %}price-free{% else %}price-paid{% endif %}">{{ service.price_display }}</span>
       {% if not service.is_active %}
         <span class="service-inactive">Inactive</span>
       {% endif %}

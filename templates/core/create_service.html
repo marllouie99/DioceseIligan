@@ -78,16 +78,6 @@
           <h2 class="section-title">Pricing</h2>
           <div class="form-grid">
             <div class="form-group">
-              <label class="form-checkbox-label">
-                {{ form.is_free }}
-                <span class="checkbox-text">This service is free</span>
-              </label>
-              {% if form.is_free.errors %}
-                <div class="form-error">{{ form.is_free.errors.0 }}</div>
-              {% endif %}
-            </div>
-            
-            <div class="form-group" id="price-group" style="display: none;">
               <label for="{{ form.price.id_for_label }}" class="form-label">Price</label>
               {{ form.price }}
               <small class="form-help">Enter the price for this service</small>
@@ -96,7 +86,7 @@
               {% endif %}
             </div>
             
-            <div class="form-group" id="currency-group" style="display: none;">
+            <div class="form-group">
               <label for="{{ form.currency.id_for_label }}" class="form-label">Currency</label>
               {{ form.currency }}
               {% if form.currency.errors %}
@@ -115,24 +105,6 @@
               {{ form.duration }}
               {% if form.duration.errors %}
                 <div class="form-error">{{ form.duration.errors.0 }}</div>
-              {% endif %}
-            </div>
-            
-            <div class="form-group">
-              <label for="{{ form.max_bookings_per_day.id_for_label }}" class="form-label">Max Bookings Per Day *</label>
-              {{ form.max_bookings_per_day }}
-              <small class="form-help">Maximum number of appointments per day</small>
-              {% if form.max_bookings_per_day.errors %}
-                <div class="form-error">{{ form.max_bookings_per_day.errors.0 }}</div>
-              {% endif %}
-            </div>
-            
-            <div class="form-group">
-              <label for="{{ form.advance_booking_days.id_for_label }}" class="form-label">Advance Booking Days *</label>
-              {{ form.advance_booking_days }}
-              <small class="form-help">How many days in advance can this be booked</small>
-              {% if form.advance_booking_days.errors %}
-                <div class="form-error">{{ form.advance_booking_days.errors.0 }}</div>
               {% endif %}
             </div>
           </div>
@@ -245,67 +217,87 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnText = submitBtn.querySelector('.btn-text');
     const btnSpinner = submitBtn.querySelector('.btn-spinner');
     
-    // Handle pricing toggle
-    const isFreeCheckbox = document.getElementById('id_is_free');
-    const priceGroup = document.getElementById('price-group');
-    const currencyGroup = document.getElementById('currency-group');
-    
-    function togglePricingFields() {
-      if (isFreeCheckbox.checked) {
-        priceGroup.style.display = 'none';
-        currencyGroup.style.display = 'none';
-      } else {
-        priceGroup.style.display = 'block';
-        currencyGroup.style.display = 'block';
-      }
-    }
-    
-    // Initial state
-    togglePricingFields();
-    
-    // Listen for changes
-    isFreeCheckbox.addEventListener('change', togglePricingFields);
-    
-    // Handle multiple image upload preview
+    // Handle image preview for both primary and additional images
+    const primaryImageInput = document.getElementById('id_image');
     const imagesInput = document.getElementById('id_images');
     const previewContainer = document.getElementById('image-preview-container');
     const previewGrid = document.getElementById('image-preview-grid');
     
-    if (imagesInput) {
-      imagesInput.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
-        
-        // Clear previous previews
-        previewGrid.innerHTML = '';
-        
-        if (files.length > 0) {
-          previewContainer.style.display = 'block';
-          
-          files.forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-              const reader = new FileReader();
-              reader.onload = function(e) {
-                const previewItem = document.createElement('div');
-                previewItem.className = 'image-preview-item';
-                previewItem.innerHTML = `
-                  <img src="${e.target.result}" alt="Preview ${index + 1}" class="preview-image">
-                  <div class="preview-overlay">
-                    <span class="preview-number">${index + 1}</span>
-                    <button type="button" class="preview-remove" data-index="${index}">×</button>
-                  </div>
-                `;
-                previewGrid.appendChild(previewItem);
-              };
-              reader.readAsDataURL(file);
-            }
-          });
-        } else {
-          previewContainer.style.display = 'none';
-        }
-      });
+    function updateImagePreviews() {
+      // Clear previous previews
+      previewGrid.innerHTML = '';
       
-      // Handle image removal
+      let hasImages = false;
+      
+      // Add primary image preview if exists
+      if (primaryImageInput && primaryImageInput.files && primaryImageInput.files.length > 0) {
+        hasImages = true;
+        const file = primaryImageInput.files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+              <img src="${e.target.result}" alt="Primary Image" class="preview-image">
+              <div class="primary-badge">Primary</div>
+              <div class="preview-overlay">
+                <button type="button" class="preview-remove-primary" title="Remove primary image">×</button>
+              </div>
+            `;
+            previewGrid.insertBefore(previewItem, previewGrid.firstChild);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+      
+      // Add additional images preview
+      if (imagesInput && imagesInput.files && imagesInput.files.length > 0) {
+        hasImages = true;
+        const files = Array.from(imagesInput.files);
+        
+        files.forEach((file, index) => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const previewItem = document.createElement('div');
+              previewItem.className = 'image-preview-item';
+              previewItem.innerHTML = `
+                <img src="${e.target.result}" alt="Additional Image ${index + 1}" class="preview-image">
+                <div class="preview-overlay">
+                  <span class="preview-number">${index + 1}</span>
+                  <button type="button" class="preview-remove" data-index="${index}">×</button>
+                </div>
+              `;
+              previewGrid.appendChild(previewItem);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      
+      // Show/hide preview container
+      if (hasImages) {
+        previewContainer.style.display = 'block';
+      } else {
+        previewContainer.style.display = 'none';
+      }
+    }
+    
+    // Listen for primary image changes
+    if (primaryImageInput) {
+      primaryImageInput.addEventListener('change', updateImagePreviews);
+    }
+    
+    // Listen for additional images changes
+    if (imagesInput) {
+      imagesInput.addEventListener('change', updateImagePreviews);
+    }
+    
+    // Handle image removal
+    if (previewGrid) {
       previewGrid.addEventListener('click', function(e) {
+        // Remove additional image
         if (e.target.classList.contains('preview-remove')) {
           const index = parseInt(e.target.dataset.index);
           const dt = new DataTransfer();
@@ -318,9 +310,13 @@ document.addEventListener('DOMContentLoaded', function() {
           });
           
           imagesInput.files = dt.files;
-          
-          // Trigger change event to update preview
-          imagesInput.dispatchEvent(new Event('change'));
+          updateImagePreviews();
+        }
+        
+        // Remove primary image
+        if (e.target.classList.contains('preview-remove-primary')) {
+          primaryImageInput.value = '';
+          updateImagePreviews();
         }
       });
     }

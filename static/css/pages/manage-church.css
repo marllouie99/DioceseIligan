@@ -521,6 +521,45 @@ body.page-manage-church {
 }
 
 /* ===================================
+   SERVICES ANALYTICS STYLING
+   =================================== */
+
+/* Apply same styling to services analytics */
+.services-stats.parchment-card {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Keep services analytics container static on hover */
+.services-stats.parchment-card:hover {
+  background: white !important;
+  transform: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-color: var(--border) !important;
+}
+
+/* Prevent hover color/transform changes for inner analytics items in Services */
+.services-stats .analytics-card:hover {
+  background: rgba(255, 249, 230, 0.3) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Within services card, ensure the analytics blocks align like other analytics */
+.services-stats .unified-content-management { display: flex; flex-direction: column; gap: 1.5rem; }
+.services-stats .analytics-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+@media (max-width: 1024px) {
+  .services-stats .analytics-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .services-stats .analytics-cards { grid-template-columns: 1fr; }
+}
+
+/* ===================================
    FOLLOWERS ANALYTICS STYLING
    =================================== */
 

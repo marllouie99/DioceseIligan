@@ -514,31 +514,51 @@ class BookableServiceForm(forms.ModelForm):
         if self.instance and self.instance.pk:
             self.fields['is_free'].initial = not self.instance.price
         
-        # Make currency field not required initially
+        # Make these fields not required since they're removed from the template
+        self.fields['is_free'].required = False
+        self.fields['max_bookings_per_day'].required = False
+        self.fields['advance_booking_days'].required = False
         self.fields['currency'].required = False
     
     def save(self, commit=True):
         service = super().save(commit=False)
         if self.church:
             service.church = self.church
+        
+        # Set default values for fields removed from template
+        if not service.max_bookings_per_day:
+            service.max_bookings_per_day = 10  # Default value
+        if not service.advance_booking_days:
+            service.advance_booking_days = 30  # Default value
+        
+        # Set is_free based on price
+        service.is_free = not service.price or service.price == 0
+        
         if commit:
             service.save()
         return service
     
     def clean(self):
         cleaned_data = super().clean()
-        is_free = cleaned_data.get('is_free')
         price = cleaned_data.get('price')
         currency = cleaned_data.get('currency')
         
-        # If service is not free and has a price, validate it
-        if not is_free and price and price <= 0:
-            self.add_error('price', 'Price must be greater than 0 when service is not free.')
+        # Validate price if provided
+        if price and price < 0:
+            self.add_error('price', 'Price cannot be negative.')
         
-        # If service is free, clear the price and currency
-        if is_free:
-            cleaned_data['price'] = None
-            cleaned_data['currency'] = 'PHP'  # Set default currency
+        # Set default currency if not provided
+        if not currency:
+            cleaned_data['currency'] = 'PHP'
+        
+        # Set default values for removed fields
+        if not cleaned_data.get('max_bookings_per_day'):
+            cleaned_data['max_bookings_per_day'] = 10
+        if not cleaned_data.get('advance_booking_days'):
+            cleaned_data['advance_booking_days'] = 30
+        
+        # Determine is_free based on price
+        cleaned_data['is_free'] = not price or price == 0
         
         return cleaned_data
 
@@ -690,6 +710,13 @@ class ServiceImageForm(forms.ModelForm):
             }),
             'is_primary': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make caption and order not required since they're removed from the template
+        self.fields['caption'].required = False
+        self.fields['order'].required = False
+        self.fields['is_primary'].required = False
 
 
 class AvailabilityForm(forms.ModelForm):

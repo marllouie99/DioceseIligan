@@ -34,6 +34,7 @@ from .models import (
     Notification,
     DeclineReason,
     Donation,
+    ServiceReview,
 )
 from .forms import (
     ChurchCreateForm,
@@ -615,6 +616,44 @@ def manage_church(request):
         donor.total_donated = donor_data['total_donated']
         donor.donation_count = donor_data['donation_count']
         top_donors.append(donor)
+    
+    # Services statistics
+    total_services = church.bookable_services.count()
+    
+    # Most booked service (only if it has bookings)
+    from django.db.models import Avg
+    most_booked_service = church.bookable_services.annotate(
+        booking_count=Count('bookings')
+    ).filter(booking_count__gt=0).order_by('-booking_count').first()
+    
+    # Highest rated service
+    highest_rated_service = church.bookable_services.annotate(
+        avg_rating=Avg('reviews__rating', filter=Q(reviews__is_active=True))
+    ).filter(avg_rating__isnull=False).order_by('-avg_rating').first()
+    
+    # Lowest rated service
+    lowest_rated_service = church.bookable_services.annotate(
+        avg_rating=Avg('reviews__rating', filter=Q(reviews__is_active=True))
+    ).filter(avg_rating__isnull=False).order_by('avg_rating').first()
+    
+    # Service bookings over time (last 30 days)
+    from datetime import timedelta
+    service_bookings_by_day = []
+    for i in range(29, -1, -1):
+        day = today - timedelta(days=i)
+        count = Booking.objects.filter(
+            church=church,
+            created_at__date=day
+        ).count()
+        service_bookings_by_day.append({
+            'date': day.strftime('%b %d'),
+            'count': count
+        })
+    
+    # Top 5 services by bookings
+    top_services_by_bookings = church.bookable_services.annotate(
+        booking_count=Count('bookings')
+    ).filter(booking_count__gt=0).order_by('-booking_count')[:5]
 
     ctx = {
         'active': 'manage',
@@ -664,6 +703,13 @@ def manage_church(request):
             'unique_donors': unique_donors,
             'top_donors': top_donors,
         },
+        # Services statistics
+        'total_services': total_services,
+        'most_booked_service': most_booked_service,
+        'highest_rated_service': highest_rated_service,
+        'lowest_rated_service': lowest_rated_service,
+        'service_bookings_by_day': service_bookings_by_day,
+        'top_services_by_bookings': top_services_by_bookings,
     }
     ctx.update(_app_context(request))
     # AJAX partial for appointments list

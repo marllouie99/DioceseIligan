@@ -18,6 +18,151 @@
       </div>
     {% endif %}
     
+    <!-- Services Statistics -->
+    <div class="services-stats parchment-card">
+      <div class="unified-content-management">
+        <div class="analytics-cards">
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ total_services|default:"0" }}</h4>
+              <p>Total Services</p>
+              <span class="analytics-change">All bookable services</span>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <polyline points="17 11 19 13 23 9"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              {% if most_booked_service %}
+                <h4>{{ most_booked_service.name|truncatewords:3 }}</h4>
+                <p>Most Booked</p>
+                <span class="analytics-change">{{ most_booked_service.booking_count }} booking{{ most_booked_service.booking_count|pluralize }}</span>
+              {% else %}
+                <h4>No bookings</h4>
+                <p>Most Booked</p>
+                <span class="analytics-change">No data yet</span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              {% if highest_rated_service %}
+                <h4>{{ highest_rated_service.name|truncatewords:3 }}</h4>
+                <p>Highest Rated</p>
+                <span class="analytics-change">{{ highest_rated_service.avg_rating|floatformat:1 }} ★ rating</span>
+              {% else %}
+                <h4>No ratings</h4>
+                <p>Highest Rated</p>
+                <span class="analytics-change">No reviews yet</span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                <polyline points="17 18 23 18 23 12"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              {% if lowest_rated_service %}
+                <h4>{{ lowest_rated_service.name|truncatewords:3 }}</h4>
+                <p>Lowest Rated</p>
+                <span class="analytics-change">{{ lowest_rated_service.avg_rating|floatformat:1 }} ★ rating</span>
+              {% else %}
+                <h4>No ratings</h4>
+                <p>Lowest Rated</p>
+                <span class="analytics-change">No reviews yet</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        {# Services Analytics Charts #}
+        <div class="analytics-charts">
+          <div class="charts-grid">
+            {# Service Bookings Over Time Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Service Bookings Trend</h4>
+                <p>Bookings over the last 30 days</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="serviceBookingsTrendChart" 
+                        width="400" 
+                        height="200"
+                        data-labels='[{% for day in service_bookings_by_day %}{"date":"{{ day.date }}","count":{{ day.count }}}{% if not forloop.last %},{% endif %}{% endfor %}]'></canvas>
+                <div class="chart-details">
+                  <div class="post-preview">
+                    <div class="engagement-stats">
+                      <span class="stat">Total Bookings: {{ booking_counts.all|default:"0" }}</span>
+                      <span class="stat">This Month: {{ analytics.bookings_last_30_days|default:"0" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {# Top Services by Bookings Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Service Performance</h4>
+                <p>Top 5 services by bookings</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="servicePerformanceChart" 
+                        width="400" 
+                        height="200"></canvas>
+                <div class="posts-ranking services-ranking">
+                  {% if top_services_by_bookings %}
+                    {% for service in top_services_by_bookings %}
+                      <div class="ranking-item">
+                        <div class="rank-number">{{ forloop.counter }}</div>
+                        <div class="post-info">
+                          <p>{{ service.name }}</p>
+                          <div class="engagement-total">{{ service.booking_count }} booking{{ service.booking_count|pluralize }}</div>
+                        </div>
+                        <div class="engagement-bar">
+                          {% widthratio service.booking_count top_services_by_bookings.0.booking_count 100 as percentage %}
+                          <div class="bar-fill" style="width: {{ percentage }}%;"></div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="ranking-item">
+                      <div class="post-info">
+                        <p>No bookings data yet</p>
+                        <div class="engagement-total">Start promoting your services!</div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="services-management">
       <div class="services-header">
         <h3>Available Services</h3>
