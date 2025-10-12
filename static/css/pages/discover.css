@@ -667,9 +667,11 @@
   gap: 4px;
 }
 
-.church-location::before {
-  content: "📍";
-  font-size: 12px;
+.discover-page .church-location .location-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--primary);
 }
 
 .church-badges {

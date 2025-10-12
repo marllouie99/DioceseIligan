@@ -162,7 +162,13 @@
           </div>
           <div class="church-info">
             <h3 class="church-name">{{ church.name }}</h3>
-            <p class="church-location">{{ church.city }}, {{ church.state }}</p>
+            <p class="church-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="location-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ church.full_address }}
+            </p>
             <div class="church-badges">
               <span class="denomination-badge">{{ church.get_denomination_display }}</span>
               {% if church.is_verified %}
