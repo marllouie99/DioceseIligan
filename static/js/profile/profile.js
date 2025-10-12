@@ -12,7 +12,6 @@ class ProfileModule {
     this.profileDropdown = null;
     this.profileMenu = null;
     this.isOpen = false;
-    this.justOpened = false;
   }
 
   /**
@@ -80,19 +79,22 @@ class ProfileModule {
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
-      if (this.isOpen && !this.justOpened && !this.profileDropdown.contains(e.target) && e.target !== this.profileToggle) {
-        this.closeDropdown();
-      }
+      // Use setTimeout to avoid closing immediately after opening
+      setTimeout(() => {
+        if (this.isOpen && !this.profileDropdown.contains(e.target)) {
+          this.closeDropdown();
+        }
+      }, 0);
     });
 
     // Close dropdown when pressing escape
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && this.isOpen) {
         this.closeDropdown();
       }
     });
     
-    // Event listeners attached successfully
+    console.log('✅ Profile dropdown event listeners attached');
   }
 
   /**
@@ -103,12 +105,7 @@ class ProfileModule {
     this.profileDropdown.classList.toggle('open');
     this.isOpen = this.profileDropdown.classList.contains('open');
     
-    if (this.isOpen) {
-      this.justOpened = true;
-      setTimeout(() => {
-        this.justOpened = false;
-      }, 200);
-    }
+    console.log('🔄 Profile dropdown toggled:', this.isOpen);
     
     if (this.profileMenu) {
       if (this.isOpen) {
