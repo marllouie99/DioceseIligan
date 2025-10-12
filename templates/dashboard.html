@@ -286,50 +286,6 @@
           </div>
           
           <div class="sidebar-content">
-            <!-- Following Churches Section -->
-            <div class="sidebar-section">
-              <h3 class="sidebar-title">Following</h3>
-              <div class="following-churches">
-                {% if followed_churches_list %}
-                  {% for church in followed_churches_list %}
-                    <a href="{% url 'core:church_detail' church.slug %}" class="church-item">
-                      <div class="church-item-avatar">
-                        {% if church.logo %}
-                          <img src="{{ church.logo.url }}" alt="{{ church.name }}">
-                        {% else %}
-                          <div class="church-item-placeholder">{{ church.name|first|upper }}</div>
-                        {% endif %}
-                      </div>
-                      <div class="church-item-info">
-                        <p class="church-item-name">{{ church.name|truncatewords:4 }}</p>
-                        <p class="church-item-location">
-                          <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                          </svg>
-                          {{ church.city_municipality|default:"Location" }}
-                        </p>
-                      </div>
-                    </a>
-                  {% endfor %}
-                  {% if followed_churches_count > 5 %}
-                    <a href="{% url 'core:following' %}" class="view-all-link">
-                      View all {{ followed_churches_count }} churches →
-                    </a>
-                  {% endif %}
-                {% else %}
-                  <div class="empty-following">
-                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                      <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    <p class="empty-text">No churches followed yet</p>
-                    <a href="{% url 'core:discover' %}" class="discover-btn">Discover Churches</a>
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-            
             <!-- Upcoming Events Section -->
             <div class="sidebar-section">
               <h3 class="sidebar-title">Upcoming Events</h3>
@@ -373,6 +329,50 @@
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                     <p class="empty-text">No upcoming events</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- Following Churches Section -->
+            <div class="sidebar-section">
+              <h3 class="sidebar-title">Following</h3>
+              <div class="following-churches">
+                {% if followed_churches_list %}
+                  {% for church in followed_churches_list %}
+                    <a href="{% url 'core:church_detail' church.slug %}" class="church-item">
+                      <div class="church-item-avatar">
+                        {% if church.logo %}
+                          <img src="{{ church.logo.url }}" alt="{{ church.name }}">
+                        {% else %}
+                          <div class="church-item-placeholder">{{ church.name|first|upper }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="church-item-info">
+                        <p class="church-item-name">{{ church.name|truncatewords:4 }}</p>
+                        <p class="church-item-location">
+                          <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          {{ church.city_municipality|default:"Location" }}
+                        </p>
+                      </div>
+                    </a>
+                  {% endfor %}
+                  {% if followed_churches_count > 5 %}
+                    <a href="{% url 'core:following' %}" class="view-all-link">
+                      View all {{ followed_churches_count }} churches →
+                    </a>
+                  {% endif %}
+                {% else %}
+                  <div class="empty-following">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <p class="empty-text">No churches followed yet</p>
+                    <a href="{% url 'core:discover' %}" class="discover-btn">Discover Churches</a>
                   </div>
                 {% endif %}
               </div>
