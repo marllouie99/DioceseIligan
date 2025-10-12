@@ -173,13 +173,13 @@
           </svg>
           <span>Member since {{ user.date_joined|date:"F Y" }}</span>
         </div>
-        {% if profile.street_address or profile.city_municipality or profile.province %}
+        {% if profile.street_address or profile.barangay or profile.city_municipality or profile.province %}
         <div class="meta-item">
           <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
-          <span>{% if profile.street_address %}{{ profile.street_address }}, {% endif %}{% if profile.barangay %}{{ profile.barangay }}, {% endif %}{% if profile.city_municipality %}{{ profile.city_municipality }}, {% endif %}{% if profile.province %}{{ profile.province }}{% endif %}</span>
+          <span>{% if profile.street_address %}{{ profile.street_address }}, {% endif %}{% if profile.barangay %}Brgy. {{ profile.barangay }}, {% endif %}{% if profile.city_municipality %}{{ profile.city_municipality }}, {% endif %}{% if profile.province %}{{ profile.province }}{% endif %}{% if profile.region %}, {{ profile.region }}{% endif %}{% if profile.postal_code %}, {{ profile.postal_code }}{% endif %}</span>
         </div>
         {% endif %}
       </div>
@@ -1362,42 +1362,7 @@
     loadRegions();
 })();
 
-// Display formatted address in profile overview
-(function() {
-    const region = '{{ profile.region|escapejs }}';
-    const province = '{{ profile.province|escapejs }}';
-    const city = '{{ profile.city_municipality|escapejs }}';
-    const barangay = '{{ profile.barangay|escapejs }}';
-    const street = '{{ profile.street_address|escapejs }}';
-    const postal = '{{ profile.postal_code|escapejs }}';
-    
-    if (region || province || city || barangay || street) {
-        const addressParts = [];
-        if (street) addressParts.push(street);
-        if (barangay) addressParts.push('Brgy. ' + barangay);
-        if (city) addressParts.push(city);
-        if (province) addressParts.push(province);
-        if (region) addressParts.push(region);
-        if (postal) addressParts.push(postal);
-        
-        const formattedAddress = addressParts.join(', ');
-        
-        // Find and update address display in overview
-        const profileMeta = document.querySelector('.profile-meta');
-        if (profileMeta && formattedAddress) {
-            const addressElement = document.createElement('div');
-            addressElement.className = 'profile-meta';
-            addressElement.innerHTML = `
-                <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                </svg>
-                <span>${formattedAddress}</span>
-            `;
-            profileMeta.parentNode.insertBefore(addressElement, profileMeta.nextSibling);
-        }
-    }
-})();
+// Address is now displayed directly in the HTML template, no need for JavaScript injection
 
 // Initialize profile system with error handling
 document.addEventListener('DOMContentLoaded', function() {
