@@ -120,14 +120,20 @@ class ProfileFormModule {
       body: formData,
       headers: {
         'X-CSRFToken': this.getCSRFToken(),
+        'X-Requested-With': 'XMLHttpRequest',
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Try JSON first, fallback to text
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      return await response.json();
+    } else {
+      const text = await response.text();
+      console.warn('Legacy profile-form.js received non-JSON response, treating as success. First 200 chars:', text.substring(0, 200));
+      return { success: response.ok, message: response.ok ? 'Profile updated' : 'Server error', profile_data: null };
     }
-
-    return await response.json();
   }
 
   /**
@@ -204,11 +210,10 @@ class ProfileFormModule {
    * @private
    */
   showLoadingState() {
-    if (this.submitBtn) {
-      this.originalBtnText = this.submitBtn.textContent;
-      this.submitBtn.disabled = true;
-      this.submitBtn.innerHTML = '<span class="btn-spinner animate-spin">⟳</span> Saving...';
-    }
+    if (!this.submitBtn) return;
+    this.originalBtnText = this.submitBtn.textContent || 'Save Changes';
+    this.submitBtn.disabled = true;
+    this.submitBtn.innerHTML = '<span class="btn-spinner animate-spin">⟳</span> Saving...';
   }
 
   /**
@@ -216,10 +221,9 @@ class ProfileFormModule {
    * @private
    */
   hideLoadingState() {
-    if (this.submitBtn) {
-      this.submitBtn.disabled = false;
-      this.submitBtn.textContent = this.originalBtnText;
-    }
+    if (!this.submitBtn) return;
+    this.submitBtn.disabled = false;
+    this.submitBtn.textContent = this.originalBtnText || 'Save Changes';
   }
 
   /**

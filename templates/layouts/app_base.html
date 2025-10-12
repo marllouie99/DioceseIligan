@@ -56,7 +56,9 @@
   <!-- Load main applications -->
   <script defer src="{% static 'js/app/app_new.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/app/notifications_new.js' %}?v={{ STATIC_VERSION }}"></script>
+  {% block profile_app_js %}
   <script defer src="{% static 'js/app/profile_new.js' %}?v={{ STATIC_VERSION }}"></script>
+  {% endblock %}
   <!-- Load dashboard modules -->
   <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/post-bookmark.js' %}?v={{ STATIC_VERSION }}"></script>
