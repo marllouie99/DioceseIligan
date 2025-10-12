@@ -6,8 +6,15 @@
         <button onclick="markAllAsRead()" class="mark-all-read">Mark all read</button>
         {% endif %}
     </div>
-    
-    <div class="notification-list">
+
+    <div class="notif-tabs">
+        <button class="notif-tab-btn active" data-target="notif-panel-notifications">Notifications</button>
+        <button class="notif-tab-btn" data-target="notif-panel-messages">Messages</button>
+    </div>
+
+    <div class="notif-panels">
+      <div id="notif-panel-notifications" class="notif-panel active">
+        <div class="notification-list">
         {% if dropdown_items %}
             {% for item in dropdown_items %}
             {% with notification=item.notification %}
@@ -93,6 +100,20 @@
                 <p>No notifications</p>
             </div>
         {% endif %}
+        </div>
+      </div>
+
+      <div id="notif-panel-messages" class="notif-panel" aria-hidden="true">
+        <div class="empty-notifications">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="5" width="18" height="14" rx="2" ry="2"/>
+                    <polyline points="3,7 12,13 21,7"/>
+                </svg>
+            </div>
+            <p>No messages</p>
+        </div>
+      </div>
     </div>
     
     <div class="notification-footer">

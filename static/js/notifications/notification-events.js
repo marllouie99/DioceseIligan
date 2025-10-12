@@ -88,6 +88,25 @@ class NotificationEventsModule {
     if (markAllBtn) {
       markAllBtn.addEventListener('click', this.eventHandlers.get('markAllRead'));
     }
+
+    // Tabs: Notifications / Messages
+    const tabButtons = container.querySelectorAll('.notif-tab-btn');
+    if (tabButtons && tabButtons.length) {
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = btn.getAttribute('data-target');
+          const panelsWrapper = container.querySelector('.notif-panels');
+          if (!targetId || !panelsWrapper) return;
+          const panels = panelsWrapper.querySelectorAll('.notif-panel');
+          panels.forEach(p => p.classList.remove('active'));
+          const targetPanel = panelsWrapper.querySelector(`#${CSS.escape(targetId)}`);
+          if (targetPanel) targetPanel.classList.add('active');
+          tabButtons.forEach(tb => tb.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
   }
 
   /**
