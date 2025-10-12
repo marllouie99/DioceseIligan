@@ -368,11 +368,7 @@
             <div class="form-group form-group-full">
               <label for="{{ form.service_times.id_for_label }}" class="form-label">Service Times *</label>
               {{ form.service_times }}
-              <small class="form-help">Enter your service schedule (one per line)<br>
-              Examples:<br>
-              • Sunday 9:00 AM, 11:00 AM<br>
-              • Wednesday 7:00 PM<br>
-              • Saturday 6:00 PM</small>
+              <small class="form-help">Enter your service schedule (one per line)</small>
               {% if form.service_times.errors %}
                 <div class="form-error">{{ form.service_times.errors.0 }}</div>
               {% endif %}
