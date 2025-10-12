@@ -119,8 +119,8 @@ class ChurchCreateForm(forms.ModelForm):
             # Contact Information (Required for bookings)
             'email', 'phone',
             
-            # Location (Required for appointments)
-            'address', 'city', 'state', 'country',
+            # Location (Required for appointments) - Philippine Address Structure
+            'region', 'province', 'city_municipality', 'barangay', 'street_address', 'postal_code',
             
             # Visual Identity (Important for social media)
             'logo', 'cover_image',
@@ -165,27 +165,37 @@ class ChurchCreateForm(forms.ModelForm):
                 'required': True
             }),
             
-            # Location
-            'address': forms.Textarea(attrs={
-                'class': 'form-textarea',
-                'placeholder': 'Complete street address (needed for appointments)',
-                'rows': 2,
+            # Location - Philippine Address Structure
+            'region': forms.Select(attrs={
+                'class': 'form-select',
                 'required': True
             }),
-            'city': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'City',
-                'required': True
+            'province': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
             }),
-            'state': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'State/Province',
-                'required': True
+            'city_municipality': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
             }),
-            'country': forms.TextInput(attrs={
+            'barangay': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
+            }),
+            'street_address': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'Country',
-                'required': True
+                'placeholder': 'House/Building No., Street Name',
+                'required': False
+            }),
+            'postal_code': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '4-digit postal code',
+                'maxlength': 4,
+                'pattern': '[0-9]{4}',
+                'required': False
             }),
             
             # Visual Identity
@@ -233,9 +243,11 @@ class ChurchCreateForm(forms.ModelForm):
         except Exception:
             pass
 
-        # Set default country
-        if not self.instance.pk:
-            self.fields['country'].initial = 'Philippines'
+        # Initialize empty choices for cascading dropdowns
+        self.fields['region'].choices = [('', 'Select Region')]
+        self.fields['province'].choices = [('', 'Select Province')]
+        self.fields['city_municipality'].choices = [('', 'Select City/Municipality')]
+        self.fields['barangay'].choices = [('', 'Select Barangay')]
     
     def clean_name(self):
         return clean_name_field(self.cleaned_data.get('name'), Church, self.instance)
