@@ -24,28 +24,23 @@
         <div class="dashboard-background"></div>
         
         {% if not essential_status.is_complete %}
-        <section class="banner">
-          <h3>Complete Essential Info to Request Appointments</h3>
-          <p class="muted">
-            You must complete the required fields before you can request an appointment with a church.
-            Profile completeness: {{ profile_status.percent }}% ({{ profile_status.completed }}/{{ profile_status.total }} fields)
-          </p>
-          <div class="progress">
-            <a class="btn dark" href="{% url 'manage_profile' %}">✦ Complete Profile</a>
-            <div class="progress-bar"><span style="width: {{ profile_status.percent }}%"></span></div>
-          </div>
-          {% if essential_status.missing %}
-          <div class="small" style="margin-top:6px; color:#92400e;">
-            Required missing:
-            {% for item in essential_status.missing|slice:":4" %}
-              <span>{{ item }}{% if not forloop.last %}, {% endif %}</span>
-            {% endfor %}
-            {% if essential_status.missing|length > 4 %}
-              <span>+ {{ essential_status.missing|length|add:"-4" }} more</span>
+        <div class="profile-completion-banner">
+          <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <circle cx="12" cy="16" r="1"/>
+          </svg>
+          <div class="banner-content">
+            <strong>Complete Essential Info to Request Appointments</strong>
+            <span>You must complete the required fields before you can request an appointment with a church. Profile completeness: {{ profile_status.percent }}% ({{ profile_status.completed }}/{{ profile_status.total }} fields)</span>
+            {% if essential_status.missing %}
+            <span class="missing-fields">Required missing: 
+              {% for item in essential_status.missing|slice:":3" %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if essential_status.missing|length > 3 %} + {{ essential_status.missing|length|add:"-3" }} more{% endif %}
+            </span>
             {% endif %}
           </div>
-          {% endif %}
-        </section>
+          <a href="{% url 'manage_profile' %}" class="banner-cta">Complete Profile</a>
+        </div>
         {% endif %}
 
         <div class="dashboard-layout">

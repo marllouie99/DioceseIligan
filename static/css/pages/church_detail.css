@@ -5072,3 +5072,108 @@ textarea.form-input::placeholder {
     font-size: 11px;
   }
 }
+
+/* ====================================================
+   Profile Completion Banner (Dashboard)
+   ==================================================== */
+
+.profile-completion-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
+.profile-completion-banner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+}
+
+.profile-completion-banner .banner-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  color: #d97706;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(217, 119, 6, 0.2));
+}
+
+.profile-completion-banner .banner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-completion-banner .banner-content strong {
+  color: #92400e;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.profile-completion-banner .banner-content span {
+  color: #78350f;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.profile-completion-banner .banner-content .missing-fields {
+  color: #92400e;
+  font-size: 13px;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.profile-completion-banner .banner-cta {
+  margin-left: auto;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.profile-completion-banner .banner-cta:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+@media (max-width: 768px) {
+  .profile-completion-banner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  
+  .profile-completion-banner .banner-content {
+    width: 100%;
+  }
+  
+  .profile-completion-banner .banner-cta {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+}
