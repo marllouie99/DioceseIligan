@@ -139,6 +139,28 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Listen for hash changes (when user uses back/forward buttons)
   window.addEventListener('hashchange', handleHashNavigation);
+
+  // Handle location link clicks to open in maps
+  const locationLink = document.querySelector('.location-link');
+  if (locationLink) {
+    locationLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const lat = this.dataset.lat;
+      const lng = this.dataset.lng;
+      const address = this.dataset.address;
+      
+      // If coordinates are available, use them for better accuracy
+      if (lat && lng && lat !== 'None' && lng !== 'None') {
+        openInMaps(lat, lng);
+      } else if (address && address !== 'No address provided') {
+        // Fallback to address-based search
+        openInMapsByAddress(address);
+      } else {
+        showNotification('Location information not available', 'error');
+      }
+    });
+  }
 });
 
 // Modal functions
@@ -288,6 +310,92 @@ function scrollToPost(postId) {
       }, 2000);
     }
   }, 100);
+}
+
+/**
+ * Opens the location in a maps application using coordinates
+ * Tries multiple map services with fallbacks
+ */
+function openInMaps(lat, lng) {
+  // Detect user's device/platform
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+  const isAndroid = /android/i.test(userAgent);
+  
+  let mapUrl;
+  
+  if (isIOS) {
+    // For iOS devices, try Apple Maps first, fallback to Google Maps
+    mapUrl = `maps://maps.apple.com/?q=${lat},${lng}`;
+    // Try to open Apple Maps
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = mapUrl;
+    document.body.appendChild(iframe);
+    
+    // Fallback to Google Maps after a short delay if Apple Maps doesn't open
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+    }, 500);
+  } else if (isAndroid) {
+    // For Android devices, use geo: URI scheme which opens default maps app
+    mapUrl = `geo:${lat},${lng}?q=${lat},${lng}`;
+    window.location.href = mapUrl;
+    
+    // Fallback to Google Maps if geo: doesn't work
+    setTimeout(() => {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+    }, 1000);
+  } else {
+    // For desktop/other devices, open Google Maps in a new tab
+    mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    window.open(mapUrl, '_blank');
+  }
+}
+
+/**
+ * Opens the location in a maps application using address string
+ * Used as fallback when coordinates are not available
+ */
+function openInMapsByAddress(address) {
+  // Encode the address for URL
+  const encodedAddress = encodeURIComponent(address);
+  
+  // Detect user's device/platform
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+  const isAndroid = /android/i.test(userAgent);
+  
+  let mapUrl;
+  
+  if (isIOS) {
+    // For iOS devices, try Apple Maps first
+    mapUrl = `maps://maps.apple.com/?q=${encodedAddress}`;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = mapUrl;
+    document.body.appendChild(iframe);
+    
+    // Fallback to Google Maps
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    }, 500);
+  } else if (isAndroid) {
+    // For Android devices, use geo: URI with address query
+    mapUrl = `geo:0,0?q=${encodedAddress}`;
+    window.location.href = mapUrl;
+    
+    // Fallback to Google Maps
+    setTimeout(() => {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    }, 1000);
+  } else {
+    // For desktop/other devices, open Google Maps in a new tab
+    mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    window.open(mapUrl, '_blank');
+  }
 }
 
 

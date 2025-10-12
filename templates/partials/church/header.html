@@ -30,7 +30,19 @@
         {% endif %}
       </h1>
       <div class="church-location-row">
-        <p class="church-location">{{ church.full_address }}</p>
+        <p class="church-location">
+          <a href="#" class="location-link" 
+             data-lat="{{ church.latitude }}" 
+             data-lng="{{ church.longitude }}" 
+             data-address="{{ church.full_address }}"
+             title="Open in maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="location-icon">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ church.full_address }}
+          </a>
+        </p>
         <span class="denomination-badge">{{ church.get_denomination_display }}</span>
       </div>
       <div class="church-badges">
