@@ -524,8 +524,14 @@
 /* Churches Grid - Social Media Style */
 .churches-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .churches-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Church Card - Instagram/Facebook Style */
@@ -660,18 +666,24 @@
 
 .discover-page .church-location {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   margin: 0 0 6px 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .discover-page .church-location .location-icon {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
   color: var(--primary);
+  margin-top: 2px;
 }
 
 .church-badges {
