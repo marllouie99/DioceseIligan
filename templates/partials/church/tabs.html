@@ -270,7 +270,10 @@
                     </div>
                   {% endif %}
                 </h4>
-                <p class="service-location">{{ service.church_location.name|default:"Church Location" }}</p>
+                <p class="service-location">
+                  <i data-feather="map-pin"></i>
+                  {{ church.address|default:church.city }}{% if church.city %}, {{ church.city }}{% endif %}
+                </p>
                 <p>{{ service.description|default:"No description provided."|truncatewords:20 }}</p>
                 <div class="service-meta">
                   <span>{{ service.duration_display }}</span>
