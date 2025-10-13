@@ -771,12 +771,17 @@ class BookingModal {
     if (btnLoading) btnLoading.style.display = 'inline-flex';
     
     try {
+      // Convert time to 12-hour format for the API
+      const time12Hour = this.formatTime12Hour(this.selectedTime);
+      
       const formData = {
         service_id: this.serviceData.id,
         date: this.selectedDate,
-        time: this.selectedTime,
+        time: time12Hour,
         notes: this.elements.notesInput?.value || ''
       };
+      
+      console.log('Submitting booking with data:', formData);
       
       const response = await fetch('/app/api/bookings/create/', {
         method: 'POST',
@@ -789,17 +794,32 @@ class BookingModal {
       
       const result = await response.json();
       
-      if (response.ok) {
+      console.log('API Response:', result);
+      
+      if (response.ok && result.success) {
         // Success
         this.showSuccessMessage(result.booking_code || 'APPT-000');
       } else {
-        // Error
-        throw new Error(result.message || 'Failed to create booking');
+        // Error - show specific error message
+        const errorMsg = result.error || result.message || 'Failed to create booking';
+        console.error('Booking error:', errorMsg);
+        
+        // Show form errors if available
+        if (result.form_errors) {
+          console.error('Form errors:', result.form_errors);
+          let errorDetails = '';
+          for (const [field, errors] of Object.entries(result.form_errors)) {
+            errorDetails += `\n${field}: ${errors.join(', ')}`;
+          }
+          alert(`Booking failed:\n${errorMsg}${errorDetails}`);
+        } else {
+          alert(`Booking failed: ${errorMsg}`);
+        }
       }
       
     } catch (error) {
       console.error('Booking submission error:', error);
-      alert('Failed to submit booking request. Please try again.');
+      alert(`Failed to submit booking request: ${error.message}`);
     } finally {
       // Reset loading state
       if (submitBtn) submitBtn.disabled = false;
