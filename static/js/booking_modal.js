@@ -315,9 +315,15 @@ class BookingModal {
     // Extract service data from existing page elements
     const serviceElement = document.querySelector(`[data-service-id="${serviceId}"]`);
     if (serviceElement) {
+      // Try to get image from service card
+      const serviceCard = serviceElement.closest('.service-card');
+      const imageElement = serviceCard?.querySelector('.service-image img');
+      
       this.serviceData = {
         id: serviceId,
         name: serviceElement.dataset.serviceName || 'Service',
+        description: serviceElement.dataset.serviceDescription || 'No description available.',
+        image: imageElement?.src || null,
         duration: serviceElement.dataset.serviceDuration || '1 hour',
         price: serviceElement.dataset.servicePrice || 'Free',
         advance_booking_days: parseInt(serviceElement.dataset.advanceBookingDays) || 30

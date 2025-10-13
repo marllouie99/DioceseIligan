@@ -2891,11 +2891,16 @@ def api_get_service(request, service_id):
                 'error': 'This church is not yet verified and cannot accept appointment requests.'
             }, status=400)
         
+        # Get service image
+        service_images = service.get_images()
+        image_url = service_images[0].image.url if service_images else (service.image.url if service.image else None)
+        
         # Prepare service data
         service_data = {
             'id': service.id,
             'name': service.name,
             'description': service.description or 'No description provided.',
+            'image': image_url,
             'duration': service.duration_display,
             'price': service.price_display,
             'advance_booking_days': service.advance_booking_days,
