@@ -1955,6 +1955,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new ChurchManagementApp();
   app.init();
 
+  // Handle "Submit Documents" button click from verification banner
+  const submitDocsBtn = document.querySelector('.verification-cta');
+  if (submitDocsBtn) {
+    submitDocsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Switch to settings tab
+      const settingsTabBtn = document.querySelector('[data-tab="settings"]');
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabPanels = document.querySelectorAll('.tab-panel');
+      
+      if (settingsTabBtn && window.TabManager) {
+        // Use TabManager to switch tabs
+        const tabManager = new window.TabManager();
+        tabManager.setActiveTab('settings', tabButtons, tabPanels);
+        
+        // Wait for tab to be visible, then scroll to verification section
+        setTimeout(() => {
+          const verificationSection = document.getElementById('verification-settings');
+          const settingsContent = document.querySelector('.settings-content');
+          
+          if (verificationSection && settingsContent) {
+            // Update active state in settings navigation
+            const navLinks = document.querySelectorAll('.settings-nav-link');
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              const linkSection = link.getAttribute('data-section');
+              if (linkSection === 'verification-settings') {
+                link.classList.add('active');
+              }
+            });
+            
+            // Scroll to verification section
+            const sectionTop = verificationSection.offsetTop;
+            settingsContent.scrollTo({
+              top: sectionTop - 20,
+              behavior: 'smooth'
+            });
+            
+            // Add highlight effect
+            verificationSection.style.transition = 'all 0.3s ease';
+            verificationSection.style.boxShadow = '0 0 0 4px rgba(218, 165, 32, 0.3)';
+            setTimeout(() => {
+              verificationSection.style.boxShadow = '';
+            }, 2000);
+          }
+        }, 300);
+      }
+    });
+  }
+
   // Verification file upload monitoring
   initVerificationFileMonitoring();
 
