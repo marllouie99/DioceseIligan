@@ -615,9 +615,10 @@ body.page-church-detail {
 /* Enhanced Services Grid */
 .services-grid { 
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
   gap: 24px; 
   margin-top: 24px;
+  max-width: 100%;
 }
 
 .service-card { 
@@ -636,6 +637,7 @@ body.page-church-detail {
   box-shadow: 
     0 6px 12px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.03);
+  max-width: 420px;
 }
 
 .service-card:hover {
