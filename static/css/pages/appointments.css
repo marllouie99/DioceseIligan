@@ -141,9 +141,7 @@ body.page-appointments {
 .booking-header-section {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .booking-service-name {
@@ -151,7 +149,7 @@ body.page-appointments {
   font-weight: 700;
   color: var(--text);
   margin: 0;
-  line-height: 1.3;
+  line-height: 1;
   font-family: var(--font-family-primary);
 }
 
