@@ -274,29 +274,37 @@ body.page-appointments {
 /* Right Section - Actions */
 .booking-card-right {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: stretch;
-  min-width: 140px;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-icon {
+/* Icon-only buttons */
+.booking-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  padding: 10px 16px;
-  white-space: nowrap;
-  text-decoration: none;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  font-weight: 600;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--brand);
+  cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
 }
 
-.btn-icon i {
-  width: 16px;
-  height: 16px;
+.booking-icon-btn:hover {
+  background: var(--warm-white);
+  border-color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.12);
+}
+
+.booking-icon-btn i {
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 

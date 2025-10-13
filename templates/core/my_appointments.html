@@ -102,32 +102,27 @@
           <!-- Right Section: Actions -->
           <div class="booking-card-right">
             {% if b.church.slug %}
-              <a href="{% url 'core:church_detail' b.church.slug %}" class="btn btn-outline btn-icon">
+              <a href="{% url 'core:church_detail' b.church.slug %}" class="booking-icon-btn" title="View Church">
                 <i data-feather="eye"></i>
-                View Church
               </a>
             {% endif %}
             
             {% if b.status == 'reviewed' or b.status == 'approved' %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-primary btn-icon">
+              <a href="{% url 'core:booking_invoice' b.id %}" class="booking-icon-btn" title="Print Invoice">
                 <i data-feather="printer"></i>
-                Print Invoice
               </a>
             {% elif b.status == 'completed' %}
               {% if b.user_has_reviewed %}
-                <a href="{% url 'core:service_reviews' b.service.id %}" class="btn btn-success btn-icon">
+                <a href="{% url 'core:service_reviews' b.service.id %}" class="booking-icon-btn" title="Check Review">
                   <i data-feather="check-circle"></i>
-                  Check Review
                 </a>
               {% else %}
-                <button class="btn btn-secondary btn-icon" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})">
+                <button class="booking-icon-btn" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})" title="Rate & Review">
                   <i data-feather="star"></i>
-                  Rate & Review
                 </button>
               {% endif %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-outline btn-icon">
+              <a href="{% url 'core:booking_invoice' b.id %}" class="booking-icon-btn" title="View Invoice">
                 <i data-feather="file-text"></i>
-                View Invoice
               </a>
             {% endif %}
           </div>
