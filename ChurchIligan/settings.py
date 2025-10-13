@@ -169,6 +169,9 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_TIMEOUT = int(env('EMAIL_TIMEOUT', default=10))  # 10 second timeout for SMTP connections
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=f'Church Iligan Connect <{env("EMAIL_HOST_USER", default="noreply@churchiligan.com")}>')
 
+# Brevo API configuration for reliable email delivery (works on Render free tier)
+BREVO_API_KEY = env('BREVO_API_KEY', default='')
+
 # Email verification settings
 EMAIL_VERIFICATION_TIMEOUT_MINUTES = 15
 EMAIL_VERIFICATION_MAX_ATTEMPTS = 5
