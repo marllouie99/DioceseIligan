@@ -70,22 +70,24 @@ class BookingModal {
       // Form elements
       form: this.modal.querySelector('#modalBookingForm'),
       dateInput: this.modal.querySelector('#modal_date'),
+      timeInput: this.modal.querySelector('#modal_time'),
       notesInput: this.modal.querySelector('#modal_notes'),
-      timeSlots: this.modal.querySelector('#modalTimeSlots'),
       
-      // Display elements
+      // Left panel - Service details
+      serviceImage: this.modal.querySelector('#modalServiceImage'),
       serviceName: this.modal.querySelector('#modalServiceName'),
       churchName: this.modal.querySelector('#modalChurchName'),
-      serviceMeta: this.modal.querySelector('#modalServiceMeta'),
+      serviceDuration: this.modal.querySelector('#modalServiceDuration'),
+      servicePrice: this.modal.querySelector('#modalServicePrice'),
+      serviceDescription: this.modal.querySelector('#modalServiceDescription'),
+      
+      // Right panel - Summary
       summaryDate: this.modal.querySelector('#modalSummaryDate'),
       summaryTime: this.modal.querySelector('#modalSummaryTime'),
-      summaryServiceName: this.modal.querySelector('#summaryServiceName'),
-      summaryChurchName: this.modal.querySelector('#summaryChurchName'),
-      summaryDuration: this.modal.querySelector('#summaryDuration'),
-      summaryPrice: this.modal.querySelector('#summaryPrice'),
       
       // Error/hint elements
       dateError: this.modal.querySelector('#dateError'),
+      timeError: this.modal.querySelector('#timeError'),
       dateHint: this.modal.querySelector('#dateHint'),
       profileWarning: this.modal.querySelector('#profileWarning'),
       missingFields: this.modal.querySelector('#missingFields')
@@ -146,6 +148,7 @@ class BookingModal {
     
     // Form events
     this.elements.dateInput?.addEventListener('change', () => this.onDateChange());
+    this.elements.timeInput?.addEventListener('change', () => this.onTimeChange());
     
     // Keyboard events
     document.addEventListener('keydown', (e) => {
@@ -154,6 +157,13 @@ class BookingModal {
         this.close();
       }
     });
+  }
+  
+  onTimeChange() {
+    if (this.elements.timeInput?.value) {
+      this.selectedTime = this.elements.timeInput.value;
+      this.updateSummary();
+    }
   }
   
   open(serviceId, churchId) {
@@ -189,7 +199,6 @@ class BookingModal {
         
         // Initialize wizard
         this.updateStepDisplay();
-        this.generateTimeSlots();
         this.updateDateConstraints();
       })
       .catch(error => {
@@ -379,34 +388,51 @@ class BookingModal {
   }
   
   populateServiceInfo() {
-    // Update service information in modal
+    // Update left panel - Service image
+    if (this.elements.serviceImage) {
+      if (this.serviceData.image) {
+        this.elements.serviceImage.src = this.serviceData.image;
+        this.elements.serviceImage.alt = this.serviceData.name;
+      } else {
+        // Use placeholder or default image
+        this.elements.serviceImage.src = '/static/images/default-service.jpg';
+        this.elements.serviceImage.alt = this.serviceData.name;
+      }
+    }
+    
+    // Update left panel - Service name
     if (this.elements.serviceName) {
       this.elements.serviceName.textContent = this.serviceData.name;
     }
+    
+    // Update left panel - Church name with location
     if (this.elements.churchName) {
-      this.elements.churchName.textContent = this.churchData.name;
+      const churchNameSpan = this.elements.churchName.querySelector('span');
+      if (churchNameSpan) {
+        churchNameSpan.textContent = this.churchData.name;
+      } else {
+        this.elements.churchName.textContent = this.churchData.name;
+      }
     }
     
-    // Update service metadata
-    if (this.elements.serviceMeta) {
-      this.elements.serviceMeta.innerHTML = `
-        <span>⏱️ ${this.serviceData.duration || '1 hour'}</span>
-        <span>💰 ${this.serviceData.price || 'Free'}</span>
-      `;
+    // Update left panel - Duration
+    if (this.elements.serviceDuration) {
+      this.elements.serviceDuration.textContent = this.serviceData.duration || '1 hour';
     }
     
-    // Update summary
-    if (this.elements.summaryServiceName) {
-      this.elements.summaryServiceName.textContent = this.serviceData.name;
+    // Update left panel - Price
+    if (this.elements.servicePrice) {
+      this.elements.servicePrice.textContent = this.serviceData.price || 'Free';
     }
-    if (this.elements.summaryChurchName) {
-      this.elements.summaryChurchName.textContent = this.churchData.name;
+    
+    // Update left panel - Description
+    if (this.elements.serviceDescription) {
+      this.elements.serviceDescription.textContent = this.serviceData.description || 'No description available.';
     }
-    if (this.elements.summaryDuration) {
-      this.elements.summaryDuration.textContent = this.serviceData.duration || '1 hour';
-    }
-    if (this.elements.summaryPrice) {
-      this.elements.summaryPrice.textContent = this.serviceData.price || 'Free';
+    
+    // Re-initialize feather icons for the left panel
+    if (typeof feather !== 'undefined') {
+      feather.replace();
     }
   }
   
@@ -637,10 +663,11 @@ class BookingModal {
         return true;
       
       case 2:
-        if (!this.selectedTime) {
-          alert('Please select a preferred time slot.');
+        if (!this.elements.timeInput?.value) {
+          this.showError('timeError', 'Please select a preferred time.');
           return false;
         }
+        this.selectedTime = this.elements.timeInput.value;
         return true;
       
       default:
@@ -702,14 +729,27 @@ class BookingModal {
   
   updateSummary() {
     if (this.selectedDate && this.elements.summaryDate) {
-      const dateObj = new Date(this.selectedDate);
+      const dateObj = new Date(this.selectedDate + 'T00:00:00');
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       this.elements.summaryDate.textContent = dateObj.toLocaleDateString('en-US', options);
     }
     
     if (this.selectedTime && this.elements.summaryTime) {
-      this.elements.summaryTime.textContent = this.selectedTime;
+      // Convert 24-hour time to 12-hour format
+      const formattedTime = this.formatTime12Hour(this.selectedTime);
+      this.elements.summaryTime.textContent = formattedTime;
     }
+  }
+  
+  formatTime12Hour(time24) {
+    if (!time24) return '';
+    
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    
+    return `${hour12}:${minutes} ${ampm}`;
   }
   
   async submitForm() {
