@@ -98,33 +98,37 @@ body.page-appointments {
 }
 
 /* =============================================================================
-   BOOKING LIST - MODERN CARD DESIGN
+   BOOKING LIST - WARM SACRED EARTH DESIGN
    ============================================================================= */
 
 .booking-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 /* Booking Card */
 .booking-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 24px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 20px 24px;
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1.5fr auto;
   gap: 24px;
   align-items: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 
+    0 4px 12px rgba(139, 69, 19, 0.08),
+    0 2px 4px rgba(101, 67, 33, 0.05);
 }
 
 .booking-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-  border-color: #0f766e;
+  box-shadow: 
+    0 8px 20px rgba(139, 69, 19, 0.12),
+    0 4px 8px rgba(101, 67, 33, 0.08);
+  transform: translateY(-1px);
+  border-color: rgba(139, 69, 19, 0.3);
 }
 
 /* Left Section - Service Info */
@@ -145,23 +149,25 @@ body.page-appointments {
 .booking-service-name {
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin: 0;
   line-height: 1.3;
+  font-family: var(--font-family-primary);
 }
 
 .booking-church-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
-  font-size: 15px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .booking-church-info i {
-  width: 18px;
-  height: 18px;
-  color: #0f766e;
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
 }
 
 .booking-meta-row {
@@ -175,13 +181,14 @@ body.page-appointments {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .booking-meta-item i {
   width: 14px;
   height: 14px;
-  color: #94a3b8;
+  color: var(--brand);
+  opacity: 0.7;
 }
 
 .booking-meta-item .meta-label {
@@ -190,7 +197,7 @@ body.page-appointments {
 
 .booking-meta-item .meta-value {
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 }
 
 .booking-decline-reason {
@@ -220,54 +227,58 @@ body.page-appointments {
 }
 
 .booking-datetime-card {
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  border: 2px solid #99f6e4;
-  border-radius: 12px;
-  padding: 16px;
+  background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
+  border: 2px solid #80DEEA;
+  border-radius: 16px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  min-width: 280px;
+  min-width: 260px;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.15);
 }
 
 .datetime-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   flex: 1;
+  text-align: center;
 }
 
 .datetime-item i {
-  width: 24px;
-  height: 24px;
-  color: #0f766e;
+  width: 20px;
+  height: 20px;
+  color: #00838F;
   flex-shrink: 0;
 }
 
 .datetime-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .datetime-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #0f766e;
+  color: #00838F;
 }
 
 .datetime-value {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: #004D40;
+  font-family: var(--font-family-primary);
 }
 
 .datetime-divider {
   width: 2px;
-  height: 40px;
-  background: #5eead4;
+  height: 50px;
+  background: #4DD0E1;
   border-radius: 2px;
 }
 
@@ -298,48 +309,50 @@ body.page-appointments {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-family: var(--font-family-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .badge-requested {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fde68a;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE4A3 100%);
+  color: #8B6914;
+  border: 1px solid #E6D19A;
 }
 
 .badge-reviewed {
-  background: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  color: #1565C0;
+  border: 1px solid #90CAF9;
 }
 
 .badge-approved {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  color: #2E7D32;
+  border: 1px solid #A5D6A7;
 }
 
 .badge-completed {
-  background: #e0e7ff;
-  color: #3730a3;
-  border: 1px solid #c7d2fe;
+  background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+  color: #6A1B9A;
+  border: 1px solid #CE93D8;
 }
 
 .badge-declined {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+  color: #C62828;
+  border: 1px solid #EF9A9A;
 }
 
 .badge-canceled {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%);
+  color: #616161;
+  border: 1px solid #BDBDBD;
 }
 
 /* =============================================================================
