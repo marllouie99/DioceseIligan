@@ -922,13 +922,19 @@ function toggleDescription(button) {
     const descriptionDiv = button.closest('.service-description');
     const descriptionText = descriptionDiv.querySelector('.description-text');
     const fullText = descriptionText.getAttribute('data-full-text');
-    const truncatedText = descriptionText.textContent.trim();
     const readMoreText = button.querySelector('.read-more-text');
     const icon = button.querySelector('.read-more-icon');
     
+    // Store truncated text on first click
+    if (!descriptionText.hasAttribute('data-truncated-text')) {
+        descriptionText.setAttribute('data-truncated-text', descriptionText.textContent.trim());
+    }
+    
+    const truncatedText = descriptionText.getAttribute('data-truncated-text');
+    
     if (button.classList.contains('expanded')) {
         // Collapse - show truncated text
-        descriptionText.textContent = truncatedText.split('...')[0] + '...';
+        descriptionText.textContent = truncatedText;
         readMoreText.textContent = 'Read more';
         button.classList.remove('expanded');
         icon.style.transform = 'rotate(0deg)';
