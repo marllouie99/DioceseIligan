@@ -15,6 +15,10 @@ class BookingModal {
     this.availabilityData = null;
     this.lastCheckedValue = '';
     
+    // Image carousel
+    this.serviceImages = [];
+    this.currentImageIndex = 0;
+    
     // DOM elements (will be set when modal is opened)
     this.elements = {};
     
@@ -75,6 +79,11 @@ class BookingModal {
       
       // Left panel - Service details
       serviceImage: this.modal.querySelector('#modalServiceImage'),
+      imagePrevBtn: this.modal.querySelector('#imagePrevBtn'),
+      imageNextBtn: this.modal.querySelector('#imageNextBtn'),
+      imageCounter: this.modal.querySelector('#imageCounter'),
+      currentImageIndex: this.modal.querySelector('#currentImageIndex'),
+      totalImages: this.modal.querySelector('#totalImages'),
       serviceName: this.modal.querySelector('#modalServiceName'),
       churchName: this.modal.querySelector('#modalChurchName'),
       serviceDuration: this.modal.querySelector('#modalServiceDuration'),
@@ -149,6 +158,10 @@ class BookingModal {
     // Form events
     this.elements.dateInput?.addEventListener('change', () => this.onDateChange());
     this.elements.timeInput?.addEventListener('change', () => this.onTimeChange());
+    
+    // Image navigation events
+    this.elements.imagePrevBtn?.addEventListener('click', () => this.previousImage());
+    this.elements.imageNextBtn?.addEventListener('click', () => this.nextImage());
     
     // Keyboard events
     document.addEventListener('keydown', (e) => {
@@ -394,16 +407,14 @@ class BookingModal {
   }
   
   populateServiceInfo() {
-    // Update left panel - Service image
-    if (this.elements.serviceImage) {
-      if (this.serviceData.image) {
-        this.elements.serviceImage.src = this.serviceData.image;
-        this.elements.serviceImage.alt = this.serviceData.name;
-      } else {
-        // Use placeholder or default image
-        this.elements.serviceImage.src = '/static/images/default-service.jpg';
-        this.elements.serviceImage.alt = this.serviceData.name;
-      }
+    // Load service images
+    this.loadServiceImages();
+    
+    // Update left panel - Service image (will be set by loadServiceImages)
+    // Initial placeholder
+    if (this.elements.serviceImage && !this.serviceData.image) {
+      this.elements.serviceImage.src = '/static/images/default-service.jpg';
+      this.elements.serviceImage.alt = this.serviceData.name;
     }
     
     // Update left panel - Service name
@@ -829,22 +840,29 @@ class BookingModal {
   }
   
   showSuccessMessage(bookingCode) {
-    // Replace modal content with success message
+    // Replace modal content with success message (centered in modal)
     const modalBody = this.modal.querySelector('.modal-body');
     if (modalBody) {
+      // Remove split layout classes and center content
+      modalBody.classList.remove('modal-body-split');
+      modalBody.style.display = 'flex';
+      modalBody.style.alignItems = 'center';
+      modalBody.style.justifyContent = 'center';
+      modalBody.style.minHeight = '400px';
+      
       modalBody.innerHTML = `
-        <div style="text-align: center; padding: 40px 20px;">
-          <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-          <h3 style="margin: 0 0 8px 0; color: #059669;">Booking Request Submitted!</h3>
-          <p style="color: #6b7280; margin-bottom: 20px;">Your appointment request has been sent to the church for review.</p>
-          <div style="background: #f0f9ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-            <strong>Booking ID: ${bookingCode}</strong>
+        <div style="text-align: center; padding: 40px 20px; max-width: 500px;">
+          <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+          <h3 style="margin: 0 0 12px 0; color: #059669; font-size: 24px;">Booking Request Submitted!</h3>
+          <p style="color: #6b7280; margin-bottom: 24px; font-size: 15px;">Your appointment request has been sent to the church for review.</p>
+          <div style="background: #f0f9ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <strong style="font-size: 16px;">Booking ID: ${bookingCode}</strong>
           </div>
-          <p style="font-size: 14px; color: #6b7280; margin-bottom: 24px;">
+          <p style="font-size: 14px; color: #6b7280; margin-bottom: 32px; line-height: 1.6;">
             You will receive a notification once the church reviews your request.
             You can check the status in your appointments section.
           </p>
-          <button type="button" class="btn btn-primary" onclick="bookingModal.close()">Close</button>
+          <button type="button" class="btn btn-primary" onclick="bookingModal.close()" style="padding: 12px 32px;">Close</button>
         </div>
       `;
     }
@@ -876,6 +894,109 @@ class BookingModal {
   getCSRFToken() {
     const token = document.querySelector('[name=csrfmiddlewaretoken]');
     return token ? token.value : '';
+  }
+  
+  // Image Carousel Methods
+  async loadServiceImages() {
+    try {
+      // Fetch service images from API
+      const response = await fetch(`/app/api/service/${this.serviceData.id}/images/`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.success && data.images && data.images.length > 0) {
+          this.serviceImages = data.images;
+        } else if (this.serviceData.image) {
+          // Fallback to single image from service data
+          this.serviceImages = [{ url: this.serviceData.image, is_primary: true }];
+        } else {
+          // No images available
+          this.serviceImages = [];
+        }
+      } else {
+        // Fallback to single image
+        if (this.serviceData.image) {
+          this.serviceImages = [{ url: this.serviceData.image, is_primary: true }];
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load service images:', error);
+      // Fallback to single image
+      if (this.serviceData.image) {
+        this.serviceImages = [{ url: this.serviceData.image, is_primary: true }];
+      }
+    }
+    
+    // Initialize carousel
+    this.currentImageIndex = 0;
+    this.updateImageDisplay();
+  }
+  
+  updateImageDisplay() {
+    if (this.serviceImages.length === 0) {
+      // Show default image
+      if (this.elements.serviceImage) {
+        this.elements.serviceImage.src = '/static/images/default-service.jpg';
+        this.elements.serviceImage.alt = this.serviceData.name;
+      }
+      // Hide navigation
+      if (this.elements.imagePrevBtn) this.elements.imagePrevBtn.style.display = 'none';
+      if (this.elements.imageNextBtn) this.elements.imageNextBtn.style.display = 'none';
+      if (this.elements.imageCounter) this.elements.imageCounter.style.display = 'none';
+      return;
+    }
+    
+    // Update image
+    const currentImage = this.serviceImages[this.currentImageIndex];
+    if (this.elements.serviceImage) {
+      this.elements.serviceImage.src = currentImage.url;
+      this.elements.serviceImage.alt = this.serviceData.name;
+    }
+    
+    // Show/hide navigation based on image count
+    if (this.serviceImages.length > 1) {
+      if (this.elements.imagePrevBtn) this.elements.imagePrevBtn.style.display = 'flex';
+      if (this.elements.imageNextBtn) this.elements.imageNextBtn.style.display = 'flex';
+      if (this.elements.imageCounter) this.elements.imageCounter.style.display = 'block';
+      
+      // Update counter
+      if (this.elements.currentImageIndex) {
+        this.elements.currentImageIndex.textContent = this.currentImageIndex + 1;
+      }
+      if (this.elements.totalImages) {
+        this.elements.totalImages.textContent = this.serviceImages.length;
+      }
+    } else {
+      if (this.elements.imagePrevBtn) this.elements.imagePrevBtn.style.display = 'none';
+      if (this.elements.imageNextBtn) this.elements.imageNextBtn.style.display = 'none';
+      if (this.elements.imageCounter) this.elements.imageCounter.style.display = 'none';
+    }
+    
+    // Re-initialize feather icons
+    if (typeof feather !== 'undefined') {
+      feather.replace();
+    }
+  }
+  
+  previousImage() {
+    if (this.serviceImages.length <= 1) return;
+    
+    this.currentImageIndex--;
+    if (this.currentImageIndex < 0) {
+      this.currentImageIndex = this.serviceImages.length - 1;
+    }
+    this.updateImageDisplay();
+  }
+  
+  nextImage() {
+    if (this.serviceImages.length <= 1) return;
+    
+    this.currentImageIndex++;
+    if (this.currentImageIndex >= this.serviceImages.length) {
+      this.currentImageIndex = 0;
+    }
+    this.updateImageDisplay();
   }
 }
 

@@ -16,6 +16,19 @@
       <div class="booking-left-panel">
         <div class="service-image-container">
           <img id="modalServiceImage" src="" alt="Service" class="service-image">
+          
+          <!-- Image Navigation Buttons -->
+          <button type="button" class="image-nav-btn image-nav-prev" id="imagePrevBtn" style="display: none;">
+            <i data-feather="chevron-left"></i>
+          </button>
+          <button type="button" class="image-nav-btn image-nav-next" id="imageNextBtn" style="display: none;">
+            <i data-feather="chevron-right"></i>
+          </button>
+          
+          <!-- Image Counter -->
+          <div class="image-counter" id="imageCounter" style="display: none;">
+            <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
+          </div>
         </div>
         
         <div class="service-details-panel">
