@@ -44,37 +44,91 @@
   {% if bookings %}
     <div class="booking-list">
       {% for b in bookings %}
-        <div class="booking-row">
-          <div class="booking-service">
-            <h3 class="booking-title">{{ b.service.name }}</h3>
-            <p class="booking-sub booking-church">at {{ b.church.name }}</p>
-            <p class="booking-sub">ID: {{ b.code }} • Requested: {{ b.created_at|date:'M j, Y' }}</p>
-          </div>
-          <div class="booking-details">
-            <p class="booking-date">{{ b.date|date:'M j, Y' }}</p>
-            <p class="booking-time">{% if b.start_time and b.end_time %}{{ b.start_time|time:'g:i A' }} - {{ b.end_time|time:'g:i A' }}{% else %}Time: No time set{% endif %}</p>
-            <div class="booking-status">
-              <span class="badge {{ b.status }}">{{ b.get_status_display }}</span>
+        <div class="booking-card">
+          <!-- Left Section: Service Info -->
+          <div class="booking-card-left">
+            <div class="booking-header-section">
+              <h3 class="booking-service-name">{{ b.service.name }}</h3>
+              <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
             </div>
+            
+            <div class="booking-church-info">
+              <i data-feather="map-pin"></i>
+              <span>{{ b.church.name }}</span>
+            </div>
+            
+            <div class="booking-meta-row">
+              <div class="booking-meta-item">
+                <i data-feather="hash"></i>
+                <span class="meta-label">ID:</span>
+                <span class="meta-value">{{ b.code }}</span>
+              </div>
+              <div class="booking-meta-item">
+                <i data-feather="calendar"></i>
+                <span class="meta-label">Requested:</span>
+                <span class="meta-value">{{ b.created_at|date:'M j, Y' }}</span>
+              </div>
+            </div>
+            
             {% if b.status == 'declined' and b.decline_reason %}
-              <p class="booking-sub" style="color: #dc2626; margin-top: 0.5rem;">Declined: {{ b.decline_reason }}</p>
+              <div class="booking-decline-reason">
+                <i data-feather="alert-circle"></i>
+                <span>{{ b.decline_reason }}</span>
+              </div>
             {% endif %}
           </div>
-          <div class="booking-actions">
+          
+          <!-- Center Section: Date & Time -->
+          <div class="booking-card-center">
+            <div class="booking-datetime-card">
+              <div class="datetime-item">
+                <i data-feather="calendar"></i>
+                <div class="datetime-content">
+                  <span class="datetime-label">Date</span>
+                  <span class="datetime-value">{{ b.date|date:'M j, Y' }}</span>
+                </div>
+              </div>
+              <div class="datetime-divider"></div>
+              <div class="datetime-item">
+                <i data-feather="clock"></i>
+                <div class="datetime-content">
+                  <span class="datetime-label">Time</span>
+                  <span class="datetime-value">{% if b.start_time %}{{ b.start_time|time:'g:i A' }}{% if b.end_time %} - {{ b.end_time|time:'g:i A' }}{% endif %}{% else %}Not set{% endif %}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Section: Actions -->
+          <div class="booking-card-right">
             {% if b.church.slug %}
-            <a href="{% url 'core:church_detail' b.church.slug %}" class="btn btn-outline">View Church</a>
-            {% else %}
-            <a href="#" class="btn btn-outline disabled" title="Church details not available">View Church</a>
+              <a href="{% url 'core:church_detail' b.church.slug %}" class="btn btn-outline btn-icon">
+                <i data-feather="eye"></i>
+                View Church
+              </a>
             {% endif %}
+            
             {% if b.status == 'reviewed' or b.status == 'approved' %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-primary">Print Invoice</a>
+              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-primary btn-icon">
+                <i data-feather="printer"></i>
+                Print Invoice
+              </a>
             {% elif b.status == 'completed' %}
               {% if b.user_has_reviewed %}
-                <a href="{% url 'core:service_reviews' b.service.id %}" class="btn btn-success">Check Review</a>
+                <a href="{% url 'core:service_reviews' b.service.id %}" class="btn btn-success btn-icon">
+                  <i data-feather="check-circle"></i>
+                  Check Review
+                </a>
               {% else %}
-                <button class="btn btn-secondary" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})">Rate & Review</button>
+                <button class="btn btn-secondary btn-icon" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})">
+                  <i data-feather="star"></i>
+                  Rate & Review
+                </button>
               {% endif %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-outline">View Invoice</a>
+              <a href="{% url 'core:booking_invoice' b.id %}" class="btn btn-outline btn-icon">
+                <i data-feather="file-text"></i>
+                View Invoice
+              </a>
             {% endif %}
           </div>
         </div>
