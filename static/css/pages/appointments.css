@@ -220,37 +220,29 @@ body.page-appointments {
   margin-top: 2px;
 }
 
-/* Center Section - Date & Time Card */
+/* Center Section - Date & Time (Simplified) */
 .booking-card-center {
-  display: flex;
-  justify-content: center;
-}
-
-.booking-datetime-card {
-  background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
-  border: 2px solid #80DEEA;
-  border-radius: 16px;
-  padding: 16px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  min-width: 260px;
-  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.15);
+}
+
+.booking-datetime-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .datetime-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  flex: 1;
-  text-align: center;
+  gap: 8px;
 }
 
 .datetime-item i {
-  width: 20px;
-  height: 20px;
-  color: #00838F;
+  width: 18px;
+  height: 18px;
+  color: var(--brand);
   flex-shrink: 0;
 }
 
@@ -262,24 +254,23 @@ body.page-appointments {
 
 .datetime-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #00838F;
+  letter-spacing: 0.3px;
+  color: var(--muted);
 }
 
 .datetime-value {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: #004D40;
+  color: var(--text);
   font-family: var(--font-family-primary);
 }
 
 .datetime-divider {
-  width: 2px;
-  height: 50px;
-  background: #4DD0E1;
-  border-radius: 2px;
+  width: 1px;
+  height: 32px;
+  background: var(--border);
 }
 
 /* Right Section - Actions */
