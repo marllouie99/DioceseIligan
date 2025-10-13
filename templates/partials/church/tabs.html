@@ -272,7 +272,13 @@
                 </h4>
                 <p class="service-location">
                   <i data-feather="map-pin"></i>
-                  {{ church.address|default:church.city }}{% if church.city %}, {{ church.city }}{% endif %}
+                  {% if church.address %}
+                    {{ church.address }}{% if church.city %}, {{ church.city }}{% endif %}
+                  {% elif church.city %}
+                    {{ church.city }}
+                  {% else %}
+                    Church Location
+                  {% endif %}
                 </p>
                 <p>{{ service.description|default:"No description provided."|truncatewords:20 }}</p>
                 <div class="service-meta">
