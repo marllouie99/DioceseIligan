@@ -26,13 +26,13 @@ from .models import (
 @admin.register(Church)
 class ChurchAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'city', 'state', 'owner', 'paypal_email', 'is_verified', 'is_active', 'created_at',
+        'name', 'city_municipality', 'province', 'owner', 'paypal_email', 'is_verified', 'is_active', 'created_at',
     )
     search_fields = (
-        'name', 'city', 'state', 'email', 'paypal_email', 'owner__username',
+        'name', 'city_municipality', 'province', 'barangay', 'email', 'paypal_email', 'owner__username',
     )
     list_filter = (
-        'is_verified', 'is_active', 'denomination', 'size', 'city', 'created_at',
+        'is_verified', 'is_active', 'denomination', 'size', 'region', 'province', 'created_at',
     )
     readonly_fields = ('created_at', 'updated_at')
     prepopulated_fields = { 'slug': ('name',) }
@@ -45,8 +45,14 @@ class ChurchAdmin(admin.ModelAdmin):
         ('Contact Information', {
             'fields': ('email', 'phone', 'website')
         }),
-        ('Location', {
-            'fields': ('address', 'city', 'state', 'country', 'postal_code', 'latitude', 'longitude')
+        ('Location (Philippine Address)', {
+            'fields': ('region', 'province', 'city_municipality', 'barangay', 'street_address', 'postal_code', 'latitude', 'longitude'),
+            'description': 'New Philippine address structure used by the create church form'
+        }),
+        ('Location (Legacy)', {
+            'fields': ('address', 'city', 'state', 'country'),
+            'classes': ('collapse',),
+            'description': 'Legacy address fields for backward compatibility - use Philippine Address fields above instead'
         }),
         ('Leadership', {
             'fields': ('pastor_name', 'pastor_email', 'pastor_phone')
