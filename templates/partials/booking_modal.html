@@ -1,9 +1,9 @@
 <!-- Booking Modal -->
 <div id="bookingModal" class="booking-modal">
   <div class="modal-overlay"></div>
-  <div class="modal-container">
+  <div class="modal-container modal-container-wide">
     <div class="modal-header">
-      <h3 class="modal-title">Book Appointment</h3>
+      <h3 class="modal-title">Request Appointment</h3>
       <button type="button" class="modal-close" id="closeBookingModal">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -11,8 +11,45 @@
       </button>
     </div>
     
-    <div class="modal-body">
-      <div class="booking-wizard">
+    <div class="modal-body modal-body-split">
+      <!-- Left Column: Service Details -->
+      <div class="booking-left-panel">
+        <div class="service-image-container">
+          <img id="modalServiceImage" src="" alt="Service" class="service-image">
+        </div>
+        
+        <div class="service-details-panel">
+          <h2 id="modalServiceName" class="service-name">Service Name</h2>
+          <p id="modalChurchName" class="church-name">
+            <i data-feather="map-pin"></i>
+            <span>Church Name</span>
+          </p>
+          
+          <div class="service-meta-info">
+            <div class="meta-item">
+              <i data-feather="clock"></i>
+              <span id="modalServiceDuration">Duration</span>
+            </div>
+            <div class="meta-item">
+              <i data-feather="dollar-sign"></i>
+              <span id="modalServicePrice">Price</span>
+            </div>
+          </div>
+          
+          <div class="service-description">
+            <h4>About this service</h4>
+            <p id="modalServiceDescription">Service description will appear here.</p>
+          </div>
+          
+          <div class="booking-note">
+            <i data-feather="info"></i>
+            <p>Your appointment request will be reviewed by the church. You'll receive a confirmation once approved.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Booking Form -->
+      <div class="booking-right-panel">
         <!-- Step Indicator -->
         <div class="step-indicator">
           <div class="step active" data-step="1">
@@ -29,28 +66,10 @@
           </div>
         </div>
 
-        <!-- Service Information Header -->
-        <div class="service-header">
-          <div class="service-title">
-            <h2 id="modalServiceName">Service Name</h2>
-            <p class="service-church" id="modalChurchName">Church Name</p>
-          </div>
-          <div class="service-details">
-            <div class="service-meta" id="modalServiceMeta">
-              <!-- Service metadata will be populated by JavaScript -->
-            </div>
-          </div>
-        </div>
-        
-        <!-- Booking Information -->
-        <div class="booking-info">
-          <strong>Booking Request:</strong> Choose your preferred date and time. The church will review and confirm your appointment.
-        </div>
-
         <!-- Profile Warning (will be shown if incomplete) -->
         <div class="profile-warning" id="profileWarning" style="display: none;">
           <div class="profile-warning-header">
-            <span>⚠️</span>
+            <i data-feather="alert-triangle"></i>
             <span>Complete Profile Required</span>
           </div>
           <div class="profile-warning-text">
@@ -79,12 +98,16 @@
           <!-- Step 2: Choose Time -->
           <div class="step-content" data-step="2">
             <div class="form-section">
-              <label class="form-label">Preferred Time</label>
-              <p class="form-hint" style="margin-bottom: 16px;">Choose your preferred appointment time. All times are approximate and subject to church availability.</p>
-              <div class="time-slots" id="modalTimeSlots">
-                <!-- Time slots will be populated by JavaScript -->
+              <label class="form-label" for="modal_time">Preferred Time</label>
+              <p class="form-hint" style="margin-bottom: 16px;">Select your preferred appointment time. The church will confirm availability.</p>
+              <div class="time-input-wrapper">
+                <input type="time" id="modal_time" name="time" class="form-input time-input" required>
+                <div class="time-icon">
+                  <i data-feather="clock"></i>
+                </div>
               </div>
-              <div class="form-hint" style="margin-top: 16px;">Click on a time slot to select it</div>
+              <div class="form-hint" style="margin-top: 8px;">Choose any time during church office hours (typically 8:00 AM - 5:00 PM)</div>
+              <div class="form-error" id="timeError" style="display: none;"></div>
             </div>
           </div>
 
@@ -94,47 +117,47 @@
               <h4 class="section-title">Review Your Appointment</h4>
               <div class="appointment-summary">
                 <div class="summary-item">
-                  <span class="summary-label">Service</span>
-                  <span class="summary-value" id="summaryServiceName">-</span>
+                  <i data-feather="calendar"></i>
+                  <div>
+                    <span class="summary-label">Date</span>
+                    <span class="summary-value" id="modalSummaryDate">Please select a date</span>
+                  </div>
                 </div>
                 <div class="summary-item">
-                  <span class="summary-label">Church</span>
-                  <span class="summary-value" id="summaryChurchName">-</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-label">Date</span>
-                  <span class="summary-value" id="modalSummaryDate">Please select a date</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-label">Time</span>
-                  <span class="summary-value" id="modalSummaryTime">Please select a time</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-label">Duration</span>
-                  <span class="summary-value" id="summaryDuration">-</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-label">Cost</span>
-                  <span class="summary-value" id="summaryPrice">-</span>
+                  <i data-feather="clock"></i>
+                  <div>
+                    <span class="summary-label">Time</span>
+                    <span class="summary-value" id="modalSummaryTime">Please select a time</span>
+                  </div>
                 </div>
               </div>
               
-              <div class="form-section">
-                <label class="form-label" for="modal_notes">Additional Notes (optional)</label>
-                <textarea id="modal_notes" name="notes" class="form-textarea" 
-                          placeholder="Any special requests or information for the church"></textarea>
+              <div class="form-section" style="margin-top: 24px;">
+                <label class="form-label" for="modal_notes">Additional Notes (Optional)</label>
+                <textarea id="modal_notes" name="notes" class="form-textarea" rows="4"
+                          placeholder="Any special requests or information for the church..."></textarea>
+                <div class="form-hint">Let the church know if you have any specific requirements or questions.</div>
               </div>
             </div>
           </div>
 
           <!-- Navigation Buttons -->
           <div class="wizard-actions">
-            <button type="button" id="modalBackBtn" class="btn btn-outline" style="display: none;">Back</button>
-            <div>
+            <button type="button" id="modalBackBtn" class="btn btn-outline" style="display: none;">
+              <i data-feather="arrow-left"></i>
+              Back
+            </button>
+            <div class="wizard-actions-right">
               <button type="button" id="modalCancelBtn" class="btn btn-secondary">Cancel</button>
-              <button type="button" id="modalNextBtn" class="btn btn-primary">Next</button>
+              <button type="button" id="modalNextBtn" class="btn btn-primary">
+                Next
+                <i data-feather="arrow-right"></i>
+              </button>
               <button type="button" id="modalSubmitBtn" class="btn btn-primary" style="display: none;">
-                <span class="btn-text">Submit Request</span>
+                <span class="btn-text">
+                  <i data-feather="check"></i>
+                  Submit Request
+                </span>
                 <span class="btn-loading" style="display: none;">
                   <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -147,6 +170,10 @@
           </div>
         </form>
       </div>
+      <!-- End Right Panel -->
     </div>
+    <!-- End Modal Body -->
   </div>
+  <!-- End Modal Container -->
 </div>
+<!-- End Booking Modal -->
