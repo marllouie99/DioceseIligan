@@ -272,7 +272,13 @@
                 </h4>
                 <p class="service-location">
                   <i data-feather="map-pin"></i>
-                  {% if church.address %}
+                  {% if church.street_address %}
+                    {{ church.street_address }}, {{ church.barangay }}, {{ church.city_municipality }}
+                  {% elif church.barangay and church.city_municipality %}
+                    {{ church.barangay }}, {{ church.city_municipality }}
+                  {% elif church.city_municipality %}
+                    {{ church.city_municipality }}
+                  {% elif church.address %}
                     {{ church.address }}{% if church.city %}, {{ church.city }}{% endif %}
                   {% elif church.city %}
                     {{ church.city }}
