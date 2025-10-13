@@ -277,21 +277,27 @@ body.page-appointments {
   flex-direction: column;
   gap: 10px;
   align-items: stretch;
+  min-width: 140px;
 }
 
 .btn-icon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   font-size: 14px;
   padding: 10px 16px;
   white-space: nowrap;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn-icon i {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }
 
 /* Badge Styles */
