@@ -286,7 +286,17 @@
                     Church Location
                   {% endif %}
                 </p>
-                <p>{{ service.description|default:"No description provided."|truncatewords:20 }}</p>
+                <div class="service-description">
+                  <p class="description-text" data-full-text="{{ service.description|default:'No description provided.' }}">
+                    {{ service.description|default:"No description provided."|truncatewords:20 }}
+                  </p>
+                  {% if service.description|wordcount > 20 %}
+                    <button class="read-more-btn" onclick="toggleDescription(this)">
+                      <span class="read-more-text">Read more</span>
+                      <i data-feather="chevron-down" class="read-more-icon"></i>
+                    </button>
+                  {% endif %}
+                </div>
                 <div class="service-meta">
                   <span>{{ service.duration_display }}</span>
                   <span>{% if service.is_free %}Free{% else %}{{ service.price_display }}{% endif %}</span>

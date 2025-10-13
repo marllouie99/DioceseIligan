@@ -916,5 +916,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Toggle service description read more/less
+function toggleDescription(button) {
+    const descriptionDiv = button.closest('.service-description');
+    const descriptionText = descriptionDiv.querySelector('.description-text');
+    const fullText = descriptionText.getAttribute('data-full-text');
+    const truncatedText = descriptionText.textContent.trim();
+    const readMoreText = button.querySelector('.read-more-text');
+    const icon = button.querySelector('.read-more-icon');
+    
+    if (button.classList.contains('expanded')) {
+        // Collapse - show truncated text
+        descriptionText.textContent = truncatedText.split('...')[0] + '...';
+        readMoreText.textContent = 'Read more';
+        button.classList.remove('expanded');
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        // Expand - show full text
+        descriptionText.textContent = fullText;
+        readMoreText.textContent = 'Read less';
+        button.classList.add('expanded');
+        icon.style.transform = 'rotate(180deg)';
+    }
+    
+    // Re-initialize feather icons for the rotated icon
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+}
 </script>
 {% endblock %}
