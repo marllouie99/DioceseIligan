@@ -121,9 +121,6 @@ STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Django-imagekit compatibility with Django 5.2+
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
 # Ensure default staticfiles finders are enabled explicitly (some hosts override defaults)
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -151,7 +148,6 @@ if not DEBUG and _cloud_name and _cloud_key and _cloud_secret:
         'API_KEY': _cloud_key,
         'API_SECRET': _cloud_secret,
     }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     STORAGES["default"]["BACKEND"] = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Auth redirects

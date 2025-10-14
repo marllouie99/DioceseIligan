@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q, Count, F, Exists, OuterRef, Value, BooleanField, ExpressionWrapper, IntegerField
+from django.db.models import Q, Count, F, Exists, OuterRef, Value, BooleanField, ExpressionWrapper, IntegerField, Sum
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.cache import cache
@@ -1150,6 +1150,100 @@ def super_admin_dashboard(request):
     except Exception:
         pending_verifications = []
         verif_counts = {'pending': 0, 'approved': 0, 'rejected': 0}
+    
+    # Post Statistics
+    from .models import Post, PostLike, PostComment, PostBookmark, ChurchFollow
+    
+    total_posts = Post.objects.filter(is_active=True).count()
+    posts_this_month = Post.objects.filter(
+        created_at__gte=first_day_of_month,
+        is_active=True
+    ).count()
+    
+    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    posts_today = Post.objects.filter(
+        created_at__gte=today_start,
+        is_active=True
+    ).count()
+    
+    # Total engagement (likes + comments + bookmarks)
+    total_likes = PostLike.objects.count()
+    total_comments = PostComment.objects.filter(is_active=True).count()
+    total_bookmarks = PostBookmark.objects.count()
+    total_engagement = total_likes + total_comments + total_bookmarks
+    
+    # Church followers
+    total_followers = ChurchFollow.objects.count()
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    new_followers_this_week = ChurchFollow.objects.filter(
+        followed_at__gte=seven_days_ago
+    ).count()
+    
+    # Total donations (if you have a Donation model)
+    try:
+        from .models import Donation
+        total_donations = Donation.objects.filter(status='completed').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        donations_this_month = Donation.objects.filter(
+            created_at__gte=first_day_of_month,
+            status='completed'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+    except:
+        total_donations = 0
+        donations_this_month = 0
+    
+    # Monthly growth data (last 6 months)
+    monthly_growth_labels = []
+    monthly_user_growth = []
+    monthly_church_growth = []
+    monthly_booking_data = {
+        'completed': [],
+        'pending': [],
+        'cancelled': []
+    }
+    
+    for i in range(5, -1, -1):  # Last 6 months
+        month_date = timezone.now() - timedelta(days=30 * i)
+        month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        # Calculate next month start
+        if month_start.month == 12:
+            month_end = month_start.replace(year=month_start.year + 1, month=1)
+        else:
+            month_end = month_start.replace(month=month_start.month + 1)
+        
+        # Month label
+        monthly_growth_labels.append(month_start.strftime('%b'))
+        
+        # User growth
+        user_count = User.objects.filter(date_joined__lt=month_end).count() if hasattr(User, 'date_joined') else 0
+        monthly_user_growth.append(user_count)
+        
+        # Church growth
+        church_count = Church.objects.filter(created_at__lt=month_end).count()
+        monthly_church_growth.append(church_count)
+        
+        # Booking status data
+        completed = Booking.objects.filter(
+            created_at__gte=month_start,
+            created_at__lt=month_end,
+            status='completed'
+        ).count()
+        pending = Booking.objects.filter(
+            created_at__gte=month_start,
+            created_at__lt=month_end,
+            status='pending'
+        ).count()
+        cancelled = Booking.objects.filter(
+            created_at__gte=month_start,
+            created_at__lt=month_end,
+            status='cancelled'
+        ).count()
+        
+        monthly_booking_data['completed'].append(completed)
+        monthly_booking_data['pending'].append(pending)
+        monthly_booking_data['cancelled'].append(cancelled)
 
     ctx = {
         'active': 'super_admin',
@@ -1185,6 +1279,25 @@ def super_admin_dashboard(request):
         'verif': {
             'counts': verif_counts,
             'pending_list': pending_verifications,
+        },
+        'monthly_growth': {
+            'labels': monthly_growth_labels,
+            'users': monthly_user_growth,
+            'churches': monthly_church_growth,
+        },
+        'monthly_bookings': monthly_booking_data,
+        'post_stats': {
+            'total_posts': total_posts,
+            'posts_this_month': posts_this_month,
+            'posts_today': posts_today,
+            'total_engagement': total_engagement,
+            'total_likes': total_likes,
+            'total_comments': total_comments,
+            'total_bookmarks': total_bookmarks,
+            'total_followers': total_followers,
+            'new_followers_this_week': new_followers_this_week,
+            'total_donations': total_donations,
+            'donations_this_month': donations_this_month,
         },
     }
     ctx.update(_app_context(request))
