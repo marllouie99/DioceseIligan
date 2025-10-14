@@ -1,0 +1,1586 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Churches Management • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<style>
+/* Container */
+.churches-container {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+/* Override dashboard-layout for churches page */
+.dashboard-page .churches-container {
+  display: block;
+}
+
+/* Override any parent overflow constraints */
+.content {
+  overflow: visible !important;
+  min-height: auto !important;
+}
+
+/* 3 Column Statistics Grid */
+.stats-grid-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid-3col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid-3col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stat Cards */
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.stat-card-icon.primary {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+}
+
+.stat-card-icon.success {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+.stat-card-icon.warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.stat-card-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.stat-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-card-title {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card-subtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Remove old stat-card-header since we're not using it anymore */
+.stat-card-header {
+  display: none;
+}
+
+/* Chart Section */
+.chart-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.chart-header {
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+}
+
+.chart-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+.chart-container canvas {
+  max-height: 400px !important;
+  height: 400px !important;
+  width: 100% !important;
+}
+
+/* All Churches Section */
+.all-churches-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title-group h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+}
+
+.section-title-group p {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-box {
+  position: relative;
+  width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: var(--text);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--shadow-accent);
+}
+
+.search-box input::placeholder {
+  color: var(--muted);
+}
+
+.search-box svg {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.btn-add-church {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: var(--shadow-md), 0 2px 8px var(--shadow-accent);
+}
+
+.btn-add-church:hover {
+  background: var(--gradient-brand-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 6px 20px var(--shadow-accent);
+  text-decoration: none;
+  color: var(--text-light);
+}
+
+.btn-add-church svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Table */
+.churches-table-container {
+  overflow-x: auto;
+}
+
+.churches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.churches-table thead {
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border);
+}
+
+.churches-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.churches-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.churches-table tbody tr:hover {
+  background: var(--bg-secondary);
+}
+
+.churches-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.church-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.church-name-cell a {
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.church-name-cell a:hover {
+  color: var(--brand-hover);
+  text-decoration: underline;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.category-badge.catholic {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.category-badge.protestant {
+  background: #e9d5ff;
+  color: #6b21a8;
+}
+
+.category-badge.baptist {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.category-badge.methodist {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.category-badge.other {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--muted);
+}
+
+.btn-action:hover {
+  background: var(--bg-secondary);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Church Directory Specific Styles */
+.church-mini-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.church-mini-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.church-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.church-name-text {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.church-size-badge {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.denom-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%);
+  border: 1px solid rgba(218, 165, 32, 0.2);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #654321;
+  font-weight: 600;
+}
+
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+}
+
+.location-cell svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.owner-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.owner-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.owner-email {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.followers-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.followers-cell svg {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.status-verified {
+  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+  color: #166534;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-unverified {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.date-cell {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.action-view:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+/* Filter Controls */
+.table-controls {
+  margin-bottom: 1.5rem;
+}
+
+.filters-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  background: white;
+  color: var(--text);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--shadow-accent);
+}
+
+.filter-select {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 180px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--shadow-accent);
+}
+
+.btn-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  border: none;
+}
+
+.btn-filter:hover {
+  background: var(--gradient-brand-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-filter svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  background: var(--bg-secondary);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.btn-clear:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btn-clear svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.page-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.page-btn:hover {
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  border-color: var(--brand);
+}
+
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.page-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.page-jump-input {
+  width: 60px;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+  background: white;
+  transition: all 0.2s;
+}
+
+.page-jump-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--shadow-accent);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem !important;
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  color: var(--border);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* Toggle Switch Styles */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+}
+
+.toggle-option.active {
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  box-shadow: var(--shadow-md);
+}
+
+.toggle-option svg {
+  width: 16px;
+  height: 16px;
+}
+
+.toggle-option:hover:not(.active) {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Content Sections Toggle */
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+.filter-results-info {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #0c4a6e;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-results-info svg {
+  width: 18px;
+  height: 18px;
+  color: #0284c7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-box {
+    width: 100%;
+  }
+  
+  .view-toggle {
+    width: 100%;
+  }
+  
+  .toggle-option {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section-actions {
+    flex-direction: column;
+  }
+  
+  .btn-add-church {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+  
+  .chart-container canvas {
+    max-height: 300px !important;
+    height: 300px !important;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Top Churches by Followers Chart (Horizontal Bar Chart)
+  const topChurchesCtx = document.getElementById('topChurchesChart');
+  if (topChurchesCtx) {
+    new Chart(topChurchesCtx, {
+      type: 'bar',
+      data: {
+        labels: [{% for church in top_churches %}'{{ church.name|escapejs }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+          label: 'Followers',
+          data: [{% for church in top_churches %}{{ church.follower_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+          backgroundColor: 'rgba(59, 130, 246, 0.8)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            },
+            callbacks: {
+              label: function(context) {
+                return 'Followers: ' + context.parsed.x.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          y: {
+            ticks: {
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Page jump functionality
+  const pageJumpInput = document.getElementById('pageJumpInput');
+  if (pageJumpInput) {
+    pageJumpInput.addEventListener('change', function(e) {
+      const page = parseInt(e.target.value);
+      const maxPage = parseInt(e.target.max);
+      const minPage = parseInt(e.target.min);
+      
+      if (page >= minPage && page <= maxPage) {
+        const search = e.target.dataset.search || '';
+        const verified = e.target.dataset.verified || '';
+        const denom = e.target.dataset.denom || '';
+        
+        let url = `?page=${page}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (verified) url += `&verified=${verified}`;
+        if (denom) url += `&denomination=${denom}`;
+        
+        window.location.href = url;
+      } else {
+        e.target.value = e.target.dataset.currentPage || minPage;
+      }
+    });
+    
+    // Store current page for reset
+    pageJumpInput.dataset.currentPage = pageJumpInput.value;
+  }
+
+  // View Toggle Functionality
+  const toggleButtons = document.querySelectorAll('.toggle-option');
+  const churchesView = document.getElementById('churchesView');
+  const verificationsView = document.getElementById('verificationsView');
+  const sectionTitle = document.getElementById('sectionTitleText');
+  const sectionSubtitle = document.getElementById('sectionSubtitleText');
+  
+  // Check URL parameter to determine initial view
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewParam = urlParams.get('view');
+  
+  if (viewParam === 'verifications') {
+    // Switch to verifications view
+    toggleButtons.forEach(btn => {
+      if (btn.dataset.view === 'verifications') {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    churchesView.classList.remove('active');
+    verificationsView.classList.add('active');
+    sectionTitle.textContent = 'Verification Requests';
+    sectionSubtitle.textContent = 'Review and manage church verification requests';
+  }
+  
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const view = this.dataset.view;
+      
+      // Update active state
+      toggleButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Toggle content sections
+      if (view === 'churches') {
+        churchesView.classList.add('active');
+        verificationsView.classList.remove('active');
+        sectionTitle.textContent = 'Church Directory';
+        sectionSubtitle.textContent = 'Manage and monitor all churches registered on the platform';
+        
+        // Update URL without reload
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.delete('view');
+        window.history.pushState({}, '', newUrl);
+      } else if (view === 'verifications') {
+        churchesView.classList.remove('active');
+        verificationsView.classList.add('active');
+        sectionTitle.textContent = 'Verification Requests';
+        sectionSubtitle.textContent = 'Review and manage church verification requests';
+        
+        // Update URL without reload
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('view', 'verifications');
+        window.history.pushState({}, '', newUrl);
+      }
+    });
+  });
+  
+  // Live Verification Filter Functionality
+  const verifStatusFilter = document.getElementById('verifStatusFilter');
+  const clearVerifFilter = document.getElementById('clearVerifFilter');
+  const verifTableBody = document.getElementById('verifTableBody');
+  const filterResultsInfo = document.getElementById('filterResultsInfo');
+  const filterResultsText = document.getElementById('filterResultsText');
+  const emptyStateRow = document.getElementById('emptyStateRow');
+  
+  if (verifStatusFilter && verifTableBody) {
+    // Get all verification rows (exclude empty state)
+    const allRows = Array.from(verifTableBody.querySelectorAll('tr[data-status]'));
+    const totalRequests = allRows.length;
+    
+    // Function to filter verification requests
+    function filterVerificationRequests(status) {
+      let visibleCount = 0;
+      
+      allRows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        
+        if (status === 'all' || rowStatus === status) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // Show/hide no results message
+      if (emptyStateRow) {
+        if (visibleCount === 0 && allRows.length > 0) {
+          emptyStateRow.style.display = '';
+        } else {
+          emptyStateRow.style.display = 'none';
+        }
+      }
+      
+      // Update filter results info
+      if (status !== 'all') {
+        filterResultsInfo.style.display = 'flex';
+        filterResultsText.textContent = `Showing ${visibleCount} of ${totalRequests} ${status} requests`;
+        clearVerifFilter.style.display = 'inline-flex';
+      } else {
+        filterResultsInfo.style.display = 'none';
+        clearVerifFilter.style.display = 'none';
+      }
+    }
+    
+    // Event listener for filter dropdown
+    verifStatusFilter.addEventListener('change', function() {
+      filterVerificationRequests(this.value);
+    });
+    
+    // Event listener for clear filter button
+    if (clearVerifFilter) {
+      clearVerifFilter.addEventListener('click', function() {
+        verifStatusFilter.value = 'all';
+        filterVerificationRequests('all');
+      });
+    }
+  }
+});
+</script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="churches-container">
+  <h1 class="section-title" style="font-size: 28px; font-weight: 800; margin: 0 0 0.5rem 0;">Churches Management</h1>
+  <p style="font-size: 0.9375rem; margin-bottom: 1.5rem; color: var(--muted);">Manage and monitor all church pages on the platform</p>
+  
+  <!-- 3 Column Statistics Cards -->
+  <div class="stats-grid-3col">
+    <div class="stat-card">
+      <div class="stat-card-icon primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-value">{{ stats.total_churches }}</div>
+        <div class="stat-card-title">Total Churches</div>
+        <div class="stat-card-subtitle">↑ Across {{ stats.total_cities }} cities</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-icon success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+          <path d="M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-value">{{ stats.total_followers|default:0 }}</div>
+        <div class="stat-card-title">Total Followers</div>
+        <div class="stat-card-subtitle">↑ Average {{ stats.avg_followers_per_church }} per church</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-icon warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-value">{{ stats.pending_verifications }}</div>
+        <div class="stat-card-title">Pending Approvals</div>
+        <div class="stat-card-subtitle">↑ Verification + Reports</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Churches by Followers Chart -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <h3 class="chart-title">Top Churches by Followers</h3>
+      <p class="chart-subtitle">Most followed church pages on the platform</p>
+    </div>
+    <div class="chart-container">
+      <canvas id="topChurchesChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Church Directory Section -->
+  <div class="all-churches-section">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <span id="sectionTitleText">Church Directory</span>
+        </h2>
+        <p id="sectionSubtitleText">Manage and monitor all churches registered on the platform</p>
+      </div>
+      
+      <!-- View Toggle Switch -->
+      <div class="view-toggle">
+        <button class="toggle-option active" data-view="churches">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Churches
+        </button>
+        <button class="toggle-option" data-view="verifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Verifications
+        </button>
+      </div>
+    </div>
+
+    <!-- Churches View -->
+    <div id="churchesView" class="content-section active">
+    <!-- Filters and Search -->
+    <div class="table-controls">
+      <form method="get" class="filters-form">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" name="search" placeholder="Search churches, city, or owner..." value="{{ search_query }}" class="search-input">
+        </div>
+        
+        <select name="verified" class="filter-select">
+          <option value="">All Verification Status</option>
+          <option value="verified" {% if verified_filter == 'verified' %}selected{% endif %}>Verified Only</option>
+          <option value="unverified" {% if verified_filter == 'unverified' %}selected{% endif %}>Unverified Only</option>
+        </select>
+        
+        <select name="denomination" class="filter-select">
+          <option value="">All Denominations</option>
+          {% for code, label in denomination_choices %}
+          <option value="{{ code }}" {% if denom_filter == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn-filter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+          Apply Filters
+        </button>
+        
+        {% if search_query or verified_filter or denom_filter %}
+        <a href="?" class="btn-clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Clear
+        </a>
+        {% endif %}
+      </form>
+    </div>
+
+    <!-- Churches Table -->
+    <div class="table-wrapper">
+      <table class="churches-table">
+        <thead>
+          <tr>
+            <th>Church Name</th>
+            <th>Denomination</th>
+            <th>Location</th>
+            <th>Owner</th>
+            <th>Followers</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for church in churches_page %}
+          <tr>
+            <td>
+              <div class="church-name-cell">
+                {% if church.logo %}
+                <img src="{{ church.logo.url }}" alt="{{ church.name }}" class="church-mini-logo">
+                {% else %}
+                <div class="church-mini-placeholder">{{ church.name|first|upper }}</div>
+                {% endif %}
+                <div class="church-info-cell">
+                  <div class="church-name-text">{{ church.name }}</div>
+                  <div class="church-size-badge">{{ church.get_size_display }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="denom-badge">{{ church.get_denomination_display }}</span>
+            </td>
+            <td>
+              <div class="location-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ church.city }}, {{ church.state }}
+              </div>
+            </td>
+            <td>
+              <div class="owner-cell">
+                <div class="owner-name">{{ church.owner.get_full_name|default:church.owner.email }}</div>
+                <div class="owner-email">{{ church.owner.email }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="followers-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                {{ church.follower_count }}
+              </div>
+            </td>
+            <td>
+              {% if church.is_verified %}
+              <span class="status-badge status-verified">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Verified
+              </span>
+              {% else %}
+              <span class="status-badge status-unverified">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Unverified
+              </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="date-cell">{{ church.created_at|date:"M d, Y" }}</div>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <a href="{% url 'core:super_admin_church_detail' church.id %}" 
+                  class="action-btn action-view" 
+                  title="View Church Profile">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <p>No churches found matching your criteria.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if churches_page.has_other_pages %}
+    <div class="pagination">
+      <div class="pagination-info">
+        Showing {{ churches_page.start_index }} to {{ churches_page.end_index }} of {{ churches_page.paginator.count }} churches
+      </div>
+      <div class="pagination-controls">
+        {% if churches_page.has_previous %}
+        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if verified_filter %}&verified={{ verified_filter }}{% endif %}{% if denom_filter %}&denomination={{ denom_filter }}{% endif %}" class="page-btn" title="Go to first page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="11 17 6 12 11 7"/>
+            <polyline points="18 17 13 12 18 7"/>
+          </svg>
+          First
+        </a>
+        <a href="?page={{ churches_page.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if verified_filter %}&verified={{ verified_filter }}{% endif %}{% if denom_filter %}&denomination={{ denom_filter }}{% endif %}" class="page-btn" title="Previous page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Previous
+        </a>
+        {% endif %}
+        
+        <!-- Page Number Display with Jump Input -->
+        <div class="page-jump">
+          <span class="page-label">Page</span>
+          <input 
+            type="number" 
+            id="pageJumpInput" 
+            class="page-jump-input" 
+            min="1" 
+            max="{{ churches_page.paginator.num_pages }}" 
+            value="{{ churches_page.number }}"
+            data-search="{{ search_query }}"
+            data-verified="{{ verified_filter }}"
+            data-denom="{{ denom_filter }}"
+          >
+          <span class="page-label">of {{ churches_page.paginator.num_pages }}</span>
+        </div>
+        
+        {% if churches_page.has_next %}
+        <a href="?page={{ churches_page.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if verified_filter %}&verified={{ verified_filter }}{% endif %}{% if denom_filter %}&denomination={{ denom_filter }}{% endif %}" class="page-btn" title="Next page">
+          Next
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+        <a href="?page={{ churches_page.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if verified_filter %}&verified={{ verified_filter }}{% endif %}{% if denom_filter %}&denomination={{ denom_filter }}{% endif %}" class="page-btn" title="Go to last page">
+          Last
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="13 17 18 12 13 7"/>
+            <polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    </div>
+    
+    <!-- Verifications View -->
+    <div id="verificationsView" class="content-section">
+      <!-- Verification Status Filters -->
+      <div class="table-controls">
+        <div class="filters-form">
+          <select id="verifStatusFilter" class="filter-select">
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          
+          <button type="button" id="clearVerifFilter" class="btn-clear" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Clear Filter
+          </button>
+        </div>
+      </div>
+      
+      <!-- Filter Results Info -->
+      <div id="filterResultsInfo" class="filter-results-info" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <span id="filterResultsText"></span>
+      </div>
+      
+      <!-- Verification Requests Table -->
+      <div class="table-wrapper">
+        <table class="churches-table verif-request-table">
+          <thead>
+            <tr>
+              <th>Church Name</th>
+              <th>Submitted By</th>
+              <th>Documents</th>
+              <th>Status</th>
+              <th>Submitted Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="verifTableBody">
+            {% for req in verification_requests %}
+            <tr data-status="{{ req.status }}">
+              <td>
+                <div class="church-name-cell">
+                  {% if req.church.logo %}
+                  <img src="{{ req.church.logo.url }}" alt="{{ req.church.name }}" class="church-mini-logo">
+                  {% else %}
+                  <div class="church-mini-placeholder">{{ req.church.name|first|upper }}</div>
+                  {% endif %}
+                  <div class="church-info-cell">
+                    <div class="church-name-text">{{ req.church.name }}</div>
+                    <div class="church-size-badge">{{ req.church.city }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="owner-cell">
+                  <div class="owner-name">{{ req.submitted_by.get_full_name|default:req.submitted_by.email }}</div>
+                  <div class="owner-email">{{ req.submitted_by.email }}</div>
+                </div>
+              </td>
+              <td>
+                {% if req.documents.exists %}
+                <ul class="doc-list" style="list-style: disc; padding-left: 18px; margin: 4px 0 0 0; font-size: 0.75rem; color: #6b7280;">
+                  {% for doc in req.documents.all %}
+                  <li><a href="{{ doc.file.url }}" target="_blank" style="color: #3b82f6; text-decoration: underline;">{{ doc.get_doc_type_display }}</a></li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                <span style="color: #9ca3af; font-size: 0.75rem;">No documents</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if req.status == 'pending' %}
+                <span class="status-badge request-status-pending" style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); color: #92400e; border: 1px solid rgba(245, 158, 11, 0.2);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Pending
+                </span>
+                {% elif req.status == 'approved' %}
+                <span class="status-badge request-status-approved" style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); color: #166534; border: 1px solid rgba(34, 197, 94, 0.2);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  Approved
+                </span>
+                {% elif req.status == 'rejected' %}
+                <span class="status-badge request-status-rejected" style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); color: #991b1b; border: 1px solid rgba(239, 68, 68, 0.2);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  Rejected
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="date-cell">{{ req.created_at|date:"M d, Y" }}</div>
+                {% if req.reviewed_by %}
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">by {{ req.reviewed_by.get_full_name|default:req.reviewed_by.email }}</div>
+                {% endif %}
+              </td>
+              <td>
+                <div class="actions-cell verif-actions" style="gap: 0.5rem;">
+                  {% if req.status == 'pending' %}
+                  <form method="post" action="{% url 'core:approve_verification' req.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action verif-btn-approve" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; width: auto; padding: 0.5rem 0.875rem; font-size: 0.75rem; font-weight: 600;" onclick="return confirm('Approve this verification request?')">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      Approve
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'core:reject_verification' req.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action verif-btn-reject" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; width: auto; padding: 0.5rem 0.875rem; font-size: 0.75rem; font-weight: 600;" onclick="return confirm('Reject this verification request?')">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                      Reject
+                    </button>
+                  </form>
+                  {% endif %}
+                  <a href="{% url 'core:super_admin_church_detail' req.church.id %}" class="btn-action action-view" title="View Church Details">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr id="emptyStateRow">
+              <td colspan="6" class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p>No verification requests found.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

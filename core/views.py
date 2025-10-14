@@ -1346,6 +1346,211 @@ def super_admin_profile(request):
     return render(request, 'core/super_admin_profile.html', ctx)
 
 
+@login_required
+def super_admin_churches(request):
+    """Super Admin churches management page.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    from django.db.models import Count, Avg
+    from django.core.paginator import Paginator
+    
+    # Get filter parameters
+    search_query = request.GET.get('search', '').strip()
+    verified_filter = request.GET.get('verified', '')
+    denom_filter = request.GET.get('denomination', '')
+    
+    # Get all churches with related data
+    churches = Church.objects.select_related('owner').annotate(
+        posts_count=Count('posts', filter=Q(posts__is_active=True)),
+        verification_pending=Exists(
+            ChurchVerificationRequest.objects.filter(
+                church_id=OuterRef('pk'),
+                status=ChurchVerificationRequest.STATUS_PENDING
+            )
+        )
+    )
+    
+    # Apply filters
+    if search_query:
+        churches = churches.filter(
+            Q(name__icontains=search_query) |
+            Q(city__icontains=search_query) |
+            Q(owner__email__icontains=search_query) |
+            Q(owner__first_name__icontains=search_query) |
+            Q(owner__last_name__icontains=search_query)
+        )
+    
+    if verified_filter == 'verified':
+        churches = churches.filter(is_verified=True)
+    elif verified_filter == 'unverified':
+        churches = churches.filter(is_verified=False)
+    
+    if denom_filter:
+        churches = churches.filter(denomination=denom_filter)
+    
+    churches = churches.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(churches, 20)  # 20 churches per page
+    page_number = request.GET.get('page', 1)
+    churches_page = paginator.get_page(page_number)
+    
+    # Statistics (on all churches, not filtered)
+    all_churches = Church.objects.all()
+    total_churches = all_churches.count()
+    total_followers = ChurchFollow.objects.count()
+    total_cities = all_churches.values('city').distinct().count()
+    avg_followers_per_church = round(total_followers / total_churches) if total_churches > 0 else 0
+    pending_verifications = ChurchVerificationRequest.objects.filter(
+        status=ChurchVerificationRequest.STATUS_PENDING
+    ).count()
+    
+    # Top churches by followers (limit to 6 for chart)
+    top_churches = Church.objects.order_by('-follower_count')[:6]
+    
+    # Denomination choices for filter dropdown
+    denomination_choices = Church.DENOMINATION_CHOICES
+    
+    # Get verification requests for the verifications tab
+    verification_requests = ChurchVerificationRequest.objects.select_related(
+        'church', 'submitted_by', 'reviewed_by'
+    ).prefetch_related('documents').order_by('-created_at')
+    
+    ctx = {
+        'active': 'super_admin_churches',
+        'page_title': 'Churches Management',
+        'churches_page': churches_page,
+        'top_churches': top_churches,
+        'stats': {
+            'total_churches': total_churches,
+            'total_followers': total_followers,
+            'total_cities': total_cities,
+            'avg_followers_per_church': avg_followers_per_church,
+            'pending_verifications': pending_verifications,
+        },
+        'search_query': search_query,
+        'verified_filter': verified_filter,
+        'denom_filter': denom_filter,
+        'denomination_choices': denomination_choices,
+        'verification_requests': verification_requests,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_churches.html', ctx)
+
+
+@login_required
+def super_admin_users(request):
+    """Super Admin users management page.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    from django.db.models import Count
+    from django.core.paginator import Paginator
+    from datetime import timedelta
+    from django.contrib.auth import get_user_model
+    
+    User = get_user_model()
+    
+    # Get all users with related data
+    users = User.objects.annotate(
+        churches_count=Count('owned_churches', distinct=True),
+        posts_count=Count('owned_churches__posts', distinct=True),
+        appointments_count=Count('bookings', distinct=True)
+    ).order_by('-date_joined')
+    
+    # Pagination
+    paginator = Paginator(users, 20)  # 20 users per page
+    page_number = request.GET.get('page', 1)
+    users_page = paginator.get_page(page_number)
+    
+    # Statistics
+    total_users = User.objects.count()
+    active_users = User.objects.filter(is_active=True).count()
+    church_admins = User.objects.filter(owned_churches__isnull=False).distinct().count()
+    inactive_users = User.objects.filter(is_active=False).count()
+    
+    # Calculate percentages
+    active_percentage = round((active_users / total_users * 100)) if total_users > 0 else 0
+    inactive_percentage = round((inactive_users / total_users * 100)) if total_users > 0 else 0
+    
+    # New users this week
+    week_ago = timezone.now() - timedelta(days=7)
+    new_users_this_week = User.objects.filter(date_joined__gte=week_ago).count()
+    
+    # Total churches for church admins stat
+    total_churches = Church.objects.count()
+    
+    # Activity trends data (last 4 weeks)
+    activity_labels = []
+    active_users_data = []
+    new_users_data = []
+    
+    for i in range(3, -1, -1):
+        week_start = timezone.now() - timedelta(weeks=i+1)
+        week_end = timezone.now() - timedelta(weeks=i)
+        activity_labels.append(f'Week {4-i}')
+        
+        # Active users (users who logged in during that week)
+        active_count = User.objects.filter(
+            last_login__gte=week_start,
+            last_login__lt=week_end
+        ).count()
+        active_users_data.append(active_count)
+        
+        # New users (users who joined during that week)
+        new_count = User.objects.filter(
+            date_joined__gte=week_start,
+            date_joined__lt=week_end
+        ).count()
+        new_users_data.append(new_count)
+    
+    # Users by role data
+    regular_users = User.objects.filter(
+        is_superuser=False,
+        owned_churches__isnull=True
+    ).count()
+    
+    role_labels = ['Regular Users', 'Church Admins', 'Service Providers', 'Inactive']
+    role_data = [
+        regular_users,
+        church_admins,
+        0,  # Service providers (if you have this role)
+        inactive_users
+    ]
+    
+    import json
+    
+    ctx = {
+        'active': 'super_admin_users',
+        'page_title': 'Users Management',
+        'users_page': users_page,
+        'stats': {
+            'total_users': total_users,
+            'active_users': active_users,
+            'church_admins': church_admins,
+            'suspended_users': inactive_users,
+            'active_percentage': active_percentage,
+            'suspended_percentage': inactive_percentage,
+            'new_users_this_week': new_users_this_week,
+            'total_churches': total_churches,
+        },
+        'activity_labels': json.dumps(activity_labels),
+        'active_users_data': json.dumps(active_users_data),
+        'new_users_data': json.dumps(new_users_data),
+        'role_labels': json.dumps(role_labels),
+        'role_data': json.dumps(role_data),
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_users.html', ctx)
+
+
 # Bookable Services Management
 @login_required
 def manage_services(request):
