@@ -3954,6 +3954,7 @@ def super_admin_posts(request):
     total_posts = Post.objects.count()
     posts_last_30_days = Post.objects.filter(created_at__date__gte=last_30_days).count()
     posts_last_7_days = Post.objects.filter(created_at__date__gte=last_7_days).count()
+    new_posts_this_week = Post.objects.filter(created_at__date__gte=last_7_days).count()
 
     type_dist = Post.objects.values('post_type').annotate(count=Count('id'))
     type_map = {row['post_type']: row['count'] for row in type_dist}
@@ -3967,6 +3968,36 @@ def super_admin_posts(request):
     total_likes = PostLike.objects.count()
     total_comments = PostComment.objects.filter(is_active=True).count()
     total_views = Post.objects.aggregate(total_views=Sum('view_count'))['total_views'] or 0
+    total_shares = total_views  # Using views as shares for now
+    
+    # Calculate averages
+    avg_likes_per_post = round(total_likes / total_posts) if total_posts > 0 else 0
+    avg_comments_per_post = round(total_comments / total_posts) if total_posts > 0 else 0
+    avg_shares_per_post = round(total_shares / total_posts) if total_posts > 0 else 0
+    
+    # Weekly engagement data (last 7 days)
+    import json
+    engagement_comments = []
+    engagement_likes = []
+    engagement_shares = []
+    
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        day_comments = PostComment.objects.filter(created_at__date=day, is_active=True).count()
+        day_likes = PostLike.objects.filter(created_at__date=day).count()
+        day_shares = PostView.objects.filter(viewed_at__date=day).count()
+        
+        engagement_comments.append(day_comments)
+        engagement_likes.append(day_likes)
+        engagement_shares.append(day_shares)
+    
+    # Type distribution data
+    type_data = [
+        type_counts.get('general', 0),
+        type_counts.get('event', 0),
+        type_counts.get('photo', 0),
+        type_counts.get('prayer', 0),
+    ]
 
     likes_last_30_days = PostLike.objects.filter(created_at__date__gte=last_30_days).count()
     comments_last_30_days = PostComment.objects.filter(is_active=True, created_at__date__gte=last_30_days).count()
@@ -4015,6 +4046,22 @@ def super_admin_posts(request):
         'status_filter': status_filter,
         'reported_filter': reported_filter,
         'order': order,
+        'stats': {
+            'total_posts': total_posts,
+            'new_posts_this_week': new_posts_this_week,
+            'total_likes': total_likes,
+            'avg_likes_per_post': avg_likes_per_post,
+            'total_comments': total_comments,
+            'avg_comments_per_post': avg_comments_per_post,
+            'total_shares': total_shares,
+            'avg_shares_per_post': avg_shares_per_post,
+        },
+        'engagement_data': {
+            'comments': json.dumps(engagement_comments),
+            'likes': json.dumps(engagement_likes),
+            'shares': json.dumps(engagement_shares),
+        },
+        'type_data': json.dumps(type_data),
         'analytics': {
             'total_posts': total_posts,
             'posts_last_30_days': posts_last_30_days,
