@@ -488,7 +488,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Monthly Bookings & Revenue Trends Chart
+  // Booking Trends Chart
   const trendsCtx = document.getElementById('bookingTrendsChart');
   if (trendsCtx) {
     new Chart(trendsCtx, {
@@ -497,28 +497,37 @@ document.addEventListener('DOMContentLoaded', function() {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [
           {
-            label: 'Bookings',
-            data: [90, 105, 115, 135, 150, 180],
-            borderColor: 'rgba(59, 130, 246, 1)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-            yAxisID: 'y'
-          },
-          {
-            label: 'Revenue ($)',
-            data: [9000, 10500, 11250, 13500, 15000, 18000],
+            label: 'Completed',
+            data: [350, 400, 430, 500, 580, 640],
             borderColor: 'rgba(16, 185, 129, 1)',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            borderWidth: 3,
-            fill: true,
+            borderWidth: 2,
+            fill: false,
             tension: 0.4,
-            pointRadius: 5,
-            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
-            yAxisID: 'y1'
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+          },
+          {
+            label: 'Cancelled',
+            data: [25, 30, 28, 35, 40, 45],
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(239, 68, 68, 1)'
+          },
+          {
+            label: 'Pending',
+            data: [15, 20, 18, 22, 25, 30],
+            borderColor: 'rgba(245, 158, 11, 1)',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(245, 158, 11, 1)'
           }
         ]
       },
@@ -536,40 +545,15 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: {
               padding: 15,
               usePointStyle: true,
-              pointStyle: 'circle'
+              pointStyle: 'line'
             }
           }
         },
         scales: {
           y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
             beginAtZero: true,
             ticks: {
               precision: 0
-            },
-            title: {
-              display: true,
-              text: 'Bookings'
-            }
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            beginAtZero: true,
-            grid: {
-              drawOnChartArea: false
-            },
-            ticks: {
-              callback: function(value) {
-                return '$' + value.toLocaleString();
-              }
-            },
-            title: {
-              display: true,
-              text: 'Revenue ($)'
             }
           }
         }
@@ -581,19 +565,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const serviceTypeCtx = document.getElementById('bookingsByServiceTypeChart');
   if (serviceTypeCtx) {
     new Chart(serviceTypeCtx, {
-      type: 'doughnut',
+      type: 'bar',
       data: {
-        labels: ['Counseling', 'Ceremony', 'Mentoring', 'Prayer', 'Sacrament'],
+        labels: ['Counseling', 'Wedding', 'Baptism', 'Prayer', 'Other'],
         datasets: [{
-          data: [145, 98, 76, 54, 32],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.85)',
-            'rgba(16, 185, 129, 0.85)',
-            'rgba(245, 158, 11, 0.85)',
-            'rgba(168, 85, 247, 0.85)',
-            'rgba(239, 68, 68, 0.85)'
-          ],
-          borderWidth: 0
+          data: [240, 150, 190, 145, 85],
+          backgroundColor: 'rgba(59, 130, 246, 0.85)',
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false
         }]
       },
       options: {
@@ -601,12 +581,19 @@ document.addEventListener('DOMContentLoaded', function() {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              padding: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          },
+          x: {
+            grid: {
+              display: false
             }
           }
         }
@@ -752,8 +739,8 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="charts-grid-2col">
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Booking Trends & Revenue</h3>
-        <p class="chart-subtitle">Monthly service bookings and revenue over 6 months</p>
+        <h3 class="chart-title">Booking Trends</h3>
+        <p class="chart-subtitle">Monthly booking statistics over 6 months</p>
       </div>
       <div class="chart-container">
         <canvas id="bookingTrendsChart"></canvas>
@@ -763,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="chart-card">
       <div class="chart-header">
         <h3 class="chart-title">Bookings by Service Type</h3>
-        <p class="chart-subtitle">Distribution of bookings across service categories</p>
+        <p class="chart-subtitle">Most popular service bookings</p>
       </div>
       <div class="chart-container">
         <canvas id="bookingsByServiceTypeChart"></canvas>
