@@ -106,10 +106,9 @@ if CLOUDINARY_STORAGE['CLOUD_NAME']:
             "default": {"BACKEND": 'cloudinary_storage.storage.MediaCloudinaryStorage'},
             "staticfiles": STORAGES.get("staticfiles", {"BACKEND": 'django.contrib.staticfiles.storage.StaticFilesStorage'}),
         }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     print(f"[Cloudinary] ✓ Configured with cloud_name: {CLOUDINARY_STORAGE['CLOUD_NAME']}")
     print(f"[Cloudinary] ✓ API_KEY: {CLOUDINARY_STORAGE['API_KEY'][:10]}...")
-    print(f"[Cloudinary] ✓ DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+    print(f"[Cloudinary] ✓ STORAGES['default']['BACKEND']: {STORAGES['default']['BACKEND']}")
 else:
     print("[Cloudinary] ✗ WARNING: Cloudinary not configured - CLOUDINARY_CLOUD_NAME is empty!")
     print(f"[Cloudinary] ✗ CLOUD_NAME value: '{CLOUDINARY_STORAGE['CLOUD_NAME']}'")

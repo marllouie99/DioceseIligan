@@ -133,9 +133,6 @@ CACHES = {
     }
 }
 
-# Django-imagekit compatibility with Django 5.2+
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
 # Storage settings for Django 5.2+
 STORAGES = {
     "default": {
