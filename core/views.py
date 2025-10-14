@@ -4125,6 +4125,73 @@ def super_admin_bookings(request):
     return render(request, 'core/super_admin_bookings.html', ctx)
 
 
+# Super Admin - Moderation Management
+@login_required
+def super_admin_moderation(request):
+    """Super Admin moderation page for managing reports and verifications."""
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    from datetime import timedelta
+    
+    # Get post reports
+    reports = PostReport.objects.select_related(
+        'post', 'post__church', 'user'
+    ).order_by('-created_at')[:20]
+    
+    # Get church verification requests
+    verifications = ChurchVerificationRequest.objects.select_related(
+        'church', 'submitted_by'
+    ).prefetch_related('documents').filter(
+        status=ChurchVerificationRequest.STATUS_PENDING
+    ).order_by('created_at')[:20]
+    
+    # Calculate statistics
+    pending_reports = PostReport.objects.filter(status='pending').count()
+    high_severity_reports = PostReport.objects.filter(
+        status='pending'
+    ).count()  # You can add severity field later
+    
+    church_verifications = ChurchVerificationRequest.objects.filter(
+        status=ChurchVerificationRequest.STATUS_PENDING
+    ).count()
+    
+    # Resolved this week
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    resolved_this_week = PostReport.objects.filter(
+        status__in=['reviewed', 'dismissed', 'action_taken'],
+        reviewed_at__isnull=False,
+        reviewed_at__gte=seven_days_ago
+    ).count()
+    
+    # Calculate resolution rate
+    total_reports = PostReport.objects.count()
+    resolved_reports = PostReport.objects.filter(
+        status__in=['reviewed', 'dismissed', 'action_taken']
+    ).count()
+    resolution_rate = int((resolved_reports / total_reports * 100)) if total_reports > 0 else 0
+    
+    stats = {
+        'pending_reports': pending_reports,
+        'high_severity_reports': high_severity_reports,
+        'church_verifications': church_verifications,
+        'resolved_this_week': resolved_this_week,
+        'resolution_rate': resolution_rate,
+        'avg_response_time': '2.3',  # You can calculate this based on your data
+    }
+    
+    ctx = {
+        'active': 'super_admin_moderation',
+        'page_title': 'Moderation',
+        'reports': reports,
+        'verifications': verifications,
+        'stats': stats,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_moderation.html', ctx)
+
+
 @login_required
 def super_admin_post_detail(request, post_id):
     if not request.user.is_superuser:

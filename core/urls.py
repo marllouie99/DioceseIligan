@@ -31,6 +31,7 @@ urlpatterns = [
     path('super-admin/posts/<int:post_id>/delete/', views.super_admin_delete_post, name='super_admin_delete_post'),
     path('super-admin/services/', views.super_admin_services, name='super_admin_services'),
     path('super-admin/bookings/', views.super_admin_bookings, name='super_admin_bookings'),
+    path('super-admin/moderation/', views.super_admin_moderation, name='super_admin_moderation'),
     
     # Media updates (AJAX)
     path('settings/update-logo/', views.update_church_logo, name='update_church_logo'),

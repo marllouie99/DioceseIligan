@@ -1,0 +1,81 @@
+<div class="reports-section">
+  <div class="section-header">
+    <div class="section-title-group">
+      <h2>Church Verification Requests</h2>
+      <p>Review church registration applications and documents</p>
+    </div>
+    <div class="section-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="verificationSearch" placeholder="Search requests...">
+      </div>
+    </div>
+  </div>
+  
+  <div class="table-wrapper">
+    {% if verifications %}
+    <table class="reports-table" id="verificationsTable">
+      <thead>
+        <tr>
+          <th>Church Name</th>
+          <th>Location</th>
+          <th>Submitted By</th>
+          <th>Email</th>
+          <th>Documents</th>
+          <th>Submitted Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for verification in verifications %}
+        <tr>
+          <td class="church-name">{{ verification.church.name }}</td>
+          <td>{{ verification.church.city }}, {{ verification.church.province }}</td>
+          <td class="reporter-name">{{ verification.submitted_by.get_full_name|default:verification.submitted_by.username }}</td>
+          <td>{{ verification.submitted_by.email }}</td>
+          <td>{{ verification.documents.count }} files</td>
+          <td>{{ verification.created_at|date:"Y-m-d" }}</td>
+          <td>
+            <span class="status-badge status-{{ verification.status }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              {{ verification.status }}
+            </span>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <a href="{% url 'core:super_admin_church_detail' verification.church.id %}" class="btn-action" title="View Details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </a>
+              <button class="btn-action" title="More Options">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="1"/>
+                  <circle cx="12" cy="5" r="1"/>
+                  <circle cx="12" cy="19" r="1"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <p>No verification requests found</p>
+    </div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="reports-section">
+  <div class="section-header">
+    <div class="section-title-group">
+      <h2>Post Reports</h2>
+      <p>Review and moderate reported content</p>
+    </div>
+    <div class="section-actions">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="reportSearch" placeholder="Search reports...">
+      </div>
+    </div>
+  </div>
+  
+  <div class="table-wrapper">
+    {% if reports %}
+    <table class="reports-table" id="reportsTable">
+      <thead>
+        <tr>
+          <th>Post Title</th>
+          <th>Church</th>
+          <th>Reported By</th>
+          <th>Reason</th>
+          <th>Date</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          <td class="post-title">{{ report.post.content|truncatechars:40 }}</td>
+          <td class="church-name">{{ report.post.church.name }}</td>
+          <td class="reporter-name">{{ report.user.get_full_name|default:report.user.username }}</td>
+          <td><span class="reason-badge">{{ report.reason }}</span></td>
+          <td>{{ report.created_at|date:"Y-m-d" }}</td>
+          <td>
+            <span class="severity-badge severity-high">
+              high
+            </span>
+          </td>
+          <td>
+            <span class="status-badge status-pending">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              pending
+            </span>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn-action" title="View Details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+              <button class="btn-action" title="More Options">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="1"/>
+                  <circle cx="12" cy="5" r="1"/>
+                  <circle cx="12" cy="19" r="1"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <p>No post reports found</p>
+    </div>
+    {% endif %}
+  </div>
+</div>

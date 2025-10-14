@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin_stat_cards.css' %}?v={{ STATIC_VERSION }}">
 <style>
 /* Container */
 .posts-container {
@@ -581,42 +582,47 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- 4 Column Statistics Cards -->
   <div class="stats-grid-4col">
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Posts</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_posts }}</div>
-      <div class="stat-card-subtitle">+{{ stats.new_posts_this_week }} this week</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Posts</div>
+        <div class="stat-card-value">{{ stats.total_posts }}</div>
+        <div class="stat-card-subtitle brand">+{{ stats.new_posts_this_week }} this week</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Likes</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_likes }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_likes_per_post }} avg per post</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Likes</div>
+        <div class="stat-card-value">{{ stats.total_likes }}</div>
+        <div class="stat-card-subtitle">{{ stats.avg_likes_per_post }} avg per post</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Comments</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_comments }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_comments_per_post }} avg per post</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Comments</div>
+        <div class="stat-card-value">{{ stats.total_comments }}</div>
+        <div class="stat-card-subtitle">{{ stats.avg_comments_per_post }} avg per post</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Shares</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="18" cy="5" r="3"/>
           <circle cx="6" cy="12" r="3"/>
           <circle cx="18" cy="19" r="3"/>
@@ -624,8 +630,11 @@ document.addEventListener('DOMContentLoaded', function() {
           <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_shares }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_shares_per_post }} avg per post</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Shares</div>
+        <div class="stat-card-value">{{ stats.total_shares }}</div>
+        <div class="stat-card-subtitle">{{ stats.avg_shares_per_post }} avg per post</div>
+      </div>
     </div>
   </div>
 

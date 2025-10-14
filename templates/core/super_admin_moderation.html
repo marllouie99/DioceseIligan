@@ -1,0 +1,126 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}Moderation • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin_stat_cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin_moderation.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/super_admin_moderation.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="moderation-container">
+  <h1 class="section-title" style="font-size: 28px; font-weight: 800; margin: 0 0 0.5rem 0;">Moderation</h1>
+  <p style="font-size: 0.9375rem; margin-bottom: 1.5rem; color: var(--muted);">Monitor and manage content reports and church verifications</p>
+  
+  <!-- 4 Column Statistics Cards -->
+  <div class="stats-grid-4col">
+    <div class="stat-card danger">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Pending Reports</div>
+        <div class="stat-card-value">{{ stats.pending_reports|default:0 }}</div>
+        <div class="stat-card-subtitle danger">{{ stats.high_severity_reports|default:0 }} high severity</div>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Church Verifications</div>
+        <div class="stat-card-value">{{ stats.church_verifications|default:0 }}</div>
+        <div class="stat-card-subtitle">Awaiting review</div>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Resolved This Week</div>
+        <div class="stat-card-value">{{ stats.resolved_this_week|default:0 }}</div>
+        <div class="stat-card-subtitle success">{{ stats.resolution_rate|default:0 }}% resolution rate</div>
+      </div>
+    </div>
+
+    <div class="stat-card info">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Avg Response Time</div>
+        <div class="stat-card-value">{{ stats.avg_response_time|default:"2.3" }} hrs</div>
+        <div class="stat-card-subtitle">For report reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 Column Charts -->
+  <div class="charts-grid-2col">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Moderation Activity</h3>
+        <p class="chart-subtitle">Weekly report handling and resolution trends</p>
+      </div>
+      <div class="chart-container">
+        <canvas id="moderationActivityChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Report Reasons</h3>
+        <p class="chart-subtitle">Distribution of report categories</p>
+      </div>
+      <div class="chart-container">
+        <canvas id="reportReasonsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Reports Table -->
+  {% include 'core/partials/moderation_reports_table.html' %}
+
+  <!-- Church Verification Requests Table -->
+  {% include 'core/partials/moderation_verifications_table.html' %}
+</div>
+{% endblock %}

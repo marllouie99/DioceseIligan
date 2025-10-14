@@ -1,0 +1,146 @@
+/* Super Admin Stat Cards - Consistent Design */
+
+/* Stat Cards */
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Icon wrapper - left side */
+.stat-card-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #A0522D 0%, #D2691E 100%);
+}
+
+.stat-card-icon-wrapper svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+  stroke-width: 2;
+}
+
+/* Color variants for different card types */
+.stat-card:nth-child(1) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #A0522D 0%, #D2691E 100%);
+}
+
+.stat-card:nth-child(2) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+.stat-card:nth-child(3) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+}
+
+.stat-card:nth-child(4) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.stat-card:nth-child(5) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+}
+
+.stat-card:nth-child(6) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+}
+
+.stat-card:nth-child(7) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+}
+
+.stat-card:nth-child(8) .stat-card-icon-wrapper {
+  background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+}
+
+/* Content - right side */
+.stat-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-card-title {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stat-card-value {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin: 0.25rem 0;
+}
+
+.stat-card-subtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stat-card-subtitle.brand {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.stat-card-subtitle.success {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.stat-card-subtitle.danger {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Remove old styles */
+.stat-card-header {
+  display: none;
+}
+
+.stat-card-icon {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stat-card-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-card-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .stat-card-icon-wrapper svg {
+    width: 20px;
+    height: 20px;
+  }
+}

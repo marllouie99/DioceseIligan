@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin_stat_cards.css' %}?v={{ STATIC_VERSION }}">
 <style>
 /* Container */
 .services-container {
@@ -741,49 +742,57 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- 4 Column Statistics Cards -->
   <div class="stats-grid-4col">
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Services</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
         </svg>
       </div>
-      <div class="stat-card-value">324</div>
-      <div class="stat-card-subtitle">+12 this month</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Services</div>
+        <div class="stat-card-value">324</div>
+        <div class="stat-card-subtitle brand">+12 this month</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Total Bookings</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
       </div>
-      <div class="stat-card-value">802</div>
-      <div class="stat-card-subtitle neutral">2.5 avg per service</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Bookings</div>
+        <div class="stat-card-value">802</div>
+        <div class="stat-card-subtitle">2.5 avg per service</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Revenue (Paid)</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <line x1="12" y1="1" x2="12" y2="23"/>
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       </div>
-      <div class="stat-card-value">$69,990</div>
-      <div class="stat-card-subtitle neutral">From 234 paid services</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Revenue (Paid)</div>
+        <div class="stat-card-value">$69,990</div>
+        <div class="stat-card-subtitle">From 234 paid services</div>
+      </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-title">Avg Rating</span>
-        <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </div>
-      <div class="stat-card-value">4.8</div>
-      <div class="stat-card-subtitle neutral">From 563 reviews</div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Avg Rating</div>
+        <div class="stat-card-value">4.8</div>
+        <div class="stat-card-subtitle">From 563 reviews</div>
+      </div>
     </div>
   </div>
 
