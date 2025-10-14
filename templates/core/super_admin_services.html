@@ -1,7 +1,7 @@
 {% extends 'layouts/app_base.html' %}
 {% load static %}
 
-{% block title %}Posts Management • ChurchConnect{% endblock %}
+{% block title %}Services Management • ChurchConnect{% endblock %}
 
 {% block body_class %}dashboard-page{% endblock %}
 
@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
 <style>
 /* Container */
-.posts-container {
+.services-container {
   max-width: 100%;
   width: 100%;
   padding: 0;
@@ -144,8 +144,18 @@
   height: 100% !important;
 }
 
-/* Posts Section */
-.posts-section {
+/* Services Section */
+.services-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+/* Reviews Section */
+.reviews-section {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
@@ -241,18 +251,18 @@
   margin-top: 1.5rem;
 }
 
-.posts-table {
+.services-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
 
-.posts-table thead {
+.services-table thead {
   background: var(--bg-secondary);
   border-bottom: 2px solid var(--border);
 }
 
-.posts-table th {
+.services-table th {
   padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 700;
@@ -262,19 +272,60 @@
   letter-spacing: 0.05em;
 }
 
-.posts-table tbody tr {
+.services-table tbody tr {
   border-bottom: 1px solid var(--border);
   transition: background 0.2s ease;
 }
 
-.posts-table tbody tr:hover {
+.services-table tbody tr:hover {
   background: var(--bg-secondary);
 }
 
-.posts-table td {
+.services-table td {
   padding: 1rem;
   color: var(--text);
   vertical-align: middle;
+}
+
+.reviews-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.reviews-table thead {
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border);
+}
+
+.reviews-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reviews-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.reviews-table tbody tr:hover {
+  background: var(--bg-secondary);
+}
+
+.reviews-table td {
+  padding: 1rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.service-name {
+  font-weight: 600;
+  color: var(--brand);
 }
 
 .church-name {
@@ -282,15 +333,12 @@
   color: var(--brand);
 }
 
-.post-excerpt {
+.provider-name {
   color: var(--text);
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
 }
 
-.type-badge {
+.category-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -299,6 +347,57 @@
   background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%);
   color: #654321;
   border: 1px solid rgba(218, 165, 32, 0.2);
+}
+
+.price-cell {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rating-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-icon {
+  width: 14px;
+  height: 14px;
+  color: #F59E0B;
+  fill: #F59E0B;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rating-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.stars-display {
+  display: flex;
+  gap: 2px;
+}
+
+.stars-display svg {
+  width: 14px;
+  height: 14px;
+  color: #F59E0B;
+  fill: #F59E0B;
+}
+
+.comment-text {
+  color: var(--text);
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.helpful-votes {
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 .status-badge {
@@ -458,46 +557,118 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Weekly Engagement Trends Chart
-  const engagementCtx = document.getElementById('engagementTrendsChart');
-  if (engagementCtx) {
-    new Chart(engagementCtx, {
+  // Monthly Bookings & Revenue Trends Chart
+  const trendsCtx = document.getElementById('bookingTrendsChart');
+  if (trendsCtx) {
+    new Chart(trendsCtx, {
       type: 'line',
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [
           {
-            label: 'Comments',
-            data: {{ engagement_data.comments|safe }},
+            label: 'Bookings',
+            data: [90, 105, 115, 135, 150, 180],
             borderColor: 'rgba(59, 130, 246, 1)',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+            yAxisID: 'y'
           },
           {
-            label: 'Likes',
-            data: {{ engagement_data.likes|safe }},
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: 'rgba(239, 68, 68, 1)'
-          },
-          {
-            label: 'Shares',
-            data: {{ engagement_data.shares|safe }},
+            label: 'Revenue ($)',
+            data: [9000, 10500, 11250, 13500, 15000, 18000],
             borderColor: 'rgba(16, 185, 129, 1)',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            },
+            title: {
+              display: true,
+              text: 'Bookings'
+            }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            beginAtZero: true,
+            grid: {
+              drawOnChartArea: false
+            },
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            },
+            title: {
+              display: true,
+              text: 'Revenue ($)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Services by Category Chart
+  const categoryCtx = document.getElementById('servicesCategoryChart');
+  if (categoryCtx) {
+    new Chart(categoryCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Counseling', 'Ceremony', 'Mentoring', 'Prayer', 'Sacrament'],
+        datasets: [
+          {
+            label: 'Bookings',
+            data: [45, 120, 28, 67, 34],
+            backgroundColor: 'rgba(59, 130, 246, 0.85)',
+            borderWidth: 0,
+            borderRadius: 8,
+            borderSkipped: false
+          },
+          {
+            label: 'Revenue ($)',
+            data: [15000, 42000, 9000, 8500, 3500],
+            backgroundColor: 'rgba(16, 185, 129, 0.85)',
+            borderWidth: 0,
+            borderRadius: 8,
+            borderSkipped: false
           }
         ]
       },
@@ -507,14 +678,25 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: {
           legend: {
             display: true,
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
             ticks: {
-              precision: 0
+              callback: function(value, index, values) {
+                // Format large numbers with K suffix
+                if (value >= 1000) {
+                  return '$' + (value / 1000) + 'K';
+                }
+                return '$' + value;
+              }
             }
           }
         }
@@ -522,43 +704,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Posts by Type Chart
-  const typeCtx = document.getElementById('postsByTypeChart');
-  if (typeCtx) {
-    new Chart(typeCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Bulletin', 'Event', 'Announcement', 'Prayer'],
-        datasets: [{
-          data: {{ type_data|safe }},
-          backgroundColor: [
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)'
-          ],
-          borderWidth: 0,
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              precision: 0
-            }
-          }
+  // Search functionality
+  const searchInput = document.getElementById('serviceSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const tableRows = document.querySelectorAll('.services-table tbody tr');
+      
+      tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
         }
-      }
+      });
     });
   }
 });
@@ -574,58 +734,56 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endblock %}
 
 {% block content %}
-<div class="posts-container">
-  <h1 class="section-title" style="font-size: 28px; font-weight: 800; margin: 0 0 0.5rem 0;">Posts Management</h1>
-  <p style="font-size: 0.9375rem; margin-bottom: 1.5rem; color: var(--muted);">Monitor and moderate content across all churches</p>
+<div class="services-container">
+  <h1 class="section-title" style="font-size: 28px; font-weight: 800; margin: 0 0 0.5rem 0;">Services Management</h1>
+  <p style="font-size: 0.9375rem; margin-bottom: 1.5rem; color: var(--muted);">Manage church services and bookable offerings</p>
   
   <!-- 4 Column Statistics Cards -->
   <div class="stats-grid-4col">
     <div class="stat-card">
       <div class="stat-card-header">
-        <span class="stat-card-title">Total Posts</span>
+        <span class="stat-card-title">Total Services</span>
         <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_posts }}</div>
-      <div class="stat-card-subtitle">+{{ stats.new_posts_this_week }} this week</div>
+      <div class="stat-card-value">324</div>
+      <div class="stat-card-subtitle">+12 this month</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-card-header">
-        <span class="stat-card-title">Total Likes</span>
+        <span class="stat-card-title">Total Bookings</span>
         <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_likes }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_likes_per_post }} avg per post</div>
+      <div class="stat-card-value">802</div>
+      <div class="stat-card-subtitle neutral">2.5 avg per service</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-card-header">
-        <span class="stat-card-title">Total Comments</span>
+        <span class="stat-card-title">Revenue (Paid)</span>
         <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_comments }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_comments_per_post }} avg per post</div>
+      <div class="stat-card-value">$69,990</div>
+      <div class="stat-card-subtitle neutral">From 234 paid services</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-card-header">
-        <span class="stat-card-title">Total Shares</span>
+        <span class="stat-card-title">Avg Rating</span>
         <svg class="stat-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </div>
-      <div class="stat-card-value">{{ stats.total_shares }}</div>
-      <div class="stat-card-subtitle neutral">{{ stats.avg_shares_per_post }} avg per post</div>
+      <div class="stat-card-value">4.8</div>
+      <div class="stat-card-subtitle neutral">From 563 reviews</div>
     </div>
   </div>
 
@@ -633,31 +791,31 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="charts-grid-2col">
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Weekly Engagement Trends</h3>
-        <p class="chart-subtitle">Post interactions over the last 7 days</p>
+        <h3 class="chart-title">Booking Trends & Revenue</h3>
+        <p class="chart-subtitle">Monthly service bookings and revenue over 6 months</p>
       </div>
       <div class="chart-container">
-        <canvas id="engagementTrendsChart"></canvas>
+        <canvas id="bookingTrendsChart"></canvas>
       </div>
     </div>
 
     <div class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">Posts by Type</h3>
-        <p class="chart-subtitle">Distribution of content categories</p>
+        <h3 class="chart-title">Services by Category</h3>
+        <p class="chart-subtitle">Bookings and revenue breakdown by service type</p>
       </div>
       <div class="chart-container">
-        <canvas id="postsByTypeChart"></canvas>
+        <canvas id="servicesCategoryChart"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Recent Posts Table -->
-  <div class="posts-section">
+  <!-- Bookable Services Table -->
+  <div class="services-section">
     <div class="section-header">
       <div class="section-title-group">
-        <h2>Recent Posts</h2>
-        <p>Monitor and moderate content across all churches</p>
+        <h2>Bookable Services</h2>
+        <p>Manage church services and offerings</p>
       </div>
       <div class="section-actions">
         <div class="search-box">
@@ -665,82 +823,67 @@ document.addEventListener('DOMContentLoaded', function() {
             <circle cx="11" cy="11" r="8"/>
             <path d="m21 21-4.35-4.35"/>
           </svg>
-          <input type="text" name="search" id="postSearch" placeholder="Search posts...">
+          <input type="text" name="search" id="serviceSearch" placeholder="Search services...">
         </div>
-        <select class="filter-select" id="typeFilter">
-          <option value="">All Types</option>
-          <option value="bulletin">Bulletin</option>
-          <option value="event">Event</option>
-          <option value="announcement">Announcement</option>
-          <option value="prayer">Prayer</option>
-        </select>
-        <select class="filter-select" id="statusFilter">
-          <option value="">All Status</option>
-          <option value="published">Published</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="flagged">Flagged</option>
-        </select>
+        <a href="#" class="btn-add-user">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Service
+        </a>
       </div>
     </div>
     
     <div class="table-wrapper">
-      {% if posts %}
-      <table class="posts-table">
+      <table class="services-table">
         <thead>
           <tr>
+            <th>Service Name</th>
             <th>Church</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Likes</th>
-            <th>Comments</th>
-            <th>Shares</th>
+            <th>Provider</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Bookings</th>
+            <th>Rating</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {% for post in posts %}
           <tr>
-            <td class="church-name">{{ post.church.name }}</td>
+            <td class="service-name">Marriage Counseling</td>
+            <td class="church-name">Grace Community Church</td>
+            <td class="provider-name">Pastor John Smith</td>
+            <td><span class="category-badge">Counseling</span></td>
+            <td class="price-cell">$50/hr</td>
+            <td>45</td>
             <td>
-              <div class="post-excerpt">{{ post.content|truncatechars:50 }}</div>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="rating-value">4.8</span>
+                <span class="rating-count">(23)</span>
+              </div>
             </td>
-            <td>{{ post.church.owner.get_full_name|default:post.church.owner.username }}</td>
-            <td><span class="type-badge">{{ post.get_post_type_display }}</span></td>
-            <td>{{ post.created_at|date:"Y-m-d" }}</td>
-            <td>{{ post.likes_count|default:0 }}</td>
-            <td>{{ post.comments_count|default:0 }}</td>
-            <td>{{ post.view_count|default:0 }}</td>
             <td>
-              {% if post.is_active %}
-                <span class="status-badge status-published">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
-                  Published
-                </span>
-              {% else %}
-                <span class="status-badge status-flagged">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="15" y1="9" x2="9" y2="15"/>
-                    <line x1="9" y1="9" x2="15" y2="15"/>
-                  </svg>
-                  Flagged
-                </span>
-              {% endif %}
+              <span class="status-badge status-published">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Active
+              </span>
             </td>
             <td>
               <div class="actions-cell">
-                <a href="{% url 'core:super_admin_post_detail' post.id %}" class="btn-action" title="View Details">
+                <button class="btn-action" title="View Details">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                     <circle cx="12" cy="12" r="3"/>
                   </svg>
-                </a>
+                </button>
                 <button class="btn-action" title="More Options">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="1"/>
@@ -751,51 +894,276 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
             </td>
           </tr>
-          {% endfor %}
+          <tr>
+            <td class="service-name">Wedding Ceremony</td>
+            <td class="church-name">St. Mary's Cathedral</td>
+            <td class="provider-name">Father Michael</td>
+            <td><span class="category-badge">Ceremony</span></td>
+            <td class="price-cell">$500</td>
+            <td>12</td>
+            <td>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="rating-value">5</span>
+                <span class="rating-count">(12)</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-published">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Active
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" title="View Details">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-action" title="More Options">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="service-name">Baptism Service</td>
+            <td class="church-name">Faith Baptist Church</td>
+            <td class="provider-name">Pastor David</td>
+            <td><span class="category-badge">Sacrament</span></td>
+            <td class="price-cell">Free</td>
+            <td>34</td>
+            <td>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="rating-value">4.9</span>
+                <span class="rating-count">(18)</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-published">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Active
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" title="View Details">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-action" title="More Options">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="service-name">Spiritual Guidance</td>
+            <td class="church-name">Hope Methodist Church</td>
+            <td class="provider-name">Elder Sarah</td>
+            <td><span class="category-badge">Counseling</span></td>
+            <td class="price-cell">$30/hr</td>
+            <td>28</td>
+            <td>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="rating-value">4.7</span>
+                <span class="rating-count">(15)</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-published">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Active
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" title="View Details">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-action" title="More Options">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="service-name">Youth Mentoring</td>
+            <td class="church-name">Trinity Church</td>
+            <td class="provider-name">Youth Leader Mike</td>
+            <td><span class="category-badge">Mentoring</span></td>
+            <td class="price-cell">Free</td>
+            <td>56</td>
+            <td>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span class="rating-value">4.9</span>
+                <span class="rating-count">(34)</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-published">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Active
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" title="View Details">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-action" title="More Options">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
+    </div>
+  </div>
 
-      <!-- Pagination -->
-      {% if posts.has_other_pages %}
-      <div class="pagination">
-        <div class="pagination-info">
-          Showing {{ posts.start_index }} to {{ posts.end_index }} of {{ posts.paginator.count }} posts
-        </div>
-        <div class="pagination-controls">
-          {% if posts.has_previous %}
-          <a href="?page={{ posts.previous_page_number }}" class="page-btn" title="Previous page">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"/>
-            </svg>
-            Previous
-          </a>
-          {% endif %}
-          
-          <span class="page-btn" style="background: var(--bg-secondary); cursor: default;">
-            Page {{ posts.number }} of {{ posts.paginator.num_pages }}
-          </span>
-          
-          {% if posts.has_next %}
-          <a href="?page={{ posts.next_page_number }}" class="page-btn" title="Next page">
-            Next
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </a>
-          {% endif %}
-        </div>
+  <!-- Recent Service Reviews -->
+  <div class="reviews-section">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Recent Service Reviews</h2>
+        <p>Latest feedback from users on bookable services</p>
       </div>
-      {% endif %}
-      {% else %}
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="14" rx="2"/>
-          <line x1="7" y1="8" x2="17" y2="8"/>
-          <line x1="7" y1="12" x2="14" y2="12"/>
-        </svg>
-        <p>No posts found</p>
-      </div>
-      {% endif %}
+    </div>
+    
+    <div class="table-wrapper">
+      <table class="reviews-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Church</th>
+            <th>Reviewer</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Date</th>
+            <th>Helpful Votes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="service-name">Marriage Counseling</td>
+            <td class="church-name">Grace Community Church</td>
+            <td class="provider-name">John Smith</td>
+            <td>
+              <div class="stars-display">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </td>
+            <td class="comment-text">Excellent guidance and support during difficult times.</td>
+            <td>2025-10-13</td>
+            <td class="helpful-votes">12</td>
+          </tr>
+          <tr>
+            <td class="service-name">Wedding Ceremony</td>
+            <td class="church-name">St. Mary's Cathedral</td>
+            <td class="provider-name">Sarah & Mike</td>
+            <td>
+              <div class="stars-display">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </td>
+            <td class="comment-text">Beautiful ceremony, Father Michael was wonderful!</td>
+            <td>2025-10-12</td>
+            <td class="helpful-votes">8</td>
+          </tr>
+          <tr>
+            <td class="service-name">Youth Mentoring</td>
+            <td class="church-name">Trinity Church</td>
+            <td class="provider-name">Lisa Anderson</td>
+            <td>
+              <div class="stars-display">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </td>
+            <td class="comment-text">My son has grown so much through this program.</td>
+            <td>2025-10-11</td>
+            <td class="helpful-votes">15</td>
+          </tr>
+          <tr>
+            <td class="service-name">Prayer Session</td>
+            <td class="church-name">Blessed Sacrament Church</td>
+            <td class="provider-name">David Wilson</td>
+            <td>
+              <div class="stars-display">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </td>
+            <td class="comment-text">Very peaceful and meaningful experience.</td>
+            <td>2025-10-10</td>
+            <td class="helpful-votes">6</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

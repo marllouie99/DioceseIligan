@@ -4095,6 +4095,21 @@ def super_admin_posts(request):
     return render(request, 'core/super_admin_posts.html', ctx)
 
 
+# Super Admin - Services Management
+@login_required
+def super_admin_services(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    ctx = {
+        'active': 'super_admin_services',
+        'page_title': 'Services Management',
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_services.html', ctx)
+
+
 @login_required
 def super_admin_post_detail(request, post_id):
     if not request.user.is_superuser:

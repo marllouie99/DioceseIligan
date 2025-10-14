@@ -29,6 +29,7 @@ urlpatterns = [
     path('super-admin/posts/<int:post_id>/', views.super_admin_post_detail, name='super_admin_post_detail'),
     path('super-admin/posts/<int:post_id>/toggle-active/', views.super_admin_toggle_post_active, name='super_admin_toggle_post_active'),
     path('super-admin/posts/<int:post_id>/delete/', views.super_admin_delete_post, name='super_admin_delete_post'),
+    path('super-admin/services/', views.super_admin_services, name='super_admin_services'),
     
     # Media updates (AJAX)
     path('settings/update-logo/', views.update_church_logo, name='update_church_logo'),
