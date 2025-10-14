@@ -143,6 +143,10 @@ STORAGES = {
     },
 }
 
+# Compatibility setting for django-imagekit (required until it's updated for Django 5.2+)
+# This tells imagekit which storage backend to use
+IMAGEKIT_DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 # Image optimization settings
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = 'imagekit.cachefiles.strategies.Optimistic'
 IMAGEKIT_CACHE_BACKEND = 'default'
