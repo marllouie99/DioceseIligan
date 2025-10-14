@@ -43,6 +43,9 @@
       {% include 'partials/manage/tab_navigation.html' %}
       
       <div class="tabs-content">
+        {# Overview Tab #}
+        {% include 'partials/manage/overview_tab.html' with church=church follower_count=follower_count analytics=analytics bookings=bookings booking_counts=booking_counts donations=donations %}
+
         {# Appointments Tab #}
         {% include 'partials/manage/appointments_tab.html' with bookings=bookings booking_counts=booking_counts appt_status=appt_status %}
 

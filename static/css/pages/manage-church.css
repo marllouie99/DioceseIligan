@@ -2038,3 +2038,602 @@ body.page-manage-church {
     font-size: 0.875rem;
   }
 }
+
+/* ===================================
+   OVERVIEW TAB STYLES
+   =================================== */
+
+/* Overview Stats Section */
+.overview-stats .unified-content-management {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.overview-stats .analytics-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.overview-stats .analytics-charts .charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+/* Single chart grid for Revenue and Upcoming Bookings */
+.overview-stats .analytics-charts .charts-grid.single-chart {
+  grid-template-columns: 1fr;
+  max-width: 100%;
+}
+
+/* Revenue Chart Container */
+.revenue-chart-container {
+  background: rgba(255, 249, 230, 0.2);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.revenue-chart-container:hover {
+  background: rgba(255, 249, 230, 0.3);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.revenue-chart-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.revenue-chart-content canvas {
+  width: 100% !important;
+  height: 280px !important;
+  max-height: 280px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(139, 69, 19, 0.05);
+}
+
+/* Upcoming Bookings Container */
+.upcoming-bookings-container {
+  background: rgba(255, 249, 230, 0.2);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.upcoming-bookings-container:hover {
+  background: rgba(255, 249, 230, 0.3);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.upcoming-bookings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Upcoming Bookings Table */
+.upcoming-bookings-table {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(139, 69, 19, 0.05);
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Georgia, serif;
+}
+
+.bookings-table thead {
+  background: rgba(139, 69, 19, 0.05);
+  border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.bookings-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bookings-table tbody tr {
+  border-bottom: 1px solid rgba(139, 69, 19, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.bookings-table tbody tr:hover {
+  background: rgba(139, 69, 19, 0.03);
+}
+
+.bookings-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.bookings-table td {
+  padding: 1rem;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.bookings-table .service-name {
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.bookings-table .user-name {
+  color: var(--text);
+}
+
+.bookings-table .booking-date,
+.bookings-table .booking-time {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.bookings-table .status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bookings-table .status-badge.status-requested,
+.bookings-table .status-badge.status-approved,
+.bookings-table .status-badge.status-completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.bookings-table .status-badge.status-pending {
+  background: rgba(234, 179, 8, 0.1);
+  color: #ca8a04;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+/* Empty state for bookings */
+.upcoming-bookings-content .empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(139, 69, 19, 0.05);
+  border-radius: 8px;
+}
+
+.upcoming-bookings-content .empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.upcoming-bookings-content .empty-state h3 {
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+}
+
+.upcoming-bookings-content .empty-state p {
+  font-size: 0.9375rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive adjustments for Overview tab */
+@media (max-width: 1024px) {
+  .overview-stats .analytics-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .overview-stats .analytics-charts .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-stats .analytics-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .revenue-chart-content canvas {
+    height: 220px !important;
+    max-height: 220px;
+  }
+  
+  .bookings-table th,
+  .bookings-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+  
+  .bookings-table th {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .upcoming-bookings-table {
+    overflow-x: scroll;
+  }
+  
+  .bookings-table {
+    min-width: 600px;
+  }
+}
+
+/* ===================================
+   APPOINTMENTS TAB STYLES
+   =================================== */
+
+/* 6-column grid for appointments cards */
+.appointment-stats .analytics-cards.appointments-cards {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+/* Compact styling for appointments cards */
+.appointment-stats .analytics-cards.appointments-cards .analytics-card {
+  padding: 1rem;
+  gap: 0.75rem;
+}
+
+.appointment-stats .analytics-cards.appointments-cards .analytics-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.appointment-stats .analytics-cards.appointments-cards .analytics-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.appointment-stats .analytics-cards.appointments-cards .analytics-content h4 {
+  font-size: 1.5rem;
+  margin: 0 0 0.125rem 0;
+}
+
+.appointment-stats .analytics-cards.appointments-cards .analytics-content p {
+  font-size: 0.8125rem;
+  margin: 0 0 0.125rem 0;
+  line-height: 1.2;
+}
+
+.appointment-stats .analytics-cards.appointments-cards .analytics-change {
+  font-size: 0.6875rem;
+}
+
+/* Appointments Table Wrapper */
+.appointments-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  background: rgba(255, 249, 230, 0.3);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  margin-top: 1.5rem;
+}
+
+/* Appointments Table */
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Georgia, serif;
+  min-width: 1000px;
+}
+
+.appointments-table thead {
+  background: rgba(139, 69, 19, 0.05);
+  border-bottom: 2px solid rgba(139, 69, 19, 0.15);
+}
+
+.appointments-table th {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.appointments-table tbody tr {
+  border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.appointments-table tbody tr:hover {
+  background: rgba(139, 69, 19, 0.04);
+}
+
+.appointments-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.appointments-table td {
+  padding: 1rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+/* Table Cell Specific Styles */
+.appointments-table .service-cell {
+  font-weight: 600;
+  padding-left: 1.25rem;
+}
+
+.appointments-table .service-name {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.appointments-table .user-cell {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* User Info with Avatar */
+.appointments-table .user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.appointments-table .user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointments-table .user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.appointments-table .user-avatar .avatar-initial {
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.appointments-table .user-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.appointments-table .email-cell {
+  color: var(--brand);
+  font-size: 0.8125rem;
+}
+
+.appointments-table .date-cell {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.appointments-table .time-cell {
+  color: var(--brand);
+  font-weight: 500;
+}
+
+.appointments-table .duration-cell,
+.appointments-table .amount-cell {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.appointments-table .status-cell {
+  white-space: nowrap;
+}
+
+.appointments-table .status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.appointments-table .status-badge.status-requested {
+  background: rgba(234, 179, 8, 0.1);
+  color: #ca8a04;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.appointments-table .status-badge.status-reviewed {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.appointments-table .status-badge.status-approved,
+.appointments-table .status-badge.status-confirmed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.appointments-table .status-badge.status-completed {
+  background: rgba(139, 69, 19, 0.1);
+  color: #8b4513;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.appointments-table .status-badge.status-cancelled,
+.appointments-table .status-badge.status-declined {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.appointments-table .status-badge.status-conflict {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  margin-left: 0.25rem;
+}
+
+.appointments-table .actions-cell {
+  text-align: center;
+  width: 80px;
+  position: relative;
+}
+
+/* Dropdown Wrapper */
+.appointments-table .dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.appointments-table .action-btn {
+  background: transparent;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointments-table .action-btn:hover {
+  background: rgba(139, 69, 19, 0.05);
+  border-color: rgba(139, 69, 19, 0.3);
+}
+
+.appointments-table .action-btn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
+}
+
+/* Dropdown Menu */
+.appointments-table .action-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  background: #fff;
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  min-width: 180px;
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+
+.appointments-table .action-dropdown.show {
+  display: block;
+}
+
+.appointments-table .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+}
+
+.appointments-table .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.appointments-table .dropdown-item:hover {
+  background: rgba(139, 69, 19, 0.05);
+}
+
+.appointments-table .dropdown-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.appointments-table .dropdown-item-danger {
+  color: #dc2626;
+}
+
+.appointments-table .dropdown-item-danger svg {
+  color: #dc2626;
+}
+
+.appointments-table .dropdown-item-danger:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Responsive adjustments for Appointments tab */
+@media (max-width: 1400px) {
+  .appointment-stats .analytics-cards.appointments-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .appointment-stats .analytics-cards.appointments-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .appointments-table-wrapper {
+    overflow-x: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  .appointment-stats .analytics-cards.appointments-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .appointments-table th,
+  .appointments-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+  
+  .appointments-table th {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .appointment-stats .analytics-cards.appointments-cards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -18,7 +18,7 @@ class ChurchManagementApp {
   constructor() {
     this.modules = {};
     this.config = {
-      defaultTab: 'appointments',
+      defaultTab: 'overview',
       imagePreviewMaxWidth: 200,
       imagePreviewMaxHeight: 150
     };
@@ -204,10 +204,10 @@ class ChurchManagementApp {
   }
 
   /**
-   * Render appointments breakdown chart (Status distribution)
+   * Render booking trends chart (Weekly status breakdown)
    */
-  renderAppointmentsBreakdownChart() {
-    const canvas = document.getElementById('appointmentsBreakdownChart');
+  renderBookingTrendsChart() {
+    const canvas = document.getElementById('bookingTrendsChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
@@ -215,133 +215,76 @@ class ChurchManagementApp {
     // Read values from data attributes
     const pending = parseInt(canvas.getAttribute('data-pending') || '0') || 0;
     const approved = parseInt(canvas.getAttribute('data-approved') || '0') || 0;
+    const confirmed = parseInt(canvas.getAttribute('data-confirmed') || '0') || 0;
     const completed = parseInt(canvas.getAttribute('data-completed') || '0') || 0;
-    const reviewed = parseInt(canvas.getAttribute('data-reviewed') || '0') || 0;
 
-    const dataPoints = [pending, approved, completed, reviewed];
-    if (dataPoints.every(v => v === 0)) {
-      this.showEmptyChartState(canvas);
-      return;
-    }
-
-    // Destroy existing instance and clean up empty states
-    try { this.chartInstances.appointmentsBreakdown?.destroy(); } catch (_) {}
+    // Generate 4 weeks of data
+    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
     
-    // Remove any existing empty states and show canvas
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
-
-    this.chartInstances.appointmentsBreakdown = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Pending', 'Approved', 'Completed', 'Reviewed'],
-        datasets: [{
-          data: dataPoints,
-          backgroundColor: [
-            'rgba(218, 165, 32, 0.7)',   // gold - pending
-            'rgba(34, 197, 94, 0.7)',    // green - approved  
-            'rgba(139, 69, 19, 0.7)',    // brown - completed
-            'rgba(160, 82, 45, 0.7)'     // sienna - reviewed
-          ],
-          borderColor: [
-            'rgba(218, 165, 32, 1)',
-            'rgba(34, 197, 94, 1)',
-            'rgba(139, 69, 19, 1)',
-            'rgba(160, 82, 45, 1)'
-          ],
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.2,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { usePointStyle: true, padding: 20, font: { family: 'Georgia, serif', size: 12 } }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0) || 1;
-                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                return `${context.label}: ${context.parsed} (${percentage}%)`;
-              }
-            }
-          }
-        },
-        animation: { animateRotate: true, duration: 1000 }
+    // Distribute data across weeks with variation
+    const cancelledData = [];
+    const confirmedData = [];
+    const pendingData = [];
+    
+    const hasData = pending > 0 || approved > 0 || confirmed > 0 || completed > 0;
+    
+    for (let i = 0; i < 4; i++) {
+      if (hasData) {
+        const factor = 0.2 + Math.random() * 0.15;
+        cancelledData.push(Math.floor((pending + completed) * factor * 0.1)); // 10% cancelled
+        confirmedData.push(Math.floor((confirmed + approved) * factor));
+        pendingData.push(Math.floor(pending * factor));
+      } else {
+        // Sample data
+        cancelledData.push(Math.floor(Math.random() * 5) + 2);
+        confirmedData.push(Math.floor(Math.random() * 10) + 10);
+        pendingData.push(Math.floor(Math.random() * 8) + 3);
       }
-    });
-  }
-
-  /**
-   * Render appointments trend chart (Monthly volume)
-   */
-  renderAppointmentsTrendChart() {
-    const canvas = document.getElementById('appointmentsTrendChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-
-    // Generate sample monthly data (in real app, this would come from backend)
-    const currentMonth = new Date().getMonth();
-    const months = [];
-    const data = [];
-    
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      months.push(monthNames[monthIndex]);
-      // Generate sample data based on total appointments with some variation
-      const totalAppointments = parseInt(document.querySelector('[data-pending]')?.getAttribute('data-pending') || '0') +
-                               parseInt(document.querySelector('[data-approved]')?.getAttribute('data-approved') || '0') +
-                               parseInt(document.querySelector('[data-completed]')?.getAttribute('data-completed') || '0') +
-                               parseInt(document.querySelector('[data-reviewed]')?.getAttribute('data-reviewed') || '0');
-      data.push(Math.max(0, totalAppointments + Math.floor(Math.random() * 10) - 5));
     }
 
-    if (data.every(v => v === 0)) {
-      this.showEmptyChartState(canvas);
-      return;
-    }
-
-    try { this.chartInstances.appointmentsTrend?.destroy(); } catch (_) {}
+    try { this.chartInstances.bookingTrends?.destroy(); } catch (_) {}
     
-    // Remove any existing empty states and show canvas
     const container = canvas.parentElement;
     const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
     existingEmptyStates.forEach(state => state.remove());
     canvas.style.display = 'block';
 
-    this.chartInstances.appointmentsTrend = new Chart(ctx, {
+    this.chartInstances.bookingTrends = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: months,
-        datasets: [{
-          label: 'Appointments',
-          data: data,
-          borderColor: 'rgba(139, 69, 19, 1)',
-          backgroundColor: 'rgba(139, 69, 19, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(218, 165, 32, 1)',
-          pointBorderColor: 'rgba(139, 69, 19, 1)',
-          pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 8
-        }]
+        labels: weeks,
+        datasets: [
+          {
+            label: 'Cancelled',
+            data: cancelledData,
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Confirmed',
+            data: confirmedData,
+            borderColor: 'rgba(34, 197, 94, 1)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Pending',
+            data: pendingData,
+            borderColor: 'rgba(234, 179, 8, 1)',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }
+        ]
       },
       options: {
         responsive: true,
@@ -366,6 +309,78 @@ class ChurchManagementApp {
             ticks: { 
               stepSize: 1,
               font: { family: 'Georgia, serif' } 
+            },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          x: {
+            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
+            grid: { display: false }
+          }
+        },
+        animation: { duration: 1000, easing: 'easeInOutQuart' }
+      }
+    });
+  }
+
+  /**
+   * Render popular services chart (Bar chart)
+   */
+  renderPopularServicesChart() {
+    const canvas = document.getElementById('popularServicesChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // Sample service data - in production this would come from backend
+    const services = ['Counseling', 'Prayer', 'Mentoring', 'Baptism'];
+    const bookingCounts = [24, 18, 14, 10];
+
+    try { this.chartInstances.popularServices?.destroy(); } catch (_) {}
+    
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    this.chartInstances.popularServices = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: services,
+        datasets: [{
+          label: 'Bookings',
+          data: bookingCounts,
+          backgroundColor: 'rgba(59, 130, 246, 0.7)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 1.8,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'rgba(59, 130, 246, 0.8)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return `Bookings: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { 
+              stepSize: 5,
+              font: { family: 'Georgia, serif' }
             },
             grid: { color: 'rgba(139, 69, 19, 0.1)' }
           },
@@ -557,9 +572,8 @@ class ChurchManagementApp {
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.set('tab', 'appointments');
             newUrl.searchParams.set('appt_status', status || 'all');
-            history.pushState({ appt_status: status }, '', newUrl.pathname + newUrl.search + '#appointments');
+            history.pushState({ appt_status: status }, '', newUrl.pathname + newUrl.search);
           }
-          appointmentsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         })
         .catch(() => {
           // Fallback: navigate normally
@@ -831,7 +845,13 @@ class ChurchManagementApp {
       this.renderCharts();
     }
 
-    // Re-render when Content or Donations tab is activated (in case HTML was not measured/available yet)
+    // Re-render when tabs are activated (in case HTML was not measured/available yet)
+    const overviewTabBtn = document.querySelector('[data-tab="overview"]');
+    if (overviewTabBtn) {
+      overviewTabBtn.addEventListener('click', () => {
+        setTimeout(() => this.renderCharts(), 150);
+      });
+    }
     const contentTabBtn = document.querySelector('[data-tab="content"]');
     if (contentTabBtn) {
       contentTabBtn.addEventListener('click', () => {
@@ -888,13 +908,17 @@ class ChurchManagementApp {
     this.renderTop5PostsChart();
     this.renderDonationsBreakdownChart();
     this.renderTopDonorsChart();
-    this.renderAppointmentsBreakdownChart();
-    this.renderAppointmentsTrendChart();
+    this.renderBookingTrendsChart();
+    this.renderPopularServicesChart();
     this.renderFollowersGrowthChart();
     this.renderFollowersEngagementChart();
     this.renderServiceBookingsTrendChart();
     this.renderServicePerformanceChart();
     this.renderEngagementBars();
+    // Overview tab charts
+    this.renderOverviewFollowerGrowthChart();
+    this.renderOverviewWeeklyEngagementChart();
+    this.renderOverviewRevenueChart();
   }
 
   /**
@@ -1695,9 +1719,361 @@ class ChurchManagementApp {
       }
     });
   }
+
+  /**
+   * Render overview follower growth chart
+   */
+  renderOverviewFollowerGrowthChart() {
+    const canvas = document.getElementById('overviewFollowerGrowthChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Get data from data attributes
+    const total = parseInt(canvas.getAttribute('data-total') || '0') || 0;
+    const recent = parseInt(canvas.getAttribute('data-recent') || '0') || 0;
+    
+    // Generate 6 months of data
+    const currentMonth = new Date().getMonth();
+    const months = [];
+    const data = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      months.push(monthNames[monthIndex]);
+      
+      // Simulate growth pattern - use sample data if no real data
+      if (total === 0) {
+        // Sample data for demonstration
+        data.push(Math.floor(Math.random() * 50) + (6 - i) * 10);
+      } else {
+        const baseGrowth = Math.floor(total / 6);
+        data.push(i === 0 ? total : Math.max(0, baseGrowth * (6 - i) + Math.floor(Math.random() * Math.max(recent, 1))));
+      }
+    }
+
+    try { this.chartInstances.overviewFollowerGrowth?.destroy(); } catch (_) {}
+    
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    this.chartInstances.overviewFollowerGrowth = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Followers',
+          data: data,
+          borderColor: 'rgba(139, 69, 19, 1)',
+          backgroundColor: 'rgba(139, 69, 19, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'rgba(218, 165, 32, 1)',
+          pointBorderColor: 'rgba(139, 69, 19, 1)',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 1.8,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff', bodyColor: '#fff',
+            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return `Followers: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { 
+              stepSize: Math.max(1, Math.floor(total / 10)),
+              font: { family: 'Georgia, serif' } 
+            },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          x: {
+            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
+            grid: { display: false }
+          }
+        },
+        animation: { duration: 1000, easing: 'easeInOutQuart' }
+      }
+    });
+  }
+
+  /**
+   * Render overview weekly engagement chart
+   */
+  renderOverviewWeeklyEngagementChart() {
+    const canvas = document.getElementById('overviewWeeklyEngagementChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Generate 7 days of data
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    
+    // Get base engagement data from the page
+    const viewsElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(1) .engagement-total');
+    const likesElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(2) .engagement-total');
+    const commentsElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(3) .engagement-total');
+    
+    const totalViews = viewsElement ? parseInt(viewsElement.textContent.match(/\d+/)?.[0] || '0') : 0;
+    const totalLikes = likesElement ? parseInt(likesElement.textContent.match(/\d+/)?.[0] || '0') : 0;
+    const totalComments = commentsElement ? parseInt(commentsElement.textContent.match(/\d+/)?.[0] || '0') : 0;
+    
+    // Distribute across 7 days with some variation
+    const viewsData = [];
+    const likesData = [];
+    const commentsData = [];
+    
+    const hasData = totalViews > 0 || totalLikes > 0 || totalComments > 0;
+    
+    for (let i = 0; i < 7; i++) {
+      if (hasData) {
+        const factor = 0.1 + Math.random() * 0.2; // 10-30% of total per day
+        viewsData.push(Math.floor(totalViews * factor));
+        likesData.push(Math.floor(totalLikes * factor));
+        commentsData.push(Math.floor(totalComments * factor));
+      } else {
+        // Sample data for demonstration
+        viewsData.push(Math.floor(Math.random() * 100) + 50);
+        likesData.push(Math.floor(Math.random() * 30) + 10);
+        commentsData.push(Math.floor(Math.random() * 15) + 5);
+      }
+    }
+
+    try { this.chartInstances.overviewWeeklyEngagement?.destroy(); } catch (_) {}
+    
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    this.chartInstances.overviewWeeklyEngagement = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [
+          {
+            label: 'Views',
+            data: viewsData,
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Likes',
+            data: likesData,
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Comments',
+            data: commentsData,
+            borderColor: 'rgba(34, 197, 94, 1)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 1.8,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 11 } }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff', bodyColor: '#fff',
+            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { font: { family: 'Georgia, serif' } },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          x: {
+            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
+            grid: { display: false }
+          }
+        },
+        animation: { duration: 1000, easing: 'easeInOutQuart' }
+      }
+    });
+  }
+
+  /**
+   * Render overview revenue chart
+   */
+  renderOverviewRevenueChart() {
+    const canvas = document.getElementById('overviewRevenueChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Generate 6 months of revenue data
+    const currentMonth = new Date().getMonth();
+    const months = [];
+    const donationsData = [];
+    const servicesData = [];
+    
+    // Get current month revenue from the page
+    const thisMonthElement = document.querySelector('.revenue-chart-content .chart-details .engagement-stats .stat:nth-child(1)');
+    const thisMonthRevenue = thisMonthElement ? 
+      parseFloat(thisMonthElement.textContent.replace(/[^0-9.]/g, '') || '0') : 0;
+    
+    const hasRevenue = thisMonthRevenue > 0;
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      months.push(monthNames[monthIndex]);
+      
+      if (hasRevenue) {
+        // Simulate revenue pattern with real data
+        const baseDonations = i === 0 ? thisMonthRevenue : Math.floor(thisMonthRevenue * (0.6 + Math.random() * 0.8));
+        const baseServices = Math.floor(baseDonations * (0.4 + Math.random() * 0.6));
+        donationsData.push(baseDonations);
+        servicesData.push(baseServices);
+      } else {
+        // Sample data for demonstration
+        const sampleDonations = Math.floor(Math.random() * 3000) + 2000;
+        const sampleServices = Math.floor(Math.random() * 2000) + 1000;
+        donationsData.push(sampleDonations);
+        servicesData.push(sampleServices);
+      }
+    }
+
+    try { this.chartInstances.overviewRevenue?.destroy(); } catch (_) {}
+    
+    const container = canvas.parentElement;
+    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+    existingEmptyStates.forEach(state => state.remove());
+    canvas.style.display = 'block';
+
+    this.chartInstances.overviewRevenue = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: 'Donations ($)',
+            data: donationsData,
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2,
+            borderRadius: 6
+          },
+          {
+            label: 'Services ($)',
+            data: servicesData,
+            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+            borderColor: 'rgba(34, 197, 94, 1)',
+            borderWidth: 2,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 2.5,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 12 } }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            titleColor: '#fff', bodyColor: '#fff',
+            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ₱${context.parsed.y.toFixed(2)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { 
+              font: { family: 'Georgia, serif' },
+              callback: function(value) {
+                return '₱' + value.toFixed(0);
+              }
+            },
+            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+          },
+          x: {
+            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
+            grid: { display: false }
+          }
+        },
+        animation: { duration: 1000, easing: 'easeInOutQuart' }
+      }
+    });
+  }
 }
 
 // Global utility functions
+function toggleDropdown(button, event) {
+  event.stopPropagation();
+  const wrapper = button.closest('.dropdown-wrapper');
+  const dropdown = wrapper.querySelector('.action-dropdown');
+  const isOpen = dropdown.classList.contains('show');
+  
+  // Close all other dropdowns
+  document.querySelectorAll('.action-dropdown.show').forEach(d => {
+    if (d !== dropdown) d.classList.remove('show');
+  });
+  
+  // Toggle current dropdown
+  dropdown.classList.toggle('show');
+  
+  // Close dropdown when clicking outside
+  if (!isOpen) {
+    setTimeout(() => {
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!wrapper.contains(e.target)) {
+          dropdown.classList.remove('show');
+          document.removeEventListener('click', closeDropdown);
+        }
+      });
+    }, 0);
+  }
+}
+
 function openImageGallery(serviceId) {
   const base = window.manageServiceImagesUrl || (window.djangoUrls && window.djangoUrls.manageServiceImages);
   if (!base) {

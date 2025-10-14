@@ -1,0 +1,313 @@
+{% load static %}
+{# Overview Tab Content #}
+<div class="tab-panel {% if not request.GET.tab or request.GET.tab == 'overview' %}active{% endif %}" id="overview">
+  <div class="tab-header">
+    <h2>Overview</h2>
+    <p>Your church's performance at a glance</p>
+  </div>
+  <div class="tab-content">
+    <!-- Overview Statistics Cards -->
+    <div class="overview-stats parchment-card">
+      <div class="unified-content-management">
+        <div class="analytics-cards">
+          {# Total Followers #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ follower_count|default:"0" }}</h4>
+              <p>Total Followers</p>
+              <span class="analytics-change">
+                {% if analytics.followers_last_30_days > 0 %}
+                  +{{ analytics.followers_last_30_days }} vs last month
+                {% else %}
+                  No change vs last month
+                {% endif %}
+              </span>
+            </div>
+          </div>
+          
+          {# Posts This Month #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ analytics.posts_last_30_days|default:"0" }}</h4>
+              <p>Posts This Month</p>
+              <span class="analytics-change">
+                {% if analytics.posts_last_30_days > 0 %}
+                  +{{ analytics.posts_last_30_days|floatformat:0 }}% vs last month
+                {% else %}
+                  No posts this month
+                {% endif %}
+              </span>
+            </div>
+          </div>
+          
+          {# Total Bookings #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ booking_counts.all|default:"0" }}</h4>
+              <p>Total Bookings</p>
+              <span class="analytics-change">
+                {% if analytics.bookings_last_30_days > 0 %}
+                  +{{ analytics.bookings_last_30_days }} vs last month
+                {% else %}
+                  All time bookings
+                {% endif %}
+              </span>
+            </div>
+          </div>
+          
+          {# Monthly Revenue #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>₱{{ donations.this_month_amount|floatformat:2|default:"0.00" }}</h4>
+              <p>Monthly Revenue</p>
+              <span class="analytics-change">
+                {% if donations.this_month_amount > 0 %}
+                  {% widthratio donations.this_month_amount donations.this_year_amount 100 %}% of yearly total
+                {% else %}
+                  No revenue this month
+                {% endif %}
+              </span>
+            </div>
+          </div>
+          
+          {# Total Views #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ analytics.total_views|default:"0" }}</h4>
+              <p>Total Views</p>
+              <span class="analytics-change">This week</span>
+            </div>
+          </div>
+          
+          {# Total Likes #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ analytics.total_likes|default:"0" }}</h4>
+              <p>Total Likes</p>
+              <span class="analytics-change">This week</span>
+            </div>
+          </div>
+          
+          {# Bookmarks/Saved #}
+          <div class="analytics-card">
+            <div class="analytics-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div class="analytics-content">
+              <h4>{{ analytics.total_comments|default:"0" }}</h4>
+              <p>Saved</p>
+              <span class="analytics-change">This week</span>
+            </div>
+          </div>
+        </div>
+        
+        {# Overview Analytics Charts - 1x2 Grid #}
+        <div class="analytics-charts">
+          <div class="charts-grid">
+            {# Follower Growth Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Follower Growth</h4>
+                <p>Monthly follower trends over the last 6 months</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="overviewFollowerGrowthChart"
+                        width="400" height="200"
+                        data-total="{{ follower_count|default:'0' }}"
+                        data-recent="{{ analytics.followers_last_30_days|default:'0' }}"></canvas>
+                <div class="chart-details">
+                  <div class="post-preview">
+                    <div class="engagement-stats">
+                      <span class="stat">Total: {{ follower_count|default:"0" }}</span>
+                      <span class="stat">This Month: {{ analytics.followers_last_30_days|default:"0" }}</span>
+                      <span class="stat">Growth Rate: 
+                        {% if follower_count > 0 %}
+                          {% widthratio analytics.followers_last_30_days follower_count 100 %}%
+                        {% else %}
+                          0%
+                        {% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {# Weekly Engagement Chart #}
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4>Weekly Engagement</h4>
+                <p>Post views, likes, and comments over the last 7 days</p>
+              </div>
+              <div class="chart-content">
+                <canvas id="overviewWeeklyEngagementChart" width="400" height="200"></canvas>
+                <div class="posts-ranking weekly-engagement">
+                  <div class="ranking-item">
+                    <div class="rank-number">👁️</div>
+                    <div class="post-info">
+                      <p>Views</p>
+                      <div class="engagement-total">{{ analytics.views_last_30_days|default:"0" }} views</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: 100%;"></div>
+                    </div>
+                  </div>
+                  <div class="ranking-item">
+                    <div class="rank-number">❤️</div>
+                    <div class="post-info">
+                      <p>Likes</p>
+                      <div class="engagement-total">{{ analytics.likes_last_30_days|default:"0" }} likes</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: {% if analytics.views_last_30_days > 0 %}{% widthratio analytics.likes_last_30_days analytics.views_last_30_days 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                  </div>
+                  <div class="ranking-item">
+                    <div class="rank-number">💬</div>
+                    <div class="post-info">
+                      <p>Comments</p>
+                      <div class="engagement-total">{{ analytics.comments_last_30_days|default:"0" }} comments</div>
+                    </div>
+                    <div class="engagement-bar">
+                      <div class="bar-fill" style="width: {% if analytics.views_last_30_days > 0 %}{% widthratio analytics.comments_last_30_days analytics.views_last_30_days 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Revenue Overview Chart - 1x1 Grid #}
+        <div class="analytics-charts">
+          <div class="charts-grid single-chart">
+            <div class="chart-container revenue-chart-container">
+              <div class="chart-header">
+                <h4>Revenue Overview</h4>
+                <p>Donations and service revenue over 6 months</p>
+              </div>
+              <div class="chart-content revenue-chart-content">
+                <canvas id="overviewRevenueChart"></canvas>
+                <div class="chart-details">
+                  <div class="post-preview">
+                    <div class="engagement-stats">
+                      <span class="stat">This Month: ₱{{ donations.this_month_amount|floatformat:2|default:"0.00" }}</span>
+                      <span class="stat">This Year: ₱{{ donations.this_year_amount|floatformat:2|default:"0.00" }}</span>
+                      <span class="stat">Total: ₱{{ donations.total_amount|floatformat:2|default:"0.00" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Upcoming Bookings Section - 1x1 Grid #}
+        <div class="analytics-charts">
+          <div class="charts-grid single-chart">
+            <div class="chart-container upcoming-bookings-container">
+              <div class="chart-header">
+                <h4>Upcoming Bookings</h4>
+                <p>Next scheduled service bookings</p>
+              </div>
+              <div class="chart-content upcoming-bookings-content">
+                {% if bookings %}
+                  {% load tz %}
+                  <div class="upcoming-bookings-table">
+                    <table class="bookings-table">
+                      <thead>
+                        <tr>
+                          <th>Service</th>
+                          <th>User</th>
+                          <th>Date</th>
+                          <th>Time</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for booking in bookings|slice:":5" %}
+                          <tr>
+                            <td class="service-name">{{ booking.service.name }}</td>
+                            <td class="user-name">{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                            <td class="booking-date">{{ booking.date|date:"Y-m-d" }}</td>
+                            <td class="booking-time">{{ booking.time|time:"g:i A" }}</td>
+                            <td class="booking-status">
+                              <span class="status-badge status-{{ booking.status }}">
+                                {% if booking.status == 'requested' %}
+                                  confirmed
+                                {% elif booking.status == 'approved' %}
+                                  confirmed
+                                {% elif booking.status == 'completed' %}
+                                  confirmed
+                                {% else %}
+                                  {{ booking.status }}
+                                {% endif %}
+                              </span>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% else %}
+                  <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <h3>No Upcoming Bookings</h3>
+                    <p>When people book your services, they'll appear here.</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
