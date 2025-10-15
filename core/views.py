@@ -94,6 +94,23 @@ def _app_context(request):
     # Stripe configuration for credit card donations
     STRIPE_PUBLISHABLE_KEY = getattr(settings, 'STRIPE_PUBLISHABLE_KEY', '')
     
+    # Get unread booking notifications count for church owners
+    unread_booking_notifications = 0
+    if user.is_authenticated and user.owned_churches.exists():
+        from core.models import Notification, Booking
+        unread_booking_notifications = Notification.objects.filter(
+            user=user,
+            is_read=False,
+            notification_type__in=[
+                Notification.TYPE_BOOKING_REQUESTED,
+                Notification.TYPE_BOOKING_REVIEWED,
+                Notification.TYPE_BOOKING_APPROVED,
+                Notification.TYPE_BOOKING_DECLINED,
+                Notification.TYPE_BOOKING_CANCELED,
+                Notification.TYPE_BOOKING_COMPLETED
+            ]
+        ).count()
+    
     return {
         'user_display_name': user_display_name,
         'user_initial': user_initial,
@@ -106,6 +123,7 @@ def _app_context(request):
         'PAYPAL_CLIENT_ID': PAYPAL_CLIENT_ID,
         'PAYPAL_CURRENCY': PAYPAL_CURRENCY,
         'STRIPE_PUBLISHABLE_KEY': STRIPE_PUBLISHABLE_KEY,
+        'unread_booking_notifications': unread_booking_notifications,
     }
 
 def home(request):
@@ -372,6 +390,22 @@ def manage_church(request):
     except Church.DoesNotExist:
         messages.info(request, 'You don\'t own any churches. Create one to get started!')
         return redirect('core:create_church')
+    
+    # Mark booking notifications as read when viewing appointments tab
+    current_tab = request.GET.get('tab', 'overview')
+    if current_tab == 'appointments':
+        Notification.objects.filter(
+            user=request.user,
+            is_read=False,
+            notification_type__in=[
+                Notification.TYPE_BOOKING_REQUESTED,
+                Notification.TYPE_BOOKING_REVIEWED,
+                Notification.TYPE_BOOKING_APPROVED,
+                Notification.TYPE_BOOKING_DECLINED,
+                Notification.TYPE_BOOKING_CANCELED,
+                Notification.TYPE_BOOKING_COMPLETED
+            ]
+        ).update(is_read=True)
     
     if request.method == 'POST' and request.POST.get('form_type') != 'verification':
         form = ChurchUpdateForm(request.POST, request.FILES, instance=church)

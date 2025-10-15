@@ -544,11 +544,15 @@ class Booking(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        super().save(*args, **kwargs)
         if is_new and not self.code:
-            # Generate code after first save so 'id' is available
+            # For new bookings, save first to get ID, then update code
+            super().save(*args, **kwargs)
             self.code = f"APPT-{self.id:04d}"
-            super().save(update_fields=['code'])
+            # Use update() to avoid triggering signals again
+            Booking.objects.filter(pk=self.pk).update(code=self.code)
+        else:
+            # For existing bookings, just save normally
+            super().save(*args, **kwargs)
 
     @property
     def conflict_key(self):
