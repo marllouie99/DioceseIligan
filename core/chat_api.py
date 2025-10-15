@@ -61,8 +61,8 @@ def conversations_api(request):
                 try:
                     if hasattr(conv.user, 'profile'):
                         profile = getattr(conv.user, 'profile', None)
-                        if profile and profile.avatar:
-                            avatar = profile.avatar.url
+                        if profile and hasattr(profile, 'profile_image') and profile.profile_image:
+                            avatar = profile.profile_image.url
                 except Exception as e:
                     # Log the error for debugging
                     print(f"Error getting user avatar: {e}")
@@ -187,8 +187,8 @@ def conversation_messages_api(request, conversation_id):
                 try:
                     if hasattr(msg.sender, 'profile'):
                         profile = getattr(msg.sender, 'profile', None)
-                        if profile and profile.avatar:
-                            avatar = profile.avatar.url
+                        if profile and hasattr(profile, 'profile_image') and profile.profile_image:
+                            avatar = profile.profile_image.url
                 except Exception as e:
                     print(f"Error getting message sender avatar: {e}")
                     avatar = None
@@ -284,8 +284,8 @@ def conversation_messages_api(request, conversation_id):
             avatar = None
             try:
                 if hasattr(request.user, 'profile') and request.user.profile:
-                    if request.user.profile.avatar:
-                        avatar = request.user.profile.avatar.url
+                    if hasattr(request.user.profile, 'profile_image') and request.user.profile.profile_image:
+                        avatar = request.user.profile.profile_image.url
             except Exception:
                 avatar = None
             
