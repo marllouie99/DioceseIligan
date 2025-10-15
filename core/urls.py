@@ -79,6 +79,7 @@ urlpatterns = [
     path('dashboard/create-post/', views.dashboard_create_post, name='dashboard_create_post'),
     path('edit-post/<int:post_id>/', views.edit_post, name='edit_post'),
     path('posts/<int:post_id>/data/', views.get_post_data, name='get_post_data'),
+    path('posts/<int:post_id>/analytics/', views.get_post_analytics, name='get_post_analytics'),
     path('posts/<int:post_id>/update/', views.update_post, name='update_post'),
     path('posts/<int:post_id>/delete/', views.delete_post, name='delete_post'),
     path('posts/<int:post_id>/report/', views.report_post, name='report_post'),

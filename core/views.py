@@ -27,6 +27,7 @@ from .models import (
     PostLike,
     PostBookmark,
     PostComment,
+    CommentLike,
     PostView,
     PostReport,
     ChurchVerificationRequest,
@@ -5012,6 +5013,207 @@ def update_post(request, post_id):
         return JsonResponse({
             'success': False,
             'message': 'An error occurred while updating the post.'
+        }, status=500)
+
+
+@login_required
+def get_post_analytics(request, post_id):
+    """Get detailed analytics for a specific post."""
+    try:
+        from django.db.models import Count, Q, F
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        post = get_object_or_404(Post, id=post_id)
+        
+        # Check if user owns the church
+        if post.church.owner != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'You do not have permission to view this post analytics.'
+            }, status=403)
+        
+        # Get basic stats
+        views_count = post.view_count
+        likes_count = post.likes.count()
+        comments_count = post.comments.filter(is_active=True).count()
+        bookmarks_count = post.bookmarks.count()
+        
+        # Calculate engagement rate
+        total_interactions = likes_count + comments_count + bookmarks_count
+        engagement_rate = (total_interactions / views_count * 100) if views_count > 0 else 0
+        
+        # Get hourly views and interactions data (last 24 hours)
+        now = timezone.now()
+        hours_ago_24 = now - timedelta(hours=24)
+        
+        # Get views over time (hourly)
+        views_over_time = []
+        interactions_over_time = []
+        
+        for i in range(24):
+            hour_start = hours_ago_24 + timedelta(hours=i)
+            hour_end = hour_start + timedelta(hours=1)
+            
+            # Count views in this hour
+            hour_views = PostView.objects.filter(
+                post=post,
+                viewed_at__gte=hour_start,
+                viewed_at__lt=hour_end
+            ).count()
+            
+            # Count interactions (likes + comments + bookmarks) in this hour
+            hour_likes = PostLike.objects.filter(
+                post=post,
+                created_at__gte=hour_start,
+                created_at__lt=hour_end
+            ).count()
+            
+            hour_comments = PostComment.objects.filter(
+                post=post,
+                created_at__gte=hour_start,
+                created_at__lt=hour_end,
+                is_active=True
+            ).count()
+            
+            hour_bookmarks = PostBookmark.objects.filter(
+                post=post,
+                created_at__gte=hour_start,
+                created_at__lt=hour_end
+            ).count()
+            
+            views_over_time.append({
+                'hour': hour_start.strftime('%H:%M'),
+                'count': hour_views
+            })
+            
+            interactions_over_time.append({
+                'hour': hour_start.strftime('%H:%M'),
+                'count': hour_likes + hour_comments + hour_bookmarks
+            })
+        
+        # Get engagement breakdown
+        engagement_breakdown = {
+            'likes': likes_count,
+            'comments': comments_count,
+            'bookmarks': bookmarks_count,
+            'shares': 0  # Placeholder for future share tracking
+        }
+        
+        # Get audience demographics (followers vs non-followers)
+        followers_views = PostView.objects.filter(
+            post=post,
+            user__in=post.church.followers.values_list('user', flat=True)
+        ).count()
+        
+        total_followers = post.church.follower_count
+        non_followers_views = views_count - followers_views
+        
+        # Calculate active vs new followers
+        active_followers_views = followers_views
+        new_followers_views = 0  # Simplified for now
+        
+        audience_demographics = {
+            'active_followers': {
+                'count': active_followers_views,
+                'percentage': round((active_followers_views / views_count * 100) if views_count > 0 else 0, 1)
+            },
+            'new_followers': {
+                'count': new_followers_views,
+                'percentage': round((new_followers_views / views_count * 100) if views_count > 0 else 0, 1)
+            },
+            'non_followers': {
+                'count': non_followers_views,
+                'percentage': round((non_followers_views / views_count * 100) if views_count > 0 else 0, 1)
+            }
+        }
+        
+        # Get top comments (most liked)
+        top_comments = []
+        comments = post.comments.filter(is_active=True).annotate(
+            likes_count=Count('comment_likes')
+        ).order_by('-likes_count', '-created_at')[:5]
+        
+        for comment in comments:
+            top_comments.append({
+                'user': {
+                    'name': comment.user.get_full_name(),
+                    'initials': f"{comment.user.first_name[0]}{comment.user.last_name[0]}" if comment.user.first_name and comment.user.last_name else comment.user.username[0].upper()
+                },
+                'content': comment.content,
+                'likes': comment.likes_count,
+                'time_ago': comment.time_ago
+            })
+        
+        # Calculate performance insights
+        # Get average stats for all posts from this church
+        all_posts = Post.objects.filter(church=post.church, is_active=True).exclude(id=post.id)
+        
+        if all_posts.exists():
+            avg_views = all_posts.aggregate(avg=Count('post_views'))['avg'] or 0
+            avg_engagement = 0
+            
+            for p in all_posts:
+                p_interactions = p.likes.count() + p.comments.filter(is_active=True).count() + p.bookmarks.count()
+                p_views = p.view_count
+                if p_views > 0:
+                    avg_engagement += (p_interactions / p_views * 100)
+            
+            avg_engagement = avg_engagement / all_posts.count() if all_posts.count() > 0 else 0
+            
+            # Compare current post with average
+            performance_vs_average = ((engagement_rate - avg_engagement) / avg_engagement * 100) if avg_engagement > 0 else 0
+        else:
+            performance_vs_average = 0
+            avg_engagement = 0
+        
+        # Find peak engagement time
+        peak_hour = max(interactions_over_time, key=lambda x: x['count'])
+        
+        performance_insights = {
+            'above_average': {
+                'percentage': round(performance_vs_average, 1),
+                'message': f"This post is performing {abs(round(performance_vs_average))}% {'better' if performance_vs_average > 0 else 'worse'} than your average post"
+            },
+            'peak_engagement': {
+                'time': peak_hour['hour'],
+                'message': f"Most interactions occurred around {peak_hour['hour']}"
+            }
+        }
+        
+        return JsonResponse({
+            'success': True,
+            'analytics': {
+                'post_id': post.id,
+                'post_type': post.get_post_type_display(),
+                'post_type_value': post.post_type,
+                'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
+                'updated_at': post.updated_at.strftime('%Y-%m-%d %H:%M'),
+                'content': post.content[:200],  # First 200 chars
+                'status': 'published' if post.is_active else 'inactive',
+                'stats': {
+                    'views': views_count,
+                    'likes': likes_count,
+                    'comments': comments_count,
+                    'bookmarks': bookmarks_count,
+                    'engagement_rate': round(engagement_rate, 2)
+                },
+                'views_over_time': views_over_time,
+                'interactions_over_time': interactions_over_time,
+                'engagement_breakdown': engagement_breakdown,
+                'audience_demographics': audience_demographics,
+                'top_comments': top_comments,
+                'performance_insights': performance_insights
+            }
+        })
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Get post analytics error: {str(e)}')
+        return JsonResponse({
+            'success': False,
+            'message': 'An error occurred while fetching post analytics.'
         }, status=500)
 
 

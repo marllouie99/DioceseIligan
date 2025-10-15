@@ -6,214 +6,305 @@
     <p>Track and manage donations received for your church posts</p>
   </div>
   <div class="tab-content">
-    <!-- Donation Analytics (mirrors Content Analytics layout) -->
-    <div class="donation-stats parchment-card">
-      <div class="unified-content-management">
-        <div class="analytics-cards">
-        <div class="analytics-card">
-          <div class="analytics-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="analytics-content">
-            <h4>₱{{ donations.this_month_amount|floatformat:2|default:"0.00" }}</h4>
-            <p>This Month</p>
-            <span class="analytics-change">{{ donations.this_month_count }} donations</span>
-          </div>
+    <!-- 1x4 Analytics Cards Grid -->
+    <div class="analytics-grid-4">
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
         </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <div class="analytics-content">
-            <h4>₱{{ donations.this_year_amount|floatformat:2|default:"0.00" }}</h4>
-            <p>This Year</p>
-            <span class="analytics-change">{{ donations.this_year_count }} donations</span>
-          </div>
+        <div class="analytics-content">
+          <h4>₱{{ donations.this_month_amount|floatformat:2|default:"0.00" }}</h4>
+          <p>This Month</p>
+          <span class="analytics-change">{{ donations.this_month_count }} donations</span>
         </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="analytics-content">
-            <h4>{{ donations.unique_donors|default:"0" }}</h4>
-            <p>Unique Donors</p>
-            <span class="analytics-change">{{ donations.total_donations }} total donations</span>
-          </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
         </div>
-        
-        <div class="analytics-card">
-          <div class="analytics-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </div>
-          <div class="analytics-content">
-            <h4>₱{{ donations.total_amount|floatformat:2|default:"0.00" }}</h4>
-            <p>Total Received</p>
-            <span class="analytics-change">All time donations</span>
-          </div>
+        <div class="analytics-content">
+          <h4>₱{{ donations.this_year_amount|floatformat:2|default:"0.00" }}</h4>
+          <p>This Year</p>
+          <span class="analytics-change">{{ donations.this_year_count }} donations</span>
         </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
         </div>
-        
-        {# Donations Analytics Charts #}
-        <div class="analytics-charts">
-          <div class="charts-grid">
-            {# Donations Breakdown Chart #}
-            <div class="chart-container">
-              <div class="chart-header">
-                <h4>Donations Breakdown</h4>
-                <p>Composition of total received donations</p>
+        <div class="analytics-content">
+          <h4>{{ donations.unique_donors|default:"0" }}</h4>
+          <p>Unique Donors</p>
+          <span class="analytics-change">{{ donations.total_donations }} total donations</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>₱{{ donations.total_amount|floatformat:2|default:"0.00" }}</h4>
+          <p>Total Received</p>
+          <span class="analytics-change">All time donations</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1x2 Charts Grid -->
+    <div class="charts-grid-2">
+      {# Monthly Donation Trends Chart #}
+      <div class="chart-container">
+        <div class="chart-header">
+          <h4>Donation Trends</h4>
+          <p>Monthly donation totals and donor count</p>
+        </div>
+        <div class="chart-content">
+          <canvas id="donationTrendsChart" 
+                  width="400" 
+                  height="250"
+                  data-monthly-amounts="{{ donations.monthly_amounts|default:'[]' }}"
+                  data-monthly-donors="{{ donations.monthly_donors|default:'[]' }}"></canvas>
+          
+          {# Chart Summary Stats #}
+          <div class="chart-summary-stats">
+            <div class="summary-stat-item">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <polyline points="19 12 12 19 5 12"/>
+                </svg>
               </div>
-              <div class="chart-content">
-                <canvas id="donationsBreakdownChart"
-                        width="400" height="200"
-                        data-month="{{ donations.this_month_amount|default:'0' }}"
-                        data-year="{{ donations.this_year_amount|default:'0' }}"
-                        data-total="{{ donations.total_amount|default:'0' }}"></canvas>
-                <div class="chart-details">
-                  <div class="post-preview">
-                    <div class="engagement-stats">
-                      <span class="stat">This Month: ₱{{ donations.this_month_amount|floatformat:2|default:"0.00" }}</span>
-                      <span class="stat">This Year: ₱{{ donations.this_year_amount|floatformat:2|default:"0.00" }}</span>
-                      <span class="stat">All Time: ₱{{ donations.total_amount|floatformat:2|default:"0.00" }}</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="stat-info">
+                <span class="stat-label">Avg. Monthly</span>
+                <span class="stat-value">₱{{ donations.average_monthly|floatformat:2|default:"0.00" }}</span>
               </div>
             </div>
-
-            {# Top Donors Chart #}
-            <div class="chart-container">
-              <div class="chart-header">
-                <h4>Top 5 Donors</h4>
-                <p>Ranking by total donated amount</p>
+            <div class="summary-stat-item">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
               </div>
-              <div class="chart-content">
-                <canvas id="topDonorsChart" width="400" height="200"></canvas>
-                <div class="posts-ranking donor-ranking">
-                  {% for donor in donations.top_donors %}
-                  <div class="ranking-item" data-rank="{{ forloop.counter }}" data-engagement="{{ donor.total_donated|default:'0' }}" data-max-engagement="{{ donations.top_donors.0.total_donated|default:'1' }}">
-                    <div class="rank-number">{{ forloop.counter }}</div>
-                    <div class="post-info">
-                      <p>
-                        {% if donor.profile and donor.profile.display_name %}
-                          {{ donor.profile.display_name }}
-                        {% elif donor.first_name or donor.last_name %}
-                          {{ donor.get_full_name }}
-                        {% else %}
-                          {{ donor.username }}
-                        {% endif %}
-                      </p>
-                      <div class="engagement-total">₱{{ donor.total_donated|floatformat:2 }} donated</div>
-                    </div>
-                    <div class="engagement-bar">
-                      <div class="bar-fill"></div>
-                    </div>
-                  </div>
-                  {% empty %}
-                  <div class="no-posts">
-                    <p>No donors available for ranking</p>
-                  </div>
-                  {% endfor %}
-                </div>
+              <div class="stat-info">
+                <span class="stat-label">Highest Month</span>
+                <span class="stat-value">₱{{ donations.highest_month|floatformat:2|default:"0.00" }}</span>
+              </div>
+            </div>
+            <div class="summary-stat-item">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Growth Rate</span>
+                <span class="stat-value {% if donations.growth_rate > 0 %}positive{% elif donations.growth_rate < 0 %}negative{% endif %}">
+                  {{ donations.growth_rate|default:"0" }}%
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Donations -->
-    <div class="recent-donations parchment-card">
-      <h3>Recent Donations</h3>
-      {% if donations.recent_donations %}
-        <div class="donations-list">
-          {% for donation in donations.recent_donations %}
-            <div class="donation-item">
-              <div class="donation-avatar">
-                {% if donation.is_anonymous %}
-                  <div class="donor-avatar-placeholder">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </div>
-                {% else %}
-                  {% if donation.donor.profile and donation.donor.profile.profile_picture %}
-                    <img src="{{ donation.donor.profile.profile_picture.url }}" alt="{{ donation.get_donor_name }}" class="donor-avatar">
+      {# Top 3 Donors Chart #}
+      <div class="chart-container">
+        <div class="chart-header">
+          <h4>Top 3 Donors</h4>
+          <p>Ranking by total donated amount</p>
+        </div>
+        <div class="chart-content">
+          <canvas id="topDonorsChart" width="400" height="250"></canvas>
+          <div class="posts-ranking donor-ranking">
+            {% for donor in donations.top_donors|slice:":3" %}
+            <div class="ranking-item" data-rank="{{ forloop.counter }}" data-engagement="{{ donor.total_donated|default:'0' }}" data-max-engagement="{{ donations.top_donors.0.total_donated|default:'1' }}">
+              <div class="rank-number">{{ forloop.counter }}</div>
+              <div class="post-info">
+                <p>
+                  {% if donor.profile and donor.profile.display_name %}
+                    {{ donor.profile.display_name }}
+                  {% elif donor.first_name or donor.last_name %}
+                    {{ donor.get_full_name }}
                   {% else %}
-                    <div class="donor-avatar-placeholder">
-                      {{ donation.donor.first_name|first|default:"U"|upper }}{{ donation.donor.last_name|first|default:""|upper }}
-                    </div>
+                    {{ donor.username }}
                   {% endif %}
-                {% endif %}
+                </p>
+                <div class="engagement-total">₱{{ donor.total_donated|floatformat:2 }} donated</div>
               </div>
-              <div class="donation-info">
-                <div class="donor-name">
-                  {% if donation.is_anonymous %}
-                    <span class="anonymous-donor">Anonymous</span>
-                  {% else %}
-                    <strong>{{ donation.get_donor_name }}</strong>
-                    {% if donation.is_follower %}
-                      <span class="follower-badge" title="Follower of your church">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        Follower
-                      </span>
-                    {% endif %}
-                  {% endif %}
-                </div>
-                <div class="donation-details">
-                  <span class="donation-amount">₱{{ donation.amount|floatformat:2 }}</span>
-                  <span class="payment-method-badge">
-                    <svg class="paypal-logo" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 0 0-.794.68l-.04.22-.63 3.993-.032.17a.804.804 0 0 1-.794.679H7.72a.483.483 0 0 1-.477-.558L7.418 20h1.518l.95-6.02h1.385c4.678 0 7.75-2.203 8.796-6.502z" fill="#009cde"/>
-                      <path d="M6.238 3.178C6.546 2.724 7.039 2.5 7.638 2.5h6.472c1.07 0 1.914.16 2.555.502 1.346.718 1.964 2.144 1.702 4.093-.708 5.308-4.37 7.405-8.67 7.405H7.412L6.126 21.28c-.054.342-.353.606-.7.619H2.78a.642.642 0 0 1-.634-.748l2.48-15.733c.13-.826.768-1.479 1.612-1.24z" fill="#012169"/>
-                      <path d="M8.852 8.978c.135-.856.772-1.4 1.6-1.4h4.872c.628 0 1.19.097 1.676.302.812.342 1.328 1.044 1.328 2.097 0 2.897-2.996 4.523-6.684 4.523H9.258l1.594-5.522z" fill="#003087"/>
-                    </svg>
-                  </span>
-                  <span class="donation-separator">•</span>
-                  <span class="donation-post-context">
-                    donated to the post 
-                    <span class="donation-post-caption" title="{{ donation.post.content|striptags }}">"{{ donation.post.content|striptags|truncatechars:11 }}"</span>
-                  </span>
-                  <span class="donation-separator">•</span>
-                  <span class="donation-date">{{ donation.created_at|timesince }} ago</span>
-                </div>
-                {% if donation.message %}
-                  <div class="donation-message">
-                    <em>"{{ donation.message|truncatechars:100 }}"</em>
-                  </div>
-                {% endif %}
-              </div>
-              <div class="donation-status">
-                <span class="status-badge status-{{ donation.payment_status }}">
-                  {{ donation.get_payment_status_display }}
-                </span>
+              <div class="engagement-bar">
+                <div class="bar-fill"></div>
               </div>
             </div>
-          {% endfor %}
+            {% empty %}
+            <div class="no-posts">
+              <p>No donors available for ranking</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Donations Section with Sorting -->
+    <div class="donations-table-section">
+      <div class="section-header">
+        <div class="header-content">
+          <h3>Recent Donations</h3>
+          <p>Transaction history and donor information</p>
+        </div>
+        <div class="header-actions">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" class="search-input" id="donationSearch" placeholder="Search donations...">
+          </div>
+          <button class="btn-export" onclick="exportDonations()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      {% if donations.recent_donations %}
+        <div class="donations-table-wrapper">
+          <table class="donations-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="donor" onclick="sortDonations('donor')">
+                  Donor
+                  <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </th>
+                <th class="sortable" data-sort="amount" onclick="sortDonations('amount')">
+                  Amount
+                  <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </th>
+                <th class="sortable" data-sort="type" onclick="sortDonations('type')">
+                  Type
+                  <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </th>
+                <th>Method</th>
+                <th class="sortable" data-sort="post" onclick="sortDonations('post')">
+                  Post
+                  <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </th>
+                <th class="sortable" data-sort="date" onclick="sortDonations('date')">
+                  Date
+                  <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="donationsTableBody">
+              {% for donation in donations.recent_donations %}
+              <tr data-donor="{{ donation.get_donor_name|lower }}" 
+                  data-amount="{{ donation.amount }}" 
+                  data-type="{{ donation.donation_type|default:'one-time' }}"
+                  data-post="{{ donation.post.content|striptags|truncatechars:30|lower }}"
+                  data-date="{{ donation.created_at.timestamp }}">
+                <td>
+                  <div class="donor-cell">
+                    <div class="donor-avatar-small">
+                      {% if donation.is_anonymous %}
+                        <div class="avatar-initials">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                        </div>
+                      {% else %}
+                        {% if donation.donor.profile and donation.donor.profile.profile_picture %}
+                          <img src="{{ donation.donor.profile.profile_picture.url }}" alt="{{ donation.get_donor_name }}">
+                        {% else %}
+                          <div class="avatar-initials">
+                            {{ donation.donor.first_name|first|default:"U"|upper }}{{ donation.donor.last_name|first|default:""|upper }}
+                          </div>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                    <div class="donor-info-cell">
+                      <div class="donor-name-cell">
+                        {% if donation.is_anonymous %}
+                          <span class="anonymous-donor">Anonymous</span>
+                        {% else %}
+                          {{ donation.get_donor_name }}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="amount-cell">₱{{ donation.amount|floatformat:2 }}</span>
+                </td>
+                <td>
+                  <span class="badge badge-{{ donation.donation_type|default:'one-time' }}">
+                    {% if donation.donation_type == 'monthly' %}Monthly{% else %}One-time{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <span class="method-badge">
+                    <svg class="paypal-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 0 0-.794.68l-.04.22-.63 3.993-.032.17a.804.804 0 0 1-.794.679H7.72a.483.483 0 0 1-.477-.558L7.418 20h1.518l.95-6.02h1.385c4.678 0 7.75-2.203 8.796-6.502z" fill="#009cde"/>
+                    </svg>
+                    PayPal
+                  </span>
+                </td>
+                <td>
+                  <span class="post-cell" title="{{ donation.post.content|striptags }}">
+                    {{ donation.post.content|striptags|truncatechars:30 }}
+                  </span>
+                </td>
+                <td>
+                  <span class="date-cell">{{ donation.created_at|date:"Y-m-d" }}</span>
+                </td>
+                <td>
+                  <span class="status-badge status-{{ donation.payment_status }}">
+                    {{ donation.get_payment_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
         
         {% if donations.total_donations > 20 %}
-          <div class="view-all-donations">
-            <button class="btn btn-outline" onclick="loadAllDonations()">
-              View All {{ donations.total_donations }} Donations
+          <div class="table-pagination">
+            <button class="btn btn-outline" onclick="loadMoreDonations()">
+              Load More Donations
             </button>
           </div>
         {% endif %}
@@ -230,31 +321,5 @@
         </div>
       {% endif %}
     </div>
-
-    <!-- Top Donors (if any) -->
-    {% if donations.top_donors %}
-      <div class="top-donors parchment-card">
-        <h3>Top Donors</h3>
-        <div class="donors-list">
-          {% for donor in donations.top_donors %}
-            <div class="donor-item">
-              <div class="donor-info">
-                <strong>
-                  {% if donor.profile and donor.profile.display_name %}
-                    {{ donor.profile.display_name }}
-                  {% elif donor.first_name or donor.last_name %}
-                    {{ donor.get_full_name }}
-                  {% else %}
-                    {{ donor.username }}
-                  {% endif %}
-                </strong>
-                <span class="donor-stats">{{ donor.donation_count }} donations</span>
-              </div>
-              <div class="donor-amount">₱{{ donor.total_donated|floatformat:2 }}</div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
   </div>
 </div>

@@ -1481,3 +1481,363 @@
     padding: 12px 8px;
   }
 }
+
+/* ===================================
+   DONATIONS TAB STYLES
+   =================================== */
+
+/* Donations Table Section */
+.donations-table-section {
+  background: 
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 
+    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 2px 4px rgba(101, 67, 33, 0.06),
+    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  margin-top: 32px;
+}
+
+.donations-table-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.donations-table-section .header-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2D1810;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.donations-table-section .header-content p {
+  font-size: 14px;
+  color: #8B4513;
+  margin: 0;
+  font-weight: 400;
+}
+
+.donations-table-section .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Donations Table */
+.donations-table-wrapper {
+  overflow-x: auto !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(139, 69, 19, 0.15) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  margin-top: 20px !important;
+}
+
+.donations-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  background: transparent !important;
+  table-layout: auto !important;
+  border-spacing: 0 !important;
+}
+
+.donations-table thead {
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%) !important;
+}
+
+.donations-table thead th {
+  padding: 14px 10px !important;
+  text-align: left !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #2D1810 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.2) !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  vertical-align: middle !important;
+  line-height: 1.2 !important;
+}
+
+.donations-table thead th.sortable {
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.donations-table thead th.sortable:hover {
+  background: rgba(139, 69, 19, 0.08) !important;
+}
+
+.donations-table thead th .sort-icon {
+  width: 12px !important;
+  height: 12px !important;
+  margin-left: 4px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  opacity: 0.4 !important;
+  transition: all 0.2s ease !important;
+}
+
+.donations-table thead th.sortable.active .sort-icon {
+  opacity: 1 !important;
+  color: #8B4513 !important;
+}
+
+.donations-table thead th.sortable.desc .sort-icon {
+  transform: rotate(180deg) !important;
+}
+
+.donations-table thead th:first-child {
+  padding-left: 16px !important;
+}
+
+.donations-table thead th:last-child {
+  padding-right: 16px !important;
+  text-align: center !important;
+}
+
+.donations-table tbody tr {
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.donations-table tbody tr:hover {
+  background: rgba(139, 69, 19, 0.05) !important;
+}
+
+.donations-table tbody tr:last-child {
+  border-bottom: none !important;
+}
+
+.donations-table tbody td {
+  padding: 12px 10px !important;
+  font-size: 13px !important;
+  color: #2D1810 !important;
+  vertical-align: middle !important;
+  line-height: 1.3 !important;
+}
+
+.donations-table tbody td:first-child {
+  padding-left: 16px !important;
+}
+
+.donations-table tbody td:last-child {
+  padding-right: 16px !important;
+  text-align: center !important;
+}
+
+/* Donor Cell */
+.donor-cell {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 150px !important;
+}
+
+.donor-avatar-small {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2) !important;
+  border: 2px solid rgba(255, 249, 230, 0.8) !important;
+}
+
+.donor-avatar-small img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.donor-avatar-small .avatar-initials {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%) !important;
+  color: #FFF9E6 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+.donor-info-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.donor-name-cell {
+  font-weight: 600 !important;
+  color: #2D1810 !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.anonymous-donor {
+  color: #8B4513 !important;
+  font-style: italic !important;
+}
+
+/* Amount Cell */
+.amount-cell {
+  font-weight: 700 !important;
+  color: #2D1810 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+}
+
+/* Badge Styles */
+.donations-table .badge {
+  display: inline-block !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+}
+
+.donations-table .badge-one-time {
+  background: rgba(139, 69, 19, 0.12) !important;
+  color: #654321 !important;
+  border: 1px solid rgba(139, 69, 19, 0.2) !important;
+}
+
+.donations-table .badge-monthly {
+  background: rgba(45, 122, 62, 0.12) !important;
+  color: #1F6B2E !important;
+  border: 1px solid rgba(45, 122, 62, 0.25) !important;
+}
+
+/* Method Badge */
+.method-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  color: #654321 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+.paypal-icon {
+  flex-shrink: 0 !important;
+}
+
+/* Post Cell */
+.post-cell {
+  color: #654321 !important;
+  font-size: 12px !important;
+  display: block !important;
+  max-width: 150px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Date Cell */
+.date-cell {
+  color: #654321 !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  white-space: nowrap !important;
+}
+
+/* Status Badge */
+.donations-table .status-badge {
+  display: inline-block !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+}
+
+.donations-table .status-badge.status-completed {
+  background: rgba(45, 122, 62, 0.15) !important;
+  color: #1F6B2E !important;
+  border: 1px solid rgba(45, 122, 62, 0.3) !important;
+}
+
+.donations-table .status-badge.status-pending {
+  background: rgba(234, 179, 8, 0.15) !important;
+  color: #9B7309 !important;
+  border: 1px solid rgba(234, 179, 8, 0.3) !important;
+}
+
+.donations-table .status-badge.status-failed {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #B91C1C !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Table Pagination */
+.table-pagination {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.table-pagination .btn {
+  padding: 12px 32px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Responsive for Donations Table */
+@media (max-width: 768px) {
+  .donations-table-section .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .donations-table-section .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .donations-table-section .search-box .search-input {
+    width: 100%;
+  }
+  
+  .donations-table-section .btn-export {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .donations-table {
+    font-size: 12px;
+  }
+  
+  .donations-table thead th,
+  .donations-table tbody td {
+    padding: 12px 8px;
+  }
+  
+  .donor-avatar-small {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .post-cell {
+    max-width: 120px;
+  }
+}

@@ -775,6 +775,41 @@ class PostComment(models.Model):
     def reply_count(self):
         """Return the number of replies to this comment."""
         return self.replies.filter(is_active=True).count()
+    
+    @property
+    def time_ago(self):
+        """Return human-readable time since comment was created."""
+        from django.utils import timezone
+        now = timezone.now()
+        diff = now - self.created_at
+
+        if diff.days > 0:
+            return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+        else:
+            return "Just now"
+
+
+class CommentLike(models.Model):
+    """Model for comment likes."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_likes')
+    comment = models.ForeignKey(PostComment, on_delete=models.CASCADE, related_name='comment_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'comment']
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['comment', 'created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.get_full_name()} likes comment by {self.comment.user.get_full_name()}"
 
 
 class PostView(models.Model):

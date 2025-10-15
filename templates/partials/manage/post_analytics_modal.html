@@ -1,0 +1,257 @@
+{% load static %}
+{# Post Analytics Modal #}
+<div id="postAnalyticsModal" class="modal post-analytics-modal" style="display: none;">
+  <div class="modal-overlay" onclick="closePostAnalyticsModal()"></div>
+  <div class="modal-content post-analytics-content">
+    {# Modal Header #}
+    <div class="modal-header">
+      <div class="header-left">
+        <span class="post-type-badge" id="analyticsPostType">bulletin</span>
+        <div class="post-date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Published: <span id="analyticsPostDate">-</span></span>
+        </div>
+        <span class="status-badge" id="analyticsPostStatus">published</span>
+      </div>
+      <div class="header-right">
+        <button type="button" class="btn-secondary" id="analyticsEditBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Post
+        </button>
+        <button type="button" class="btn-danger" id="analyticsDeleteBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          Delete
+        </button>
+        <button type="button" class="modal-close" onclick="closePostAnalyticsModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    {# Modal Body #}
+    <div class="modal-body">
+      {# Post Content Section #}
+      <div class="post-content-section">
+        <h4>Post Content</h4>
+        <p id="analyticsPostContent" class="post-content-text">Loading...</p>
+      </div>
+
+      {# 1x5 Grid Analytics Cards #}
+      <div class="analytics-grid-5">
+        <div class="analytics-card">
+          <div class="analytics-icon views-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="analytics-content">
+            <h4 id="analyticsViews">0</h4>
+            <p>Views</p>
+            <span class="analytics-subtitle">Total reach</span>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-icon likes-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+          </div>
+          <div class="analytics-content">
+            <h4 id="analyticsLikes">0</h4>
+            <p>Likes</p>
+            <span class="analytics-subtitle" id="analyticsLikesPercent">0% of views</span>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-icon comments-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+          </div>
+          <div class="analytics-content">
+            <h4 id="analyticsComments">0</h4>
+            <p>Comments</p>
+            <span class="analytics-subtitle">Conversations</span>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-icon bookmarks-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="analytics-content">
+            <h4 id="analyticsBookmarks">0</h4>
+            <p>Bookmarks</p>
+            <span class="analytics-subtitle">Saved</span>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-icon engagement-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="analytics-content">
+            <h4 id="analyticsEngagement">0%</h4>
+            <p>Engagement</p>
+            <span class="analytics-subtitle">Rate</span>
+          </div>
+        </div>
+      </div>
+
+      {# 1x2 Grid Charts #}
+      <div class="charts-grid-2">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Views & Interactions Over Time</h4>
+            <p>Hourly breakdown since publication</p>
+          </div>
+          <div class="chart-content">
+            <canvas id="viewsInteractionsChart" width="600" height="300"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Engagement Breakdown</h4>
+            <p>Types of interactions received</p>
+          </div>
+          <div class="chart-content">
+            <canvas id="engagementBreakdownChart" width="600" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+
+      {# 1x1 Grid Audience Demographics #}
+      <div class="demographics-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h4>Audience Demographics</h4>
+            <p>Who viewed this post</p>
+          </div>
+          <div class="demographics-content">
+            <div class="demographic-item">
+              <div class="demographic-label">
+                <span class="demographic-name">Active Followers</span>
+                <span class="demographic-count" id="activeFollowersCount">0 (0%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="activeFollowersProgress" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="demographic-item">
+              <div class="demographic-label">
+                <span class="demographic-name">New Followers</span>
+                <span class="demographic-count" id="newFollowersCount">0 (0%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="newFollowersProgress" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="demographic-item">
+              <div class="demographic-label">
+                <span class="demographic-name">Non-Followers</span>
+                <span class="demographic-count" id="nonFollowersCount">0 (0%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="nonFollowersProgress" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# 1x1 Grid Top Comments #}
+      <div class="top-comments-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h4>Top Comments</h4>
+            <p>Most liked comments on this post</p>
+          </div>
+          <div class="top-comments-content">
+            <table class="comments-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Comment</th>
+                  <th>Likes</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="topCommentsBody">
+                <tr class="no-comments">
+                  <td colspan="4">No comments yet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {# 1x1 Grid Performance Insights #}
+      <div class="performance-insights-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h4>Performance Insights</h4>
+          </div>
+          <div class="insights-content">
+            <div class="insight-card insight-primary">
+              <div class="insight-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                </svg>
+              </div>
+              <div class="insight-content">
+                <h5>Above Average Performance</h5>
+                <p id="performanceMessage">This post is performing well</p>
+              </div>
+            </div>
+
+            <div class="insight-card insight-success">
+              <div class="insight-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div class="insight-content">
+                <h5>Peak Engagement Time</h5>
+                <p id="peakEngagementMessage">Most interactions occurred at peak time</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Post ID and Update Info #}
+      <div class="post-meta-info">
+        <span>Post ID: <strong id="analyticsPostId">-</strong></span>
+        <span>•</span>
+        <span>Updated: <strong id="analyticsPostUpdated">-</strong></span>
+      </div>
+    </div>
+  </div>
+</div>

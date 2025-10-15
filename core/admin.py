@@ -11,6 +11,7 @@ from .models import (
     PostLike,
     PostBookmark,
     PostComment,
+    CommentLike,
     PostView,
     PostReport,
     ChurchVerificationRequest,
@@ -260,6 +261,32 @@ class PostCommentAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'post', 'post__church', 'parent')
+
+
+@admin.register(CommentLike)
+class CommentLikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_comment_preview', 'get_post', 'get_church', 'created_at')
+    list_filter = ('created_at', 'comment__post__church')
+    search_fields = ('user__username', 'user__email', 'comment__content', 'comment__post__church__name')
+    autocomplete_fields = ('user', 'comment')
+    readonly_fields = ('created_at',)
+    list_select_related = ('user', 'comment', 'comment__post', 'comment__post__church')
+    
+    def get_comment_preview(self, obj):
+        return f"{obj.comment.content[:50]}..." if len(obj.comment.content) > 50 else obj.comment.content
+    get_comment_preview.short_description = 'Comment'
+    
+    def get_post(self, obj):
+        return f"{obj.comment.post.content[:40]}..."
+    get_post.short_description = 'Post'
+    
+    def get_church(self, obj):
+        return obj.comment.post.church.name
+    get_church.short_description = 'Church'
+    get_church.admin_order_field = 'comment__post__church__name'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'comment', 'comment__post', 'comment__post__church')
 
 
 @admin.register(PostView)
