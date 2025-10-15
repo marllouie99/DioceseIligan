@@ -21,7 +21,7 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
       </thead>
       <tbody>
         {% for b in bookings %}
-          <tr class="appointment-row">
+          <tr class="appointment-row {% if b.is_conflict %}conflict-row{% endif %}">
             <td class="service-cell">
               <span class="service-name">{{ b.service.name }}</span>
             </td>
@@ -58,7 +58,11 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
             </td>
             <td class="status-cell">
               <span class="status-badge status-{{ b.status }}">{{ b.get_status_display }}</span>
-              {% if b.is_conflict %}<span class="status-badge status-conflict">Conflict</span>{% endif %}
+              {% if b.is_conflict %}
+                <span class="status-badge status-conflict" title="{% if b.conflict_type == 'date' %}Multiple bookings on same date{% else %}User has multiple bookings on this date{% endif %}">
+                  CONFLICT
+                </span>
+              {% endif %}
             </td>
             <td class="actions-cell">
               <div class="dropdown-wrapper">

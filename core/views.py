@@ -448,17 +448,26 @@ def manage_church(request):
 
     # Conflict detection among active statuses on same church/date
     active_statuses = [Booking.STATUS_REQUESTED, Booking.STATUS_REVIEWED, Booking.STATUS_APPROVED]
-    active_keys = list(
-        bookings_all.filter(status__in=active_statuses)
-        .values('church_id', 'date')
-    )
+    active_bookings = bookings_all.filter(status__in=active_statuses)
+    
+    # Detect date conflicts (multiple bookings on same date)
+    active_keys = list(active_bookings.values('church_id', 'date'))
     from collections import Counter
     key_counter = Counter((k['church_id'], k['date']) for k in active_keys)
-    conflicts = {(cid, d) for (cid, d), c in key_counter.items() if c > 1}
+    date_conflicts = {(cid, d) for (cid, d), c in key_counter.items() if c > 1}
+    
+    # Detect user conflicts (same user booking multiple services on same date)
+    user_date_keys = list(active_bookings.values('user_id', 'date'))
+    user_date_counter = Counter((k['user_id'], k['date']) for k in user_date_keys)
+    user_conflicts = {(uid, d) for (uid, d), c in user_date_counter.items() if c > 1}
+    
     # Mark conflicts for template usage
     booking_list = []
     for b in bookings:
-        setattr(b, 'is_conflict', (b.church_id, b.date) in conflicts)
+        has_date_conflict = (b.church_id, b.date) in date_conflicts
+        has_user_conflict = (b.user_id, b.date) in user_conflicts
+        setattr(b, 'is_conflict', has_date_conflict or has_user_conflict)
+        setattr(b, 'conflict_type', 'date' if has_date_conflict else ('user' if has_user_conflict else None))
         booking_list.append(b)
 
     # Posts data for Content tab

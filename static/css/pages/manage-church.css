@@ -2498,10 +2498,38 @@ body.page-manage-church {
 }
 
 .appointments-table .status-badge.status-conflict {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.15);
   color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 600;
   margin-left: 0.25rem;
+  animation: pulse-conflict 2s ease-in-out infinite;
+}
+
+/* Highlight entire row for conflicts */
+.appointments-table .appointment-row.conflict-row {
+  background: linear-gradient(90deg, rgba(254, 226, 226, 0.4) 0%, rgba(254, 226, 226, 0.1) 100%);
+  border-left: 4px solid #ef4444;
+  position: relative;
+}
+
+.appointments-table .appointment-row.conflict-row:hover {
+  background: linear-gradient(90deg, rgba(254, 226, 226, 0.6) 0%, rgba(254, 226, 226, 0.2) 100%);
+}
+
+/* Add a subtle pulsing animation for conflict badge */
+@keyframes pulse-conflict {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Make conflict rows more prominent */
+.appointments-table .conflict-row td {
+  border-bottom-color: rgba(239, 68, 68, 0.2);
 }
 
 .appointments-table .actions-cell {
