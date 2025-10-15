@@ -66,6 +66,7 @@ def create_booking_notifications(sender, instance, created, **kwargs):
                 notification_type = Notification.TYPE_BOOKING_COMPLETED
             
             if template:
+                # Create in-app notification
                 create_booking_notification(
                     booking=instance,
                     notification_type=notification_type,
@@ -73,6 +74,15 @@ def create_booking_notifications(sender, instance, created, **kwargs):
                     message=template['message'],
                     priority=template['priority']
                 )
+                
+                # Send email notification
+                from accounts.email_utils import send_booking_status_email
+                try:
+                    send_booking_status_email(instance, instance.status)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Failed to send booking status email: {str(e)}")
 
 
 @receiver(post_save, sender=ChurchVerificationRequest)

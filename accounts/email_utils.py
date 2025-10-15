@@ -426,3 +426,80 @@ def send_church_verification_rejected_email(user_email, church_name, rejection_n
     except Exception as e:
         logger.error(f"Failed to send church verification rejected email to {user_email}: {str(e)}")
         return False
+
+
+def send_booking_status_email(booking, status):
+    """
+    Send email notification when booking status changes
+    
+    Args:
+        booking: Booking instance
+        status: New status of the booking
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    """
+    try:
+        user_email = booking.user.email
+        user_name = booking.user.get_full_name() or booking.user.username
+        church_name = booking.church.name
+        service_name = booking.service.name
+        booking_code = booking.code
+        booking_date = booking.date.strftime("%B %d, %Y")
+        booking_time = booking.start_time.strftime("%I:%M %p") if booking.start_time else "TBD"
+        
+        # Determine subject and template based on status
+        if status == 'reviewed':
+            subject = f'ChurchConnect - Your Appointment is Being Reviewed'
+            template_name = 'emails/booking_reviewed.html'
+        elif status == 'approved':
+            subject = f'ChurchConnect - Your Appointment Has Been Approved! ✅'
+            template_name = 'emails/booking_approved.html'
+        elif status == 'declined':
+            subject = f'ChurchConnect - Appointment Update'
+            template_name = 'emails/booking_declined.html'
+            decline_reason = booking.decline_reason or 'No reason provided'
+        elif status == 'completed':
+            subject = f'ChurchConnect - Appointment Completed'
+            template_name = 'emails/booking_completed.html'
+        elif status == 'canceled':
+            subject = f'ChurchConnect - Appointment Canceled'
+            template_name = 'emails/booking_canceled.html'
+        else:
+            return False
+        
+        # Create context for email template
+        context = {
+            'user_name': user_name,
+            'church_name': church_name,
+            'service_name': service_name,
+            'booking_code': booking_code,
+            'booking_date': booking_date,
+            'booking_time': booking_time,
+        }
+        
+        # Add decline reason if applicable
+        if status == 'declined':
+            context['decline_reason'] = decline_reason
+        
+        # Create HTML content
+        html_message = render_to_string(template_name, context)
+        
+        # Create plain text version
+        plain_message = strip_tags(html_message)
+        
+        # Use Brevo HTTP API for reliable email delivery
+        success = send_email_via_brevo_api(
+            to_email=user_email,
+            subject=subject,
+            html_content=html_message,
+            plain_content=plain_message
+        )
+        
+        if success:
+            logger.info(f"Booking {status} email sent successfully to {user_email} for booking {booking_code}")
+        return success
+        
+    except Exception as e:
+        logger.error(f"Failed to send booking {status} email: {str(e)}")
+        return False

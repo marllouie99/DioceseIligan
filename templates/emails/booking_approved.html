@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurchConnect - Appointment Approved</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .email-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-badge {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            color: white;
+            font-size: 32px;
+            line-height: 60px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .success-banner {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .success-banner h2 {
+            color: #065f46;
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        .success-banner p {
+            margin: 0;
+            color: #047857;
+            font-size: 16px;
+        }
+        .booking-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .booking-info h3 {
+            color: #1e293b;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .booking-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .booking-info .info-row:last-child {
+            border-bottom: none;
+        }
+        .booking-info .label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .booking-info .value {
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .next-steps {
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .next-steps h3 {
+            color: #1e40af;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #1e40af;
+        }
+        .next-steps li {
+            margin: 8px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <div class="logo-badge">✓</div>
+            <h1>Appointment Approved!</h1>
+            <p class="subtitle">Your request has been confirmed</p>
+        </div>
+
+        <div class="success-banner">
+            <h2>✅ Great News!</h2>
+            <p>Your appointment request with <strong>{{ church_name }}</strong> has been approved!</p>
+        </div>
+
+        <p>Dear {{ user_name }},</p>
+        
+        <p>We're pleased to inform you that your appointment request has been reviewed and approved by {{ church_name }}. Please review the details below and make note of the date and time.</p>
+
+        <div class="booking-info">
+            <h3>Appointment Details</h3>
+            <div class="info-row">
+                <span class="label">Booking ID:</span>
+                <span class="value">{{ booking_code }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Church:</span>
+                <span class="value">{{ church_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Service:</span>
+                <span class="value">{{ service_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Date:</span>
+                <span class="value">{{ booking_date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Time:</span>
+                <span class="value">{{ booking_time }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value" style="color: #10b981;">✓ Approved</span>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>📋 Next Steps</h3>
+            <ul>
+                <li>Mark your calendar for {{ booking_date }} at {{ booking_time }}</li>
+                <li>Arrive 10-15 minutes early if possible</li>
+                <li>Bring any required documents or information</li>
+                <li>Contact the church if you need to reschedule</li>
+            </ul>
+        </div>
+
+        <p><strong>Important:</strong> If you need to cancel or reschedule, please notify the church as soon as possible through your appointments page.</p>
+
+        <div class="footer">
+            <p>Need help? Contact us at <a href="mailto:support@churchconnect.com" style="color: #3b82f6; text-decoration: none;">support@churchconnect.com</a></p>
+            <p style="margin-top: 15px;">© 2025 ChurchConnect. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

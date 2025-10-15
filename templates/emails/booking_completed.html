@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurchConnect - Appointment Completed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .email-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-badge {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-radius: 50%;
+            color: white;
+            font-size: 32px;
+            line-height: 60px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .success-banner {
+            background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+            border-left: 4px solid #8b5cf6;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .success-banner h2 {
+            color: #5b21b6;
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        .success-banner p {
+            margin: 0;
+            color: #6b21a8;
+            font-size: 16px;
+        }
+        .booking-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .booking-info h3 {
+            color: #1e293b;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .booking-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .booking-info .info-row:last-child {
+            border-bottom: none;
+        }
+        .booking-info .label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .booking-info .value {
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <div class="logo-badge">✓</div>
+            <h1>Appointment Completed</h1>
+            <p class="subtitle">Thank you for visiting</p>
+        </div>
+
+        <div class="success-banner">
+            <h2>🎉 Appointment Completed</h2>
+            <p>Your appointment with <strong>{{ church_name }}</strong> has been marked as completed.</p>
+        </div>
+
+        <p>Dear {{ user_name }},</p>
+        
+        <p>Thank you for attending your appointment with {{ church_name }}. We hope your experience was meaningful and fulfilling.</p>
+
+        <div class="booking-info">
+            <h3>Appointment Summary</h3>
+            <div class="info-row">
+                <span class="label">Booking ID:</span>
+                <span class="value">{{ booking_code }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Church:</span>
+                <span class="value">{{ church_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Service:</span>
+                <span class="value">{{ service_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Date:</span>
+                <span class="value">{{ booking_date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Time:</span>
+                <span class="value">{{ booking_time }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value" style="color: #8b5cf6;">✓ Completed</span>
+            </div>
+        </div>
+
+        <p><strong>We'd Love Your Feedback!</strong></p>
+        <p>Your feedback helps us improve and helps others in the community make informed decisions. Please consider leaving a review about your experience with {{ church_name }}.</p>
+
+        <p>Thank you for using ChurchConnect to connect with your spiritual community. We hope to serve you again soon!</p>
+
+        <div class="footer">
+            <p>Need help? Contact us at <a href="mailto:support@churchconnect.com" style="color: #3b82f6; text-decoration: none;">support@churchconnect.com</a></p>
+            <p style="margin-top: 15px;">© 2025 ChurchConnect. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
