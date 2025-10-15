@@ -606,8 +606,11 @@ def confirm_stripe_payment(request, post_id):
         
         logger.info(f"Confirming Stripe payment: {payment_intent_id}")
         
-        # Retrieve the payment intent from Stripe
-        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        # Retrieve the payment intent from Stripe with charges expanded
+        payment_intent = stripe.PaymentIntent.retrieve(
+            payment_intent_id,
+            expand=['latest_charge']
+        )
         
         logger.info(f"Payment Intent status: {payment_intent.status}")
         
@@ -620,13 +623,16 @@ def confirm_stripe_payment(request, post_id):
                 donation.completed_at = timezone.now()
                 
                 # Store charge ID if available
-                if payment_intent.charges and payment_intent.charges.data:
-                    charge = payment_intent.charges.data[0]
-                    donation.stripe_charge_id = charge.id
-                    
-                    # Store payment method details if available
-                    if charge.payment_method:
-                        donation.stripe_payment_method_id = charge.payment_method
+                if hasattr(payment_intent, 'latest_charge') and payment_intent.latest_charge:
+                    charge = payment_intent.latest_charge
+                    # Handle both expanded object and ID string
+                    if isinstance(charge, str):
+                        donation.stripe_charge_id = charge
+                    else:
+                        donation.stripe_charge_id = charge.id
+                        # Store payment method details if available
+                        if hasattr(charge, 'payment_method') and charge.payment_method:
+                            donation.stripe_payment_method_id = charge.payment_method
                 
                 donation.save()
                 logger.info(f"Donation completed: {donation.id}")

@@ -58,12 +58,16 @@ def get_user_display_data(user, profile):
     Get user display name and initial for UI.
     
     Args:
-        user: User instance
+        user: User instance (can be AnonymousUser)
         profile: Profile instance (can be None)
     
     Returns:
         tuple: (display_name, user_initial)
     """
+    # Handle anonymous users
+    if not user.is_authenticated:
+        return 'Guest', 'G'
+    
     display_name = None
     if profile and profile.display_name:
         display_name = profile.display_name
