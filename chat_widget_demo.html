@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Widget Demo - ChurchConnect</title>
+  <link rel="stylesheet" href="static/css/components/chat-widget.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .demo-header {
+      text-align: center;
+      margin-bottom: 40px;
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .demo-header h1 {
+      font-size: 36px;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+    
+    .demo-header p {
+      font-size: 18px;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+    
+    .demo-badge {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .demo-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    .demo-card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .demo-card h2 {
+      font-size: 24px;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+    
+    .demo-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .demo-card li {
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .demo-card li:last-child {
+      border-bottom: none;
+    }
+    
+    .demo-card li::before {
+      content: '✓';
+      background: #10b981;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .demo-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .demo-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .demo-btn-primary {
+      background: #8B4513;
+      color: white;
+    }
+    
+    .demo-btn-primary:hover {
+      background: #654321;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    }
+    
+    .demo-btn-secondary {
+      background: white;
+      color: #8B4513;
+      border: 2px solid #8B4513;
+    }
+    
+    .demo-btn-secondary:hover {
+      background: #8B4513;
+      color: white;
+    }
+    
+    .demo-footer {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 40px;
+      padding: 24px;
+      background: white;
+      border-radius: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .demo-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Override chat widget position for demo */
+    .chat-widget {
+      display: block !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>🎉 Floating Chat Widget</h1>
+      <p>A modern, responsive chat interface for ChurchConnect</p>
+      <span class="demo-badge">✓ Implementation Complete</span>
+    </div>
+    
+    <div class="demo-content">
+      <div class="demo-card">
+        <h2>✨ Features</h2>
+        <ul>
+          <li>Floating bottom-right position</li>
+          <li>Minimized & expanded states</li>
+          <li>Conversation list view</li>
+          <li>Real-time messaging</li>
+          <li>Unread message badges</li>
+          <li>Typing indicators</li>
+          <li>Auto-scroll to latest</li>
+          <li>Responsive design</li>
+          <li>Mobile full-screen mode</li>
+          <li>Warm sacred earth theme</li>
+        </ul>
+      </div>
+      
+      <div class="demo-card">
+        <h2>🎨 Design Highlights</h2>
+        <ul>
+          <li>Smooth animations</li>
+          <li>Modern UI/UX patterns</li>
+          <li>Consistent theming</li>
+          <li>Accessible markup</li>
+          <li>Touch-friendly</li>
+          <li>Dark mode support</li>
+          <li>Custom scrollbars</li>
+          <li>Loading states</li>
+          <li>Empty states</li>
+          <li>Error handling</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="demo-card">
+      <h2>🚀 Try It Out</h2>
+      <p style="margin-bottom: 24px; color: #6b7280;">Click the buttons below to interact with the chat widget:</p>
+      <div class="demo-buttons">
+        <button class="demo-btn demo-btn-primary" onclick="openChatWidget()">Open Chat Widget</button>
+        <button class="demo-btn demo-btn-secondary" onclick="openConversation()">Open Sample Conversation</button>
+        <button class="demo-btn demo-btn-secondary" onclick="toggleWidget()">Toggle Widget</button>
+      </div>
+    </div>
+    
+    <div class="demo-footer">
+      <p><strong>Implementation Status:</strong> Frontend Complete ✓</p>
+      <p style="margin-top: 8px;">Backend API endpoints need to be implemented for full functionality.</p>
+      <p style="margin-top: 16px; font-size: 14px;">
+        📚 See <code>CHAT_WIDGET_QUICK_START.md</code> for setup instructions
+      </p>
+    </div>
+  </div>
+  
+  <!-- Chat Widget -->
+  <div id="chat-widget" class="chat-widget">
+    <!-- Minimized State -->
+    <button id="chat-widget-toggle" class="chat-widget-toggle" title="Open Chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chat-icon">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span class="chat-unread-badge" id="chat-unread-badge">3</span>
+    </button>
+
+    <!-- Expanded Chat Window -->
+    <div id="chat-widget-window" class="chat-widget-window" style="display: none;">
+      <!-- Chat Header -->
+      <div class="chat-widget-header">
+        <div class="chat-header-info">
+          <div class="chat-church-avatar" id="chat-church-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="chat-header-text">
+            <h3 class="chat-church-name" id="chat-church-name">Messages</h3>
+            <span class="chat-status" id="chat-status"></span>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="chat-action-btn" id="chat-minimize-btn" title="Minimize">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <button class="chat-action-btn" id="chat-close-btn" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Conversations List -->
+      <div id="chat-conversations-list" class="chat-conversations-list">
+        <div class="chat-conversations-header">
+          <h4>Messages</h4>
+        </div>
+        <div class="chat-conversations-scroll" id="chat-conversations-scroll">
+          <!-- Sample conversations -->
+          <div class="chat-conversation-item unread" onclick="showSampleChat()">
+            <div class="chat-conversation-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="chat-conversation-info">
+              <h4 class="chat-conversation-name">St. Mary's Church</h4>
+              <p class="chat-conversation-preview">Thank you for your interest!</p>
+            </div>
+            <div class="chat-conversation-meta">
+              <span class="chat-conversation-time">2m ago</span>
+              <span class="chat-conversation-unread">2</span>
+            </div>
+          </div>
+          
+          <div class="chat-conversation-item">
+            <div class="chat-conversation-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="chat-conversation-info">
+              <h4 class="chat-conversation-name">Grace Community Church</h4>
+              <p class="chat-conversation-preview">We'd love to have you visit!</p>
+            </div>
+            <div class="chat-conversation-meta">
+              <span class="chat-conversation-time">1h ago</span>
+            </div>
+          </div>
+          
+          <div class="chat-conversation-item unread">
+            <div class="chat-conversation-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="chat-conversation-info">
+              <h4 class="chat-conversation-name">Faith Baptist Church</h4>
+              <p class="chat-conversation-preview">Service times are available</p>
+            </div>
+            <div class="chat-conversation-meta">
+              <span class="chat-conversation-time">3h ago</span>
+              <span class="chat-conversation-unread">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Chat View -->
+      <div id="chat-active-view" class="chat-active-view" style="display: none;">
+        <button class="chat-back-btn" id="chat-back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Back
+        </button>
+
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-date-separator">
+            <span>Today</span>
+          </div>
+          
+          <div class="chat-message received">
+            <div class="chat-message-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="chat-message-content">
+              <div class="chat-message-bubble">Hello! Welcome to St. Mary's Church. How can we help you today?</div>
+              <span class="chat-message-time">10:30 AM</span>
+            </div>
+          </div>
+          
+          <div class="chat-message sent">
+            <div class="chat-message-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+            </div>
+            <div class="chat-message-content">
+              <div class="chat-message-bubble">Hi! I'm interested in learning more about your Sunday services.</div>
+              <span class="chat-message-time">10:31 AM</span>
+            </div>
+          </div>
+          
+          <div class="chat-message received">
+            <div class="chat-message-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="chat-message-content">
+              <div class="chat-message-bubble">Great! We have services every Sunday at 9:00 AM and 11:00 AM. Would you like more details?</div>
+              <span class="chat-message-time">10:32 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-container">
+          <form class="chat-message-form" onsubmit="return false;">
+            <textarea 
+              class="chat-message-input" 
+              placeholder="Type a message..." 
+              rows="1"
+              maxlength="1000"></textarea>
+            <button type="submit" class="chat-send-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Demo functionality
+    const toggleBtn = document.getElementById('chat-widget-toggle');
+    const chatWindow = document.getElementById('chat-widget-window');
+    const minimizeBtn = document.getElementById('chat-minimize-btn');
+    const closeBtn = document.getElementById('chat-close-btn');
+    const conversationsList = document.getElementById('chat-conversations-list');
+    const activeView = document.getElementById('chat-active-view');
+    const backBtn = document.getElementById('chat-back-btn');
+    const chatWidget = document.getElementById('chat-widget');
+    
+    function openChatWidget() {
+      chatWindow.style.display = 'flex';
+      toggleBtn.style.display = 'none';
+      conversationsList.style.display = 'flex';
+      activeView.style.display = 'none';
+    }
+    
+    function toggleWidget() {
+      if (chatWindow.style.display === 'none') {
+        openChatWidget();
+      } else {
+        chatWindow.style.display = 'none';
+        toggleBtn.style.display = 'flex';
+      }
+    }
+    
+    function openConversation() {
+      openChatWidget();
+      showSampleChat();
+    }
+    
+    function showSampleChat() {
+      conversationsList.style.display = 'none';
+      activeView.style.display = 'flex';
+      document.getElementById('chat-church-name').textContent = "St. Mary's Church";
+      document.getElementById('chat-status').textContent = "Active";
+      document.getElementById('chat-status').classList.add('online');
+    }
+    
+    toggleBtn.addEventListener('click', openChatWidget);
+    minimizeBtn.addEventListener('click', () => {
+      chatWindow.style.display = 'none';
+      toggleBtn.style.display = 'flex';
+    });
+    closeBtn.addEventListener('click', () => {
+      chatWindow.style.display = 'none';
+      toggleBtn.style.display = 'flex';
+      conversationsList.style.display = 'flex';
+      activeView.style.display = 'none';
+      document.getElementById('chat-church-name').textContent = "Messages";
+      document.getElementById('chat-status').textContent = "";
+    });
+    backBtn.addEventListener('click', () => {
+      conversationsList.style.display = 'flex';
+      activeView.style.display = 'none';
+      document.getElementById('chat-church-name').textContent = "Messages";
+      document.getElementById('chat-status').textContent = "";
+    });
+  </script>
+</body>
+</html>

@@ -936,6 +936,7 @@ class Notification(models.Model):
     TYPE_CHURCH_DECLINED = 'church_declined'
     TYPE_FOLLOW_REQUEST = 'follow_request'
     TYPE_FOLLOW_ACCEPTED = 'follow_accepted'
+    TYPE_MESSAGE_RECEIVED = 'message_received'
     
     TYPE_CHOICES = [
         (TYPE_BOOKING_REQUESTED, 'New Booking Request'),
@@ -948,6 +949,7 @@ class Notification(models.Model):
         (TYPE_CHURCH_DECLINED, 'Church Declined'),
         (TYPE_FOLLOW_REQUEST, 'Follow Request'),
         (TYPE_FOLLOW_ACCEPTED, 'Follow Accepted'),
+        (TYPE_MESSAGE_RECEIVED, 'New Message'),
     ]
     
     # Priority levels
@@ -1013,6 +1015,7 @@ class Notification(models.Model):
             self.TYPE_CHURCH_DECLINED: 'alert-circle',
             self.TYPE_FOLLOW_REQUEST: 'user-plus',
             self.TYPE_FOLLOW_ACCEPTED: 'users',
+            self.TYPE_MESSAGE_RECEIVED: 'message-circle',
         }
         return icon_map.get(self.notification_type, 'bell')
     
@@ -1388,3 +1391,100 @@ class Donation(models.Model):
             self.payment_status = 'completed'
             self.completed_at = timezone.now()
             self.save(update_fields=['payment_status', 'completed_at', 'updated_at'])
+
+
+class Conversation(models.Model):
+    """Model representing a conversation between a user and a church."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
+    church = models.ForeignKey(Church, on_delete=models.CASCADE, related_name='conversations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'church']
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['-updated_at']),
+            models.Index(fields=['user', 'church']),
+        ]
+        verbose_name = 'Conversation'
+        verbose_name_plural = 'Conversations'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.church.name}"
+    
+    def get_unread_count(self, user):
+        """Get count of unread messages for a specific user."""
+        return self.messages.filter(is_read=False).exclude(sender=user).count()
+    
+    def get_last_message(self):
+        """Get the last message in this conversation."""
+        return self.messages.last()
+
+
+class Message(models.Model):
+    """Model representing a message in a conversation."""
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    content = models.TextField(max_length=1000, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # File attachments
+    attachment = models.FileField(upload_to='chat_attachments/%Y/%m/%d/', blank=True, null=True)
+    attachment_type = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('image', 'Image'),
+        ('document', 'Document'),
+        ('other', 'Other'),
+    ])
+    attachment_name = models.CharField(max_length=255, blank=True, null=True)
+    attachment_size = models.IntegerField(blank=True, null=True)  # Size in bytes
+    
+    class Meta:
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['conversation', 'created_at']),
+            models.Index(fields=['conversation', 'is_read']),
+        ]
+        verbose_name = 'Message'
+        verbose_name_plural = 'Messages'
+    
+    def __str__(self):
+        if self.attachment:
+            return f"{self.sender.username}: [Attachment] {self.content[:30]}"
+        return f"{self.sender.username}: {self.content[:50]}"
+    
+    def mark_as_read(self):
+        """Mark this message as read."""
+        if not self.is_read:
+            self.is_read = True
+            self.save(update_fields=['is_read'])
+    
+    def get_attachment_type(self):
+        """Determine attachment type based on file extension."""
+        if not self.attachment:
+            return None
+        
+        ext = os.path.splitext(self.attachment.name)[1].lower()
+        image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+        document_exts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt']
+        
+        if ext in image_exts:
+            return 'image'
+        elif ext in document_exts:
+            return 'document'
+        else:
+            return 'other'
+    
+    def save(self, *args, **kwargs):
+        """Auto-detect attachment type and name on save."""
+        if self.attachment and not self.attachment_type:
+            self.attachment_type = self.get_attachment_type()
+        if self.attachment and not self.attachment_name:
+            self.attachment_name = os.path.basename(self.attachment.name)
+        if self.attachment and not self.attachment_size:
+            try:
+                self.attachment_size = self.attachment.size
+            except:
+                pass
+        super().save(*args, **kwargs)

@@ -3078,14 +3078,23 @@ def notification_dropdown(request):
     from .notifications import get_user_notifications, get_user_unread_count
     
     # Get recent notifications (both read and unread) for display
-    notifications = get_user_notifications(request.user, limit=20, unread_only=False)
+    all_notifications = get_user_notifications(request.user, limit=20, unread_only=False)
+    
+    # Separate message notifications from regular notifications
+    message_notifications = [n for n in all_notifications if n.notification_type == Notification.TYPE_MESSAGE_RECEIVED]
+    regular_notifications = [n for n in all_notifications if n.notification_type != Notification.TYPE_MESSAGE_RECEIVED]
+    
     unread_count = get_user_unread_count(request.user)
     
     # Compute a target URL for each notification
     def _target_url(n):
         try:
+            # Message notifications - go to church page to open chat
+            if n.notification_type == Notification.TYPE_MESSAGE_RECEIVED:
+                if n.church and getattr(n.church, 'slug', None):
+                    return reverse('core:church_detail', args=[n.church.slug])
             # Booking-related
-            if n.notification_type == Notification.TYPE_BOOKING_REQUESTED:
+            elif n.notification_type == Notification.TYPE_BOOKING_REQUESTED:
                 # If current user is the church owner -> manage appointments tab
                 if n.church and n.church.owner_id == request.user.id:
                     return reverse('core:manage_church') + '?tab=appointments'
@@ -3113,13 +3122,19 @@ def notification_dropdown(request):
             pass
         return reverse('core:notifications')
 
-    dropdown_items = [
+    regular_items = [
         {'notification': n, 'url': _target_url(n)}
-        for n in notifications
+        for n in regular_notifications
+    ]
+    
+    message_items = [
+        {'notification': n, 'url': _target_url(n)}
+        for n in message_notifications
     ]
     
     return render(request, 'core/partials/notification_dropdown.html', {
-        'dropdown_items': dropdown_items,
+        'dropdown_items': regular_items,
+        'message_items': message_items,
         'unread_count': unread_count,
     })
 

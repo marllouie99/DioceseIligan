@@ -21,6 +21,8 @@ from .models import (
     ServiceReviewHelpful,
     UserInteraction,
     Donation,
+    Conversation,
+    Message,
 )
 
 
@@ -430,3 +432,90 @@ class DonationAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('donor', 'post', 'post__church')
+
+
+class MessageInline(admin.TabularInline):
+    model = Message
+    extra = 0
+    readonly_fields = ('sender', 'content', 'is_read', 'created_at')
+    can_delete = False
+    fields = ('sender', 'content', 'is_read', 'created_at')
+    
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Conversation)
+class ConversationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'church', 'message_count', 'unread_count_display', 'created_at', 'updated_at')
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('user__username', 'user__email', 'church__name')
+    readonly_fields = ('created_at', 'updated_at')
+    autocomplete_fields = ('user', 'church')
+    list_select_related = ('user', 'church')
+    date_hierarchy = 'created_at'
+    inlines = [MessageInline]
+    
+    fieldsets = (
+        ('Conversation', {
+            'fields': ('user', 'church')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def message_count(self, obj):
+        """Get total message count."""
+        return obj.messages.count()
+    message_count.short_description = 'Messages'
+    
+    def unread_count_display(self, obj):
+        """Get unread message count for user."""
+        count = obj.get_unread_count(obj.user)
+        if count > 0:
+            return f'{count} unread'
+        return 'All read'
+    unread_count_display.short_description = 'Status'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'church').prefetch_related('messages')
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'conversation_display', 'sender', 'content_preview', 'is_read', 'created_at')
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('sender__username', 'content', 'conversation__user__username', 'conversation__church__name')
+    readonly_fields = ('created_at',)
+    autocomplete_fields = ('conversation', 'sender')
+    list_select_related = ('conversation', 'conversation__user', 'conversation__church', 'sender')
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Message', {
+            'fields': ('conversation', 'sender', 'content', 'is_read')
+        }),
+        ('Timestamp', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def conversation_display(self, obj):
+        """Display conversation participants."""
+        return f"{obj.conversation.user.username} ↔ {obj.conversation.church.name}"
+    conversation_display.short_description = 'Conversation'
+    
+    def content_preview(self, obj):
+        """Show preview of message content."""
+        if len(obj.content) > 50:
+            return f"{obj.content[:50]}..."
+        return obj.content
+    content_preview.short_description = 'Content'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            'conversation', 'conversation__user', 'conversation__church', 'sender'
+        )

@@ -7,9 +7,10 @@
   <title>{% block title %}ChurchConnect{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/forest-serenity-theme.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/chat-widget.css' %}?v={{ STATIC_VERSION }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %} {% if profile_essentials_incomplete %}needs-essentials{% endif %}">
+<body class="{% block body_class %}{% endblock %} {% if profile_essentials_incomplete %}needs-essentials{% endif %}" data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
   <!-- Mobile sidebar overlay -->
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
   
@@ -33,6 +34,12 @@
       </main>
     </div>
   </div>
+
+  <!-- Chat Widget -->
+  {% if user.is_authenticated %}
+  {% include 'partials/chat_widget.html' %}
+  {% endif %}
+
   <!-- Load utility modules first -->
   <script defer src="{% static 'js/core/utils.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/core/navigation.js' %}?v={{ STATIC_VERSION }}"></script>
@@ -62,6 +69,11 @@
   <!-- Load dashboard modules -->
   <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/post-bookmark.js' %}?v={{ STATIC_VERSION }}"></script>
+  
+  <!-- Load chat widget -->
+  {% if user.is_authenticated %}
+  <script defer src="{% static 'js/components/chat-widget.js' %}?v={{ STATIC_VERSION }}"></script>
+  {% endif %}
   
   <!-- Mobile Menu Toggle Script -->
   <script>

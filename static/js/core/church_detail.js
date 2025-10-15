@@ -161,6 +161,26 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Handle message button click to open chat widget
+  const messageBtn = document.querySelector('.message-btn');
+  if (messageBtn) {
+    messageBtn.addEventListener('click', function() {
+      const churchId = this.dataset.churchId;
+      
+      // Get church information from the page
+      const churchName = document.querySelector('.church-name')?.textContent.trim() || 'Church';
+      const churchAvatar = document.querySelector('.church-avatar img')?.src || null;
+      
+      // Check if chat widget is available
+      if (window.chatWidget) {
+        window.chatWidget.openConversation(churchId, churchName, churchAvatar);
+      } else {
+        console.error('Chat widget not initialized');
+        showNotification('Chat feature is currently unavailable. Please try again later.', 'error');
+      }
+    });
+  }
 });
 
 // Modal functions

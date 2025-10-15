@@ -1,0 +1,373 @@
+"""
+Chat API Views
+Handles real-time messaging between users and churches
+"""
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db.models import Q, Count, Max
+from .models import Conversation, Message, Church
+import json
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def conversations_api(request):
+    """
+    GET: List all conversations for the current user
+    POST: Create a new conversation with a church
+    """
+    if request.method == 'GET':
+        # Get user's conversations with optimized queries
+        # Include conversations where user is the sender OR where user owns the church
+        from django.db.models import Q
+        
+        # Get churches owned by this user
+        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
+        
+        # Get conversations where:
+        # 1. User is the conversation participant (user-to-church)
+        # 2. OR user owns the church (church owner seeing incoming messages)
+        conversations = Conversation.objects.filter(
+            Q(user=request.user) | Q(church_id__in=user_churches)
+        ).select_related('church', 'user').prefetch_related('messages').annotate(
+            last_message_time=Max('messages__created_at')
+        ).order_by('-updated_at')
+        
+        data = []
+        for conv in conversations:
+            last_message = conv.get_last_message()
+            unread_count = conv.get_unread_count(request.user)
+            
+            # Determine if current user is the church owner
+            is_church_owner = conv.church.owner == request.user
+            
+            if is_church_owner:
+                # Church owner sees the user who sent the message
+                display_name = conv.user.username
+                try:
+                    if conv.user.get_full_name():
+                        display_name = conv.user.get_full_name()
+                    if hasattr(conv.user, 'profile') and conv.user.profile:
+                        if conv.user.profile.display_name:
+                            display_name = conv.user.profile.display_name
+                except Exception:
+                    pass
+                
+                # Get user avatar
+                avatar = None
+                try:
+                    if hasattr(conv.user, 'profile') and conv.user.profile:
+                        if conv.user.profile.avatar:
+                            avatar = conv.user.profile.avatar.url
+                except Exception:
+                    avatar = None
+                
+                data.append({
+                    'id': conv.id,
+                    'church_id': conv.church.id,
+                    'church_name': display_name,  # Show user name instead
+                    'church_avatar': avatar,  # Show user avatar instead
+                    'last_message': last_message.content if last_message else None,
+                    'last_message_time': last_message.created_at.isoformat() if last_message else conv.created_at.isoformat(),
+                    'unread_count': unread_count,
+                    'is_church_owner': True,
+                    'other_user_id': conv.user.id
+                })
+            else:
+                # Regular user sees the church
+                church_avatar = None
+                if conv.church.logo:
+                    try:
+                        church_avatar = conv.church.logo.url
+                    except:
+                        church_avatar = None
+                
+                data.append({
+                    'id': conv.id,
+                    'church_id': conv.church.id,
+                    'church_name': conv.church.name,
+                    'church_avatar': church_avatar,
+                    'last_message': last_message.content if last_message else None,
+                    'last_message_time': last_message.created_at.isoformat() if last_message else conv.created_at.isoformat(),
+                    'unread_count': unread_count,
+                    'is_church_owner': False
+                })
+        
+        return JsonResponse({'conversations': data})
+    
+    elif request.method == 'POST':
+        # Create new conversation
+        try:
+            data = json.loads(request.body)
+            church_id = data.get('church_id')
+            
+            if not church_id:
+                return JsonResponse({'error': 'Church ID is required'}, status=400)
+            
+            try:
+                church = Church.objects.get(id=church_id)
+            except Church.DoesNotExist:
+                return JsonResponse({'error': 'Church not found'}, status=404)
+            
+            # Get or create conversation
+            conversation, created = Conversation.objects.get_or_create(
+                user=request.user,
+                church=church
+            )
+            
+            # Get church avatar URL
+            church_avatar = None
+            if church.logo:
+                try:
+                    church_avatar = church.logo.url
+                except:
+                    church_avatar = None
+            
+            return JsonResponse({
+                'conversation': {
+                    'id': conversation.id,
+                    'church_id': church.id,
+                    'church_name': church.name,
+                    'church_avatar': church_avatar,
+                    'last_message': None,
+                    'last_message_time': conversation.created_at.isoformat(),
+                    'unread_count': 0
+                }
+            }, status=201 if created else 200)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def conversation_messages_api(request, conversation_id):
+    """
+    GET: Get all messages for a conversation
+    POST: Send a new message in a conversation
+    """
+    # Verify user has access to this conversation
+    # User can access if they are the conversation participant OR the church owner
+    try:
+        from django.db.models import Q
+        conversation = Conversation.objects.select_related('church', 'user').get(
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church__owner=request.user))
+        )
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    if request.method == 'GET':
+        # Get all messages in the conversation
+        messages = conversation.messages.select_related('sender').all()
+        
+        data = []
+        for msg in messages:
+            # Get sender avatar
+            avatar = None
+            try:
+                if hasattr(msg.sender, 'profile') and msg.sender.profile:
+                    if msg.sender.profile.avatar:
+                        avatar = msg.sender.profile.avatar.url
+            except Exception:
+                avatar = None
+            
+            # Get sender name
+            sender_name = msg.sender.username
+            try:
+                if msg.sender.get_full_name():
+                    sender_name = msg.sender.get_full_name()
+                if hasattr(msg.sender, 'profile') and msg.sender.profile:
+                    if msg.sender.profile.display_name:
+                        sender_name = msg.sender.profile.display_name
+            except Exception:
+                pass
+            
+            # Prepare attachment data
+            attachment_data = None
+            if msg.attachment:
+                try:
+                    attachment_data = {
+                        'url': msg.attachment.url,
+                        'name': msg.attachment_name,
+                        'size': msg.attachment_size,
+                        'type': msg.attachment_type
+                    }
+                except:
+                    pass
+            
+            data.append({
+                'id': msg.id,
+                'content': msg.content,
+                'created_at': msg.created_at.isoformat(),
+                'is_sent_by_user': msg.sender == request.user,
+                'sender_name': sender_name,
+                'avatar': avatar,
+                'is_read': msg.is_read,
+                'attachment': attachment_data
+            })
+        
+        return JsonResponse({'messages': data})
+    
+    elif request.method == 'POST':
+        # Send a new message (with optional file attachment)
+        try:
+            # Check if this is a file upload (multipart/form-data)
+            if request.FILES.get('attachment'):
+                content = request.POST.get('content', '').strip()
+                attachment = request.FILES['attachment']
+                
+                # Validate file size (max 10MB)
+                if attachment.size > 10 * 1024 * 1024:
+                    return JsonResponse({'error': 'File size must be less than 10MB'}, status=400)
+                
+                # Validate content length if provided
+                if content and len(content) > 1000:
+                    return JsonResponse({'error': 'Message is too long (max 1000 characters)'}, status=400)
+                
+                # Create message with attachment
+                message = Message.objects.create(
+                    conversation=conversation,
+                    sender=request.user,
+                    content=content,
+                    attachment=attachment
+                )
+            else:
+                # Regular text message (JSON)
+                data = json.loads(request.body)
+                content = data.get('content', '').strip()
+                
+                if not content:
+                    return JsonResponse({'error': 'Message content cannot be empty'}, status=400)
+                
+                if len(content) > 1000:
+                    return JsonResponse({'error': 'Message is too long (max 1000 characters)'}, status=400)
+                
+                # Create the message
+                message = Message.objects.create(
+                    conversation=conversation,
+                    sender=request.user,
+                    content=content
+                )
+            
+            # Update conversation timestamp
+            conversation.updated_at = message.created_at
+            conversation.save(update_fields=['updated_at'])
+            
+            # Get sender avatar
+            avatar = None
+            try:
+                if hasattr(request.user, 'profile') and request.user.profile:
+                    if request.user.profile.avatar:
+                        avatar = request.user.profile.avatar.url
+            except Exception:
+                avatar = None
+            
+            # Get sender name
+            sender_name = request.user.username
+            try:
+                if request.user.get_full_name():
+                    sender_name = request.user.get_full_name()
+                if hasattr(request.user, 'profile') and request.user.profile:
+                    if request.user.profile.display_name:
+                        sender_name = request.user.profile.display_name
+            except Exception:
+                pass
+            
+            # Prepare attachment data
+            attachment_data = None
+            if message.attachment:
+                try:
+                    attachment_data = {
+                        'url': message.attachment.url,
+                        'name': message.attachment_name,
+                        'size': message.attachment_size,
+                        'type': message.attachment_type
+                    }
+                except:
+                    pass
+            
+            return JsonResponse({
+                'message': {
+                    'id': message.id,
+                    'content': message.content,
+                    'created_at': message.created_at.isoformat(),
+                    'is_sent_by_user': True,
+                    'sender_name': sender_name,
+                    'avatar': avatar,
+                    'is_read': False,
+                    'attachment': attachment_data
+                }
+            }, status=201)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def mark_conversation_read(request, conversation_id):
+    """Mark all messages in a conversation as read"""
+    try:
+        from django.db.models import Q
+        conversation = Conversation.objects.get(
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church__owner=request.user))
+        )
+        
+        # Mark all unread messages (not sent by user) as read
+        unread_messages = conversation.messages.filter(
+            is_read=False
+        ).exclude(sender=request.user)
+        
+        count = unread_messages.update(is_read=True)
+        
+        return JsonResponse({
+            'success': True,
+            'marked_read': count
+        })
+        
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def conversation_typing(request, conversation_id):
+    """
+    Handle typing indicator (optional feature)
+    This is a placeholder for WebSocket implementation
+    """
+    try:
+        conversation = Conversation.objects.get(
+            id=conversation_id,
+            user=request.user
+        )
+        
+        data = json.loads(request.body)
+        is_typing = data.get('is_typing', False)
+        
+        # In a real implementation, you would:
+        # 1. Store typing status in cache (Redis)
+        # 2. Broadcast via WebSocket to other participants
+        # 3. Auto-expire after 3-5 seconds
+        
+        # For now, just return success
+        return JsonResponse({
+            'success': True,
+            'is_typing': is_typing
+        })
+        
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

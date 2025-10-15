@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import api_views
 from . import donation_views
+from . import chat_api
 
 app_name = 'core'
 
@@ -126,4 +127,10 @@ urlpatterns = [
     path('donations/webhook/', donation_views.paypal_webhook, name='paypal_webhook'),
     # Legacy (kept for backward compatibility)
     path('donations/execute/<int:post_id>/', donation_views.execute_donation, name='execute_donation'),
+    
+    # Chat API endpoints
+    path('api/conversations/', chat_api.conversations_api, name='conversations_api'),
+    path('api/conversations/<int:conversation_id>/messages/', chat_api.conversation_messages_api, name='conversation_messages_api'),
+    path('api/conversations/<int:conversation_id>/read/', chat_api.mark_conversation_read, name='mark_conversation_read'),
+    path('api/conversations/<int:conversation_id>/typing/', chat_api.conversation_typing, name='conversation_typing'),
 ]
