@@ -524,6 +524,14 @@
 <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency={{ PAYPAL_CURRENCY }}"></script>
 {% endif %}
 
+<!-- Stripe SDK -->
+{% if STRIPE_PUBLISHABLE_KEY %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  window.STRIPE_PUBLISHABLE_KEY = '{{ STRIPE_PUBLISHABLE_KEY }}';
+</script>
+{% endif %}
+
 <!-- Donation Modal -->
 {% include 'partials/donation_modal.html' %}
 

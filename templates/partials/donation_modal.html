@@ -70,18 +70,55 @@
           </label>
         </div>
         
+        <!-- Payment Method Selection -->
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <div class="payment-method-tabs">
+            <button type="button" class="payment-tab active" data-method="paypal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 0 0-.794.68l-.04.22-.63 3.993-.032.17a.804.804 0 0 1-.794.679H7.72a.483.483 0 0 1-.477-.558L7.418 20h1.518l.95-6.02h1.385c4.678 0 7.75-2.203 8.796-6.502z" fill="#009cde"/>
+              </svg>
+              PayPal
+            </button>
+            <button type="button" class="payment-tab" data-method="stripe">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+              Credit Card
+            </button>
+          </div>
+        </div>
+        
         <!-- PayPal Button Container -->
-        <div id="paypal-button-container" class="paypal-button-container"></div>
+        <div id="paypal-payment-section" class="payment-section active">
+          <div id="paypal-button-container" class="paypal-button-container"></div>
+          <p class="donation-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            You'll be redirected to PayPal to complete your donation securely.
+          </p>
+        </div>
+        
+        <!-- Stripe Payment Section -->
+        <div id="stripe-payment-section" class="payment-section" style="display: none;">
+          <div id="stripe-card-element" class="stripe-card-element"></div>
+          <div id="stripe-card-errors" class="error-message" style="display: none;"></div>
+          <button type="button" id="stripe-submit-btn" class="btn btn-primary btn-block">
+            <span id="stripe-button-text">Donate Now</span>
+            <span id="stripe-spinner" class="spinner" style="display: none;"></span>
+          </button>
+          <p class="donation-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Your payment is secured by Stripe. We never store your card details.
+          </p>
+        </div>
         
         <div id="donation-error-message" class="error-message" style="display: none;"></div>
-        
-        <p class="donation-note">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 16v-4M12 8h.01"/>
-          </svg>
-          You'll be redirected to PayPal to complete your donation securely.
-        </p>
       </form>
     </div>
   </div>

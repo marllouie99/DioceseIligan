@@ -1,11 +1,12 @@
 """
-Donation views for PayPal integration using Orders API v2.
+Donation views for PayPal and Stripe integration.
 """
 import requests
 import base64
 import json
 import logging
 from decimal import Decimal
+import stripe
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -31,6 +32,11 @@ PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
 SITE_URL = getattr(settings, 'ALLOWED_HOSTS', ['localhost'])[0]
 if not SITE_URL.startswith('http'):
     SITE_URL = f'https://{SITE_URL}' if 'onrender.com' in SITE_URL else f'http://{SITE_URL}'
+
+# Stripe Configuration
+stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = getattr(settings, 'STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_WEBHOOK_SECRET = getattr(settings, 'STRIPE_WEBHOOK_SECRET', '')
 
 
 def get_paypal_access_token():
@@ -470,4 +476,265 @@ def paypal_webhook(request):
         
     except Exception as e:
         logger.error(f"Webhook processing error: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+# ============================================================================
+# STRIPE PAYMENT VIEWS
+# ============================================================================
+
+@require_POST
+def create_stripe_payment_intent(request, post_id):
+    """Create a Stripe Payment Intent for credit card donations."""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': 'You must be logged in to make a donation'
+        }, status=401)
+    
+    try:
+        # Get post
+        try:
+            post = Post.objects.get(id=post_id, is_active=True, enable_donation=True)
+        except Post.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Post not found or donations are not enabled'
+            }, status=404)
+        
+        # Get form data
+        amount = Decimal(request.POST.get('amount', 0))
+        message = request.POST.get('message', '').strip()
+        is_anonymous = request.POST.get('is_anonymous', 'false').lower() in ['true', 'on', '1']
+        
+        # Validate amount
+        if amount < 10:
+            return JsonResponse({
+                'success': False,
+                'message': 'Minimum donation amount is ₱10'
+            }, status=400)
+        
+        # Convert amount to cents (Stripe uses smallest currency unit)
+        amount_cents = int(amount * 100)
+        
+        logger.info(f"Creating Stripe Payment Intent for amount: {amount} PHP")
+        
+        # Create Payment Intent
+        payment_intent = stripe.PaymentIntent.create(
+            amount=amount_cents,
+            currency='php',
+            metadata={
+                'post_id': post_id,
+                'church_name': post.church.name,
+                'donor_id': request.user.id,
+                'donor_username': request.user.username,
+                'is_anonymous': str(is_anonymous),
+            },
+            description=f"Donation to {post.church.name}",
+            receipt_email=request.user.email if request.user.email else None,
+        )
+        
+        logger.info(f"Stripe Payment Intent created: {payment_intent.id}")
+        
+        # Create donation record with pending status
+        donation = Donation.objects.create(
+            post=post,
+            donor=request.user,
+            amount=amount,
+            currency='PHP',
+            message=message,
+            is_anonymous=is_anonymous,
+            payment_method='stripe',
+            payment_status='pending',
+            stripe_payment_intent_id=payment_intent.id
+        )
+        
+        logger.info(f"Donation record created: {donation.id} for payment intent {payment_intent.id}")
+        
+        return JsonResponse({
+            'success': True,
+            'client_secret': payment_intent.client_secret,
+            'donation_id': donation.id
+        })
+            
+    except Decimal.InvalidOperation:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid amount specified'
+        }, status=400)
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe API error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Failed to create payment. Please try again.'
+        }, status=500)
+    except Exception as e:
+        logger.error(f"Stripe payment intent creation error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'An error occurred. Please try again.'
+        }, status=500)
+
+
+@require_POST
+def confirm_stripe_payment(request, post_id):
+    """Confirm Stripe payment after successful card authorization."""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': 'You must be logged in'
+        }, status=401)
+    
+    try:
+        # Get post
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Post not found'
+            }, status=404)
+        
+        # Get payment intent ID from request
+        payment_intent_id = request.POST.get('payment_intent_id')
+        
+        if not payment_intent_id:
+            return JsonResponse({
+                'success': False,
+                'message': 'Payment Intent ID is required'
+            }, status=400)
+        
+        logger.info(f"Confirming Stripe payment: {payment_intent_id}")
+        
+        # Retrieve the payment intent from Stripe
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        
+        logger.info(f"Payment Intent status: {payment_intent.status}")
+        
+        # Update donation record
+        try:
+            donation = Donation.objects.get(stripe_payment_intent_id=payment_intent_id)
+            
+            if payment_intent.status == 'succeeded':
+                donation.payment_status = 'completed'
+                donation.completed_at = timezone.now()
+                
+                # Store charge ID if available
+                if payment_intent.charges and payment_intent.charges.data:
+                    charge = payment_intent.charges.data[0]
+                    donation.stripe_charge_id = charge.id
+                    
+                    # Store payment method details if available
+                    if charge.payment_method:
+                        donation.stripe_payment_method_id = charge.payment_method
+                
+                donation.save()
+                logger.info(f"Donation completed: {donation.id}")
+                
+                # Send email notification
+                send_donation_notification_email(donation)
+                
+                return JsonResponse({
+                    'success': True,
+                    'donation_id': donation.id,
+                    'redirect_url': f'/app/donations/success/{post.id}/'
+                })
+            else:
+                logger.warning(f"Payment Intent status not succeeded: {payment_intent.status}")
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Payment was not completed'
+                }, status=400)
+                
+        except Donation.DoesNotExist:
+            logger.error(f"Donation not found for payment intent: {payment_intent_id}")
+            return JsonResponse({
+                'success': False,
+                'message': 'Donation record not found'
+            }, status=404)
+            
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe confirmation error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Failed to confirm payment'
+        }, status=500)
+    except Exception as e:
+        logger.error(f"Stripe payment confirmation error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'An error occurred'
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def stripe_webhook(request):
+    """Handle Stripe webhook notifications."""
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    
+    try:
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+        
+        logger.info(f"Stripe webhook received: {event['type']}")
+        
+        if event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']
+            payment_intent_id = payment_intent['id']
+            
+            try:
+                donation = Donation.objects.get(stripe_payment_intent_id=payment_intent_id)
+                if donation.payment_status != 'completed':
+                    donation.payment_status = 'completed'
+                    donation.completed_at = timezone.now()
+                    
+                    # Store charge ID
+                    if payment_intent.get('charges') and payment_intent['charges']['data']:
+                        charge = payment_intent['charges']['data'][0]
+                        donation.stripe_charge_id = charge['id']
+                    
+                    donation.save()
+                    send_donation_notification_email(donation)
+                    logger.info(f"Donation completed via webhook: {donation.id}")
+            except Donation.DoesNotExist:
+                logger.warning(f"Donation not found for payment intent: {payment_intent_id}")
+        
+        elif event['type'] == 'payment_intent.payment_failed':
+            payment_intent = event['data']['object']
+            payment_intent_id = payment_intent['id']
+            
+            try:
+                donation = Donation.objects.get(stripe_payment_intent_id=payment_intent_id)
+                donation.payment_status = 'failed'
+                donation.save()
+                logger.info(f"Donation failed: {donation.id}")
+            except Donation.DoesNotExist:
+                logger.warning(f"Donation not found for payment intent: {payment_intent_id}")
+        
+        elif event['type'] == 'charge.refunded':
+            charge = event['data']['object']
+            charge_id = charge['id']
+            
+            try:
+                donation = Donation.objects.get(stripe_charge_id=charge_id)
+                donation.payment_status = 'refunded'
+                donation.save()
+                logger.info(f"Donation refunded: {donation.id}")
+            except Donation.DoesNotExist:
+                logger.warning(f"Donation not found for charge: {charge_id}")
+        
+        return JsonResponse({'status': 'success'})
+        
+    except ValueError as e:
+        logger.error(f"Invalid webhook payload: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': 'Invalid payload'}, status=400)
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Invalid webhook signature: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': 'Invalid signature'}, status=400)
+    except Exception as e:
+        logger.error(f"Stripe webhook processing error: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

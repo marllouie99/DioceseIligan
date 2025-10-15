@@ -91,6 +91,9 @@ def _app_context(request):
     PAYPAL_CLIENT_ID = getattr(settings, 'PAYPAL_CLIENT_ID', '')
     PAYPAL_CURRENCY = getattr(settings, 'PAYPAL_CURRENCY', 'PHP')
     
+    # Stripe configuration for credit card donations
+    STRIPE_PUBLISHABLE_KEY = getattr(settings, 'STRIPE_PUBLISHABLE_KEY', '')
+    
     return {
         'user_display_name': user_display_name,
         'user_initial': user_initial,
@@ -102,6 +105,7 @@ def _app_context(request):
         'recent_activities': recent_activities,
         'PAYPAL_CLIENT_ID': PAYPAL_CLIENT_ID,
         'PAYPAL_CURRENCY': PAYPAL_CURRENCY,
+        'STRIPE_PUBLISHABLE_KEY': STRIPE_PUBLISHABLE_KEY,
     }
 
 def home(request):

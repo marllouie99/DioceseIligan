@@ -128,6 +128,11 @@ urlpatterns = [
     # Legacy (kept for backward compatibility)
     path('donations/execute/<int:post_id>/', donation_views.execute_donation, name='execute_donation'),
     
+    # Stripe Donation URLs
+    path('donations/stripe/create/<int:post_id>/', donation_views.create_stripe_payment_intent, name='create_stripe_payment'),
+    path('donations/stripe/confirm/<int:post_id>/', donation_views.confirm_stripe_payment, name='confirm_stripe_payment'),
+    path('donations/stripe/webhook/', donation_views.stripe_webhook, name='stripe_webhook'),
+    
     # Chat API endpoints
     path('api/conversations/', chat_api.conversations_api, name='conversations_api'),
     path('api/conversations/<int:conversation_id>/messages/', chat_api.conversation_messages_api, name='conversation_messages_api'),

@@ -481,6 +481,139 @@
     font-weight: 600;
 }
 
+/* Payment Method Tabs */
+.payment-method-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.payment-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary, #1f2937);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-tab:hover {
+    border-color: #e91e63;
+    background: #fef3f2;
+}
+
+.payment-tab.active {
+    border-color: #e91e63;
+    background: #e91e63;
+    color: white;
+}
+
+.payment-tab svg {
+    flex-shrink: 0;
+}
+
+/* Payment Sections */
+.payment-section {
+    position: relative;
+    z-index: 1;
+}
+
+.payment-section.active {
+    display: block;
+}
+
+/* Stripe Card Element */
+.stripe-card-element {
+    padding: 12px;
+    border: 2px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: white;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.stripe-card-element:focus-within {
+    border-color: #e91e63;
+    outline: none;
+}
+
+#stripe-card-errors {
+    margin-top: -8px;
+    margin-bottom: 16px;
+}
+
+.btn-block {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #e91e63;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-block:hover:not(:disabled) {
+    background: #c2185b;
+}
+
+.btn-block:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Method Badge Styles */
+.method-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.method-badge.method-paypal {
+    background: #e8f4fd;
+    color: #0070ba;
+}
+
+.method-badge.method-stripe {
+    background: #f0f4ff;
+    color: #635bff;
+}
+
+.method-badge svg {
+    flex-shrink: 0;
+}
+
 /* Dark Mode Support (Optional) */
 @media (prefers-color-scheme: dark) {
     .donation-card {

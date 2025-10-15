@@ -1319,6 +1319,7 @@ class Donation(models.Model):
     
     PAYMENT_METHOD_CHOICES = [
         ('paypal', 'PayPal'),
+        ('stripe', 'Credit Card'),
         ('gcash', 'GCash'),
         ('paymongo', 'PayMongo'),
         ('bank', 'Bank Transfer'),
@@ -1343,6 +1344,12 @@ class Donation(models.Model):
     paypal_payer_id = models.CharField(max_length=255, blank=True, null=True)
     paypal_payer_email = models.EmailField(blank=True, null=True)
     paypal_transaction_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    
+    # Stripe specific fields
+    stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True, unique=True, db_index=True)
+    stripe_charge_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_payment_method_id = models.CharField(max_length=255, blank=True, null=True)
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

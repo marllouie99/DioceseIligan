@@ -275,12 +275,22 @@
                   </span>
                 </td>
                 <td>
-                  <span class="method-badge">
+                  {% if donation.payment_method == 'stripe' %}
+                  <span class="method-badge method-stripe">
+                    <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                      <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                    Credit Card
+                  </span>
+                  {% else %}
+                  <span class="method-badge method-paypal">
                     <svg class="paypal-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 0 0-.794.68l-.04.22-.63 3.993-.032.17a.804.804 0 0 1-.794.679H7.72a.483.483 0 0 1-.477-.558L7.418 20h1.518l.95-6.02h1.385c4.678 0 7.75-2.203 8.796-6.502z" fill="#009cde"/>
                     </svg>
                     PayPal
                   </span>
+                  {% endif %}
                 </td>
                 <td>
                   <span class="post-cell" title="{{ donation.post.content|striptags }}">

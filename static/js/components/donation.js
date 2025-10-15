@@ -1,5 +1,5 @@
 /**
- * Donation functionality with PayPal integration
+ * Donation functionality with PayPal and Stripe integration
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPostId = null;
     let currentChurchSlug = null;
     let currentPostData = {};
+    let currentPaymentMethod = 'paypal'; // Default to PayPal
+    
+    // Stripe Elements
+    let stripe = null;
+    let stripeElements = null;
+    let stripeCardElement = null;
     
     // Open donation modal when clicking "Donate" button
     document.addEventListener('click', function(e) {
@@ -76,6 +82,102 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.addEventListener('input', function() {
             messageCharCount.textContent = this.value.length;
         });
+    }
+    
+    // Payment method tab switching
+    const paymentTabs = document.querySelectorAll('.payment-tab');
+    const paypalSection = document.getElementById('paypal-payment-section');
+    const stripeSection = document.getElementById('stripe-payment-section');
+    
+    paymentTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const method = this.dataset.method;
+            
+            // Update active tab
+            paymentTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Switch payment sections
+            if (method === 'paypal') {
+                currentPaymentMethod = 'paypal';
+                paypalSection.style.display = 'block';
+                stripeSection.style.display = 'none';
+                
+                // Re-render PayPal button if amount is set
+                const amount = parseFloat(customAmountInput.value);
+                if (amount >= 10) {
+                    renderPayPalButton();
+                }
+            } else if (method === 'stripe') {
+                currentPaymentMethod = 'stripe';
+                paypalSection.style.display = 'none';
+                stripeSection.style.display = 'block';
+                
+                // Initialize Stripe if not already done
+                if (!stripeCardElement) {
+                    initializeStripe();
+                }
+            }
+            
+            clearError();
+        });
+    });
+    
+    // Initialize Stripe
+    function initializeStripe() {
+        if (typeof Stripe === 'undefined') {
+            console.error('Stripe.js not loaded');
+            return;
+        }
+        
+        // Get Stripe publishable key from template
+        const stripeKey = document.querySelector('meta[name="stripe-key"]')?.content || 
+                         window.STRIPE_PUBLISHABLE_KEY;
+        
+        if (!stripeKey) {
+            console.error('Stripe publishable key not found');
+            return;
+        }
+        
+        stripe = Stripe(stripeKey);
+        stripeElements = stripe.elements();
+        
+        // Create card element
+        stripeCardElement = stripeElements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            }
+        });
+        
+        stripeCardElement.mount('#stripe-card-element');
+        
+        // Handle card errors
+        stripeCardElement.on('change', function(event) {
+            const cardErrors = document.getElementById('stripe-card-errors');
+            if (event.error) {
+                cardErrors.textContent = event.error.message;
+                cardErrors.style.display = 'block';
+            } else {
+                cardErrors.style.display = 'none';
+            }
+        });
+        
+        // Handle Stripe payment submission
+        const stripeSubmitBtn = document.getElementById('stripe-submit-btn');
+        if (stripeSubmitBtn) {
+            stripeSubmitBtn.addEventListener('click', handleStripePayment);
+        }
     }
     
     function fetchPostData(postId) {
@@ -313,6 +415,100 @@ document.addEventListener('DOMContentLoaded', function() {
             msg.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => msg.remove(), 300);
         }, 3000);
+    }
+    
+    async function handleStripePayment() {
+        const amount = parseFloat(customAmountInput.value);
+        
+        if (!amount || amount < 10) {
+            showError('Please enter an amount of at least ₱10');
+            return;
+        }
+        
+        if (!stripeCardElement) {
+            showError('Payment form not initialized');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('stripe-submit-btn');
+        const buttonText = document.getElementById('stripe-button-text');
+        const spinner = document.getElementById('stripe-spinner');
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        buttonText.textContent = 'Processing...';
+        if (spinner) spinner.style.display = 'inline-block';
+        clearError();
+        
+        try {
+            // Create Payment Intent
+            const response = await fetch(`/app/donations/stripe/create/${currentPostId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: new URLSearchParams({
+                    'amount': amount,
+                    'message': document.getElementById('donation-message').value,
+                    'is_anonymous': document.getElementById('donation-anonymous').checked
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to create payment');
+            }
+            
+            // Confirm card payment
+            const result = await stripe.confirmCardPayment(data.client_secret, {
+                payment_method: {
+                    card: stripeCardElement,
+                }
+            });
+            
+            if (result.error) {
+                // Show error to customer
+                showError(result.error.message);
+                submitBtn.disabled = false;
+                buttonText.textContent = 'Donate Now';
+                if (spinner) spinner.style.display = 'none';
+            } else {
+                // Payment succeeded
+                if (result.paymentIntent.status === 'succeeded') {
+                    // Confirm payment on server
+                    const confirmResponse = await fetch(`/app/donations/stripe/confirm/${currentPostId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        body: new URLSearchParams({
+                            'payment_intent_id': result.paymentIntent.id
+                        })
+                    });
+                    
+                    const confirmData = await confirmResponse.json();
+                    
+                    if (confirmData.success) {
+                        // Redirect to success page
+                        window.location.href = confirmData.redirect_url || `/app/donations/success/${currentPostId}/`;
+                    } else {
+                        showError(confirmData.message || 'Failed to confirm payment');
+                        submitBtn.disabled = false;
+                        buttonText.textContent = 'Donate Now';
+                        if (spinner) spinner.style.display = 'none';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Stripe payment error:', error);
+            showError(error.message || 'An error occurred while processing your payment');
+            submitBtn.disabled = false;
+            buttonText.textContent = 'Donate Now';
+            if (spinner) spinner.style.display = 'none';
+        }
     }
     
     function getCsrfToken() {
