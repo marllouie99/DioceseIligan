@@ -2,19 +2,8 @@
 <div class="unified-content-management">
   {# Analytics Overview Section #}
   <div class="analytics-overview">
-    <div class="analytics-header">
-      <h3>Content Analytics</h3>
-      <div class="sort-controls">
-        <label for="analytics-sort">Sort by:</label>
-        <select id="analytics-sort" class="sort-dropdown">
-          <option value="default">Default</option>
-          <option value="highest">Highest Values</option>
-          <option value="lowest">Lowest Values</option>
-          <option value="recent">Most Recent</option>
-        </select>
-      </div>
-    </div>
-    <div class="analytics-cards">
+    {# 1x4 Grid Analytics Cards #}
+    <div class="analytics-grid-4 posts-analytics">
       <div class="analytics-card">
         <div class="analytics-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -72,75 +61,21 @@
       </div>
     </div>
     
-    {# Analytics Charts #}
-    <div class="analytics-charts">
-      <div class="charts-grid">
-        {# Most Engaged Post Chart #}
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Most Engaged Post Performance</h4>
-            <p>Detailed engagement metrics for your top performing post</p>
-          </div>
-          <div class="chart-content">
-            <canvas id="mostEngagedChart" width="400" height="200"></canvas>
-            <div class="chart-details">
-              <div class="post-preview">
-                <h5>{{ analytics.most_engaged_post.content|truncatechars:60|default:"No posts available" }}</h5>
-                <div class="engagement-stats">
-                  <span class="stat">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-                    </svg>
-                    {{ analytics.most_engaged_post.likes_count|default:0 }}
-                  </span>
-                  <span class="stat">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                    </svg>
-                    {{ analytics.most_engaged_post.comments_count|default:0 }}
-                  </span>
-                  <span class="stat">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    {{ analytics.most_engaged_post.view_count|default:0 }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+    {# 1x1 Grid Chart - Weekly Engagement #}
+    <div class="weekly-engagement-section">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h4>Weekly Engagement</h4>
+          <p>Post performance metrics over the last 7 days</p>
         </div>
-
-        {# Top 5 Posts Ranking Chart #}
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Top 5 Most Engaged Posts</h4>
-            <p>Ranking comparison of your best performing content</p>
-          </div>
-          <div class="chart-content">
-            <canvas id="top5PostsChart" width="400" height="200"></canvas>
-            <div class="posts-ranking">
-              {% for post in analytics.top_5_posts %}
-              <div class="ranking-item" data-rank="{{ forloop.counter }}" data-engagement="{{ post.total_engagement|default:0 }}" data-max-engagement="{{ analytics.max_engagement|default:1 }}">
-                <div class="rank-number">{{ forloop.counter }}</div>
-                <div class="post-info">
-                  <p>{{ post.content|truncatechars:40 }}</p>
-                  <div class="engagement-total">
-                    {{ post.total_engagement|default:0 }} engagements
-                  </div>
-                </div>
-                <div class="engagement-bar">
-                  <div class="bar-fill"></div>
-                </div>
-              </div>
-              {% empty %}
-              <div class="no-posts">
-                <p>No posts available for ranking</p>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
+        <div class="chart-content">
+          <canvas id="weeklyEngagementChart" 
+                  width="800" 
+                  height="300"
+                  data-total-posts="{{ analytics.total_posts|default:'0' }}"
+                  data-total-likes="{{ analytics.total_likes|default:'0' }}"
+                  data-total-comments="{{ analytics.total_comments|default:'0' }}"
+                  data-total-views="{{ analytics.total_views|default:'0' }}"></canvas>
         </div>
       </div>
     </div>

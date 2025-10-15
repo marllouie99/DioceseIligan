@@ -1,35 +1,129 @@
 {% load static %}
-{# Posts Management Section #}
-<div class="posts-management">
-  <div class="posts-header">
-    <div class="posts-stats">
-      <div class="stat-item">
-        <span class="stat-number">{{ posts_count }}</span>
-        <span class="stat-label">Total Posts</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">{{ follower_count }}</span>
-        <span class="stat-label">Followers</span>
-      </div>
+{# Posts Management Section - Your Posts #}
+<div class="posts-management-section">
+  <div class="section-header">
+    <div class="header-content">
+      <h3>Your Posts</h3>
+      <p>Manage and monitor your church content</p>
     </div>
-    <button class="btn btn-primary" onclick="showCreatePostModal()">
-      {% include 'partials/icons/plus.html' %}
-      Create New Post
-    </button>
+    <div class="header-actions">
+      <div class="search-box">
+        <i data-feather="search" class="search-icon"></i>
+        <input 
+          type="text" 
+          id="postSearch" 
+          placeholder="Search posts..." 
+          class="search-input"
+          autocomplete="off"
+        >
+      </div>
+      <button type="button" class="btn-create-post" onclick="showCreatePostModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Create Post
+      </button>
+    </div>
   </div>
 
   {% if posts %}
-    <div class="posts-list">
-      {% for post in posts %}
-        {% include 'partials/manage/post_card.html' with post=post church=church %}
-      {% endfor %}
+    <div class="posts-table-wrapper">
+      <table class="posts-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Views</th>
+            <th><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Likes</th>
+            <th><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Comments</th>
+            <th><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Saved</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="postsTableBody">
+          {% for post in posts %}
+            <tr class="post-row" 
+                data-title="{{ post.content|truncatechars:50|lower }}"
+                data-type="{{ post.post_type|lower }}"
+                data-post-id="{{ post.id }}">
+              <td>
+                <div class="post-title-cell">
+                  <span class="title">{{ post.content|truncatechars:60 }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="post-type-badge post-type-{{ post.post_type|lower }}">
+                  {{ post.post_type|default:"bulletin"|title }}
+                </span>
+              </td>
+              <td>
+                <span class="date-text">{{ post.created_at|date:"Y-m-d" }}</span>
+              </td>
+              <td>
+                <span class="stat-count">{{ post.view_count|default:0 }}</span>
+              </td>
+              <td>
+                <span class="stat-count">{{ post.likes_count|default:0 }}</span>
+              </td>
+              <td>
+                <span class="stat-count">{{ post.comments_count|default:0 }}</span>
+              </td>
+              <td>
+                <span class="stat-count">{{ post.bookmarks_count|default:0 }}</span>
+              </td>
+              <td>
+                <span class="status-badge status-{{ post.status|lower }}">
+                  {{ post.status|default:"published"|title }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button type="button" 
+                          class="btn-action" 
+                          onclick="viewPost('{{ post.id }}')"
+                          title="View">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  <button type="button" 
+                          class="btn-action" 
+                          onclick="editPost('{{ post.id }}')"
+                          title="Edit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button type="button" 
+                          class="btn-action btn-action-danger" 
+                          onclick="deletePost('{{ post.id }}')"
+                          title="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    
-    {% if posts_count > 20 %}
-      <div class="posts-pagination">
-        <a href="#" class="btn btn-outline">View All Posts</a>
+
+    <!-- No Results Message -->
+    <div id="noPostsResults" class="no-results" style="display: none;">
+      <div class="empty-state">
+        <i data-feather="search" class="empty-icon"></i>
+        <h3>No posts found</h3>
+        <p>Try adjusting your search criteria.</p>
       </div>
-    {% endif %}
+    </div>
   {% else %}
     {% include 'partials/manage/empty_posts.html' with church=church %}
   {% endif %}
