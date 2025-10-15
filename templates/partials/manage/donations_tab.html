@@ -246,8 +246,8 @@
                           </svg>
                         </div>
                       {% else %}
-                        {% if donation.donor.profile and donation.donor.profile.profile_picture %}
-                          <img src="{{ donation.donor.profile.profile_picture.url }}" alt="{{ donation.get_donor_name }}">
+                        {% if donation.donor.profile and donation.donor.profile.profile_image %}
+                          <img src="{{ donation.donor.profile.profile_image.url }}" alt="{{ donation.get_donor_name }}" class="donor-profile-img">
                         {% else %}
                           <div class="avatar-initials">
                             {{ donation.donor.first_name|first|default:"U"|upper }}{{ donation.donor.last_name|first|default:""|upper }}
