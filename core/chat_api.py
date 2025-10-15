@@ -59,10 +59,13 @@ def conversations_api(request):
                 # Get user avatar
                 avatar = None
                 try:
-                    if hasattr(conv.user, 'profile') and conv.user.profile:
-                        if conv.user.profile.avatar:
-                            avatar = conv.user.profile.avatar.url
-                except Exception:
+                    if hasattr(conv.user, 'profile'):
+                        profile = getattr(conv.user, 'profile', None)
+                        if profile and profile.avatar:
+                            avatar = profile.avatar.url
+                except Exception as e:
+                    # Log the error for debugging
+                    print(f"Error getting user avatar: {e}")
                     avatar = None
                 
                 data.append({
@@ -182,10 +185,12 @@ def conversation_messages_api(request, conversation_id):
             else:
                 # Use user profile avatar
                 try:
-                    if hasattr(msg.sender, 'profile') and msg.sender.profile:
-                        if msg.sender.profile.avatar:
-                            avatar = msg.sender.profile.avatar.url
-                except Exception:
+                    if hasattr(msg.sender, 'profile'):
+                        profile = getattr(msg.sender, 'profile', None)
+                        if profile and profile.avatar:
+                            avatar = profile.avatar.url
+                except Exception as e:
+                    print(f"Error getting message sender avatar: {e}")
                     avatar = None
             
             # Get sender name
