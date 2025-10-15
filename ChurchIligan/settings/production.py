@@ -81,6 +81,11 @@ PAYPAL_CLIENT_SECRET = env('PAYPAL_CLIENT_SECRET', default='')
 PAYPAL_MODE = env('PAYPAL_MODE', default='sandbox')  # 'sandbox' or 'live'
 PAYPAL_CURRENCY = env('PAYPAL_CURRENCY', default='PHP')
 
+# Stripe configuration for credit card donations
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default='')
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default='')
+
 # Cloudinary configuration for media storage (prevents file loss on Render deployments)
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default=''),
