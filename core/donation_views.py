@@ -522,7 +522,7 @@ def create_stripe_payment_intent(request, post_id):
         # Create Payment Intent
         payment_intent = stripe.PaymentIntent.create(
             amount=amount_cents,
-            currency='php',
+            currency='usd',  # Stripe test mode works best with USD
             metadata={
                 'post_id': post_id,
                 'church_name': post.church.name,
@@ -541,7 +541,7 @@ def create_stripe_payment_intent(request, post_id):
             post=post,
             donor=request.user,
             amount=amount,
-            currency='PHP',
+            currency='USD',  # Match Stripe currency
             message=message,
             is_anonymous=is_anonymous,
             payment_method='stripe',
