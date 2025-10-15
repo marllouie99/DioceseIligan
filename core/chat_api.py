@@ -167,25 +167,42 @@ def conversation_messages_api(request, conversation_id):
         
         data = []
         for msg in messages:
+            # Determine if sender is the church owner
+            is_church_owner = msg.sender == conversation.church.owner
+            
             # Get sender avatar
             avatar = None
-            try:
-                if hasattr(msg.sender, 'profile') and msg.sender.profile:
-                    if msg.sender.profile.avatar:
-                        avatar = msg.sender.profile.avatar.url
-            except Exception:
-                avatar = None
+            if is_church_owner:
+                # Use church logo for church owner messages
+                try:
+                    if conversation.church.logo:
+                        avatar = conversation.church.logo.url
+                except Exception:
+                    avatar = None
+            else:
+                # Use user profile avatar
+                try:
+                    if hasattr(msg.sender, 'profile') and msg.sender.profile:
+                        if msg.sender.profile.avatar:
+                            avatar = msg.sender.profile.avatar.url
+                except Exception:
+                    avatar = None
             
             # Get sender name
             sender_name = msg.sender.username
-            try:
-                if msg.sender.get_full_name():
-                    sender_name = msg.sender.get_full_name()
-                if hasattr(msg.sender, 'profile') and msg.sender.profile:
-                    if msg.sender.profile.display_name:
-                        sender_name = msg.sender.profile.display_name
-            except Exception:
-                pass
+            if is_church_owner:
+                # Use church name for church owner
+                sender_name = conversation.church.name
+            else:
+                # Use user's display name
+                try:
+                    if msg.sender.get_full_name():
+                        sender_name = msg.sender.get_full_name()
+                    if hasattr(msg.sender, 'profile') and msg.sender.profile:
+                        if msg.sender.profile.display_name:
+                            sender_name = msg.sender.profile.display_name
+                except Exception:
+                    pass
             
             # Prepare attachment data
             attachment_data = None
