@@ -1172,7 +1172,7 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
         from django.conf import settings
         from django.template.loader import render_to_string
         from django.utils.html import strip_tags
-        from accounts.models import Notification
+        from .models import Notification
         
         logger = logging.getLogger(__name__)
         
