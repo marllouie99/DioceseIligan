@@ -50,13 +50,15 @@
   {% endif %}
 </a>
 {% else %}
-<a href="{% url 'core:create_church' %}" class="manage-church-link {% if request.resolver_match.url_name == 'create_church' %}active{% endif %}" title="Apply Church">
+{% if user.is_superuser %}
+<a href="{% url 'core:super_admin_create_church' %}" class="manage-church-link {% if request.resolver_match.url_name == 'super_admin_create_church' %}active{% endif %}" title="Create Church">
   <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/>
     <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
   </svg>
-  <span>Apply Church</span>
+  <span>Create Church</span>
 </a>
+{% endif %}
 {% endif %}
 {% endif %}
 <div class="profile-dropdown" id="profile-dropdown">

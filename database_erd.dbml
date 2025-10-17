@@ -1,0 +1,766 @@
+// ChurchIligan Database Schema - ERD for dbdiagram.io
+// Generated: 2025-10-16
+// Last Updated: 2025-10-17
+// This file contains the complete database schema with all models and relationships
+//
+// RECENT CHANGES (2025-10-17):
+// - Church creation now restricted to Super Admins only
+// - Added profile completeness validation for church manager assignment
+// - Added manager assignment notification system (email + in-app)
+// - Church owners are now assigned by admins, not self-created
+
+// ============================================
+// AUTHENTICATION & USER MANAGEMENT
+// ============================================
+
+Table auth_user {
+  id bigint [pk, increment]
+  username varchar(150) [unique, not null]
+  email varchar(254) [unique, not null]
+  password varchar(128) [not null]
+  first_name varchar(150)
+  last_name varchar(150)
+  is_staff boolean [default: false]
+  is_active boolean [default: true]
+  is_superuser boolean [default: false]
+  date_joined datetime [not null]
+  last_login datetime
+  
+  Note: 'Django built-in User model for authentication'
+}
+
+Table accounts_profile {
+  id bigint [pk, increment]
+  user_id bigint [unique, not null, ref: - auth_user.id]
+  display_name varchar(150)
+  phone varchar(20)
+  
+  // Philippine Address Structure
+  region varchar(200)
+  province varchar(200)
+  city_municipality varchar(200)
+  barangay varchar(200)
+  street_address varchar(300)
+  postal_code varchar(10)
+  address text // Legacy field
+  
+  bio text
+  date_of_birth date
+  profile_image varchar(255)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  Note: '''User profile with Philippine address structure
+  
+  BUSINESS RULE (2025-10-17):
+  For church manager assignment, profile must be complete with:
+  - Full Name (display_name or user.first_name + last_name)
+  - Phone number
+  - Address (region + city_municipality OR legacy address)
+  - Date of birth
+  
+  Validated in: core.forms.SuperAdminChurchCreateForm.__init__()
+  '''
+}
+
+Table accounts_emailverification {
+  id bigint [pk, increment]
+  email varchar(254) [not null]
+  code varchar(6) [not null]
+  created_at datetime [not null]
+  expires_at datetime [not null]
+  is_used boolean [default: false]
+  attempts integer [default: 0]
+  ip_address varchar(45)
+  user_agent varchar(500)
+  device_info varchar(200)
+  
+  indexes {
+    (email, created_at)
+  }
+  
+  Note: 'Email verification codes during registration (15 min expiry, max 5 attempts)'
+}
+
+Table accounts_passwordreset {
+  id bigint [pk, increment]
+  email varchar(254) [not null]
+  code varchar(6) [not null]
+  created_at datetime [not null]
+  expires_at datetime [not null]
+  is_used boolean [default: false]
+  attempts integer [default: 0]
+  ip_address varchar(45)
+  user_agent varchar(500)
+  device_info varchar(200)
+  
+  indexes {
+    (email, created_at)
+  }
+  
+  Note: 'Password reset codes (15 min expiry, max 5 attempts)'
+}
+
+Table accounts_logincode {
+  id bigint [pk, increment]
+  email varchar(254) [not null]
+  code varchar(6) [not null]
+  created_at datetime [not null]
+  expires_at datetime [not null]
+  is_used boolean [default: false]
+  attempts integer [default: 0]
+  ip_address varchar(45)
+  user_agent varchar(500)
+  device_info varchar(200)
+  
+  indexes {
+    (email, created_at)
+  }
+  
+  Note: 'Passwordless login codes (15 min expiry, max 5 attempts)'
+}
+
+Table accounts_useractivity {
+  id bigint [pk, increment]
+  user_id bigint [ref: > auth_user.id]
+  email varchar(254) [not null]
+  activity_type varchar(30) [not null]
+  success boolean [default: true]
+  details text
+  ip_address varchar(45) [not null]
+  user_agent varchar(500) [not null]
+  device_info varchar(200)
+  browser_info varchar(200)
+  os_info varchar(200)
+  country varchar(100)
+  city varchar(100)
+  verification_code varchar(6)
+  created_at datetime [not null]
+  
+  indexes {
+    (user_id, created_at)
+    (email, created_at)
+    (ip_address, created_at)
+    (activity_type, created_at)
+  }
+  
+  Note: 'Track user registration, login, and authentication activities'
+}
+
+// ============================================
+// CHURCH MANAGEMENT
+// ============================================
+
+Table core_church {
+  id bigint [pk, increment]
+  name varchar(200) [not null]
+  slug varchar(200) [unique, not null]
+  description text [not null]
+  denomination varchar(20) [not null]
+  size varchar(10) [not null]
+  
+  // Contact Information
+  email varchar(254) [not null]
+  phone varchar(20) [not null]
+  website varchar(200)
+  
+  // Philippine Address Structure
+  region varchar(200)
+  province varchar(200)
+  city_municipality varchar(200)
+  barangay varchar(200)
+  street_address varchar(300)
+  postal_code varchar(4)
+  
+  // Legacy Location Fields
+  address text
+  city varchar(100)
+  state varchar(100)
+  country varchar(100) [default: 'Philippines']
+  latitude decimal(9,6)
+  longitude decimal(9,6)
+  
+  // Leadership
+  pastor_name varchar(100) [not null]
+  pastor_email varchar(254)
+  pastor_phone varchar(20)
+  
+  // Media
+  logo varchar(255)
+  cover_image varchar(255)
+  
+  // Services
+  service_times text [not null]
+  special_services text
+  ministries text
+  
+  // Social Media
+  facebook_url varchar(200)
+  instagram_url varchar(200)
+  youtube_url varchar(200)
+  twitter_url varchar(200)
+  
+  // Payment
+  paypal_email varchar(254)
+  
+  // Status
+  owner_id bigint [not null, ref: > auth_user.id]
+  is_verified boolean [default: false]
+  is_active boolean [default: true]
+  
+  // Timestamps
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  // Statistics
+  member_count integer [default: 0]
+  follower_count integer [default: 0]
+  
+  Note: '''Church organizations with Philippine address structure
+  
+  BUSINESS RULES (2025-10-17):
+  1. Church Creation: Only users with is_superuser=True can create churches
+  2. Manager Assignment: owner_id is assigned by Super Admin during creation
+  3. Profile Validation: Assigned owner must have complete profile
+  4. Notifications: On assignment, system sends:
+     - Email notification (template: emails/church_assignment.html)
+     - System notification (type: church_assignment)
+  5. Reassignment: Changing owner_id triggers new notifications
+  
+  Created via: core.views.super_admin_create_church
+  Form: core.forms.SuperAdminChurchCreateForm
+  '''
+}
+
+Table core_churchfollow {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  church_id bigint [not null, ref: > core_church.id]
+  followed_at datetime [not null]
+  
+  indexes {
+    (user_id, church_id) [unique]
+  }
+  
+  Note: 'Users following churches'
+}
+
+Table core_churchverificationrequest {
+  id bigint [pk, increment]
+  church_id bigint [not null, ref: > core_church.id]
+  submitted_by_id bigint [not null, ref: > auth_user.id]
+  status varchar(20) [not null, default: 'pending']
+  notes text
+  reviewed_by_id bigint [ref: > auth_user.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  Note: 'Church verification requests with legal documents'
+}
+
+Table core_churchverificationdocument {
+  id bigint [pk, increment]
+  request_id bigint [not null, ref: > core_churchverificationrequest.id]
+  file varchar(255) [not null]
+  title varchar(200)
+  uploaded_at datetime [not null]
+  
+  Note: 'Documents uploaded for church verification'
+}
+
+// ============================================
+// BOOKABLE SERVICES & BOOKINGS
+// ============================================
+
+Table core_bookableservice {
+  id bigint [pk, increment]
+  church_id bigint [not null, ref: > core_church.id]
+  name varchar(200) [not null]
+  description text
+  image varchar(255)
+  
+  // Pricing
+  price decimal(10,2)
+  is_free boolean [default: true]
+  currency varchar(3) [default: 'PHP']
+  
+  // Scheduling
+  duration integer [not null, default: 60]
+  max_bookings_per_day integer [default: 10]
+  advance_booking_days integer [default: 30]
+  
+  // Availability
+  is_active boolean [default: true]
+  requires_approval boolean [default: false]
+  
+  // Instructions
+  preparation_notes text
+  cancellation_policy text
+  
+  // Timestamps
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  Note: 'Church services that can be booked (counseling, baptism, etc.)'
+}
+
+Table core_serviceimage {
+  id bigint [pk, increment]
+  service_id bigint [not null, ref: > core_bookableservice.id]
+  image varchar(255) [not null]
+  caption varchar(200)
+  order integer [default: 0]
+  is_primary boolean [default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  Note: 'Multiple images per service (gallery)'
+}
+
+Table core_availability {
+  id bigint [pk, increment]
+  church_id bigint [not null, ref: > core_church.id]
+  date date [not null]
+  type varchar(20) [not null, default: 'closed_date']
+  is_closed boolean [default: true]
+  start_time time
+  end_time time
+  reason varchar(200)
+  notes text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (church_id, date) [unique]
+  }
+  
+  Note: 'Church availability, closed dates, and special hours'
+}
+
+Table core_declinereason {
+  id bigint [pk, increment]
+  church_id bigint [not null, ref: > core_church.id]
+  label varchar(200) [not null]
+  is_active boolean [default: true]
+  order integer [default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (church_id, label) [unique]
+  }
+  
+  Note: 'Customizable decline reasons per church for booking decisions'
+}
+
+Table core_booking {
+  id bigint [pk, increment]
+  code varchar(20) [unique, not null]
+  user_id bigint [not null, ref: > auth_user.id]
+  church_id bigint [not null, ref: > core_church.id]
+  service_id bigint [not null, ref: > core_bookableservice.id]
+  date date [not null]
+  start_time time
+  end_time time
+  notes text
+  status varchar(20) [not null, default: 'requested']
+  cancel_reason varchar(200)
+  decline_reason varchar(200)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  status_changed_at datetime
+  
+  indexes {
+    (service_id, date, status)
+    (church_id, status)
+    (user_id, status)
+  }
+  
+  Note: 'Service booking/appointment requests with status workflow'
+}
+
+// ============================================
+// POSTS & SOCIAL FEATURES
+// ============================================
+
+Table core_post {
+  id bigint [pk, increment]
+  church_id bigint [not null, ref: > core_church.id]
+  content text [not null]
+  image varchar(255)
+  post_type varchar(20) [not null, default: 'general']
+  
+  // Event-specific fields
+  event_title varchar(200)
+  event_start_date datetime
+  event_end_date datetime
+  event_location varchar(300)
+  max_participants integer
+  
+  // Donation
+  enable_donation boolean [default: false]
+  donation_goal decimal(10,2)
+  
+  view_count integer [default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  is_active boolean [default: true]
+  
+  Note: 'Church posts (general, photo, event, prayer request) with donation support'
+}
+
+Table core_postlike {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  post_id bigint [not null, ref: > core_post.id]
+  created_at datetime [not null]
+  
+  indexes {
+    (user_id, post_id) [unique]
+  }
+  
+  Note: 'Post likes'
+}
+
+Table core_postbookmark {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  post_id bigint [not null, ref: > core_post.id]
+  created_at datetime [not null]
+  
+  indexes {
+    (user_id, post_id) [unique]
+    (user_id, created_at)
+    (post_id, created_at)
+  }
+  
+  Note: 'Saved/bookmarked posts'
+}
+
+Table core_postcomment {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  post_id bigint [not null, ref: > core_post.id]
+  parent_id bigint [ref: > core_postcomment.id]
+  content text [not null]
+  is_active boolean [default: true]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (post_id, is_active)
+    (user_id, created_at)
+  }
+  
+  Note: 'Post comments with nested replies support'
+}
+
+Table core_commentlike {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  comment_id bigint [not null, ref: > core_postcomment.id]
+  created_at datetime [not null]
+  
+  indexes {
+    (user_id, comment_id) [unique]
+    (comment_id, created_at)
+  }
+  
+  Note: 'Comment likes'
+}
+
+Table core_postview {
+  id bigint [pk, increment]
+  user_id bigint [ref: > auth_user.id]
+  post_id bigint [not null, ref: > core_post.id]
+  ip_address varchar(45) [not null]
+  user_agent varchar(500) [not null]
+  viewed_at datetime [not null]
+  
+  indexes {
+    (post_id, viewed_at)
+    (user_id, viewed_at)
+    (ip_address, viewed_at)
+  }
+  
+  Note: 'Track individual post views and prevent duplicate counting'
+}
+
+Table core_postreport {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  post_id bigint [not null, ref: > core_post.id]
+  reason varchar(20) [not null]
+  description text [not null]
+  status varchar(20) [not null, default: 'pending']
+  created_at datetime [not null]
+  reviewed_at datetime
+  reviewed_by_id bigint [ref: > auth_user.id]
+  admin_notes text
+  
+  indexes {
+    (user_id, post_id) [unique]
+    (post_id, status)
+    (user_id, created_at)
+  }
+  
+  Note: 'Users reporting inappropriate posts'
+}
+
+// ============================================
+// REVIEWS & RATINGS
+// ============================================
+
+Table core_servicereview {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  service_id bigint [not null, ref: > core_bookableservice.id]
+  church_id bigint [not null, ref: > core_church.id]
+  booking_id bigint [ref: > core_booking.id]
+  
+  rating integer [not null]
+  title varchar(200) [not null]
+  comment text [not null]
+  
+  // Optional additional ratings
+  staff_rating integer
+  facility_rating integer
+  value_rating integer
+  
+  // Review status
+  is_active boolean [default: true]
+  is_anonymous boolean [default: false]
+  helpful_votes integer [default: 0]
+  
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (user_id, service_id) [unique]
+    (service_id, created_at)
+    (church_id, created_at)
+    (rating, created_at)
+    booking_id
+  }
+  
+  Note: 'User reviews and ratings of church services (1-5 stars)'
+}
+
+Table core_servicereviewhelpful {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  review_id bigint [not null, ref: > core_servicereview.id]
+  created_at datetime [not null]
+  
+  indexes {
+    (user_id, review_id) [unique]
+  }
+  
+  Note: 'Track helpful votes for service reviews'
+}
+
+// ============================================
+// DONATIONS & PAYMENTS
+// ============================================
+
+Table core_donation {
+  id bigint [pk, increment]
+  post_id bigint [not null, ref: > core_post.id]
+  donor_id bigint [ref: > auth_user.id]
+  
+  // Donation details
+  amount decimal(10,2) [not null]
+  currency varchar(3) [default: 'PHP']
+  message text
+  is_anonymous boolean [default: false]
+  
+  // Payment details
+  payment_method varchar(20) [not null, default: 'paypal']
+  payment_status varchar(20) [not null, default: 'pending']
+  
+  // PayPal specific fields
+  paypal_order_id varchar(255) [unique]
+  paypal_payer_id varchar(255)
+  paypal_payer_email varchar(254)
+  paypal_transaction_id varchar(255)
+  
+  // Stripe specific fields
+  stripe_payment_intent_id varchar(255) [unique]
+  stripe_charge_id varchar(255)
+  stripe_customer_id varchar(255)
+  stripe_payment_method_id varchar(255)
+  
+  // Metadata
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  completed_at datetime
+  
+  indexes {
+    created_at
+    (post_id, payment_status)
+    paypal_order_id
+    paypal_transaction_id
+    stripe_payment_intent_id
+    stripe_charge_id
+  }
+  
+  Note: 'Donations made to posts with PayPal and Stripe support'
+}
+
+// ============================================
+// MESSAGING & CHAT
+// ============================================
+
+Table core_conversation {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  church_id bigint [not null, ref: > core_church.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (user_id, church_id) [unique]
+    updated_at
+  }
+  
+  Note: 'Conversation between a user and a church'
+}
+
+Table core_message {
+  id bigint [pk, increment]
+  conversation_id bigint [not null, ref: > core_conversation.id]
+  sender_id bigint [not null, ref: > auth_user.id]
+  content text
+  is_read boolean [default: false]
+  created_at datetime [not null]
+  
+  // File attachments
+  attachment varchar(255)
+  attachment_type varchar(20)
+  attachment_name varchar(255)
+  attachment_size integer
+  
+  indexes {
+    (conversation_id, created_at)
+    (conversation_id, is_read)
+  }
+  
+  Note: 'Messages in a conversation with file attachment support'
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+Table core_notification {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  notification_type varchar(50) [not null]
+  title varchar(200) [not null]
+  message text [not null]
+  priority varchar(10) [not null, default: 'medium']
+  link varchar(500)
+  
+  // Related objects (optional)
+  booking_id bigint [ref: > core_booking.id]
+  church_id bigint [ref: > core_church.id]
+  
+  // Notification state
+  is_read boolean [default: false]
+  read_at datetime
+  
+  // Timestamps
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  
+  indexes {
+    (user_id, is_read)
+    (user_id, notification_type)
+    created_at
+  }
+  
+  Note: '''User notifications for bookings, follows, messages, etc.
+  
+  NEW NOTIFICATION TYPE (2025-10-17):
+  - church_assignment: Sent when user is assigned as church manager
+    Title: "Church Manager Assignment"
+    Message: "You have been assigned as the manager of {church.name}..."
+    Link: "/app/manage-church/"
+    Created in: core.forms.SuperAdminChurchCreateForm.save()
+  '''
+}
+
+// ============================================
+// ANALYTICS & TRACKING
+// ============================================
+
+Table core_userinteraction {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > auth_user.id]
+  activity_type varchar(50) [not null]
+  created_at datetime [not null]
+  
+  // Generic Foreign Key fields
+  content_type_id integer
+  object_id integer
+  
+  // Additional context
+  metadata json
+  ip_address varchar(45)
+  user_agent text
+  
+  indexes {
+    (user_id, created_at)
+    (activity_type, created_at)
+    (content_type_id, object_id)
+  }
+  
+  Note: 'Track user interactions (likes, comments, bookmarks, follows, bookings, etc.)'
+}
+
+// ============================================
+// RELATIONSHIPS SUMMARY
+// ============================================
+
+// User Relationships:
+// - One User has One Profile (1:1) [REQUIRED for church manager assignment]
+// - One User owns Many Churches (1:N) [ASSIGNED by Super Admin, not self-created]
+// - One User follows Many Churches (M:N via ChurchFollow)
+// - One User makes Many Bookings (1:N)
+// - One User writes Many Reviews (1:N)
+// - One User makes Many Donations (1:N)
+// - One User has Many Conversations (1:N)
+// - One User sends Many Messages (1:N)
+// - One User has Many Notifications (1:N) [Includes church_assignment type]
+
+// Church Relationships:
+// - One Church has Many Followers (M:N via ChurchFollow)
+// - One Church has Many Bookable Services (1:N)
+// - One Church has Many Bookings (1:N)
+// - One Church has Many Posts (1:N)
+// - One Church has Many Conversations (1:N)
+// - One Church has Many Verification Requests (1:N)
+
+// Post Relationships:
+// - One Post has Many Likes (1:N)
+// - One Post has Many Comments (1:N)
+// - One Post has Many Bookmarks (1:N)
+// - One Post has Many Views (1:N)
+// - One Post has Many Reports (1:N)
+// - One Post has Many Donations (1:N)
+
+// Service Relationships:
+// - One Service has Many Images (1:N)
+// - One Service has Many Bookings (1:N)
+// - One Service has Many Reviews (1:N)
+
+// Booking Relationships:
+// - One Booking can have One Review (1:1)
+// - One Booking can have Many Notifications (1:N)
+
+// Comment Relationships:
+// - One Comment can have Many Replies (self-referential 1:N)
+// - One Comment has Many Likes (1:N)
+
+// Conversation Relationships:
+// - One Conversation has Many Messages (1:N)

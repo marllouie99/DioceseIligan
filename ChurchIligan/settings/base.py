@@ -168,6 +168,9 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='ChurchConnect <979d0a001
 # Brevo API key for HTTP-based email (used by email_utils.py)
 BREVO_API_KEY = env('BREVO_API_KEY', default='')
 
+# Site URL for email links (production URL on Render)
+SITE_URL = env('SITE_URL', default='https://churchiligan.onrender.com')
+
 # Session and CSRF settings (env-driven; secure by default in production)
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=not DEBUG)
 SESSION_COOKIE_HTTPONLY = True

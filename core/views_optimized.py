@@ -143,11 +143,15 @@ def manage_church_optimized(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
     
     if request.method == 'POST' and request.POST.get('form_type') != 'verification':
         form = ChurchUpdateForm(request.POST, request.FILES, instance=church)

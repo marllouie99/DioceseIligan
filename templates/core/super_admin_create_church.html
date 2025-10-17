@@ -1,0 +1,774 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit Church{% else %}Create New Church{% endif %} • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin.css' %}?v={{ STATIC_VERSION }}">
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #8B4513;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.form-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-label.required::after {
+  content: '*';
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.form-help-text {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.1);
+}
+
+.form-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-group label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(160, 82, 45, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Select2 Custom Styling */
+.select2-container--default .select2-selection--single {
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default.select2-container--focus .select2-selection--single {
+  border-color: #A0522D;
+  box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.1);
+  outline: none;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 26px;
+  color: var(--text-primary);
+  padding-left: 0;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 40px;
+  right: 8px;
+}
+
+.select2-dropdown {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+  border-color: #A0522D;
+  outline: none;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: rgba(160, 82, 45, 0.1);
+  color: #8B4513;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background-color: #A0522D;
+  color: white;
+}
+
+.select2-container--default .select2-results__option {
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+}
+
+.select2-container {
+  width: 100% !important;
+}
+
+.select2-selection__placeholder {
+  color: #9ca3af !important;
+}
+</style>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="warm-sacred-earth page-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+  <div class="page-header">
+    <h1>{% if is_edit %}Edit Church{% else %}Create New Church{% endif %}</h1>
+    <p>{% if is_edit %}Update church information and reassign manager if needed{% else %}Create a new church and assign a user to manage it{% endif %}</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="error-message">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="form-card">
+    {% csrf_token %}
+    
+    <!-- User Assignment Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Church Manager Assignment</h2>
+      <div class="form-group">
+        <label for="{{ form.assigned_user.id_for_label }}" class="form-label required">
+          {{ form.assigned_user.label }}
+        </label>
+        {{ form.assigned_user }}
+        {% if form.assigned_user.help_text %}
+          <span class="form-help-text">{{ form.assigned_user.help_text }}</span>
+        {% endif %}
+        {% if not form.assigned_user.field.queryset.exists %}
+          <div style="background: #fef3c7; color: #92400e; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; font-size: 0.875rem; border: 1px solid #fbbf24;">
+            <strong>⚠️ No eligible users found.</strong> Users must complete their profile (Name, Phone, Address, Date of Birth) before they can be assigned as church managers.
+          </div>
+        {% endif %}
+        {% if form.assigned_user.errors %}
+          <div class="field-error">{{ form.assigned_user.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Basic Information</h2>
+      
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}" class="form-label required">Church Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="field-error">{{ form.name.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}" class="form-label required">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="field-error">{{ form.description.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.denomination.id_for_label }}" class="form-label required">Denomination</label>
+        {{ form.denomination }}
+        {% if form.denomination.errors %}
+          <div class="field-error">{{ form.denomination.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Contact Information</h2>
+      
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}" class="form-label required">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="field-error">{{ form.email.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.phone.id_for_label }}" class="form-label required">Phone</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="field-error">{{ form.phone.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.website.id_for_label }}" class="form-label">Website</label>
+        {{ form.website }}
+        {% if form.website.errors %}
+          <div class="field-error">{{ form.website.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Location Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Location</h2>
+      
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.region.id_for_label }}" class="form-label">Region</label>
+          {{ form.region }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.province.id_for_label }}" class="form-label">Province</label>
+          {{ form.province }}
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.city_municipality.id_for_label }}" class="form-label">City/Municipality</label>
+          {{ form.city_municipality }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.barangay.id_for_label }}" class="form-label">Barangay</label>
+          {{ form.barangay }}
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.street_address.id_for_label }}" class="form-label">Street Address</label>
+          {{ form.street_address }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
+          {{ form.postal_code }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Leadership Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Leadership</h2>
+      
+      <div class="form-group">
+        <label for="{{ form.pastor_name.id_for_label }}" class="form-label">Pastor/Minister Name</label>
+        {{ form.pastor_name }}
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.pastor_email.id_for_label }}" class="form-label">Pastor Email</label>
+          {{ form.pastor_email }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.pastor_phone.id_for_label }}" class="form-label">Pastor Phone</label>
+          {{ form.pastor_phone }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Information Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Service Information</h2>
+      
+      <div class="form-group">
+        <label for="{{ form.service_times.id_for_label }}" class="form-label required">Service Times</label>
+        {{ form.service_times }}
+        {% if form.service_times.errors %}
+          <div class="field-error">{{ form.service_times.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.special_services.id_for_label }}" class="form-label">Special Services</label>
+        {{ form.special_services }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.ministries.id_for_label }}" class="form-label">Ministries</label>
+        {{ form.ministries }}
+      </div>
+    </div>
+
+    <!-- Media Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Visual Identity</h2>
+      
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.logo.id_for_label }}" class="form-label">Church Logo</label>
+          {% if is_edit and church.logo %}
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="{{ church.logo.url }}" alt="Current Logo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #d1d5db;">
+                <div>
+                  <p style="margin: 0; font-size: 0.875rem; color: #6b7280; font-weight: 500;">Current Logo</p>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace</p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          {{ form.logo }}
+          <span class="form-help-text">Recommended: Square image, at least 200x200px</span>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.cover_image.id_for_label }}" class="form-label">Cover Image</label>
+          {% if is_edit and church.cover_image %}
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="{{ church.cover_image.url }}" alt="Current Cover" style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #d1d5db;">
+                <div>
+                  <p style="margin: 0; font-size: 0.875rem; color: #6b7280; font-weight: 500;">Current Cover Image</p>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace</p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          {{ form.cover_image }}
+          <span class="form-help-text">Recommended: Wide image, at least 1200x400px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Media Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Social Media</h2>
+      
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.facebook_url.id_for_label }}" class="form-label">Facebook URL</label>
+          {{ form.facebook_url }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.instagram_url.id_for_label }}" class="form-label">Instagram URL</label>
+          {{ form.instagram_url }}
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="{{ form.youtube_url.id_for_label }}" class="form-label">YouTube URL</label>
+          {{ form.youtube_url }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.twitter_url.id_for_label }}" class="form-label">Twitter URL</label>
+          {{ form.twitter_url }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Information Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Payment Information</h2>
+      
+      <div class="form-group">
+        <label for="{{ form.paypal_email.id_for_label }}" class="form-label">PayPal Email</label>
+        {{ form.paypal_email }}
+        <span class="form-help-text">Required for receiving donations</span>
+      </div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">Status & Settings</h2>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          {{ form.is_verified }}
+          <label for="{{ form.is_verified.id_for_label }}">Mark as Verified</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="checkbox-group">
+          {{ form.is_active }}
+          <label for="{{ form.is_active.id_for_label }}">Active</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a href="{% if is_edit %}{% url 'core:super_admin_church_detail' church.id %}{% else %}{% url 'core:super_admin_churches' %}{% endif %}" class="btn btn-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        {% if is_edit %}Update Church{% else %}Create Church{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Initialize Select2 on the assigned_user field
+  const $assignedUser = $('#{{ form.assigned_user.id_for_label }}');
+  $assignedUser.select2({
+    placeholder: 'Search and select a user...',
+    allowClear: true,
+    width: '100%',
+    theme: 'default',
+    language: {
+      noResults: function() {
+        return "No users found. Users must complete their profile to be eligible.";
+      },
+      searching: function() {
+        return "Searching users...";
+      }
+    }
+  });
+
+  // Auto-fill leadership fields when user is selected
+  $assignedUser.on('select2:select', function(e) {
+    const userId = e.params.data.id;
+    if (userId) {
+      // Fetch user profile data
+      fetch(`/app/api/user/${userId}/profile/`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Auto-fill pastor fields from user profile
+            if (data.full_name) {
+              $('#{{ form.pastor_name.id_for_label }}').val(data.full_name);
+            }
+            if (data.email) {
+              $('#{{ form.pastor_email.id_for_label }}').val(data.email);
+            }
+            if (data.phone) {
+              $('#{{ form.pastor_phone.id_for_label }}').val(data.phone);
+            }
+            console.log('Leadership fields auto-filled successfully');
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user profile:', error);
+          // Silently fail - user can still fill manually
+        });
+    }
+  });
+
+  // Cascading Philippine Address Dropdowns with local data
+  const $region = $('#{{ form.region.id_for_label }}');
+  const $province = $('#{{ form.province.id_for_label }}');
+  const $city = $('#{{ form.city_municipality.id_for_label }}');
+  const $barangay = $('#{{ form.barangay.id_for_label }}');
+
+  // Philippine address data structure
+  const addressData = {
+    'Region X - Northern Mindanao': {
+      'Lanao del Norte': ['Iligan City', 'Kauswagan', 'Linamon', 'Maigo', 'Matungao'],
+      'Misamis Oriental': ['Cagayan de Oro City', 'Gingoog City', 'Jasaan', 'Villanueva'],
+      'Bukidnon': ['Malaybalay City', 'Valencia City', 'Manolo Fortich'],
+      'Camiguin': ['Mambajao', 'Catarman']
+    },
+    'NCR - National Capital Region': {
+      'Metro Manila': ['Manila', 'Quezon City', 'Makati', 'Pasig', 'Taguig', 'Parañaque', 'Las Piñas', 'Muntinlupa', 'Caloocan', 'Malabon', 'Navotas', 'Valenzuela', 'Mandaluyong', 'Marikina', 'Pasay', 'San Juan']
+    },
+    'Region I - Ilocos Region': {
+      'Ilocos Norte': ['Laoag City', 'Batac City'],
+      'Ilocos Sur': ['Vigan City', 'Candon City'],
+      'La Union': ['San Fernando City'],
+      'Pangasinan': ['Dagupan City', 'San Carlos City', 'Urdaneta City']
+    }
+  };
+
+  // Iligan City barangays
+  const iliganBarangays = [
+    'Abuno', 'Acmac', 'Bagong Silang', 'Bonbonon', 'Bunawan', 'Buru-un', 'Dalipuga', 
+    'Del Carmen', 'Digkilaan', 'Ditucalan', 'Dulag', 'Hinaplanon', 'Hindang', 
+    'Kabacsanan', 'Kalilangan', 'Kiwalan', 'Lanipao', 'Luinab', 'Mahayahay', 
+    'Mainit', 'Mandulog', 'Maria Cristina', 'Palao', 'Panoroganan', 'Poblacion', 
+    'Puga-an', 'Rogongon', 'San Miguel', 'San Roque', 'Santa Elena', 'Santa Filomena', 
+    'Santiago', 'Santo Rosario', 'Saray', 'Suarez', 'Tambacan', 'Tibanga', 
+    'Tipanoy', 'Tominobo Proper', 'Tubod', 'Ubaldo Laya', 'Upper Hinaplanon', 
+    'Upper Tominobo', 'Villa Verde'
+  ];
+
+  // Load regions
+  $region.empty().append('<option value="">Select Region</option>');
+  Object.keys(addressData).forEach(region => {
+    $region.append(`<option value="${region}">${region}</option>`);
+  });
+
+  // Region change - load provinces
+  $region.on('change', function() {
+    const regionName = $(this).val();
+    $province.empty().append('<option value="">Select Province</option>').prop('disabled', !regionName);
+    $city.empty().append('<option value="">Select City/Municipality</option>').prop('disabled', true);
+    $barangay.empty().append('<option value="">Select Barangay</option>').prop('disabled', true);
+
+    if (regionName && addressData[regionName]) {
+      const provinces = Object.keys(addressData[regionName]);
+      provinces.forEach(province => {
+        $province.append(`<option value="${province}">${province}</option>`);
+      });
+      $province.prop('disabled', false);
+    }
+  });
+
+  // Province change - load cities
+  $province.on('change', function() {
+    const regionName = $region.val();
+    const provinceName = $(this).val();
+    $city.empty().append('<option value="">Select City/Municipality</option>').prop('disabled', !provinceName);
+    $barangay.empty().append('<option value="">Select Barangay</option>').prop('disabled', true);
+
+    if (regionName && provinceName && addressData[regionName] && addressData[regionName][provinceName]) {
+      const cities = addressData[regionName][provinceName];
+      cities.forEach(city => {
+        $city.append(`<option value="${city}">${city}</option>`);
+      });
+      $city.prop('disabled', false);
+    }
+  });
+
+  // City change - load barangays
+  $city.on('change', function() {
+    const cityName = $(this).val();
+    $barangay.empty().append('<option value="">Select Barangay</option>').prop('disabled', !cityName);
+
+    // Special handling for Iligan City
+    if (cityName === 'Iligan City') {
+      iliganBarangays.forEach(barangay => {
+        $barangay.append(`<option value="${barangay}">${barangay}</option>`);
+      });
+      $barangay.prop('disabled', false);
+    } else {
+      // For other cities, enable manual entry
+      $barangay.prop('disabled', false);
+    }
+  });
+
+  // If editing, preserve existing values and enable cascading
+  {% if is_edit and church %}
+    // Store existing values
+    const existingRegion = '{{ church.region|escapejs }}';
+    const existingProvince = '{{ church.province|escapejs }}';
+    const existingCity = '{{ church.city_municipality|escapejs }}';
+    const existingBarangay = '{{ church.barangay|escapejs }}';
+    
+    // Set the region value if it exists
+    if (existingRegion) {
+      $region.val(existingRegion);
+      
+      // Trigger region change to load provinces
+      setTimeout(() => {
+        $region.trigger('change');
+        
+        // After provinces load, set the province value
+        setTimeout(() => {
+          if (existingProvince) {
+            $province.val(existingProvince);
+            $province.trigger('change');
+            
+            // After cities load, set the city value
+            setTimeout(() => {
+              if (existingCity) {
+                $city.val(existingCity);
+                $city.trigger('change');
+                
+                // After barangays load, set the barangay value
+                setTimeout(() => {
+                  if (existingBarangay) {
+                    $barangay.val(existingBarangay);
+                  }
+                }, 300);
+              }
+            }, 300);
+          }
+        }, 300);
+      }, 100);
+    }
+  {% endif %}
+});
+</script>
+{% endblock %}

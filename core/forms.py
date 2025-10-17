@@ -864,6 +864,374 @@ class AvailabilityBulkForm(forms.Form):
         return cleaned_data
 
 
+class SuperAdminChurchCreateForm(forms.ModelForm):
+    """Form for super-admin to create a church and assign a user as manager."""
+    
+    # User assignment field
+    assigned_user = forms.ModelChoiceField(
+        queryset=User.objects.none(),  # Will be set in __init__
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'required': True
+        }),
+        label="Assign Church Manager",
+        help_text="Select a user with complete profile (Name, Phone, Address, Date of Birth) to manage this church"
+    )
+    
+    class Meta:
+        model = Church
+        # Essential fields for church creation
+        fields = [
+            # Basic Information
+            'name', 'description', 'denomination',
+            
+            # Contact Information
+            'email', 'phone', 'website',
+            
+            # Location - Philippine Address Structure
+            'region', 'province', 'city_municipality', 'barangay', 'street_address', 'postal_code',
+            
+            # Leadership
+            'pastor_name', 'pastor_email', 'pastor_phone',
+            
+            # Visual Identity
+            'logo', 'cover_image',
+            
+            # Service Information
+            'service_times', 'special_services', 'ministries',
+            
+            # Social Media
+            'facebook_url', 'instagram_url', 'youtube_url', 'twitter_url',
+            
+            # Payment Information
+            'paypal_email',
+            
+            # Status
+            'is_verified', 'is_active'
+        ]
+        widgets = {
+            # Basic Information
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter church name',
+                'maxlength': 200,
+                'required': True
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Brief description of the church',
+                'rows': 4,
+                'required': True
+            }),
+            'denomination': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True
+            }),
+            
+            # Contact Information
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'church@example.com',
+                'required': True
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '+63 123 456 7890',
+                'required': True
+            }),
+            'website': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://www.yourchurch.com'
+            }),
+            
+            # Location - Philippine Address Structure (Cascading Dropdowns)
+            'region': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True
+            }),
+            'province': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
+            }),
+            'city_municipality': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
+            }),
+            'barangay': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+                'disabled': True
+            }),
+            'street_address': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'House/Building No., Street Name'
+            }),
+            'postal_code': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '4-digit postal code',
+                'maxlength': 4
+            }),
+            
+            # Legacy location
+            'address': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Complete street address (legacy)',
+                'rows': 2
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'City (legacy)'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'State/Province (legacy)'
+            }),
+            'country': forms.TextInput(attrs={
+                'class': 'form-input',
+                'value': 'Philippines'
+            }),
+            
+            # Leadership
+            'pastor_name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Lead pastor/minister name'
+            }),
+            'pastor_email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'pastor@example.com'
+            }),
+            'pastor_phone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '+63 123 456 7890'
+            }),
+            
+            # Visual Identity
+            'logo': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': 'image/*'
+            }),
+            'cover_image': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': 'image/*'
+            }),
+            
+            # Service Information
+            'service_times': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Sunday 9:00 AM, 11:00 AM\nWednesday 7:00 PM',
+                'rows': 3,
+                'required': True
+            }),
+            'special_services': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Special services or events',
+                'rows': 3
+            }),
+            'ministries': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Available ministries and programs',
+                'rows': 3
+            }),
+            
+            # Social Media
+            'facebook_url': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://facebook.com/yourchurch'
+            }),
+            'instagram_url': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://instagram.com/yourchurch'
+            }),
+            'youtube_url': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://youtube.com/yourchurch'
+            }),
+            'twitter_url': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://twitter.com/yourchurch'
+            }),
+            
+            # Payment Information
+            'paypal_email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'paypal@yourchurch.com'
+            }),
+            
+            # Status
+            'is_verified': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'member_count': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Approximate number of members',
+                'min': 0
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Filter users with complete essential profile information
+        from .utils import get_essential_profile_status
+        
+        # Get all active users with their profiles
+        eligible_users = []
+        for user in User.objects.filter(is_active=True).select_related('profile'):
+            try:
+                profile = user.profile
+                essential_status = get_essential_profile_status(user, profile)
+                if essential_status.get('is_complete', False):
+                    eligible_users.append(user.id)
+            except Exception:
+                # Skip users without profiles or with errors
+                continue
+        
+        # Set queryset to only eligible users, ordered by email for easy selection
+        self.fields['assigned_user'].queryset = User.objects.filter(
+            id__in=eligible_users
+        ).order_by('email')
+        
+        # If editing, set the current owner as initial value
+        if self.instance and self.instance.pk and self.instance.owner:
+            self.fields['assigned_user'].initial = self.instance.owner
+        
+        # Add custom label to show user's full name and email
+        self.fields['assigned_user'].label_from_instance = lambda obj: (
+            f"{obj.get_full_name()} ({obj.email})" if obj.get_full_name() 
+            else obj.email
+        )
+        
+        # Group denomination choices for better UX
+        try:
+            self.fields['denomination'].choices = get_grouped_denomination_choices()
+        except Exception:
+            pass
+        
+        # Initialize location dropdowns with existing values if editing
+        if self.instance and self.instance.pk:
+            # Region
+            if self.instance.region:
+                self.fields['region'].choices = [('', 'Select Region'), (self.instance.region, self.instance.region)]
+                self.fields['region'].initial = self.instance.region
+            else:
+                self.fields['region'].choices = [('', 'Select Region')]
+            
+            # Province
+            if self.instance.province:
+                self.fields['province'].choices = [('', 'Select Province'), (self.instance.province, self.instance.province)]
+                self.fields['province'].initial = self.instance.province
+                self.fields['province'].widget.attrs['disabled'] = False
+            else:
+                self.fields['province'].choices = [('', 'Select Province')]
+            
+            # City/Municipality
+            if self.instance.city_municipality:
+                self.fields['city_municipality'].choices = [('', 'Select City/Municipality'), (self.instance.city_municipality, self.instance.city_municipality)]
+                self.fields['city_municipality'].initial = self.instance.city_municipality
+                self.fields['city_municipality'].widget.attrs['disabled'] = False
+            else:
+                self.fields['city_municipality'].choices = [('', 'Select City/Municipality')]
+            
+            # Barangay
+            if self.instance.barangay:
+                self.fields['barangay'].choices = [('', 'Select Barangay'), (self.instance.barangay, self.instance.barangay)]
+                self.fields['barangay'].initial = self.instance.barangay
+                self.fields['barangay'].widget.attrs['disabled'] = False
+            else:
+                self.fields['barangay'].choices = [('', 'Select Barangay')]
+        else:
+            # For new churches, initialize empty choices
+            self.fields['region'].choices = [('', 'Select Region')]
+            self.fields['province'].choices = [('', 'Select Province')]
+            self.fields['city_municipality'].choices = [('', 'Select City/Municipality')]
+            self.fields['barangay'].choices = [('', 'Select Barangay')]
+        
+        # Make most fields optional for flexibility
+        for field_name in self.fields:
+            if field_name not in ['name', 'description', 'email', 'phone', 'service_times', 'assigned_user']:
+                self.fields[field_name].required = False
+        
+        # Set default values
+        if not self.instance or not self.instance.pk:
+            self.fields['is_active'].initial = True
+    
+    def clean_name(self):
+        return clean_name_field(self.cleaned_data.get('name'), Church, self.instance)
+    
+    def clean_phone(self):
+        return clean_phone_field(self.cleaned_data.get('phone'))
+    
+    def clean_pastor_phone(self):
+        return clean_phone_field(self.cleaned_data.get('pastor_phone'))
+    
+    def save(self, commit=True):
+        from django.core.mail import send_mail
+        from django.conf import settings
+        from django.template.loader import render_to_string
+        from django.utils.html import strip_tags
+        from accounts.models import Notification
+        
+        church = super().save(commit=False)
+        assigned_user = self.cleaned_data.get('assigned_user')
+        previous_owner = self.instance.owner if self.instance.pk else None
+        is_reassignment = previous_owner and previous_owner != assigned_user
+        is_new_assignment = not previous_owner and assigned_user
+        
+        # Assign the selected user as the church owner
+        if assigned_user:
+            church.owner = assigned_user
+        
+        if commit:
+            church.save()
+            
+            # Send notifications only if there's a new assignment or reassignment
+            if (is_new_assignment or is_reassignment) and assigned_user:
+                # Create system notification
+                try:
+                    notification_message = (
+                        f'You have been assigned as the manager of {church.name}. '
+                        f'You can now manage church details, services, and bookings.'
+                    )
+                    Notification.objects.create(
+                        user=assigned_user,
+                        notification_type='church_assignment',
+                        title='Church Manager Assignment',
+                        message=notification_message,
+                        link=f'/app/manage-church/'
+                    )
+                except Exception as e:
+                    print(f"Error creating notification: {e}")
+                
+                # Send email notification
+                try:
+                    subject = f'You are now the Manager of {church.name}'
+                    context = {
+                        'user': assigned_user,
+                        'church': church,
+                        'is_reassignment': is_reassignment,
+                        'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'https://churchiligan.onrender.com',
+                    }
+                    
+                    # Render HTML email
+                    html_message = render_to_string('emails/church_assignment.html', context)
+                    plain_message = strip_tags(html_message)
+                    
+                    send_mail(
+                        subject=subject,
+                        message=plain_message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[assigned_user.email],
+                        html_message=html_message,
+                        fail_silently=True,  # Don't raise errors in production
+                    )
+                except Exception as e:
+                    print(f"Error sending email: {e}")
+        
+        return church
+
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post

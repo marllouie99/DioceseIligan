@@ -32,25 +32,13 @@
       <p class="page-subtitle">Find and connect with churches in your community</p>
     </div>
     <div class="header-actions">
-      {% if essential_status.is_complete %}
-        <a href="{% url 'core:create_church' %}" class="btn btn-primary">
+      {% if user.is_superuser %}
+        <a href="{% url 'core:super_admin_create_church' %}" class="btn btn-primary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14m7-7H5"/>
           </svg>
           Create Church
         </a>
-      {% else %}
-        <button 
-          type="button" 
-          class="btn btn-primary" 
-          onclick="alert('Please complete your essential profile information (Full Name, Phone, Address, Date of Birth) before creating a church.'); window.location.href='{% url 'manage_profile' %}';"
-          title="Complete your profile to create a church"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14m7-7H5"/>
-          </svg>
-          Create Church
-        </button>
       {% endif %}
     </div>
   </div>
@@ -246,25 +234,14 @@
           <circle cx="12" cy="10" r="3"/>
         </svg>
         <h3>No churches found</h3>
-        <p>Try adjusting your search criteria or create a new church listing.</p>
-        {% if essential_status.is_complete %}
-          <a href="{% url 'core:create_church' %}" class="btn btn-primary">
+        <p>Try adjusting your search criteria.</p>
+        {% if user.is_superuser %}
+          <a href="{% url 'core:super_admin_create_church' %}" class="btn btn-primary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14m7-7H5"/>
             </svg>
             Create Church
           </a>
-        {% else %}
-          <button 
-            type="button" 
-            class="btn btn-primary" 
-            onclick="alert('Please complete your essential profile information before creating a church.'); window.location.href='{% url 'manage_profile' %}';"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14m7-7H5"/>
-            </svg>
-            Create Church
-          </button>
         {% endif %}
       </div>
     {% endfor %}

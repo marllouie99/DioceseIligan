@@ -48,6 +48,7 @@ from .forms import (
     BookingForm,
     PostForm,
     ChurchVerificationUploadForm,
+    SuperAdminChurchCreateForm,
 )
 from .utils import get_user_display_data, get_essential_profile_status, optimize_image
 from django.core.files.storage import default_storage
@@ -224,49 +225,19 @@ def discover(request):
 
 @login_required
 def create_church(request):
-    """Create a new church."""
-    from core.utils import get_essential_profile_status
-    from accounts.models import Profile
+    """Create a new church (legacy entrypoint).
+    Church creation is now restricted to Super Admins who can create a church and assign a manager.
+    This endpoint remains to gracefully handle existing links and redirects users appropriately.
+    """
+    if request.user.is_superuser:
+        # Super Admins should use the new creation flow
+        return redirect('core:super_admin_create_church')
     
-    # Check if user has completed essential profile information
-    try:
-        profile = request.user.profile
-    except Profile.DoesNotExist:
-        profile = None
-    
-    essential_status = get_essential_profile_status(request.user, profile)
-    
-    if not essential_status.get('is_complete', False):
-        missing_fields = essential_status.get('missing', [])
-        missing_fields_text = ', '.join(missing_fields)
-        messages.error(
-            request, 
-            f'Please complete your essential profile information before creating a church. Missing: {missing_fields_text}'
-        )
-        return redirect('manage_profile')
-    
-    if request.method == 'POST':
-        form = ChurchCreateForm(request.POST, request.FILES, user=request.user)
-        if form.is_valid():
-            church = form.save()
-            # Generate slug if not provided
-            if not church.slug:
-                church.slug = slugify(church.name)
-                church.save(update_fields=['slug'])
-            messages.success(request, f'Church "{church.name}" has been created successfully!')
-            return redirect('core:church_detail', slug=church.slug)
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = ChurchCreateForm(user=request.user)
-    
-    ctx = {
-        'active': 'discover',
-        'page_title': 'Create Church',
-        'form': form,
-    }
-    ctx.update(_app_context(request))
-    return render(request, 'core/create_church.html', ctx)
+    messages.info(
+        request,
+        'Church creation is restricted to Super Admin. Please contact the platform administrator to create a church and assign you as manager.'
+    )
+    return redirect('core:home')
 
 
 @login_required
@@ -385,11 +356,21 @@ def manage_church(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     # Mark booking notifications as read when viewing appointments tab
     current_tab = request.GET.get('tab', 'overview')
@@ -1098,7 +1079,13 @@ def manage(request):
     if request.user.owned_churches.exists():
         return redirect('core:manage_church')
     else:
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "Church creation is restricted to Super Admin. Please contact an administrator to create a church and assign you as manager."
+        )
+        return redirect('core:home')
 
 
 @login_required
@@ -1491,6 +1478,100 @@ def super_admin_churches(request):
 
 
 @login_required
+def super_admin_create_church(request):
+    """Super Admin view to create a church and assign a user as manager.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    if request.method == 'POST':
+        form = SuperAdminChurchCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            church = form.save()
+            assigned_user = form.cleaned_data.get('assigned_user')
+            messages.success(
+                request, 
+                f'Church "{church.name}" has been created successfully and assigned to {assigned_user.get_full_name() or assigned_user.email}!'
+            )
+            return redirect('core:super_admin_church_detail', church_id=church.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SuperAdminChurchCreateForm()
+    
+    ctx = {
+        'active': 'super_admin_churches',
+        'page_title': 'Create New Church',
+        'form': form,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_create_church.html', ctx)
+
+
+@login_required
+def super_admin_edit_church(request, church_id):
+    """Super Admin view to edit a church and reassign manager if needed.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    church = get_object_or_404(Church, id=church_id)
+    
+    if request.method == 'POST':
+        form = SuperAdminChurchCreateForm(request.POST, request.FILES, instance=church)
+        if form.is_valid():
+            church = form.save()
+            assigned_user = form.cleaned_data.get('assigned_user')
+            messages.success(
+                request, 
+                f'Church "{church.name}" has been updated successfully! Manager: {assigned_user.get_full_name() or assigned_user.email}'
+            )
+            return redirect('core:super_admin_church_detail', church_id=church.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SuperAdminChurchCreateForm(instance=church)
+    
+    ctx = {
+        'active': 'super_admin_churches',
+        'page_title': f'Edit Church - {church.name}',
+        'form': form,
+        'church': church,
+        'is_edit': True,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_create_church.html', ctx)
+
+
+@login_required
+def api_user_profile(request, user_id):
+    """API endpoint to fetch user profile data for auto-fill.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = get_object_or_404(User, id=user_id)
+        profile = user.profile
+        
+        return JsonResponse({
+            'success': True,
+            'full_name': user.get_full_name() or profile.display_name or '',
+            'email': user.email or '',
+            'phone': profile.phone or '',
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+
+@login_required
 def super_admin_users(request):
     """Super Admin users management page.
     Access is restricted to superusers.
@@ -1606,11 +1687,21 @@ def manage_services(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     # Search and filter functionality
     search_query = request.GET.get('search', '')
@@ -1660,11 +1751,21 @@ def create_service(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     if request.method == 'POST':
         form = BookableServiceForm(request.POST, request.FILES, church=church)
@@ -1726,11 +1827,21 @@ def edit_service(request, service_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     service = get_object_or_404(BookableService, id=service_id, church=church)
     
@@ -1783,11 +1894,21 @@ def delete_service(request, service_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     service = get_object_or_404(BookableService, id=service_id, church=church)
     
@@ -1814,11 +1935,21 @@ def manage_service_images(request, service_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     service = get_object_or_404(BookableService, id=service_id, church=church)
     
@@ -1853,11 +1984,21 @@ def delete_service_image(request, image_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     service_image = get_object_or_404(ServiceImage, id=image_id, service__church=church)
     service = service_image.service
@@ -1885,11 +2026,21 @@ def manage_availability(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
     
     # Get availability entries for the next 3 months
     from datetime import date, timedelta
@@ -2256,13 +2407,23 @@ def create_decline_reason(request):
         if not church:
             if request.headers.get('Content-Type') == 'application/json':
                 return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
         if request.headers.get('Content-Type') == 'application/json':
             return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
 
     if request.method != 'POST':
         return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
@@ -2315,13 +2476,23 @@ def delete_decline_reason(request, reason_id):
         if not church:
             if request.headers.get('Content-Type') == 'application/json':
                 return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
         if request.headers.get('Content-Type') == 'application/json':
             return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
 
     reason = get_object_or_404(DeclineReason, id=reason_id, church=church)
     if request.method == 'POST':
@@ -2340,13 +2511,23 @@ def toggle_decline_reason(request, reason_id):
         if not church:
             if request.headers.get('Content-Type') == 'application/json':
                 return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(
+                request,
+                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            )
+            return redirect('core:home')
     except Church.DoesNotExist:
         if request.headers.get('Content-Type') == 'application/json':
             return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(
+            request,
+            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+        )
+        return redirect('core:home')
 
     reason = get_object_or_404(DeclineReason, id=reason_id, church=church)
     if request.method == 'POST':
@@ -2405,13 +2586,17 @@ def request_verification(request):
             # JSON path for AJAX
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'message': "You don't own any churches yet."}, status=403)
-            messages.info(request, 'You do not own any churches yet. Create one to continue.')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'message': "You don't own any churches yet."}, status=403)
-        messages.info(request, 'You do not own any churches yet. Create one to continue.')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
 
     if request.method != 'POST':
         # Redirect to settings tab where the form lives
@@ -2730,11 +2915,15 @@ def create_availability(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
     
     if request.method == 'POST':
         form = AvailabilityForm(request.POST, church=church)
@@ -2787,11 +2976,15 @@ def edit_availability(request, availability_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
     
     availability = get_object_or_404(Availability, id=availability_id, church=church)
     
@@ -2823,11 +3016,15 @@ def delete_availability(request, availability_id):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
     
     availability = get_object_or_404(Availability, id=availability_id, church=church)
     
@@ -2853,11 +3050,15 @@ def bulk_availability(request):
     try:
         church = request.user.owned_churches.first()
         if not church:
-            messages.info(request, 'You don\'t own any churches. Create one to get started!')
-            return redirect('core:create_church')
+            if request.user.is_superuser:
+                return redirect('core:super_admin_create_church')
+            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+            return redirect('core:home')
     except Church.DoesNotExist:
-        messages.info(request, 'You don\'t own any churches. Create one to get started!')
-        return redirect('core:create_church')
+        if request.user.is_superuser:
+            return redirect('core:super_admin_create_church')
+        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+        return redirect('core:home')
     
     if request.method == 'POST':
         form = AvailabilityBulkForm(request.POST)

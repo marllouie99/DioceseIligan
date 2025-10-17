@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Manager Assignment</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .email-body {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8B4513;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        .church-info {
+            background: #FFF9E6;
+            border-left: 4px solid #8B4513;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .church-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            color: #8B4513;
+        }
+        .church-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .responsibilities {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .responsibilities h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #8B4513;
+        }
+        .responsibilities ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .responsibilities li {
+            margin: 8px 0;
+            color: #555;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .cta-button:hover {
+            background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+        }
+        .email-footer {
+            background: #f9fafb;
+            padding: 25px 30px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .email-footer p {
+            margin: 5px 0;
+        }
+        .email-footer a {
+            color: #8B4513;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>🎉 Church Manager Assignment</h1>
+        </div>
+        
+        <div class="email-body">
+            <div class="greeting">
+                Hello {{ user.get_full_name|default:user.email }}!
+            </div>
+            
+            <div class="message">
+                {% if is_reassignment %}
+                    <p>You have been reassigned as the manager of <strong>{{ church.name }}</strong>.</p>
+                {% else %}
+                    <p>Congratulations! You have been assigned as the manager of <strong>{{ church.name }}</strong>.</p>
+                {% endif %}
+                
+                <p>This is an important responsibility, and we're confident you'll do a great job managing your church's presence on ChurchConnect.</p>
+            </div>
+            
+            <div class="church-info">
+                <h2>{{ church.name }}</h2>
+                {% if church.denomination %}
+                    <p><strong>Denomination:</strong> {{ church.denomination }}</p>
+                {% endif %}
+                {% if church.city_municipality %}
+                    <p><strong>Location:</strong> {{ church.city_municipality }}, {{ church.province }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="responsibilities">
+                <h3>Your Responsibilities as Church Manager:</h3>
+                <ul>
+                    <li>✅ Manage church profile and information</li>
+                    <li>✅ Create and manage church services</li>
+                    <li>✅ Handle booking requests from members</li>
+                    <li>✅ Post updates and announcements</li>
+                    <li>✅ Respond to inquiries and messages</li>
+                    <li>✅ Keep church information up-to-date</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ site_url }}/app/manage-church/" class="cta-button">
+                    Go to Church Dashboard
+                </a>
+            </div>
+            
+            <div class="message" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <p>If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>
+            </div>
+        </div>
+        
+        <div class="email-footer">
+            <p><strong>ChurchConnect</strong></p>
+            <p>Connecting Communities of Faith</p>
+            <p style="margin-top: 15px;">
+                <a href="{{ site_url }}">Visit Website</a> | 
+                <a href="{{ site_url }}/app/settings/">Account Settings</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 12px; color: #aaa;">
+                This is an automated notification. Please do not reply to this email.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
