@@ -1207,7 +1207,8 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                         notification_type='church_assignment',
                         title='Church Manager Assignment',
                         message=notification_message,
-                        link=f'/app/manage-church/'
+                        church=church,
+                        priority=Notification.PRIORITY_HIGH
                     )
                     logger.info(f"Notification created for user {assigned_user.email}")
                 except Exception as e:

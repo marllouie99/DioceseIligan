@@ -132,6 +132,15 @@ After deployment, monitor the application logs for:
 - Added `('church_assignment', 'Church Manager Assignment')` to TYPE_CHOICES
 - Created migration `0032_add_church_assignment_notification_type.py`
 
+### Fix 4: Slug Field Length Constraint (Commit f77bde0)
+**Issue**: `value too long for type character varying(50)` - The Church `slug` field was using Django's default max_length of 50, causing errors when church names were long.
+
+**Root Cause**: Django's SlugField defaults to max_length=50, but church names can be up to 200 characters. When slugified, long names exceeded the 50-character limit.
+
+**Solution**: 
+- Changed `slug = models.SlugField(unique=True, ...)` to `slug = models.SlugField(max_length=200, unique=True, ...)`
+- Created migration `0033_increase_church_slug_max_length.py`
+
 **⚠️ Important**: Run migrations on the server:
 ```bash
 python manage.py migrate core
