@@ -1214,8 +1214,10 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                 except Exception as e:
                     logger.error(f"Error creating notification: {e}", exc_info=True)
                 
-                # Send email notification
+                # Send email notification using Brevo API (same as other working emails)
                 try:
+                    from accounts.brevo_email import send_email_via_brevo_api
+                    
                     subject = f'You are now the Manager of {church.name}'
                     context = {
                         'user': assigned_user,
@@ -1228,17 +1230,20 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                     html_message = render_to_string('emails/church_assignment.html', context)
                     plain_message = strip_tags(html_message)
                     
-                    send_mail(
+                    # Use Brevo HTTP API for reliable email delivery
+                    success = send_email_via_brevo_api(
+                        to_email=assigned_user.email,
                         subject=subject,
-                        message=plain_message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[assigned_user.email],
-                        html_message=html_message,
-                        fail_silently=True,  # Don't raise errors in production
+                        html_content=html_message,
+                        plain_content=plain_message
                     )
-                    logger.info(f"Email sent to {assigned_user.email}")
+                    
+                    if success:
+                        logger.info(f"Church assignment email sent successfully to {assigned_user.email} via Brevo API")
+                    else:
+                        logger.error(f"Failed to send church assignment email via Brevo API to {assigned_user.email}")
                 except Exception as e:
-                    logger.error(f"Error sending email: {e}", exc_info=True)
+                    logger.error(f"Error sending church assignment email: {e}", exc_info=True)
         
         return church
 
