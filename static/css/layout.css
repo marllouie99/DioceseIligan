@@ -126,6 +126,23 @@
   min-height: 0; /* allow content area to shrink within the scroll container */
 }
 
+/* Sidebar Logo Container */
+.sidebar-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 8px;
+  margin-bottom: 8px;
+}
+
+/* Sidebar Logo Image */
+.sidebar-logo-img {
+  width: 240px;
+  height: 67px;
+  object-fit: contain;
+  display: block;
+}
+
 /* Enhanced Sidebar Styling */
 .sidebar .brand { 
   display: flex; 
