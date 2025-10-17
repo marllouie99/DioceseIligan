@@ -190,6 +190,7 @@ CSRF_COOKIE_AGE = 31449600  # 1 year
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'http://127.0.0.1:8000',
     'http://localhost:8000',
+    'https://churchiligan.onrender.com',
 ])
 
 # HTTPS handling behind reverse proxy (e.g., Render)
