@@ -137,8 +137,9 @@
 
 /* Sidebar Logo Image */
 .sidebar-logo-img {
-  width: 240px;
-  height: 67px;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
   object-fit: contain;
   display: block;
 }
