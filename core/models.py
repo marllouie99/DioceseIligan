@@ -954,6 +954,7 @@ class Notification(models.Model):
     TYPE_BOOKING_COMPLETED = 'booking_completed'
     TYPE_CHURCH_APPROVED = 'church_approved'
     TYPE_CHURCH_DECLINED = 'church_declined'
+    TYPE_CHURCH_ASSIGNMENT = 'church_assignment'
     TYPE_FOLLOW_REQUEST = 'follow_request'
     TYPE_FOLLOW_ACCEPTED = 'follow_accepted'
     TYPE_MESSAGE_RECEIVED = 'message_received'
@@ -967,6 +968,7 @@ class Notification(models.Model):
         (TYPE_BOOKING_COMPLETED, 'Booking Completed'),
         (TYPE_CHURCH_APPROVED, 'Church Approved'),
         (TYPE_CHURCH_DECLINED, 'Church Declined'),
+        (TYPE_CHURCH_ASSIGNMENT, 'Church Manager Assignment'),
         (TYPE_FOLLOW_REQUEST, 'Follow Request'),
         (TYPE_FOLLOW_ACCEPTED, 'Follow Accepted'),
         (TYPE_MESSAGE_RECEIVED, 'New Message'),
