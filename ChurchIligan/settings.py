@@ -110,7 +110,8 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = '/static/'
-STATIC_VERSION = env('STATIC_VERSION', default=str(int(time.time())))
+# Force cache bust for logo update - increment this manually when CSS changes
+STATIC_VERSION = env('STATIC_VERSION', default='20250118_0154')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
