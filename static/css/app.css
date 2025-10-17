@@ -97,9 +97,18 @@ body {
   }
   
   .topbar {
-    grid-template-columns: auto 1fr auto auto auto; /* Add space for mobile menu toggle + manage church */
+    grid-template-columns: auto auto 1fr auto auto; /* Mobile toggle, logo, search, and other items */
     padding: 8px 12px; /* Reduced padding for mobile */
     gap: 6px; /* Smaller gap for mobile to fit all elements */
+  }
+  
+  .topbar-logo {
+    padding-right: 8px;
+    margin-right: 4px;
+  }
+  
+  .topbar-logo img {
+    height: 35px !important; /* Smaller logo on mobile */
   }
   
   .search {
@@ -270,10 +279,19 @@ body {
   transform: translateY(0);
 }
 
+/* Topbar Logo */
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  border-right: 1px solid rgba(218, 165, 32, 0.2);
+  margin-right: 8px;
+}
+
 /* Topbar - With Backdrop for Scroll Overlay */
 .topbar { 
   display: grid; 
-  grid-template-columns: 1fr auto auto auto; /* Flexible search bar */
+  grid-template-columns: auto 1fr auto auto auto; /* Logo, flexible search bar, and other items */
   align-items: center; 
   gap: 10px; 
   background: rgba(255, 255, 255, 0.063); 
@@ -394,7 +412,16 @@ body {
   transform: translateY(-50%) scale(1) !important;
 }
 /* Admin Mode: flex layout, push profile dropdown to the far right */
-.topbar.admin-mode { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.topbar.admin-mode { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; /* Space between logo and right items */
+  gap: 12px; 
+}
+
+.topbar.admin-mode .topbar-logo {
+  margin-right: auto; /* Push logo to the left */
+}
 
 /* Admin Badge in Topbar */
 .admin-badge-container {
