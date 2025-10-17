@@ -235,6 +235,16 @@ class Church(models.Model):
         return "No address provided"
     
     @property
+    def street_location(self):
+        """Return only the street address for display."""
+        if self.street_address:
+            return self.street_address
+        # Fallback to legacy address if no street_address
+        if self.address:
+            return self.address
+        return "No street address"
+    
+    @property
     def initial(self):
         """Return first letter of church name for avatar."""
         return self.name[0].upper() if self.name else 'C'

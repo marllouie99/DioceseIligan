@@ -1167,7 +1167,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <h3 class="chart-title">Top Churches by Followers</h3>
       <p class="chart-subtitle">Most followed church pages on the platform</p>
     </div>
-    <div class="chart-container">
+    <div class="chart-container" style="min-height: 300px; height: 400px;">
       <canvas id="topChurchesChart"></canvas>
     </div>
   </div>
@@ -1185,23 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <p id="sectionSubtitleText">Manage and monitor all churches registered on the platform</p>
       </div>
       
-      <!-- View Toggle Switch -->
-      <div class="view-toggle">
-        <button class="toggle-option active" data-view="churches">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-          Churches
-        </button>
-        <button class="toggle-option" data-view="verifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          Verifications
-        </button>
-      </div>
+      <!-- View Toggle Switch - Removed Verifications tab -->
       <div class="section-actions">
         <a href="{% url 'core:super_admin_create_church' %}" class="btn-add-church">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1265,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <th>Church Name</th>
             <th>Denomination</th>
             <th>Location</th>
-            <th>Owner</th>
+            <th>Manager</th>
             <th>Followers</th>
             <th>Status</th>
             <th>Created</th>
@@ -1284,7 +1268,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 {% endif %}
                 <div class="church-info-cell">
                   <div class="church-name-text">{{ church.name }}</div>
-                  <div class="church-size-badge">{{ church.get_size_display }}</div>
                 </div>
               </div>
             </td>
@@ -1297,7 +1280,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
-                {{ church.city }}, {{ church.state }}
+                {{ church.street_location }}
               </div>
             </td>
             <td>
