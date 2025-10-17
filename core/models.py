@@ -50,7 +50,7 @@ class Church(models.Model):
     
     # Basic Information
     name = models.CharField(max_length=200, help_text="Church name")
-    slug = models.SlugField(unique=True, help_text="URL-friendly version of the name")
+    slug = models.SlugField(max_length=200, unique=True, help_text="URL-friendly version of the name")
     description = models.TextField(help_text="Brief description of the church")
     denomination = models.CharField(max_length=20, choices=DENOMINATION_CHOICES, default='other')
     size = models.CharField(max_length=10, choices=SIZE_CHOICES, default='medium')
