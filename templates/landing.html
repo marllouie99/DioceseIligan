@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Welcome to ChurchConnect</title>
+  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}">
   <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
 </head>
 <body>
@@ -86,8 +87,7 @@
       <!-- Right Side - Glassmorphism Form -->
       <div class="card">
       <div class="logo-stack">
-        <div class="logo-glow"></div>
-        <div class="logo-badge">CC</div>
+        <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan" style="width: 180px; height: auto; margin: 0 auto; display: block;">
       </div>
 
       <h1 class="title" id="heading-title">{% if active_tab == 'signup' %}Create your account{% else %}Welcome to ChurchConnect{% endif %}</h1>
