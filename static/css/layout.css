@@ -5,6 +5,7 @@
   height: 100vh;
   overflow: hidden; /* prevent body scroll; right column will scroll */
   padding-left: min(260px, 25vw); /* responsive sidebar space that scales with viewport */
+  padding-top: 65px; /* Space for fixed topbar */
   max-width: 100vw; /* prevent horizontal overflow */
   box-sizing: border-box;
 }
@@ -29,13 +30,13 @@
   padding: 18px 14px; 
   /* Pin to the viewport and scroll independently */
   position: fixed !important;
-  top: 0 !important;
+  top: 65px !important; /* Start below the topbar */
   left: 0 !important;
   width: min(260px, 25vw) !important; /* responsive width that scales with viewport */
   max-width: 300px !important; /* maximum width to prevent it getting too wide */
   min-width: 200px !important; /* minimum width to maintain usability */
-  height: 100vh !important;
-  max-height: 100vh !important;
+  height: calc(100vh - 65px) !important; /* Full height minus topbar */
+  max-height: calc(100vh - 65px) !important;
   overflow-y: auto !important;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
