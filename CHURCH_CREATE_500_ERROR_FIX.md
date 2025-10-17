@@ -117,8 +117,28 @@ After deployment, monitor the application logs for:
 2. `core/forms.py` - SuperAdminChurchCreateForm save method
 3. `core/views.py` - super_admin_create_church view function
 
+## Additional Fixes Applied
+
+### Fix 2: Incorrect Import Path (Commit 687062a)
+**Issue**: `ImportError: cannot import name 'Notification' from 'accounts.models'`
+
+**Solution**: Changed import from `accounts.models` to `core.models` where Notification is actually defined.
+
+### Fix 3: Missing Notification Type (Commit e3ec528)
+**Issue**: `value too long for type character varying(50)` - The `church_assignment` notification type was not defined in the model's TYPE_CHOICES.
+
+**Solution**: 
+- Added `TYPE_CHURCH_ASSIGNMENT = 'church_assignment'` constant
+- Added `('church_assignment', 'Church Manager Assignment')` to TYPE_CHOICES
+- Created migration `0032_add_church_assignment_notification_type.py`
+
+**⚠️ Important**: Run migrations on the server:
+```bash
+python manage.py migrate core
+```
+
 ## Date
 2025-10-17
 
 ## Status
-✅ Fixed and Ready for Testing
+✅ Fixed and Ready for Testing (Migration Required on Server)
