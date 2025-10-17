@@ -1482,6 +1482,9 @@ def super_admin_create_church(request):
     """Super Admin view to create a church and assign a user as manager.
     Access is restricted to superusers.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     if not request.user.is_superuser:
         messages.error(request, 'You do not have permission to access Super Admin.')
         return redirect('core:home')
@@ -1489,15 +1492,20 @@ def super_admin_create_church(request):
     if request.method == 'POST':
         form = SuperAdminChurchCreateForm(request.POST, request.FILES)
         if form.is_valid():
-            church = form.save()
-            assigned_user = form.cleaned_data.get('assigned_user')
-            messages.success(
-                request, 
-                f'Church "{church.name}" has been created successfully and assigned to {assigned_user.get_full_name() or assigned_user.email}!'
-            )
-            return redirect('core:super_admin_church_detail', church_id=church.id)
+            try:
+                church = form.save()
+                assigned_user = form.cleaned_data.get('assigned_user')
+                messages.success(
+                    request, 
+                    f'Church "{church.name}" has been created successfully and assigned to {assigned_user.get_full_name() or assigned_user.email}!'
+                )
+                return redirect('core:super_admin_church_detail', church_id=church.id)
+            except Exception as e:
+                logger.error(f"Error creating church: {e}", exc_info=True)
+                messages.error(request, f'An error occurred while creating the church: {str(e)}')
         else:
             messages.error(request, 'Please correct the errors below.')
+            logger.warning(f"Form validation errors: {form.errors}")
     else:
         form = SuperAdminChurchCreateForm()
     

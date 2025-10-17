@@ -1167,11 +1167,14 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
         return clean_phone_field(self.cleaned_data.get('pastor_phone'))
     
     def save(self, commit=True):
+        import logging
         from django.core.mail import send_mail
         from django.conf import settings
         from django.template.loader import render_to_string
         from django.utils.html import strip_tags
         from accounts.models import Notification
+        
+        logger = logging.getLogger(__name__)
         
         church = super().save(commit=False)
         assigned_user = self.cleaned_data.get('assigned_user')
@@ -1184,7 +1187,12 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
             church.owner = assigned_user
         
         if commit:
-            church.save()
+            try:
+                church.save()
+                logger.info(f"Church '{church.name}' saved successfully with ID {church.id}")
+            except Exception as e:
+                logger.error(f"Failed to save church: {e}", exc_info=True)
+                raise
             
             # Send notifications only if there's a new assignment or reassignment
             if (is_new_assignment or is_reassignment) and assigned_user:
@@ -1201,8 +1209,9 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                         message=notification_message,
                         link=f'/app/manage-church/'
                     )
+                    logger.info(f"Notification created for user {assigned_user.email}")
                 except Exception as e:
-                    print(f"Error creating notification: {e}")
+                    logger.error(f"Error creating notification: {e}", exc_info=True)
                 
                 # Send email notification
                 try:
@@ -1226,8 +1235,9 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                         html_message=html_message,
                         fail_silently=True,  # Don't raise errors in production
                     )
+                    logger.info(f"Email sent to {assigned_user.email}")
                 except Exception as e:
-                    print(f"Error sending email: {e}")
+                    logger.error(f"Error sending email: {e}", exc_info=True)
         
         return church
 

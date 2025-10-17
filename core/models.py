@@ -132,6 +132,9 @@ class Church(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
+        import logging
+        logger = logging.getLogger(__name__)
+        
         # Generate slug if not provided
         if not self.slug:
             self.slug = slugify(self.name)
@@ -151,11 +154,15 @@ class Church(models.Model):
                 logo_base = os.path.splitext(os.path.basename(logo_name))[0]
                 is_new_upload = isinstance(getattr(self.logo, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
                 if is_new_upload and '_optimized' not in logo_base:
-                    optimized = optimize_image(self.logo, max_size=(400, 400))
-                    # Assign optimized content; upload_to will prefix correctly on save
-                    self.logo = optimized
-            except Exception:
-                pass
+                    try:
+                        optimized = optimize_image(self.logo, max_size=(400, 400))
+                        # Assign optimized content; upload_to will prefix correctly on save
+                        self.logo = optimized
+                    except Exception as e:
+                        logger.warning(f"Failed to optimize logo image: {e}")
+                        # Continue with original image
+            except Exception as e:
+                logger.error(f"Error processing logo: {e}")
             # Normalize stored name (strip leading media/ and collapse duplicate paths)
             try:
                 n = (self.logo.name or '').replace('\\', '/').lstrip('/')
@@ -164,8 +171,8 @@ class Church(models.Model):
                 while n.startswith('churches/logos/churches/logos/'):
                     n = n[len('churches/logos/') :]
                 self.logo.name = n
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error normalizing logo name: {e}")
         
         if self.cover_image:
             try:
@@ -173,11 +180,15 @@ class Church(models.Model):
                 cover_base = os.path.splitext(os.path.basename(cover_name))[0]
                 is_new_upload = isinstance(getattr(self.cover_image, 'file', None), (InMemoryUploadedFile, TemporaryUploadedFile))
                 if is_new_upload and '_optimized' not in cover_base:
-                    optimized = optimize_image(self.cover_image, max_size=(800, 600))
-                    # Assign optimized content; upload_to will prefix correctly on save
-                    self.cover_image = optimized
-            except Exception:
-                pass
+                    try:
+                        optimized = optimize_image(self.cover_image, max_size=(800, 600))
+                        # Assign optimized content; upload_to will prefix correctly on save
+                        self.cover_image = optimized
+                    except Exception as e:
+                        logger.warning(f"Failed to optimize cover image: {e}")
+                        # Continue with original image
+            except Exception as e:
+                logger.error(f"Error processing cover image: {e}")
             # Normalize stored name
             try:
                 n = (self.cover_image.name or '').replace('\\', '/').lstrip('/')
@@ -186,9 +197,14 @@ class Church(models.Model):
                 while n.startswith('churches/covers/churches/covers/'):
                     n = n[len('churches/covers/') :]
                 self.cover_image.name = n
-            except Exception:
-                pass
-        super().save(*args, **kwargs)
+            except Exception as e:
+                logger.error(f"Error normalizing cover image name: {e}")
+        
+        try:
+            super().save(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error saving Church instance: {e}")
+            raise
     
     @property
     def full_address(self):
