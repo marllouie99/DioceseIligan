@@ -1,21 +1,22 @@
 /* Warm Sacred Earth Landing Page - Church & Religious */
+/* Using the same theme as the main app for consistency */
 :root {
-  /* Warm Sacred Earth Palette - Enhanced Contrast */
-  --bg-start: #8B4513; /* Saddle Brown */
-  --bg-end: #654321; /* Dark Brown */
-  --bg-medium: #A0522D; /* Sienna */
-  --text: #1A0F0A; /* Much darker brown for high contrast */
-  --text-light: #FFF9E6; /* Cream white for dark backgrounds */
-  --muted: #3D2817; /* Darker medium brown for better contrast */
-  --muted-2: #5A3D2A; /* Darker light brown for better contrast */
-  --border: rgba(139, 69, 19, 0.12); /* Subtle brown border */
-  --card-bg: #FFF8DC; /* Cornsilk */
-  --pill-bg: #F5F5DC; /* Beige */
-  --pill-border: #D2B48C; /* Tan */
-  --btn-start: #A0522D; /* Sienna */
-  --btn-end: #8B4513; /* Saddle Brown */
-  --brand: #8B4513; /* Darker brown for better contrast */
-  --accent-gold: #B8860B; /* Darker gold for better contrast */
+  /* Warm Sacred Earth Palette - Light Theme (matches main app) */
+  --bg-start: #FFF9E6; /* Cream White */
+  --bg-end: #F5E6D3; /* Light Beige */
+  --bg-medium: #E8D4B8; /* Warm Beige */
+  --text: #2D1810; /* Dark Brown */
+  --text-light: #654321; /* Medium Brown */
+  --muted: #8B6F47; /* Muted Brown */
+  --muted-2: #A0826D; /* Light Muted Brown */
+  --border: rgba(218, 165, 32, 0.25); /* Golden border */
+  --card-bg: #FFFBF0; /* Very Light Cream */
+  --pill-bg: #FFF8E7; /* Light Cream */
+  --pill-border: #DAA520; /* Goldenrod */
+  --btn-start: #DAA520; /* Goldenrod */
+  --btn-end: #A0522D; /* Sienna */
+  --brand: #A0522D; /* Sienna */
+  --accent-gold: #DAA520; /* Goldenrod */
   --cream: #FDF5E6; /* Old Lace */
   --warm-white: #FFF9E6; /* Cream White */
 }
@@ -26,28 +27,27 @@ html, body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-/* Landing Page Body - Warm Sacred Earth Theme */
+/* Landing Page Body - Warm Sacred Earth Theme (Light) */
 body {
   font-family: Georgia, "Times New Roman", serif; /* Traditional church font */
   color: var(--text);
   background:
-    /* Wood grain texture overlay */
+    /* Subtle wood grain texture overlay */
     repeating-linear-gradient(
-      45deg,
+      90deg,
       transparent,
       transparent 2px,
-      rgba(139, 69, 19, 0.03) 2px,
-      rgba(139, 69, 19, 0.03) 4px
+      rgba(218, 165, 32, 0.02) 2px,
+      rgba(218, 165, 32, 0.02) 4px
     ),
     /* Paper texture pattern */
-    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.03) 0%, transparent 50%),
     /* Warm glow effects */
-    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.12) 0%, rgba(218, 165, 32, 0.04) 40%, transparent 70%),
-    radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.08) 0%, rgba(139, 69, 19, 0.04) 50%, transparent 80%),
-    radial-gradient(90% 60% at 80% 80%, rgba(101, 67, 33, 0.9) 0%, rgba(139, 69, 19, 0.6) 40%, transparent 80%),
-    /* Main warm brown gradient */
-    linear-gradient(45deg, var(--bg-end) 0%, #7a5230 25%, var(--bg-medium) 50%, #b8834a 75%, var(--bg-start) 100%);
+    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.02) 40%, transparent 70%),
+    radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.05) 0%, rgba(139, 69, 19, 0.02) 50%, transparent 80%),
+    /* Main light warm gradient */
+    linear-gradient(135deg, var(--bg-start) 0%, var(--bg-medium) 50%, var(--bg-end) 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-attachment: fixed;
