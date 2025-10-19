@@ -1,7 +1,7 @@
 /*
  * Notifications Page Styling - ChurchIligan
- * Warm Sacred Earth Theme Integration
- * Version: 1.0
+ * Blue Sky Theme Integration
+ * Version: 2.0
  */
 
 /* =============================================================================
@@ -11,8 +11,8 @@
 .notifications-page {
     min-height: 100vh;
     padding: 24px;
-    font-family: Georgia, "Times New Roman", serif;
-    color: #2D1810;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1A3A52;
 }
 
 /* Page Header */
@@ -27,7 +27,7 @@
     align-items: flex-start;
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+    border-bottom: 2px solid rgba(30, 144, 255, 0.2);
     max-width: 1000px;
     margin: 0 auto 2rem auto;
 }
@@ -42,20 +42,15 @@
 .page-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #2D1810;
+    color: #1A3A52;
     margin: 0;
-    text-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #DAA520 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    text-shadow: 0 2px 4px rgba(30, 144, 255, 0.1);
 }
 
 .page-subtitle {
-    color: #6B4226;
+    color: #5A7A92;
     font-size: 1.1rem;
     margin: 0;
-    font-style: italic;
 }
 
 /* Header Actions */
@@ -68,33 +63,27 @@
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 0.95rem;
 }
 
 .header-actions .btn-secondary {
-    background: 
-        /* Wood grain texture */
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
-        /* Base gradient */
-        linear-gradient(135deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
-    color: #2D1810;
-    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    color: #FFFFFF;
+    border: 2px solid rgba(30, 144, 255, 0.3);
     box-shadow: 
-        0 8px 16px rgba(139, 69, 19, 0.15),
-        0 4px 8px rgba(218, 165, 32, 0.1),
+        0 8px 16px rgba(30, 144, 255, 0.15),
+        0 4px 8px rgba(30, 144, 255, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .header-actions .btn-secondary:hover {
-    background: 
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.08) 0.5px, transparent 2px),
-        linear-gradient(135deg, #B8860B 0%, #8B6914 50%, #654321 100%);
-    border-color: rgba(139, 69, 19, 0.5);
+    background: linear-gradient(135deg, #4A9EFF 0%, #1E90FF 100%);
+    border-color: rgba(30, 144, 255, 0.5);
     transform: translateY(-2px);
     box-shadow: 
-        0 12px 24px rgba(139, 69, 19, 0.2),
-        0 6px 12px rgba(218, 165, 32, 0.15),
+        0 12px 24px rgba(30, 144, 255, 0.2),
+        0 6px 12px rgba(30, 144, 255, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -119,42 +108,30 @@
     padding: 12px 18px;
     border-radius: 999px;
     text-decoration: none;
-    color: #6B4226;
-    background: 
-        /* Paper texture */
-        radial-gradient(ellipse 60px 40px at 25% 30%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
-        /* Wood grain */
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-        /* Base parchment */
-        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
-    border: 2px solid rgba(139, 69, 19, 0.2);
+    color: #5A7A92;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%);
+    border: 2px solid rgba(30, 144, 255, 0.2);
     font-weight: 500;
     transition: all 0.3s ease;
-    font-family: Georgia, "Times New Roman", serif;
-    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.08);
 }
 
 .filter-tab:hover {
-    color: #2D1810;
-    background: 
-        radial-gradient(ellipse 80px 60px at 25% 30%, rgba(160, 82, 45, 0.12) 0%, transparent 70%),
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.04) 0.5px, transparent 2px),
-        linear-gradient(135deg, #F4E6D0 0%, #EDD9C4 100%);
-    border-color: rgba(139, 69, 19, 0.4);
+    color: #1A3A52;
+    background: linear-gradient(135deg, #F0F8FF 0%, #E0F0FF 100%);
+    border-color: rgba(30, 144, 255, 0.4);
     transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.12);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.12);
 }
 
 .filter-tab.active {
-    color: #2D1810;
-    background: 
-        radial-gradient(ellipse 100px 80px at 25% 30%, rgba(218, 165, 32, 0.15) 0%, transparent 70%),
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.06) 0.5px, transparent 2px),
-        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
-    border-color: #8B4513;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    border-color: #1E90FF;
     font-weight: 600;
     box-shadow: 
-        0 8px 16px rgba(139, 69, 19, 0.2),
+        0 8px 16px rgba(30, 144, 255, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -179,23 +156,15 @@
     align-items: start;
     gap: 1rem 1.25rem;
     padding: 24px 28px;
-    background: 
-        /* Age spots */
-        radial-gradient(ellipse 100px 60px at 20% 25%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 80px 120px at 80% 75%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
-        /* Paper grain */
-        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
-        repeating-linear-gradient(67deg, rgba(160, 82, 45, 0.015) 0.8px, transparent 2.5px),
-        /* Base parchment gradient */
-        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 50%, #FFF9E6 100%);
-    border: 2px solid rgba(139, 69, 19, 0.15);
+    background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 50%, #FFFFFF 100%);
+    border: 2px solid rgba(30, 144, 255, 0.15);
     border-radius: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     box-shadow: 
-        0 16px 32px rgba(139, 69, 19, 0.08),
-        0 8px 16px rgba(160, 82, 45, 0.06),
-        0 4px 8px rgba(101, 67, 33, 0.04);
+        0 16px 32px rgba(30, 144, 255, 0.08),
+        0 8px 16px rgba(30, 144, 255, 0.06),
+        0 4px 8px rgba(30, 144, 255, 0.04);
 }
 
 /* Inner glow effect */
@@ -204,9 +173,9 @@
     position: absolute;
     inset: 2px;
     background: linear-gradient(135deg, 
-        rgba(255, 249, 230, 0.8) 0%, 
-        rgba(244, 230, 208, 0.6) 50%, 
-        rgba(255, 249, 230, 0.8) 100%);
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(240, 248, 255, 0.6) 50%, 
+        rgba(255, 255, 255, 0.8) 100%);
     border-radius: 18px;
     pointer-events: none;
     z-index: 0;
@@ -218,25 +187,17 @@
 }
 
 .notification-item:hover {
-    border-color: rgba(139, 69, 19, 0.3);
+    border-color: rgba(30, 144, 255, 0.3);
     transform: translateY(-2px);
     box-shadow: 
-        0 24px 48px rgba(139, 69, 19, 0.12),
-        0 12px 24px rgba(160, 82, 45, 0.08),
-        0 6px 12px rgba(101, 67, 33, 0.06);
+        0 24px 48px rgba(30, 144, 255, 0.12),
+        0 12px 24px rgba(30, 144, 255, 0.08),
+        0 6px 12px rgba(30, 144, 255, 0.06);
 }
 
 .notification-item.unread {
-    background: 
-        /* Enhanced age spots for unread */
-        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(218, 165, 32, 0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 100px 140px at 85% 80%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-        /* Paper grain */
-        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.03) 0.8px, transparent 2.5px),
-        repeating-linear-gradient(67deg, rgba(218, 165, 32, 0.02) 0.8px, transparent 2.5px),
-        /* Enhanced base gradient */
-        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 30%, #EDD9C4 70%, #F4E6D0 100%);
-    border-color: rgba(218, 165, 32, 0.3);
+    background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 30%, #E0F0FF 70%, #E8F4FF 100%);
+    border-color: rgba(30, 144, 255, 0.3);
 }
 
 .notification-indicator {
@@ -245,11 +206,11 @@
     top: 0;
     bottom: 0;
     width: 5px;
-    background: linear-gradient(180deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
+    background: linear-gradient(180deg, #1E90FF 0%, #4169E1 50%, #1E90FF 100%);
     border-radius: 0 3px 3px 0;
     opacity: 0;
     transition: opacity 0.3s ease;
-    box-shadow: 2px 0 8px rgba(218, 165, 32, 0.3);
+    box-shadow: 2px 0 8px rgba(30, 144, 255, 0.3);
 }
 
 .notification-item.unread .notification-indicator {
@@ -265,22 +226,20 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: 
-        radial-gradient(ellipse 20px 15px at 70% 30%, rgba(218, 165, 32, 0.2) 0%, transparent 60%),
-        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #2D1810;
+    color: #FFFFFF;
     box-shadow: 
-        0 6px 12px rgba(139, 69, 19, 0.15),
+        0 6px 12px rgba(30, 144, 255, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .notification-icon .icon {
     width: 1.5rem;
     height: 1.5rem;
-    filter: drop-shadow(0 1px 2px rgba(139, 69, 19, 0.2));
+    filter: drop-shadow(0 1px 2px rgba(30, 144, 255, 0.2));
 }
 
 .notification-content {
@@ -299,21 +258,20 @@
 .notification-title {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #2D1810;
+    color: #1A3A52;
     margin: 0;
     line-height: 1.4;
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+    text-shadow: 0 1px 2px rgba(30, 144, 255, 0.1);
 }
 
 .notification-time {
     font-size: 0.9rem;
-    color: #8B6F47;
+    color: #7A9AB2;
     white-space: nowrap;
-    font-style: italic;
 }
 
 .notification-message {
-    color: #4A3728;
+    color: #5A7A92;
     line-height: 1.6;
     margin: 8px 0 12px 0;
     font-size: 1rem;
@@ -333,23 +291,21 @@
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .notification-actions .btn-outline {
     background: transparent;
-    color: #8B4513;
-    border: 2px solid rgba(139, 69, 19, 0.3);
+    color: #1E90FF;
+    border: 2px solid rgba(30, 144, 255, 0.3);
 }
 
 .notification-actions .btn-outline:hover {
-    background: 
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
-        linear-gradient(135deg, #8B4513 0%, #654321 100%);
-    color: #FFF9E6;
-    border-color: #8B4513;
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    color: #FFFFFF;
+    border-color: #1E90FF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
 }
 
 .notification-actions-right {
@@ -361,10 +317,10 @@
 .notification-dot {
     width: 10px;
     height: 10px;
-    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     border-radius: 50%;
     margin-right: 8px;
-    box-shadow: 0 2px 4px rgba(218, 165, 32, 0.3);
+    box-shadow: 0 2px 4px rgba(30, 144, 255, 0.3);
     animation: gentlePulse 2s ease-in-out infinite;
 }
 
@@ -375,27 +331,23 @@
 
 .mark-read-btn {
     padding: 6px 12px;
-    background: 
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-        linear-gradient(135deg, #F4E6D0 0%, #EDD9C4 100%);
-    border: 2px solid rgba(139, 69, 19, 0.2);
+    background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%);
+    border: 2px solid rgba(30, 144, 255, 0.2);
     border-radius: 999px;
-    color: #8B4513;
+    color: #1E90FF;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 0.85rem;
     font-weight: 600;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .mark-read-btn:hover {
-    background: 
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.05) 0.5px, transparent 2px),
-        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
-    color: #2D1810;
-    border-color: rgba(139, 69, 19, 0.4);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    color: #FFFFFF;
+    border-color: rgba(30, 144, 255, 0.4);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
+    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.15);
 }
 
 /* =============================================================================
@@ -405,48 +357,43 @@
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: #6B4226;
-    background: 
-        radial-gradient(ellipse 150px 100px at 50% 50%, rgba(160, 82, 45, 0.04) 0%, transparent 70%),
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.01) 0.5px, transparent 2px),
-        linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+    color: #5A7A92;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%);
     border-radius: 20px;
-    border: 2px solid rgba(139, 69, 19, 0.1);
+    border: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 .empty-icon {
     width: 5rem;
     height: 5rem;
     margin: 0 auto 1.5rem;
-    color: #8B6F47;
-    background: 
-        radial-gradient(ellipse 30px 20px at 70% 30%, rgba(218, 165, 32, 0.15) 0%, transparent 60%),
-        linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 16px rgba(139, 69, 19, 0.1);
+    box-shadow: 0 8px 16px rgba(30, 144, 255, 0.1);
 }
 
 .empty-icon svg {
     width: 2.5rem;
     height: 2.5rem;
-    color: #2D1810;
+    color: #FFFFFF;
 }
 
 .empty-state h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #2D1810;
+    color: #1A3A52;
     margin: 0 0 0.5rem 0;
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+    text-shadow: 0 1px 2px rgba(30, 144, 255, 0.1);
 }
 
 .empty-state p {
     margin: 0;
     font-size: 1.1rem;
-    font-style: italic;
+    color: #5A7A92;
 }
 
 /* =============================================================================
@@ -563,24 +510,15 @@
 /* Priority-based styling */
 .notification-item.priority-urgent {
     border-left-color: #DC2626;
-    background: 
-        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 70%),
-        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
-        linear-gradient(135deg, #FFF9E6 0%, #FEF2F2 30%, #F4E6D0 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FEF2F2 30%, #F0F8FF 100%);
 }
 
 .notification-item.priority-high {
     border-left-color: #F59E0B;
-    background: 
-        radial-gradient(ellipse 120px 80px at 15% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 70%),
-        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
-        linear-gradient(135deg, #FFF9E6 0%, #FFFBEB 30%, #F4E6D0 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 30%, #F0F8FF 100%);
 }
 
 .notification-item.priority-low {
-    border-left-color: #8B6F47;
-    background: 
-        radial-gradient(ellipse 100px 60px at 15% 20%, rgba(139, 111, 71, 0.04) 0%, transparent 70%),
-        repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.015) 0.8px, transparent 2.5px),
-        linear-gradient(135deg, #FFF9E6 0%, #F9F7F4 50%, #F4E6D0 100%);
+    border-left-color: #7A9AB2;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #F0F8FF 100%);
 }

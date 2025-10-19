@@ -2530,7 +2530,7 @@ input:checked + .toggle-slider:before {
   gap: 12px;
   padding: 12px 16px;
   border-radius: 12px;
-  color: var(--muted);
+  color: #1A3A52 !important; /* Dark blue-gray to match sidebar */
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
@@ -2540,17 +2540,17 @@ input:checked + .toggle-slider:before {
 }
 
 .settings-nav-link:hover {
-  background: #f8fafc;
-  color: var(--text);
-  border-color: var(--border);
+  background: rgba(30, 144, 255, 0.08);
+  color: #1E90FF; /* Blue hover */
+  border-color: rgba(30, 144, 255, 0.2);
   transform: translateX(4px);
 }
 
 .settings-nav-link.active {
-  background: #eef2f7;
-  color: var(--brand);
-  border-color: rgba(124, 58, 237, 0.2);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF !important; /* White text on blue background */
+  border-color: rgba(30, 144, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.25);
   transform: translateX(4px);
 }
 
@@ -2562,7 +2562,7 @@ input:checked + .toggle-slider:before {
   transform: translateY(-50%);
   width: 4px;
   height: 20px;
-  background: var(--brand);
+  background: #1E90FF; /* Blue indicator */
   border-radius: 2px;
 }
 
@@ -2574,7 +2574,7 @@ input:checked + .toggle-slider:before {
 }
 
 .settings-nav-link.active .icon {
-  color: var(--brand);
+  color: #FFFFFF !important; /* White icon on active state */
 }
 
 .nav-text {
@@ -2588,17 +2588,22 @@ input:checked + .toggle-slider:before {
   font-weight: 700;
   font-size: 14px;
   line-height: 1.2;
+  color: inherit !important; /* Inherit from parent link */
+}
+
+.settings-nav-link.active .nav-title {
+  color: #FFFFFF !important; /* White title on active state */
 }
 
 .nav-subtitle {
   font-weight: 500;
   font-size: 12px;
-  color: var(--muted-2);
+  color: #7A9AB2 !important; /* Muted blue-gray for subtitle */
   line-height: 1.2;
 }
 
 .settings-nav-link.active .nav-subtitle {
-  color: rgba(124, 58, 237, 0.7);
+  color: rgba(255, 255, 255, 0.85) !important; /* Light white for subtitle on active */
 }
 
 /* Settings section highlight animation */

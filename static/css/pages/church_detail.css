@@ -21,21 +21,15 @@ body.page-church-detail {
   padding: 0 !important;
 }
 
-/* Enhanced Church Header with Subtle Forest Glass Effect */
+/* Enhanced Church Header with Blue Sky Theme */
 .church-header {
-  /* Warm Sacred Earth parchment header */
-  background:
-    radial-gradient(ellipse 120px 70px at 88% 12%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 88%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
-  border: 2px solid rgba(139, 69, 19, 0.18);
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%);
+  border: 2px solid rgba(30, 144, 255, 0.15);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
-    0 2px 6px rgba(101, 67, 33, 0.06);
+    0 8px 16px rgba(30, 144, 255, 0.12),
+    0 2px 6px rgba(30, 144, 255, 0.05);
   display: block;
   position: relative;
   margin-bottom: -2px;
@@ -44,19 +38,17 @@ body.page-church-detail {
 
 .church-header:hover {
   box-shadow: 
-    0 12px 24px rgba(139, 69, 19, 0.16),
-    0 4px 12px rgba(101, 67, 33, 0.08);
+    0 12px 24px rgba(30, 144, 255, 0.15),
+    0 4px 12px rgba(30, 144, 255, 0.08);
   transform: translateY(-4px);
-  border-color: rgba(139, 69, 19, 0.26);
+  border-color: rgba(30, 144, 255, 0.25);
 }
 
 /* Enhanced Church Cover */
 .church-cover { 
   width: 100%; 
   height: 220px; 
-  background: linear-gradient(135deg, 
-    rgba(255, 249, 230, 0.8) 0%, 
-    rgba(244, 230, 208, 0.7) 100%);
+  background: linear-gradient(135deg, #E8F4FF 0%, #C8E0F7 100%);
   display: flex; 
   align-items: center; 
   justify-content: center;
@@ -81,10 +73,8 @@ body.page-church-detail {
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  color: rgba(15, 118, 110, 0.6); 
-  background: linear-gradient(135deg, 
-    rgba(240, 253, 250, 0.8) 0%, 
-    rgba(219, 234, 254, 0.6) 100%);
+  color: #7A9AB2; 
+  background: linear-gradient(135deg, #F0F8FF 0%, #E0F0FF 100%);
   font-size: 16px;
   font-weight: 500;
   flex-direction: column;
@@ -94,7 +84,7 @@ body.page-church-detail {
 .church-cover .cover-placeholder svg { 
   width: 48px;
   height: 48px;
-  color: rgba(15, 118, 110, 0.4);
+  color: #7A9AB2;
   display: block;
 }
 
@@ -108,7 +98,7 @@ body.page-church-detail {
   bottom: 0;
   background: linear-gradient(180deg, 
     transparent 0%, 
-    rgba(139, 69, 19, 0.08) 100%);
+    rgba(30, 144, 255, 0.05) 100%);
   pointer-events: none;
 }
 
@@ -150,7 +140,7 @@ body.page-church-detail {
   width: 100%; 
   height: 100%; 
   border-radius: 50%; 
-  background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+  background: linear-gradient(135deg, #4169E1 0%, #1E90FF 100%);
   color: #fff; 
   display: flex; 
   align-items: center; 
@@ -159,8 +149,8 @@ body.page-church-detail {
   font-size: 34px; 
   border: 4px solid rgba(255, 255, 255, 0.9);
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.12),
-    0 2px 4px rgba(0, 0, 0, 0.06);
+    0 4px 8px rgba(30, 144, 255, 0.15),
+    0 2px 4px rgba(30, 144, 255, 0.08);
   backdrop-filter: blur(6px);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -168,8 +158,8 @@ body.page-church-detail {
 .church-avatar .avatar-placeholder:hover {
   transform: scale(1.05);
   box-shadow: 
-    0 6px 12px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+    0 6px 12px rgba(30, 144, 255, 0.2),
+    0 2px 6px rgba(30, 144, 255, 0.1);
 }
 
 /* Details */
@@ -236,36 +226,32 @@ body.page-church-detail {
   display: flex; 
   align-items: center; 
   gap: 12px; 
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(255, 249, 230, 0.7);
-  border: 1px solid rgba(139, 69, 19, 0.18);
+  background: rgba(240, 248, 255, 0.7);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   padding: 12px 16px; 
   border-radius: 16px;
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s;
   box-shadow: 
-    0 2px 4px rgba(139, 69, 19, 0.06);
+    0 2px 4px rgba(30, 144, 255, 0.08);
 }
 
 .stat-item:hover {
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.03) 1px, rgba(139, 69, 19, 0.03) 2px),
-    rgba(255, 249, 230, 0.9);
-  border-color: rgba(139, 69, 19, 0.25);
+  background: rgba(232, 244, 255, 0.9);
+  border-color: rgba(30, 144, 255, 0.25);
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.1);
+    0 4px 8px rgba(30, 144, 255, 0.12);
   transform: translateY(-2px);
 }
 
 .stat-item svg { 
   width: 20px; 
   height: 20px; 
-  color: #8B4513;
+  color: #1E90FF;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
-.stat-item:hover svg {
-  color: #A0522D;
+.stat-item:hover svg { 
+  color: #4169E1;
   transform: scale(1.1);
 }
 
@@ -303,8 +289,8 @@ body.page-church-detail {
   gap: 10px; 
   padding: 12px 20px; 
   border-radius: 16px; 
-  border: 2px solid rgba(218, 165, 32, 0.3);
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white; 
   cursor: pointer; 
   font-weight: 700; 
@@ -313,8 +299,8 @@ body.page-church-detail {
   position: relative;
   overflow: hidden;
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.2),
-    0 2px 4px rgba(101, 67, 33, 0.12);
+    0 4px 8px rgba(30, 144, 255, 0.15),
+    0 2px 4px rgba(30, 144, 255, 0.08);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s;
 }
 
@@ -337,12 +323,12 @@ body.page-church-detail {
 }
 
 .follow-btn:hover { 
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  background: linear-gradient(135deg, #4A9EFF 0%, #1E90FF 100%);
   color: white;
   transform: translateY(-2px);
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.25),
-    0 2px 6px rgba(101, 67, 33, 0.18);
+    0 6px 12px rgba(30, 144, 255, 0.2),
+    0 2px 6px rgba(30, 144, 255, 0.1);
 }
 
 .follow-btn.following { 
@@ -379,9 +365,9 @@ body.page-church-detail {
   gap: 10px; 
   padding: 12px 20px; 
   border-radius: 16px; 
-  border: 2px solid rgba(139, 69, 19, 0.3);
-  background: rgba(244, 230, 208, 0.9);
-  color: #654321; 
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  background: rgba(240, 248, 255, 0.9);
+  color: #1A3A52; 
   cursor: pointer; 
   font-weight: 600; 
   font-size: 14px;
@@ -389,10 +375,9 @@ body.page-church-detail {
   position: relative;
   overflow: hidden;
   
-  /* Warm Sacred Earth shadow */
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.15),
-    0 2px 4px rgba(101, 67, 33, 0.1);
+    0 4px 8px rgba(30, 144, 255, 0.15),
+    0 2px 4px rgba(30, 144, 255, 0.08);
   
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, background 0.3s, color 0.3s;
 }
@@ -404,7 +389,7 @@ body.page-church-detail {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.1), transparent);
   transition: left 0.6s ease;
 }
 
@@ -413,12 +398,12 @@ body.page-church-detail {
 }
 
 .message-btn:hover { 
-  background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white;
   transform: translateY(-2px);
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.22),
-    0 2px 6px rgba(101, 67, 33, 0.15);
+    0 6px 12px rgba(30, 144, 255, 0.2),
+    0 2px 6px rgba(30, 144, 255, 0.1);
 }
 
 .message-btn svg {
@@ -456,43 +441,34 @@ body.page-church-detail {
 
 /* Enhanced Content Sections */
 .content-section { 
-  /* Warm Sacred Earth parchment card */
-  background:
-    /* Age spots */
-    radial-gradient(ellipse 100px 60px at 88% 12%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 90px 55px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    /* Fine paper grain */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    /* Main parchment base */
-    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
-  border: 2px solid rgba(139, 69, 19, 0.18);
+  /* Blue Sky Theme Card */
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%);
+  border: 2px solid rgba(30, 144, 255, 0.15);
   border-radius: 20px; 
   padding: 20px; 
   margin-bottom: 24px;
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.12),
-    0 2px 6px rgba(101, 67, 33, 0.06);
+    0 6px 12px rgba(30, 144, 255, 0.12),
+    0 2px 6px rgba(30, 144, 255, 0.05);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, border-color 0.3s;
 }
 
 .content-section:hover {
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.16),
-    0 4px 8px rgba(101, 67, 33, 0.1);
+    0 8px 16px rgba(30, 144, 255, 0.15),
+    0 4px 8px rgba(30, 144, 255, 0.08);
   transform: translateY(-2px);
-  border-color: rgba(139, 69, 19, 0.28);
+  border-color: rgba(30, 144, 255, 0.25);
 }
 
 .section-title { 
   font-size: 20px; 
   font-weight: 800; 
   margin: 0 0 20px 0; 
-  color: #2D1810;
+  color: #1A3A52;
   position: relative;
   padding-bottom: 12px;
   font-family: Georgia, 'Times New Roman', serif;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 .section-title::after {
@@ -502,7 +478,7 @@ body.page-church-detail {
   left: 0;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, #8B4513, #DAA520);
+  background: linear-gradient(90deg, #1E90FF, #4169E1);
   border-radius: 2px;
 }
 
@@ -526,15 +502,13 @@ body.page-church-detail {
   gap: 4px; 
   border-bottom: none;
   margin: 0 0 28px; 
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(255, 249, 230, 0.6);
-  border: 1px solid rgba(139, 69, 19, 0.18);
+  background: rgba(240, 248, 255, 0.6);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 16px; 
   padding: 6px;
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.08),
-    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+    0 4px 8px rgba(30, 144, 255, 0.08),
+    inset 0 1px 0 rgba(240, 248, 255, 0.9);
 }
 
 .tab-btn { 
@@ -546,7 +520,7 @@ body.page-church-detail {
   cursor: pointer; 
   font-weight: 700; 
   font-size: 14px;
-  color: #6B4226; 
+  color: #5A7A92 !important; 
   text-align: center; 
   position: relative;
   overflow: hidden;
@@ -562,7 +536,7 @@ body.page-church-detail {
   height: 100%;
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(218, 165, 32, 0.2) 50%, 
+    rgba(30, 144, 255, 0.2) 50%, 
     transparent);
   transition: left 0.6s ease;
 }
@@ -572,22 +546,18 @@ body.page-church-detail {
 }
 
 .tab-btn.active { 
-  color: #2D1810;
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(255, 255, 255, 0.92);
+  color: #1A3A52 !important;
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.15),
-    0 2px 4px rgba(101, 67, 33, 0.08),
+    0 4px 8px rgba(30, 144, 255, 0.15),
+    0 2px 4px rgba(30, 144, 255, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transform: translateY(-1px);
 }
 
 .tab-btn:hover:not(.active) { 
-  background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
-    rgba(255, 249, 230, 0.8);
-  color: #654321;
+  background: rgba(240, 248, 255, 0.8);
+  color: #1A3A52 !important;
   transform: translateY(-1px);
 }
 
@@ -2017,22 +1987,12 @@ body.page-church-detail {
 
 /* Apply the exact same post card styling that works on dashboard */
 .church-detail-page .post-card {
-  /* Warm Sacred Earth parchment card - matches dashboard */
-  background:
-    /* Age spots and weathering */
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 70%),
-    /* Fine paper grain texture */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    /* Main parchment base */
-    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%) !important;
-  border: 2px solid rgba(139, 69, 19, 0.15) !important;
+  /* Blue Sky Theme - Clean white card */
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(30, 144, 255, 0.15) !important;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.1),
-    0 2px 4px rgba(101, 67, 33, 0.08),
-    inset 0 1px 0 rgba(248, 244, 230, 0.9),
-    inset 0 -1px 0 rgba(139, 69, 19, 0.05);
+    0 8px 16px rgba(30, 144, 255, 0.1),
+    0 2px 4px rgba(30, 144, 255, 0.05);
   margin-bottom: 24px;
   border-radius: 16px;
 }
@@ -2072,51 +2032,37 @@ body.page-church-detail {
 
 /* Content area - same as dashboard */
 .church-detail-page .post-content {
-  background: 
-    /* Subtle paper texture */
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
-    /* Warm cream base */
-    rgba(255, 251, 240, 0.85) !important;
+  background: transparent !important;
   border-radius: 0;
   padding: 24px 20px;
-  border-top: 1px solid rgba(139, 69, 19, 0.1);
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-top: none;
+  border-bottom: none;
 }
 
 /* Text colors - same as dashboard */
 .church-detail-page .post-text { 
-  color: #2D1810 !important;
+  color: #1A3A52 !important;
   line-height: 1.6;
   font-weight: 500;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .church-detail-page .post-author-name { 
-  color: #654321 !important;
+  color: #1A3A52 !important;
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+.church-detail-page .post-author-name:hover {
+  color: #1E90FF !important;
 }
 .church-detail-page .post-time { 
   background: transparent; 
   border: none; 
-  color: #6B4226 !important; 
+  color: #5A7A92 !important; 
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 /* Actions bar - same as dashboard */
 .church-detail-page .post-actions {
-  background: 
-    /* Rich paper texture overlay */
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 1px,
-      rgba(139, 69, 19, 0.06) 1px,
-      rgba(139, 69, 19, 0.06) 2px
-    ),
-    /* Darker warm brown base with gradient */
-    linear-gradient(135deg, rgba(210, 180, 140, 0.8) 0%, rgba(195, 165, 125, 0.7) 100%);
-  border-top: 2px solid rgba(139, 69, 19, 0.25);
+  background: rgba(240, 248, 255, 0.5) !important;
+  border-top: 1px solid rgba(30, 144, 255, 0.1) !important;
   padding: 16px 20px;
   position: relative;
   border-radius: 0;
@@ -2125,21 +2071,17 @@ body.page-church-detail {
 
 /* Action buttons - same as dashboard */
 .church-detail-page .post-action { 
-  color: #2D1810 !important; 
+  color: #5A7A92 !important; 
   background: transparent !important; 
   border: none !important; 
   font-weight: 700;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .church-detail-page .post-action:hover { 
-  color: #654321 !important; 
-  background: rgba(218, 165, 32, 0.2) !important; 
+  color: #1E90FF !important; 
+  background: rgba(30, 144, 255, 0.1) !important; 
   border: none !important; 
   border-radius: 8px;
-  box-shadow: 
-    0 2px 4px rgba(139, 69, 19, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 /* Ensure like button specifically is white */
@@ -2147,23 +2089,20 @@ body.page-church-detail {
 .church-detail-page .post-action.like-btn *,
 .church-detail-page .post-action.like-btn .like-count,
 .church-detail-page .like-count {
-  color: #2D1810 !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+  color: #5A7A92 !important;
 }
 
 .church-detail-page .post-action.like-btn:hover,
 .church-detail-page .post-action.like-btn:hover *,
 .church-detail-page .post-action.like-btn:hover .like-count {
-  color: #654321 !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
+  color: #1E90FF !important;
 }
 
 /* Liked state */
 .church-detail-page .post-action.like-btn.liked,
 .church-detail-page .post-action.like-btn.liked *,
 .church-detail-page .post-action.like-btn.liked .like-count {
-  color: #B8860B !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  color: #1E90FF !important;
   font-weight: 800;
 }
 
@@ -2171,19 +2110,28 @@ body.page-church-detail {
 .church-detail-page .content-fade-overlay { 
   background: linear-gradient(
     transparent 0%, 
-    rgba(248, 244, 230, 0.6) 70%, 
-    rgba(244, 230, 208, 0.8) 100%
+    rgba(255, 255, 255, 0.6) 70%, 
+    rgba(255, 255, 255, 0.9) 100%
   ); 
 }
 
 /* Comment form - same as dashboard */
 .church-detail-page .comment-form { 
   border-top: 0; 
-  background: transparent; 
+  background: transparent !important; 
   padding: 12px 16px; 
 }
 .church-detail-page .post-comments-section { 
-  background: transparent; 
+  background: transparent !important; 
+}
+.church-detail-page .comments-container {
+  background: transparent !important;
+}
+.church-detail-page .comment {
+  background: transparent !important;
+}
+.church-detail-page .comment-input-wrapper {
+  background: transparent !important;
 }
 
 /* Church Detail Posts Feed - Make transparent like dashboard */
@@ -2213,18 +2161,16 @@ body.page-church-detail {
 }
 
 .church-detail-page .comment-input {
-  background: 
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.015) 1px, rgba(139, 69, 19, 0.015) 2px),
-    rgba(255, 251, 240, 0.9) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 .church-detail-page .comment-input:focus {
-  border-color: rgba(139, 69, 19, 0.3);
+  border-color: #1E90FF;
   box-shadow: 
-    0 0 0 3px rgba(218, 165, 32, 0.15),
-    0 4px 12px rgba(139, 69, 19, 0.15);
+    0 0 0 3px rgba(30, 144, 255, 0.1),
+    0 4px 12px rgba(30, 144, 255, 0.15);
   backdrop-filter: blur(12px);
 }
 
@@ -4032,26 +3978,16 @@ body.page-church-detail {
 }
 
 .post-creation-card {
-  background: 
-    /* Multi-layer parchment texture */
-    radial-gradient(ellipse 150px 100px at 85% 15%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 120px 80px at 15% 85%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    /* Fine paper grain */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.025) 0.8px, transparent 2.5px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.02) 0.8px, transparent 2.5px),
-    /* Warm Sacred Earth base gradient */
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
-  
-  border: 2px solid rgba(139, 69, 19, 0.18);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 16px;
   padding: 16px;
   position: relative;
   overflow: hidden;
   
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
-    0 3px 6px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+    0 8px 16px rgba(30, 144, 255, 0.1),
+    0 3px 6px rgba(30, 144, 255, 0.05);
     
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -4059,10 +3995,9 @@ body.page-church-detail {
 .post-creation-card:hover {
   transform: translateY(-1px);
   box-shadow: 
-    0 12px 24px rgba(139, 69, 19, 0.15),
-    0 4px 8px rgba(101, 67, 33, 0.08),
-    inset 0 1px 0 rgba(255, 249, 230, 0.95);
-  border-color: rgba(139, 69, 19, 0.22);
+    0 12px 24px rgba(30, 144, 255, 0.15),
+    0 4px 8px rgba(30, 144, 255, 0.08);
+  border-color: rgba(30, 144, 255, 0.25);
 }
 
 /* Post Input Section */
@@ -4080,7 +4015,7 @@ body.page-church-detail {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
   display: flex;
   align-items: center;
@@ -4102,14 +4037,14 @@ body.page-church-detail {
 .social-post-creation .church-avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #4169E1 0%, #1E90FF 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 16px;
   font-weight: 600;
-  color: #FFF9E6;
+  color: #FFFFFF;
 }
 
 .post-input-container {
@@ -4119,21 +4054,17 @@ body.page-church-detail {
 .post-input-bar {
   width: 100%;
   padding: 0 18px;
-  border: 2px solid rgba(139, 69, 19, 0.15);
+  border: 2px solid rgba(30, 144, 255, 0.15);
   border-radius: 24px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 15px;
-  color: #6B4226;
+  color: #1A3A52;
   cursor: pointer;
   height: 48px; /* Match avatar size for perfect centering */
   display: block;
   line-height: 48px; /* Vertically center input text/placeholder */
   
-  background: 
-    /* Wood grain texture */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 3px),
-    /* Warm cream base */
-    linear-gradient(135deg, #FFF9E6 0%, #F9F2E4 100%);
+  background: #F7F9FC;
     
   transition: all 0.3s ease;
   outline: none;
@@ -4141,14 +4072,12 @@ body.page-church-detail {
 }
 
 .post-input-bar:hover {
-  border-color: rgba(139, 69, 19, 0.25);
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #FFFAEC 0%, #FAF4E6 100%);
+  border-color: rgba(30, 144, 255, 0.25);
+  background: #FFFFFF;
 }
 
 .post-input-bar::placeholder {
-  color: #8B6F47;
+  color: #7A9AB2;
   font-style: italic;
 }
 
@@ -4157,7 +4086,7 @@ body.page-church-detail {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-top: 1px solid rgba(30, 144, 255, 0.1);
   padding-top: 12px;
 }
 
@@ -4174,15 +4103,13 @@ body.page-church-detail {
   transition: all 0.3s ease;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13px;
-  color: #6B4226;
+  color: #5A7A92;
 }
 
 .post-type-btn:hover {
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, rgba(255, 249, 230, 0.5) 0%, rgba(247, 240, 224, 0.5) 100%);
+  background: rgba(240, 248, 255, 0.5);
   transform: translateY(-1px);
-  color: #2D1810;
+  color: #1E90FF;
 }
 
 .post-type-icon {
@@ -4440,9 +4367,8 @@ body.page-church-detail {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
   font-weight: 600;
-  color: #2D1810;
+  color: #1A3A52;
   margin: 0;
-  text-shadow: 0 1px 1px rgba(139, 69, 19, 0.08);
 }
 
 .form-select,
@@ -4452,76 +4378,56 @@ body.page-church-detail {
 .form-input[type="time"],
 select.form-input {
   padding: 12px 16px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   border-radius: 12px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 16px;
-  color: #2D1810;
+  color: #1A3A52;
   width: 100%;
-  
-  background: 
-    /* Wood grain texture */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
-    /* Warm cream base */
-    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
-    
+  background: #F7F9FC;
   transition: all 0.3s ease;
   outline: none;
 }
 
 .form-select:focus,
 .form-input:focus {
-  border-color: #DAA520;
+  border-color: #1E90FF;
   box-shadow: 
-    0 0 0 3px rgba(218, 165, 32, 0.2),
-    0 4px 8px rgba(139, 69, 19, 0.1);
+    0 0 0 3px rgba(30, 144, 255, 0.1),
+    0 4px 8px rgba(30, 144, 255, 0.15);
   transform: translateY(-1px);
 }
 
 .post-textarea,
 textarea.form-input {
   padding: 16px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   border-radius: 16px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 16px;
   line-height: 1.6;
-  color: #2D1810;
+  color: #1A3A52;
   resize: vertical;
   min-height: 120px;
   width: 100%;
-  
-  background: 
-    /* Aged paper texture */
-    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 60px 40px at 10% 90%, rgba(160, 82, 45, 0.03) 0%, transparent 70%),
-    /* Paper grain */
-    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.015) 0.5px, transparent 2px),
-    /* Warm cream base */
-    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
-    
+  background: #F7F9FC;
   transition: all 0.3s ease;
   outline: none;
 }
 
 .post-textarea:focus,
 textarea.form-input:focus {
-  border-color: #DAA520;
+  border-color: #1E90FF;
   box-shadow: 
-    0 0 0 3px rgba(218, 165, 32, 0.2),
-    0 6px 12px rgba(139, 69, 19, 0.12);
+    0 0 0 3px rgba(30, 144, 255, 0.1),
+    0 6px 12px rgba(30, 144, 255, 0.15);
   transform: translateY(-2px);
-  
-  background: 
-    radial-gradient(ellipse 80px 50px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60px 40px at 10% 90%, rgba(160, 82, 45, 0.05) 0%, transparent 70%),
-    repeating-linear-gradient(25deg, rgba(139, 69, 19, 0.025) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FFFAEC 0%, #F9F2E4 100%);
+  background: #FFFFFF;
 }
 
 .post-textarea::placeholder,
 textarea.form-input::placeholder {
-  color: #8B6F47;
+  color: #7A9AB2;
   font-style: italic;
 }
 
@@ -4532,7 +4438,7 @@ textarea.form-input::placeholder {
   align-items: center;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 12px;
-  color: #8B6F47;
+  color: #7A9AB2;
   margin-top: -4px;
 }
 
@@ -4550,35 +4456,30 @@ textarea.form-input::placeholder {
   justify-content: center;
   gap: 12px;
   padding: 20px;
-  border: 2px dashed rgba(139, 69, 19, 0.3);
+  border: 2px dashed rgba(30, 144, 255, 0.3);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 4px),
-    linear-gradient(135deg, rgba(255, 249, 230, 0.6) 0%, rgba(247, 240, 224, 0.6) 100%);
+  background: rgba(240, 248, 255, 0.6);
 }
 
 .file-upload-label:hover {
-  border-color: #DAA520;
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 4px),
-    linear-gradient(135deg, rgba(255, 249, 230, 0.8) 0%, rgba(247, 240, 224, 0.8) 100%);
+  border-color: #1E90FF;
+  background: rgba(240, 248, 255, 0.9);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
 }
 
 .upload-icon {
   width: 24px;
   height: 24px;
-  color: #8B4513;
+  color: #1E90FF;
 }
 
 .upload-text {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
-  color: #6B4226;
+  color: #1A3A52;
   font-weight: 500;
 }
 
@@ -4606,8 +4507,8 @@ textarea.form-input::placeholder {
   height: 32px;
   border: none;
   border-radius: 50%;
-  background: rgba(139, 69, 19, 0.9);
-  color: #FFF9E6;
+  background: rgba(30, 144, 255, 0.9);
+  color: #FFFFFF;
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -4618,7 +4519,7 @@ textarea.form-input::placeholder {
 }
 
 .remove-image-btn:hover {
-  background: rgba(101, 67, 33, 0.95);
+  background: rgba(65, 105, 225, 0.95);
   transform: scale(1.1);
 }
 
@@ -4642,21 +4543,14 @@ textarea.form-input::placeholder {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 15px;
   font-weight: 600;
-  color: #FFF9E6;
+  color: #FFFFFF;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 140px;
-  
-  background: 
-    /* Wood grain texture overlay */
-    repeating-linear-gradient(45deg, rgba(101, 67, 33, 0.1) 0px, rgba(101, 67, 33, 0.1) 1px, transparent 1px, transparent 3px),
-    /* Multi-layer gradient */
-    linear-gradient(135deg, #DAA520 0%, #B8860B 25%, #8B4513 50%, #654321 75%, #8B4513 100%);
-    
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.3),
-    0 3px 6px rgba(101, 67, 33, 0.2),
-    inset 0 1px 0 rgba(218, 165, 32, 0.4);
+    0 8px 16px rgba(30, 144, 255, 0.3),
+    0 3px 6px rgba(30, 144, 255, 0.2);
 }
 
 .btn-secondary,
@@ -4666,47 +4560,36 @@ textarea.form-input::placeholder {
   justify-content: center;
   gap: 8px;
   padding: 14px 28px;
-  border: 2px solid rgba(139, 69, 19, 0.3);
+  border: 2px solid rgba(30, 144, 255, 0.3);
   border-radius: 50px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 15px;
   font-weight: 600;
-  color: #6B4226;
+  color: #1A3A52;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 120px;
-  
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #FFF9E6 0%, #F7F0E0 100%);
-    
-  box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.1),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+  background: #F7F9FC;
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.1);
 }
 
 .btn-secondary:hover,
 .report-cancel-btn:hover {
-  border-color: rgba(139, 69, 19, 0.4);
-  color: #2D1810;
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #1E90FF;
   transform: translateY(-2px);
-  box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.15),
-    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+  box-shadow: 0 6px 12px rgba(30, 144, 255, 0.2);
+  background: #FFFFFF;
 }
 
 .post-submit-btn:hover:not(:disabled),
 .btn-primary:hover:not(:disabled),
 .report-submit-btn:hover:not(:disabled) {
   transform: translateY(-3px);
+  background: linear-gradient(135deg, #4A9EFF 0%, #1E90FF 100%);
   box-shadow: 
-    0 12px 24px rgba(139, 69, 19, 0.35),
-    0 5px 10px rgba(101, 67, 33, 0.25),
-    inset 0 1px 0 rgba(218, 165, 32, 0.5);
-    
-  background: 
-    repeating-linear-gradient(45deg, rgba(101, 67, 33, 0.15) 0px, rgba(101, 67, 33, 0.15) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #E6B800 0%, #CC9900 25%, #A0522D 50%, #7A4B1A 75%, #A0522D 100%);
+    0 12px 24px rgba(30, 144, 255, 0.4),
+    0 5px 10px rgba(30, 144, 255, 0.3);
 }
 
 .post-submit-btn:active:not(:disabled),
@@ -4714,9 +4597,8 @@ textarea.form-input::placeholder {
 .report-submit-btn:active:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.25),
-    0 2px 4px rgba(101, 67, 33, 0.15),
-    inset 0 1px 0 rgba(218, 165, 32, 0.3);
+    0 6px 12px rgba(30, 144, 255, 0.25),
+    0 2px 4px rgba(30, 144, 255, 0.15);
 }
 
 .post-submit-btn:disabled,
@@ -4726,8 +4608,8 @@ textarea.form-input::placeholder {
   cursor: not-allowed;
   transform: none;
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.2),
-    0 1px 2px rgba(101, 67, 33, 0.1);
+    0 4px 8px rgba(30, 144, 255, 0.2),
+    0 1px 2px rgba(30, 144, 255, 0.1);
 }
 
 .submit-icon {

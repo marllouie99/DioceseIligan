@@ -293,6 +293,195 @@ border: 1px solid rgba(30, 144, 255, 0.15);
 **Files Modified:**
 - `static/css/themes/blue-sky-theme.css` - Added chat widget section with `!important` flags
 
+### Issue 7: Discover Churches Page Theme Update
+**Problem:** Discover Churches page was still using the old warm sacred earth theme (brown/gold colors) instead of the new blue sky palette.
+
+**Solution:** Updated all discover page files to use blue colors:
+1. Changed template to load `blue-sky-vars.css` and `blue-sky-theme.css` instead of warm-sacred-earth theme
+2. Updated all brown/gold color references to blue in both CSS files
+3. Replaced all `rgba(139, 69, 19, ...)` with `rgba(30, 144, 255, ...)`
+4. Updated gradients from brown/cream to blue/white
+5. Changed hover states and interactive elements to use blue accent colors
+
+**Files Modified:**
+- `templates/core/discover.html` - Updated theme CSS imports and container class
+- `static/css/discover.css` - Replaced all brown colors with blue palette
+- `static/css/pages/discover.css` - Replaced all brown colors with blue palette
+
+**Color Changes:**
+- Page header background: Brown gradient → White to Alice Blue gradient
+- Search section borders: Brown → Blue (`rgba(30, 144, 255, 0.15)`)
+- Button gradients: Brown/Gold → Dodger Blue/Royal Blue
+- Church cards: Cream background → White to Alice Blue gradient
+- Avatar placeholders: Teal → Blue gradient
+- Focus states: Purple → Blue
+- All shadows: Brown tints → Blue tints
+
+### Issue 8: Church Detail Page Theme Update
+**Problem:** Church Detail page was using the warm sacred earth theme with extensive brown/gold/parchment styling throughout the page.
+
+**Solution:** Comprehensively updated the church detail page to use blue colors:
+1. Changed template to load `blue-sky-vars.css` and `blue-sky-theme.css`
+2. Updated church header from parchment texture to clean white/blue gradient
+3. Replaced all brown color references with blue equivalents
+4. Updated cover image placeholder backgrounds to blue gradients
+5. Changed avatar placeholders from teal to blue gradient
+6. Updated all stat items, buttons, and interactive elements to blue theme
+7. Converted tabs from brown/cream to blue/white styling
+8. Updated content sections from parchment cards to clean blue cards
+
+**Files Modified:**
+- `templates/core/church_detail.html` - Updated theme CSS imports and container class
+- `static/css/pages/church_detail.css` - Replaced all brown/gold colors with blue palette
+
+**Key Color Transformations:**
+- Church header: Parchment texture → White to Alice Blue gradient
+- Cover background: Cream (`#FFF9E6`) → Blue gradient (`#E8F4FF` → `#C8E0F7`)
+- Avatar placeholder: Teal (`#0f766e`) → Blue (`#4169E1` → `#1E90FF`)
+- Stat items: Brown background → Alice Blue background
+- Follow button: Brown/Gold → Dodger Blue/Royal Blue
+- Message button: Brown → Blue with blue hover
+- Content sections: Parchment cards → Clean white/blue cards
+- Tabs: Brown/cream → Blue/white with blue accents
+- **Post cards**: Parchment texture → Clean white cards with blue borders
+- **Post actions bar**: Brown/tan → Light blue background
+- **Post action buttons**: Brown → Muted blue, hover to bright blue
+- **Comment input**: Cream background → White with blue border
+- All borders: `rgba(139, 69, 19, ...)` → `rgba(30, 144, 255, ...)`
+- All shadows: Brown-tinted → Blue-tinted
+
+**Post Card & Comments Update (2025-10-20):**
+- Post cards now use clean white background instead of parchment texture
+- Actions bar changed from brown/tan to light alice blue
+- Like/Comment/Share buttons changed from brown to blue on hover
+- Comment input fields changed from cream to white with blue borders
+- All text colors updated to match blue theme (dark blue for text, muted blue for metadata)
+- Comment section container backgrounds set to transparent
+- Comment form backgrounds set to transparent to prevent beige overlay
+
+**Final Updates - Tabs, Modals & Forms (2025-10-20):**
+- Tab buttons: Base color brown → Muted blue with `!important` flag
+- Form labels: Brown → Dark blue (`#1A3A52`)
+- Form inputs: Cream with wood texture → Light blue-gray (`#F7F9FC`)
+- Form borders: Brown → Blue (`rgba(30, 144, 255, 0.2)`)
+- Textarea: Cream with paper texture → Light blue-gray
+- Focus states: Gold → Blue with blue glow
+- File upload area: Brown dashed border → Blue dashed border
+- Upload icon: Brown → Blue
+- Character counter: Brown → Muted blue
+- Remove image button: Brown → Blue
+- Primary buttons: Brown/Gold gradient → Blue gradient (`#1E90FF` → `#4169E1`)
+- Secondary buttons: Cream → Light blue-gray with blue border
+- Button hover states: All updated to blue variants
+
+---
+
+## Events Page Recoloring (2025-10-20)
+
+**Template Updated:** `templates/core/events.html`
+- Changed theme from Warm Sacred Earth to Blue Sky
+- Updated CSS imports to use `blue-sky-vars.css` and `blue-sky-theme.css`
+- Changed container class from `warm-sacred-earth` to `blue-sky`
+
+**Result:** Events page now uses the blue sky theme with all post cards, buttons, and UI elements displaying in blue colors.
+
+---
+
+## My Appointments Page Recoloring (2025-10-20)
+
+**Templates Updated:**
+- `templates/core/my_appointments.html` - Changed theme from Warm Sacred Earth to Blue Sky
+
+**CSS Files Updated:**
+- `static/css/pages/appointments.css` - Comprehensive blue theme conversion
+
+**Key Color Transformations:**
+- Status pills container: Cream/parchment → Light blue gradient (`#F0F8FF` → `#E8F4FF`)
+- Status pills: Brown borders → Blue borders (`rgba(30, 144, 255, 0.2)`)
+- Active pill: Brown/gold gradient → Blue gradient (`#1E90FF` → `#4169E1`)
+- Booking cards: Brown borders/shadows → Blue borders/shadows
+- Service names: Brown → Dark blue (`#1A3A52`)
+- Icons: Brown → Blue (`#1E90FF`)
+- Action buttons: Brown → Blue with light blue hover
+- All shadows: Brown-tinted → Blue-tinted
+
+**Result:** My Appointments page now fully uses the blue sky theme with status filters, booking cards, and all interactive elements in blue colors.
+
+---
+
+## Following Page Recoloring (2025-10-20)
+
+**Templates Updated:**
+- `templates/core/following.html` - Changed theme from Warm Sacred Earth to Blue Sky
+
+**CSS Files Updated:**
+- `static/css/pages/following.css` - Comprehensive blue theme conversion
+
+**Key Color Transformations:**
+- Church cards: Parchment texture → Clean white to light blue gradient (`#FFFFFF` → `#F0F8FF` → `#E8F4FF`)
+- Card borders: Brown → Blue (`rgba(30, 144, 255, 0.15)`)
+- Card shadows: Brown-tinted → Blue-tinted (`rgba(30, 144, 255, 0.12)`)
+- Avatar placeholder: Brown/Gold gradient → Blue gradient (`#4169E1` → `#1E90FF`)
+- Avatar borders: Brown → Blue (`rgba(30, 144, 255, 0.2)`)
+- Church badges: Brown background → Light blue background (`rgba(30, 144, 255, 0.1)`)
+- Badge text: Brown → Blue (`#1E90FF`)
+- Detail icons: Brown → Blue (`#1E90FF`)
+- Follow button: Brown → Blue with gradient hover
+- Follow button (active): Brown/Gold → Blue gradient (`#1E90FF` → `#4169E1`)
+- Empty state: Parchment → White to light blue gradient
+- All hover states: Brown tints → Blue tints
+
+**New Components Added:**
+- `.church-content` - Content section styling
+- `.church-description` - Description text styling
+- `.church-details` - Details container
+- `.detail-item` - Individual detail items with icons
+- `.church-badges` - Badge container
+- `.denomination-badge`, `.size-badge` - Badge styling
+- `.avatar-placeholder` - Avatar placeholder styling
+- `.avatar-image` - Avatar image styling
+- `.follow-btn` - Follow button with states
+- `.empty-state` - Empty state message styling
+
+**Result:** Following page now fully uses the blue sky theme with church cards, badges, buttons, and all interactive elements displaying in clean blue colors.
+
+---
+
+## Notifications Page Recoloring (2025-10-20)
+
+**Templates Updated:**
+- `templates/core/notifications.html` - Changed theme from Warm Sacred Earth to Blue Sky
+
+**CSS Files Updated:**
+- `static/css/pages/notifications.css` - Comprehensive blue theme conversion
+
+**Key Color Transformations:**
+- Page title: Brown gradient text → Dark blue (`#1A3A52`)
+- Page subtitle: Brown → Muted blue (`#5A7A92`)
+- Header border: Brown → Blue (`rgba(30, 144, 255, 0.2)`)
+- "Mark All Read" button: Gold/Brown gradient → Blue gradient (`#1E90FF` → `#4169E1`)
+- Filter tabs: Parchment texture → Clean white to light blue gradient
+- Active filter tab: Gold gradient → Blue gradient with white text
+- Notification items: Parchment texture → Clean white to light blue gradient
+- Unread notifications: Enhanced parchment → Enhanced light blue gradient
+- Notification indicator bar: Gold → Blue gradient
+- Notification icons: Gold background → Blue gradient background with white icons
+- Notification title: Brown → Dark blue (`#1A3A52`)
+- Notification time: Brown → Muted blue (`#7A9AB2`)
+- Notification message: Brown → Muted blue (`#5A7A92`)
+- Action buttons: Brown outline → Blue outline, hover to blue gradient
+- Mark read button: Parchment → Light blue, hover to blue gradient
+- Notification dot: Gold → Blue with pulse animation
+- Empty state: Parchment → White to light blue gradient
+- Empty state icon: Gold background → Blue gradient background
+- Priority urgent: Red accent with parchment → Red accent with white/blue
+- Priority high: Orange accent with parchment → Orange accent with white/blue
+- Priority low: Brown accent → Muted blue accent
+- All shadows: Brown-tinted → Blue-tinted
+- Font family: Georgia serif → System sans-serif
+
+**Result:** Notifications page now fully uses the blue sky theme with all notification items, filters, buttons, and states displaying in clean blue colors with modern sans-serif typography.
+
 ---
 
 ## Recommended Future Improvements
@@ -327,12 +516,14 @@ Create a system to toggle between themes:
 
 ### 5. Update Other Pages
 Apply the blue theme to remaining pages:
-- Discover Churches page
-- Church Detail page
-- Events page
-- Appointments page
+- ✅ Discover Churches page (Updated 2025-10-20)
+- ✅ Church Detail page (Updated 2025-10-20)
+- ✅ Events page (Updated 2025-10-20)
+- ✅ Appointments page (Updated 2025-10-20)
+- ✅ Following page (Updated 2025-10-20)
+- ✅ Notifications page (Updated 2025-10-20)
 - Profile page
-- Manage Church page
+- ✅ Manage Church page (Updated 2025-10-19)
 
 ---
 

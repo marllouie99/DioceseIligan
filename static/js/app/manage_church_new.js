@@ -66,14 +66,14 @@ class ChurchManagementApp {
         datasets: [{
           data: dataPoints,
           backgroundColor: [
-            'rgba(218, 165, 32, 0.7)',   // gold
-            'rgba(160, 82, 45, 0.7)',    // sienna
-            'rgba(139, 69, 19, 0.7)'     // brown
+            'rgba(30, 144, 255, 0.7)',   // dodger blue
+            'rgba(65, 105, 225, 0.7)',   // royal blue
+            'rgba(74, 158, 255, 0.7)'    // bright blue
           ],
           borderColor: [
-            'rgba(218, 165, 32, 1)',
-            'rgba(160, 82, 45, 1)',
-            'rgba(139, 69, 19, 1)'
+            'rgba(30, 144, 255, 1)',
+            'rgba(65, 105, 225, 1)',
+            'rgba(74, 158, 255, 1)'
           ],
           borderWidth: 2,
           hoverOffset: 6
@@ -89,10 +89,10 @@ class ChurchManagementApp {
             labels: { usePointStyle: true, padding: 20, font: { family: 'Georgia, serif', size: 12 } }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -191,7 +191,7 @@ class ChurchManagementApp {
           y: {
             beginAtZero: true,
             ticks: { font: { family: 'Georgia, serif' } },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -286,10 +286,10 @@ class ChurchManagementApp {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -317,7 +317,7 @@ class ChurchManagementApp {
                 return '₱' + value.toLocaleString();
               }
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: {
@@ -439,7 +439,7 @@ class ChurchManagementApp {
               stepSize: 1,
               font: { family: 'Georgia, serif' } 
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -511,7 +511,7 @@ class ChurchManagementApp {
               stepSize: 5,
               font: { family: 'Georgia, serif' }
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -1120,10 +1120,10 @@ class ChurchManagementApp {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -1141,7 +1141,7 @@ class ChurchManagementApp {
               font: { family: 'Georgia, serif' },
               color: '#6B4226'
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: {
@@ -1232,10 +1232,10 @@ class ChurchManagementApp {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -1253,7 +1253,7 @@ class ChurchManagementApp {
               font: { family: 'Georgia, serif' },
               color: '#6B4226'
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           y: {
             ticks: {
@@ -1413,10 +1413,10 @@ class ChurchManagementApp {
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -1555,10 +1555,10 @@ class ChurchManagementApp {
             display: false
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)',
+            borderColor: 'rgba(74, 158, 255, 0.8)',
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
@@ -1718,7 +1718,7 @@ class ChurchManagementApp {
               stepSize: Math.max(1, Math.floor(total / 10)),
               font: { family: 'Georgia, serif' } 
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -1906,10 +1906,10 @@ class ChurchManagementApp {
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.95)',
+            backgroundColor: 'rgba(30, 144, 255, 0.95)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(139, 69, 19, 0.3)',
+            borderColor: 'rgba(30, 144, 255, 0.3)',
             borderWidth: 1,
             cornerRadius: 8,
             padding: 12
@@ -1922,7 +1922,7 @@ class ChurchManagementApp {
               font: { family: 'Georgia, serif' },
               color: '#654321'
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { 
@@ -2032,10 +2032,10 @@ class ChurchManagementApp {
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.95)',
+            backgroundColor: 'rgba(30, 144, 255, 0.95)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(139, 69, 19, 0.3)',
+            borderColor: 'rgba(30, 144, 255, 0.3)',
             borderWidth: 1,
             cornerRadius: 8,
             padding: 12
@@ -2048,7 +2048,7 @@ class ChurchManagementApp {
               font: { family: 'Georgia, serif' },
               color: '#654321'
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { 
@@ -2157,13 +2157,13 @@ class ChurchManagementApp {
         datasets: [{
           label: 'Followers',
           data: data,
-          borderColor: 'rgba(139, 69, 19, 1)',
-          backgroundColor: 'rgba(139, 69, 19, 0.1)',
+          borderColor: 'rgba(205, 127, 50, 1)',
+          backgroundColor: 'rgba(205, 127, 50, 0.1)',
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: 'rgba(218, 165, 32, 1)',
-          pointBorderColor: 'rgba(139, 69, 19, 1)',
+          pointBackgroundColor: 'rgba(205, 127, 50, 1)',
+          pointBorderColor: 'rgba(205, 127, 50, 1)',
           pointBorderWidth: 2,
           pointRadius: 6,
           pointHoverRadius: 8
@@ -2176,9 +2176,9 @@ class ChurchManagementApp {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
+            borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8,
             callbacks: {
               label: function(context) {
                 return `Followers: ${context.parsed.y}`;
@@ -2193,7 +2193,7 @@ class ChurchManagementApp {
               stepSize: Math.max(1, Math.floor(total / 10)),
               font: { family: 'Georgia, serif' } 
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -2301,16 +2301,16 @@ class ChurchManagementApp {
             labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 11 } }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
+            backgroundColor: 'rgba(30, 144, 255, 0.9)',
             titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8
+            borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8
           }
         },
         scales: {
           y: {
             beginAtZero: true,
             ticks: { font: { family: 'Georgia, serif' } },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -2423,7 +2423,7 @@ class ChurchManagementApp {
                 return '₱' + value.toFixed(0);
               }
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
@@ -2467,11 +2467,11 @@ class ChurchManagementApp {
           {
             label: 'Bookmarks',
             data: bookmarksData,
-            borderColor: 'rgba(139, 69, 19, 1)',
-            backgroundColor: 'rgba(139, 69, 19, 0.1)',
+            borderColor: 'rgba(30, 144, 255, 1)',
+            backgroundColor: 'rgba(30, 144, 255, 0.1)',
             borderWidth: 2,
             tension: 0.4,
-            pointBackgroundColor: 'rgba(139, 69, 19, 1)',
+            pointBackgroundColor: 'rgba(30, 144, 255, 1)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,
@@ -2532,10 +2532,10 @@ class ChurchManagementApp {
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.95)',
+            backgroundColor: 'rgba(30, 144, 255, 0.95)',
             titleColor: '#fff',
             bodyColor: '#fff',
-            borderColor: 'rgba(139, 69, 19, 0.3)',
+            borderColor: 'rgba(30, 144, 255, 0.3)',
             borderWidth: 1,
             cornerRadius: 8,
             padding: 12,
@@ -2549,7 +2549,7 @@ class ChurchManagementApp {
               font: { family: 'Georgia, serif' },
               color: '#654321'
             },
-            grid: { color: 'rgba(139, 69, 19, 0.1)' }
+            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
           x: {
             ticks: { 
@@ -2752,6 +2752,22 @@ function toggleDropdown(button, event) {
   
   // Toggle current dropdown
   dropdown.classList.toggle('show');
+  
+  // Position dropdown using fixed positioning
+  if (!isOpen) {
+    const buttonRect = button.getBoundingClientRect();
+    dropdown.style.top = `${buttonRect.bottom + 8}px`; // 8px gap below button
+    dropdown.style.left = `${buttonRect.right - 180}px`; // Align right edge (180px is min-width)
+    
+    // Adjust if dropdown would go off-screen
+    const dropdownRect = dropdown.getBoundingClientRect();
+    if (dropdownRect.right > window.innerWidth) {
+      dropdown.style.left = `${window.innerWidth - dropdownRect.width - 16}px`;
+    }
+    if (dropdownRect.bottom > window.innerHeight) {
+      dropdown.style.top = `${buttonRect.top - dropdownRect.height - 8}px`; // Show above button
+    }
+  }
   
   // Close dropdown when clicking outside
   if (!isOpen) {

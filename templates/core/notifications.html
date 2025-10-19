@@ -6,7 +6,8 @@
 
 {% block extra_css %}
 <!-- REQUIRED: Theme CSS first -->
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <!-- Page-specific CSS second -->
 <link rel="stylesheet" href="{% static 'css/pages/notifications.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
@@ -21,7 +22,7 @@
 
 {% block content %}
 <!-- REQUIRED: Theme wrapper class -->
-<div class="notifications-page warm-sacred-earth">
+<div class="notifications-page blue-sky">
     <div class="notifications-header page-header">
         <div class="header-content">
             <h1 class="page-title">Notifications</h1>

@@ -33,17 +33,12 @@ body.page-appointments {
   margin-bottom: 2rem;
   justify-content: center;
   padding: 1.5rem;
-  background:
-    /* Subtle parchment texture */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0px, rgba(139, 69, 19, 0.02) 1px, transparent 1px, transparent 8px),
-    repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.015) 0px, rgba(160, 82, 45, 0.015) 1px, transparent 1px, transparent 12px),
-    linear-gradient(135deg, var(--warm-white) 0%, #F4E6D0 50%, var(--warm-white) 100%);
+  background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 50%, #F0F8FF 100%);
   border-radius: 20px;
-  border: 2px solid var(--border);
+  border: 2px solid rgba(30, 144, 255, 0.15);
   box-shadow: 
-    0 8px 24px rgba(139, 69, 19, 0.1),
-    0 4px 8px rgba(101, 67, 33, 0.05),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
+    0 8px 24px rgba(30, 144, 255, 0.1),
+    0 4px 8px rgba(30, 144, 255, 0.05);
 }
 
 .status-pill {
@@ -51,35 +46,33 @@ body.page-appointments {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   border-radius: 12px;
-  background: var(--card-bg);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1A3A52;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--font-family-primary);
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.12);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.12);
 }
 
 .status-pill:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.18);
-  background: var(--warm-white);
-  border-color: rgba(139, 69, 19, 0.3);
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.18);
+  background: #FFFFFF;
+  border-color: rgba(30, 144, 255, 0.3);
   text-decoration: none;
 }
 
 .status-pill.active {
-  background: var(--gradient-brand);
-  border-color: var(--brand);
-  color: var(--text-light);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  border-color: #1E90FF;
+  color: #FFFFFF;
   box-shadow: 
-    0 6px 20px rgba(139, 69, 19, 0.35),
-    0 2px 8px rgba(160, 82, 45, 0.25);
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+    0 6px 20px rgba(30, 144, 255, 0.35),
+    0 2px 8px rgba(30, 144, 255, 0.25);
 }
 
 .status-pill .count {
@@ -109,8 +102,8 @@ body.page-appointments {
 
 /* Booking Card */
 .booking-card {
-  background: var(--card-bg);
-  border: 2px solid var(--border);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(30, 144, 255, 0.15);
   border-radius: 20px;
   padding: 20px 24px;
   display: grid;
@@ -119,16 +112,16 @@ body.page-appointments {
   align-items: center;
   transition: all 0.3s ease;
   box-shadow: 
-    0 4px 12px rgba(139, 69, 19, 0.08),
-    0 2px 4px rgba(101, 67, 33, 0.05);
+    0 4px 12px rgba(30, 144, 255, 0.08),
+    0 2px 4px rgba(30, 144, 255, 0.05);
 }
 
 .booking-card:hover {
   box-shadow: 
-    0 8px 20px rgba(139, 69, 19, 0.12),
-    0 4px 8px rgba(101, 67, 33, 0.08);
+    0 8px 20px rgba(30, 144, 255, 0.12),
+    0 4px 8px rgba(30, 144, 255, 0.08);
   transform: translateY(-1px);
-  border-color: rgba(139, 69, 19, 0.3);
+  border-color: rgba(30, 144, 255, 0.3);
 }
 
 /* Left Section - Service Info */
@@ -147,7 +140,7 @@ body.page-appointments {
 .booking-service-name {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text);
+  color: #1A3A52;
   margin: 0;
   line-height: 1;
   font-family: var(--font-family-primary);
@@ -165,7 +158,7 @@ body.page-appointments {
 .booking-church-info i {
   width: 16px;
   height: 16px;
-  color: var(--brand);
+  color: #1E90FF;
 }
 
 .booking-meta-row {
@@ -185,7 +178,7 @@ body.page-appointments {
 .booking-meta-item i {
   width: 14px;
   height: 14px;
-  color: var(--brand);
+  color: #1E90FF;
   opacity: 0.7;
 }
 
@@ -195,7 +188,7 @@ body.page-appointments {
 
 .booking-meta-item .meta-value {
   font-weight: 600;
-  color: var(--text);
+  color: #1A3A52;
 }
 
 .booking-decline-reason {
@@ -240,7 +233,7 @@ body.page-appointments {
 .datetime-item i {
   width: 18px;
   height: 18px;
-  color: var(--brand);
+  color: #1E90FF;
   flex-shrink: 0;
 }
 
@@ -261,7 +254,7 @@ body.page-appointments {
 .datetime-value {
   font-size: 15px;
   font-weight: 700;
-  color: var(--text);
+  color: #1A3A52;
   font-family: var(--font-family-primary);
 }
 
@@ -286,20 +279,20 @@ body.page-appointments {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  color: var(--brand);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(30, 144, 255, 0.15);
+  color: #1E90FF;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
+  box-shadow: 0 1px 3px rgba(30, 144, 255, 0.08);
 }
 
 .booking-icon-btn:hover {
-  background: var(--warm-white);
-  border-color: var(--brand);
+  background: #F0F8FF;
+  border-color: #1E90FF;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.12);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.12);
 }
 
 .booking-icon-btn i {

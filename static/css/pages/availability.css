@@ -1,6 +1,6 @@
 /*
  * Availability Pages Styling - ChurchIligan
- * Consistent UI design following Warm Sacred Earth theme
+ * Consistent UI design following Blue Sky theme
  * Applies to: edit_availability, create_availability, manage_availability
  */
 
@@ -20,34 +20,37 @@
 .page-header {
   margin-bottom: 32px;
   padding: 24px 0;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .header-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.15),
-    0 4px 8px rgba(218, 165, 32, 0.1),
+    0 8px 16px rgba(30, 144, 255, 0.15),
+    0 4px 8px rgba(30, 144, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .header-icon svg {
   width: 24px;
   height: 24px;
-  color: #2D1810;
+  color: #FFFFFF;
 }
 
 .header-text {
@@ -57,15 +60,15 @@
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  color: #2D1810;
+  color: #1A3A52;
   margin: 0 0 8px 0;
-  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.1);
   letter-spacing: -0.5px;
 }
 
 .page-subtitle {
   font-size: 16px;
-  color: #6B4226;
+  color: #5A7A92;
   margin: 0;
   font-weight: 400;
 }
@@ -78,26 +81,26 @@
   max-width: 800px;
   margin: 0 auto;
   background: 
-    /* Parchment texture */
-    radial-gradient(ellipse 120px 80px at 25% 30%, rgba(160, 82, 45, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 75% 70%, rgba(139, 69, 19, 0.06) 0%, transparent 75%),
+    /* Subtle texture */
+    radial-gradient(ellipse 120px 80px at 25% 30%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 75% 70%, rgba(30, 144, 255, 0.04) 0%, transparent 75%),
     /* Paper grain */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.02) 0.5px, transparent 2px),
-    /* Base parchment gradient */
-    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 50%, #FFF9E6 100%);
+    repeating-linear-gradient(45deg, rgba(30, 144, 255, 0.02) 0.5px, transparent 2px),
+    repeating-linear-gradient(-45deg, rgba(30, 144, 255, 0.02) 0.5px, transparent 2px),
+    /* Base gradient */
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #FFFFFF 100%);
   
   border-radius: 24px;
   padding: 40px;
   box-shadow: 
-    0 32px 64px rgba(139, 69, 19, 0.12),
-    0 16px 32px rgba(160, 82, 45, 0.08),
-    0 8px 16px rgba(101, 67, 33, 0.06),
+    0 32px 64px rgba(30, 144, 255, 0.12),
+    0 16px 32px rgba(30, 144, 255, 0.08),
+    0 8px 16px rgba(30, 144, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 2px solid rgba(139, 69, 19, 0.1);
+  border: 2px solid rgba(30, 144, 255, 0.1);
   position: relative;
 }
 
@@ -110,7 +113,7 @@
   right: 0;
   bottom: 0;
   border-radius: 22px;
-  background: radial-gradient(circle at 20% 20%, rgba(218, 165, 32, 0.1) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 20%, rgba(30, 144, 255, 0.08) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
 }
@@ -130,26 +133,26 @@
   padding: 24px;
   background: 
     /* Subtle age spots */
-    radial-gradient(ellipse 80px 60px at 15% 25%, rgba(160, 82, 45, 0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 40px at 85% 75%, rgba(139, 69, 19, 0.04) 0%, transparent 75%),
+    radial-gradient(ellipse 80px 60px at 15% 25%, rgba(30, 144, 255, 0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 40px at 85% 75%, rgba(30, 144, 255, 0.04) 0%, transparent 75%),
     /* Paper texture */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.02) 0.8px, transparent 2.5px),
     /* Base */
-    linear-gradient(135deg, rgba(255, 249, 230, 0.6) 0%, rgba(244, 230, 208, 0.4) 100%);
+    linear-gradient(135deg, rgba(240, 248, 255, 0.6) 0%, rgba(240, 248, 255, 0.4) 100%);
   
   border-radius: 16px;
-  border: 1px solid rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(30, 144, 255, 0.08);
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.06),
+    0 4px 8px rgba(30, 144, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #2D1810;
+  color: #1A3A52;
   margin: 0 0 20px 0;
-  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.1);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.1);
 }
 
 /* =============================================================================
@@ -174,7 +177,7 @@
 
 .form-label {
   font-weight: 700;
-  color: #2D1810;
+  color: #1A3A52;
   font-size: 14px;
   font-family: Georgia, "Times New Roman", serif;
   margin-bottom: 6px;
@@ -185,21 +188,21 @@
 .form-group textarea,
 .form-group select {
   padding: 14px 18px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   border-radius: 12px;
   font-size: 15px;
   font-family: Georgia, "Times New Roman", serif;
-  color: #2D1810;
+  color: #1A3A52;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   background: 
-    /* Wood grain texture */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.03) 0.5px, transparent 2px),
-    /* Warm cream gradient */
-    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+    /* Subtle texture */
+    repeating-linear-gradient(45deg, rgba(30, 144, 255, 0.03) 0.5px, transparent 2px),
+    /* Light blue gradient */
+    linear-gradient(135deg, #F7F9FC 0%, #F0F8FF 100%);
   
   box-shadow: 
-    0 2px 4px rgba(139, 69, 19, 0.06),
+    0 2px 4px rgba(30, 144, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
@@ -207,15 +210,15 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #DAA520;
+  border-color: #1E90FF;
   box-shadow: 
-    0 0 0 4px rgba(218, 165, 32, 0.15),
-    0 4px 12px rgba(139, 69, 19, 0.1),
+    0 0 0 4px rgba(30, 144, 255, 0.15),
+    0 4px 12px rgba(30, 144, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   
   background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FFFBF0 0%, #F9EDD8 100%);
+    repeating-linear-gradient(45deg, rgba(30, 144, 255, 0.02) 0.5px, transparent 2px),
+    linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);
   
   transform: translateY(-1px);
 }
@@ -234,21 +237,21 @@
   gap: 12px;
   cursor: pointer;
   font-weight: 600;
-  color: #2D1810;
+  color: #1A3A52;
   padding: 16px;
   border-radius: 12px;
   background: 
-    linear-gradient(135deg, rgba(255, 249, 230, 0.4) 0%, rgba(244, 230, 208, 0.2) 100%);
-  border: 2px solid rgba(139, 69, 19, 0.1);
+    linear-gradient(135deg, rgba(240, 248, 255, 0.4) 0%, rgba(232, 244, 255, 0.2) 100%);
+  border: 2px solid rgba(30, 144, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-checkbox-label:hover {
-  border-color: rgba(218, 165, 32, 0.3);
+  border-color: rgba(30, 144, 255, 0.3);
   background: 
-    linear-gradient(135deg, rgba(255, 249, 230, 0.6) 0%, rgba(244, 230, 208, 0.4) 100%);
+    linear-gradient(135deg, rgba(240, 248, 255, 0.6) 0%, rgba(240, 248, 255, 0.4) 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.08);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.08);
 }
 
 .checkbox-text {
@@ -258,7 +261,7 @@
 /* Help text */
 .form-help {
   font-size: 13px;
-  color: #8B6F47;
+  color: #5A7A92;
   margin-top: 6px;
   font-style: italic;
 }
@@ -285,7 +288,7 @@
   justify-content: flex-end;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 2px solid rgba(139, 69, 19, 0.1);
+  border-top: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 /* Button styling */
@@ -308,56 +311,56 @@
 
 .btn-primary {
   background: 
-    /* Wood grain overlay */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.1) 0.5px, transparent 2px),
-    /* Gold gradient */
-    linear-gradient(135deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
+    /* Subtle overlay */
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0.5px, transparent 2px),
+    /* Blue gradient */
+    linear-gradient(135deg, #1E90FF 0%, #4169E1 50%, #4A9EFF 100%);
   
-  color: #2D1810;
-  border: 2px solid rgba(139, 69, 19, 0.2);
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  border: 2px solid rgba(30, 144, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.15),
-    0 4px 8px rgba(218, 165, 32, 0.1),
+    0 8px 16px rgba(30, 144, 255, 0.15),
+    0 4px 8px rgba(30, 144, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover {
   background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.08) 0.5px, transparent 2px),
-    linear-gradient(135deg, #E6B800 0%, #CC9900 50%, #996F00 100%);
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0.5px, transparent 2px),
+    linear-gradient(135deg, #4A9EFF 0%, #1E90FF 50%, #4169E1 100%);
   
   transform: translateY(-2px);
   box-shadow: 
-    0 12px 24px rgba(139, 69, 19, 0.2),
-    0 6px 12px rgba(218, 165, 32, 0.15),
+    0 12px 24px rgba(30, 144, 255, 0.2),
+    0 6px 12px rgba(30, 144, 255, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary {
   background: 
-    /* Paper texture */
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.03) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FFF9E6 0%, #F4E6D0 100%);
+    /* Subtle texture */
+    repeating-linear-gradient(45deg, rgba(30, 144, 255, 0.03) 0.5px, transparent 2px),
+    linear-gradient(135deg, #F7F9FC 0%, #F0F8FF 100%);
   
-  color: #2D1810;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  color: #1A3A52;
+  border: 2px solid rgba(30, 144, 255, 0.2);
   
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.08),
+    0 4px 8px rgba(30, 144, 255, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-secondary:hover {
   background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FFFBF0 0%, #F9EDD8 100%);
+    repeating-linear-gradient(45deg, rgba(30, 144, 255, 0.02) 0.5px, transparent 2px),
+    linear-gradient(135deg, #F0F8FF 0%, #E6F3FF 100%);
   
-  border-color: rgba(218, 165, 32, 0.3);
+  border-color: rgba(30, 144, 255, 0.3);
   transform: translateY(-1px);
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.12),
+    0 6px 12px rgba(30, 144, 255, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
@@ -391,7 +394,7 @@
   margin-bottom: 12px;
   font-weight: 500;
   font-family: Georgia, "Times New Roman", serif;
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.08);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.08);
 }
 
 .message-success {

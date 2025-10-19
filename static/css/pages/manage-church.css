@@ -25,8 +25,8 @@
 }
 
 .verification-banner.pending {
-  background: linear-gradient(135deg, #FBE8B5 0%, #F5D88A 100%);
-  border-color: rgba(218, 165, 32, 0.3);
+  background: linear-gradient(135deg, #E0F0FF 0%, #B8DAFF 100%);
+  border-color: rgba(30, 144, 255, 0.3);
   color: var(--text);
 }
 
@@ -38,7 +38,7 @@
 
 .verification-banner.rejected {
   background: linear-gradient(135deg, #F5D5D5 0%, #E8B8B8 100%);
-  border-color: rgba(160, 82, 45, 0.3);
+  border-color: rgba(220, 38, 38, 0.3);
   color: #5A2D2D;
 }
 
@@ -67,7 +67,7 @@
   border-radius: 12px;
   object-fit: cover;
   border: 2px solid var(--border-light);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
 }
 
 .preview-avatar-placeholder {
@@ -82,8 +82,8 @@
   font-weight: 700;
   font-size: 2rem;
   border: 2px solid var(--border-light);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.4);
 }
 
 /* =============================================================================
@@ -105,7 +105,7 @@
   justify-content: space-between;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
 }
 
 .section-title {
@@ -135,12 +135,12 @@
   padding: 1.5rem;
   background:
     /* Subtle texture for form sections */
-    radial-gradient(ellipse 60px 40px at 90% 10%, rgba(139, 69, 19, 0.03) 0%, transparent 70%),
-    repeating-linear-gradient(30deg, rgba(139, 69, 19, 0.008) 0px, rgba(139, 69, 19, 0.008) 1px, transparent 1px, transparent 5px),
-    linear-gradient(135deg, var(--warm-white) 0%, #F8F4E6 100%);
+    radial-gradient(ellipse 60px 40px at 90% 10%, rgba(30, 144, 255, 0.03) 0%, transparent 70%),
+    repeating-linear-gradient(30deg, rgba(30, 144, 255, 0.008) 0px, rgba(30, 144, 255, 0.008) 1px, transparent 1px, transparent 5px),
+    linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%);
   border: 1px solid var(--border-light);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.06);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.06);
 }
 
 .form-section h3 {
@@ -451,12 +451,12 @@ body.page-manage-church {
 
 /* Prevent hover color/transform changes for inner analytics items in Donations */
 .donation-stats .analytics-card:hover {
-  background: rgba(255, 249, 230, 0.3) !important; /* keep base color */
+  background: rgba(240, 248, 255, 0.3) !important; /* keep base color */
   transform: none !important;
   box-shadow: none !important;
 }
 .donation-stats .chart-container:hover {
-  background: rgba(255, 249, 230, 0.2) !important; /* keep base color */
+  background: rgba(240, 248, 255, 0.2) !important; /* keep base color */
   transform: none !important;
   box-shadow: none !important;
 }
@@ -497,12 +497,12 @@ body.page-manage-church {
 
 /* Prevent hover color/transform changes for inner analytics items in Appointments */
 .appointment-stats .analytics-card:hover {
-  background: rgba(255, 249, 230, 0.3) !important;
+  background: rgba(240, 248, 255, 0.3) !important;
   transform: none !important;
   box-shadow: none !important;
 }
 .appointment-stats .chart-container:hover {
-  background: rgba(255, 249, 230, 0.2) !important;
+  background: rgba(240, 248, 255, 0.2) !important;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -543,7 +543,7 @@ body.page-manage-church {
 
 /* Prevent hover color/transform changes for inner analytics items in Services */
 .services-stats .analytics-card:hover {
-  background: rgba(255, 249, 230, 0.3) !important;
+  background: rgba(240, 248, 255, 0.3) !important;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -582,12 +582,12 @@ body.page-manage-church {
 
 /* Prevent hover color/transform changes for inner analytics items in Followers */
 .followers-stats .analytics-card:hover {
-  background: rgba(255, 249, 230, 0.3) !important;
+  background: rgba(240, 248, 255, 0.3) !important;
   transform: none !important;
   box-shadow: none !important;
 }
 .followers-stats .chart-container:hover {
-  background: rgba(255, 249, 230, 0.2) !important;
+  background: rgba(240, 248, 255, 0.2) !important;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -610,16 +610,16 @@ body.page-manage-church {
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(255, 249, 230, 0.3);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  background: rgba(240, 248, 255, 0.3);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .donation-stats .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
-  background: rgba(255, 249, 230, 0.4);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.12);
+  background: rgba(240, 248, 255, 0.4);
 }
 
 .donation-stats .stat-icon {
@@ -672,7 +672,7 @@ body.page-manage-church {
   color: var(--text);
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 .donations-list {
@@ -687,14 +687,14 @@ body.page-manage-church {
   align-items: flex-start;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .donation-item:hover {
-  background: rgba(255, 249, 230, 0.3);
-  border-color: rgba(139, 69, 19, 0.2);
+  background: rgba(240, 248, 255, 0.3);
+  border-color: rgba(30, 144, 255, 0.2);
 }
 
 .donation-avatar {
@@ -706,21 +706,21 @@ body.page-manage-church {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
 }
 
 .donor-avatar-placeholder {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   font-size: 1rem;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
 }
 
 .donor-avatar-placeholder svg {
@@ -812,7 +812,7 @@ body.page-manage-church {
 .donation-message {
   margin-top: 0.5rem;
   padding: 0.75rem;
-  background: rgba(139, 69, 19, 0.05);
+  background: rgba(30, 144, 255, 0.05);
   border-left: 3px solid var(--brand-2);
   border-radius: 0 6px 6px 0;
   font-size: 0.875rem;
@@ -871,14 +871,14 @@ body.page-manage-church {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: rgba(255, 249, 230, 0.2);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .donor-item:hover {
-  background: rgba(255, 249, 230, 0.3);
+  background: rgba(240, 248, 255, 0.3);
   transform: translateX(4px);
 }
 
@@ -942,7 +942,7 @@ body.page-manage-church {
   text-align: center;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-top: 1px solid rgba(30, 144, 255, 0.1);
 }
 
 /* Mobile Responsiveness for Donations Tab */
@@ -1014,7 +1014,7 @@ body.page-manage-church {
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 .unified-content-management .analytics-overview h3 {
@@ -1040,7 +1040,7 @@ body.page-manage-church {
 
 .sort-dropdown {
   padding: 0.5rem 0.75rem;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
   border-radius: 6px;
   background: var(--card-bg);
   color: var(--text);
@@ -1056,7 +1056,7 @@ body.page-manage-church {
 .sort-dropdown:focus {
   outline: none;
   border-color: var(--brand);
-  box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+  box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.1);
 }
 
 /* Analytics Cards Grid - 1x4 Layout */
@@ -1072,16 +1072,16 @@ body.page-manage-church {
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(255, 249, 230, 0.3);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  background: rgba(240, 248, 255, 0.3);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .unified-content-management .analytics-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
-  background: rgba(255, 249, 230, 0.4);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.12);
+  background: rgba(240, 248, 255, 0.4);
 }
 
 .unified-content-management .analytics-icon {
@@ -1128,13 +1128,13 @@ body.page-manage-church {
 
 /* Posts Management Section Integration */
 .unified-content-management .posts-management {
-  border-top: 2px solid rgba(139, 69, 19, 0.1);
+  border-top: 2px solid rgba(30, 144, 255, 0.1);
   padding-top: 2rem;
 }
 
 /* Other Content Sections */
 .unified-content-management .other-content-sections {
-  border-top: 1px solid rgba(139, 69, 19, 0.1);
+  border-top: 1px solid rgba(30, 144, 255, 0.1);
   padding-top: 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1143,8 +1143,8 @@ body.page-manage-church {
 
 .unified-content-management .content-section {
   padding: 1.5rem;
-  background: rgba(255, 249, 230, 0.2);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 12px;
   text-align: center;
   transition: all 0.3s ease;
@@ -1152,8 +1152,8 @@ body.page-manage-church {
 
 .unified-content-management .content-section:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.08);
-  background: rgba(255, 249, 230, 0.3);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.08);
+  background: rgba(240, 248, 255, 0.3);
 }
 
 .unified-content-management .content-section h3 {
@@ -1244,7 +1244,7 @@ body.page-manage-church {
 .unified-content-management .analytics-charts {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid rgba(139, 69, 19, 0.1);
+  border-top: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 .unified-content-management .charts-grid {
@@ -1256,8 +1256,8 @@ body.page-manage-church {
 
 /* Chart Containers */
 .chart-container {
-  background: rgba(255, 249, 230, 0.2);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -1267,15 +1267,15 @@ body.page-manage-church {
 
 .chart-container:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.08);
-  background: rgba(255, 249, 230, 0.3);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.08);
+  background: rgba(240, 248, 255, 0.3);
 }
 
 /* Chart Headers */
 .chart-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
 }
 
 .chart-header h4 {
@@ -1308,7 +1308,7 @@ body.page-manage-church {
   max-height: 220px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
 }
 
 /* Ensure empty and error states have same visual padding as canvases */
@@ -1321,7 +1321,7 @@ body.page-manage-church {
   max-height: 220px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
 }
 
 /* Most Engaged Post Details */
@@ -1334,7 +1334,7 @@ body.page-manage-church {
 .post-preview {
   padding: 1rem;
   background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 8px;
 }
 
@@ -1380,7 +1380,7 @@ body.page-manage-church {
   gap: 1rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -1428,7 +1428,7 @@ body.page-manage-church {
 .engagement-bar {
   width: 80px;
   height: 6px;
-  background: rgba(139, 69, 19, 0.1);
+  background: rgba(30, 144, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
   flex-shrink: 0;
@@ -1463,14 +1463,14 @@ body.page-manage-church {
   font-size: 0.875rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
 }
 
 .chart-loading::before {
   content: '';
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   border-top: 2px solid var(--brand);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -2070,15 +2070,15 @@ body.page-manage-church {
 
 /* Revenue Chart Container */
 .revenue-chart-container {
-  background: rgba(255, 249, 230, 0.2);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .revenue-chart-container:hover {
-  background: rgba(255, 249, 230, 0.3);
+  background: rgba(240, 248, 255, 0.3);
   transform: none !important;
   box-shadow: none !important;
 }
@@ -2095,20 +2095,20 @@ body.page-manage-church {
   max-height: 280px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
 }
 
 /* Upcoming Bookings Container */
 .upcoming-bookings-container {
-  background: rgba(255, 249, 230, 0.2);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .upcoming-bookings-container:hover {
-  background: rgba(255, 249, 230, 0.3);
+  background: rgba(240, 248, 255, 0.3);
   transform: none !important;
   box-shadow: none !important;
 }
@@ -2124,7 +2124,7 @@ body.page-manage-church {
   overflow-x: auto;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
 }
 
 .bookings-table {
@@ -2134,8 +2134,8 @@ body.page-manage-church {
 }
 
 .bookings-table thead {
-  background: rgba(139, 69, 19, 0.05);
-  border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+  background: rgba(30, 144, 255, 0.05);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.1);
 }
 
 .bookings-table th {
@@ -2149,12 +2149,12 @@ body.page-manage-church {
 }
 
 .bookings-table tbody tr {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.05);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.05);
   transition: background-color 0.2s ease;
 }
 
 .bookings-table tbody tr:hover {
-  background: rgba(139, 69, 19, 0.03);
+  background: rgba(30, 144, 255, 0.03);
 }
 
 .bookings-table tbody tr:last-child {
@@ -2211,7 +2211,7 @@ body.page-manage-church {
   padding: 3rem 2rem;
   text-align: center;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(139, 69, 19, 0.05);
+  border: 1px solid rgba(30, 144, 255, 0.05);
   border-radius: 8px;
 }
 
@@ -2326,9 +2326,11 @@ body.page-manage-church {
 /* Appointments Table Wrapper */
 .appointments-table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 600px; /* Set max height to prevent excessive scrolling */
   border-radius: 12px;
-  background: rgba(255, 249, 230, 0.3);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  background: rgba(240, 248, 255, 0.3);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   margin-top: 1.5rem;
 }
 
@@ -2341,8 +2343,8 @@ body.page-manage-church {
 }
 
 .appointments-table thead {
-  background: rgba(139, 69, 19, 0.05);
-  border-bottom: 2px solid rgba(139, 69, 19, 0.15);
+  background: rgba(30, 144, 255, 0.05);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.15);
 }
 
 .appointments-table th {
@@ -2357,12 +2359,12 @@ body.page-manage-church {
 }
 
 .appointments-table tbody tr {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.08);
   transition: background-color 0.2s ease;
 }
 
 .appointments-table tbody tr:hover {
-  background: rgba(139, 69, 19, 0.04);
+  background: rgba(30, 144, 255, 0.04);
 }
 
 .appointments-table tbody tr:last-child {
@@ -2485,9 +2487,9 @@ body.page-manage-church {
 }
 
 .appointments-table .status-badge.status-completed {
-  background: rgba(139, 69, 19, 0.1);
+  background: rgba(30, 144, 255, 0.1);
   color: #8b4513;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 .appointments-table .status-badge.status-cancelled,
@@ -2546,7 +2548,7 @@ body.page-manage-church {
 
 .appointments-table .action-btn {
   background: transparent;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
   border-radius: 8px;
   padding: 0.5rem;
   cursor: pointer;
@@ -2557,8 +2559,8 @@ body.page-manage-church {
 }
 
 .appointments-table .action-btn:hover {
-  background: rgba(139, 69, 19, 0.05);
-  border-color: rgba(139, 69, 19, 0.3);
+  background: rgba(30, 144, 255, 0.05);
+  border-color: rgba(30, 144, 255, 0.3);
 }
 
 .appointments-table .action-btn svg {
@@ -2569,15 +2571,13 @@ body.page-manage-church {
 
 /* Dropdown Menu */
 .appointments-table .action-dropdown {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.5rem);
+  position: fixed; /* Use fixed to escape overflow container */
   background: #fff;
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
   min-width: 180px;
-  z-index: 1000;
+  z-index: 9999; /* High z-index to appear above everything */
   display: none;
   overflow: hidden;
 }
@@ -2596,7 +2596,7 @@ body.page-manage-church {
   font-size: 0.875rem;
   font-weight: 500;
   transition: background-color 0.2s ease;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.08);
 }
 
 .appointments-table .dropdown-item:last-child {
@@ -2604,7 +2604,7 @@ body.page-manage-church {
 }
 
 .appointments-table .dropdown-item:hover {
-  background: rgba(139, 69, 19, 0.05);
+  background: rgba(30, 144, 255, 0.05);
 }
 
 .appointments-table .dropdown-item svg {
@@ -2681,15 +2681,15 @@ body.page-manage-church {
 
 .analytics-grid-4 .analytics-card {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -2699,26 +2699,26 @@ body.page-manage-church {
 .analytics-grid-4 .analytics-card:hover {
   transform: translateY(-4px);
   box-shadow: 
-    0 12px 24px rgba(139, 69, 19, 0.16),
+    0 12px 24px rgba(30, 144, 255, 0.16),
     0 4px 8px rgba(101, 67, 33, 0.08),
-    inset 0 1px 0 rgba(255, 249, 230, 0.9);
+    inset 0 1px 0 rgba(240, 248, 255, 0.9);
 }
 
 .analytics-grid-4 .analytics-icon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
 }
 
 .analytics-grid-4 .analytics-icon svg {
   width: 24px;
   height: 24px;
-  color: #FFF9E6;
+  color: #FFFFFF;
 }
 
 .analytics-grid-4 .analytics-content h4 {
@@ -2740,7 +2740,7 @@ body.page-manage-church {
 
 .analytics-grid-4 .analytics-change {
   font-size: 13px;
-  color: #8B4513;
+  color: #1E90FF;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -2760,15 +2760,15 @@ body.page-manage-church {
 
 .charts-grid-2 .chart-container {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
 }
 
 .charts-grid-2 .chart-header {
@@ -2784,7 +2784,7 @@ body.page-manage-church {
 
 .charts-grid-2 .chart-header p {
   font-size: 13px;
-  color: #8B4513;
+  color: #1E90FF;
   margin: 0;
 }
 
@@ -2796,15 +2796,15 @@ body.page-manage-church {
 /* Followers Table Section */
 .followers-table-section {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   margin-top: 32px;
 }
 
@@ -2827,7 +2827,7 @@ body.page-manage-church {
 
 .followers-table-section .header-content p {
   font-size: 14px;
-  color: #8B4513;
+  color: #1E90FF;
   margin: 0;
   font-weight: 400;
 }
@@ -2849,15 +2849,15 @@ body.page-manage-church {
   left: 12px;
   width: 18px;
   height: 18px;
-  color: #8B4513;
+  color: #1E90FF;
   pointer-events: none;
 }
 
 .followers-table-section .search-box .search-input {
   padding: 10px 12px 10px 40px;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
   border-radius: 8px;
-  background: rgba(255, 249, 230, 0.5);
+  background: rgba(240, 248, 255, 0.5);
   color: #2D1810;
   font-size: 14px;
   width: 280px;
@@ -2866,9 +2866,9 @@ body.page-manage-church {
 
 .followers-table-section .search-box .search-input:focus {
   outline: none;
-  border-color: #8B4513;
-  background: rgba(255, 249, 230, 0.8);
-  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  border-color: #1E90FF;
+  background: rgba(240, 248, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 }
 
 .followers-table-section .btn-export {
@@ -2876,20 +2876,20 @@ body.page-manage-church {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.2);
 }
 
 .followers-table-section .btn-export:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
 }
 
 .followers-table-section .btn-export svg {
@@ -2901,7 +2901,7 @@ body.page-manage-church {
 .followers-table-wrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -2912,7 +2912,7 @@ body.page-manage-church {
 }
 
 .followers-table thead {
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%);
 }
 
 .followers-table thead th {
@@ -2923,7 +2923,7 @@ body.page-manage-church {
   color: #2D1810;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.2);
   white-space: nowrap;
 }
 
@@ -2937,12 +2937,12 @@ body.page-manage-church {
 }
 
 .followers-table tbody tr {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
   transition: background-color 0.2s ease;
 }
 
 .followers-table tbody tr:hover {
-  background: rgba(139, 69, 19, 0.05);
+  background: rgba(30, 144, 255, 0.05);
 }
 
 .followers-table tbody tr:last-child {
@@ -2978,8 +2978,8 @@ body.page-manage-church {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.25);
-  border: 2px solid rgba(255, 249, 230, 0.8);
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.25);
+  border: 2px solid rgba(240, 248, 255, 0.8);
 }
 
 .follower-avatar-small img {
@@ -2994,8 +2994,8 @@ body.page-manage-church {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   font-size: 17px;
   font-weight: 700;
   text-transform: uppercase;
@@ -3061,31 +3061,31 @@ body.page-manage-church {
 }
 
 .engagement-badge.engagement-low {
-  background: rgba(139, 69, 19, 0.1);
-  color: #8B4513;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  background: rgba(30, 144, 255, 0.1);
+  color: #1E90FF;
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 /* View Profile Button */
 .btn-view-profile {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.2);
   white-space: nowrap;
   letter-spacing: 0.3px;
 }
 
 .btn-view-profile:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.35);
-  background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.35);
+  background: linear-gradient(135deg, #4169E1 0%, #4A9EFF 100%);
 }
 
 /* No Results */
@@ -3168,15 +3168,15 @@ body.page-manage-church {
 
 .weekly-engagement-section .chart-container {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
 }
 
 .weekly-engagement-section .chart-header {
@@ -3193,7 +3193,7 @@ body.page-manage-church {
 
 .weekly-engagement-section .chart-header p {
   font-size: 14px;
-  color: #8B4513;
+  color: #1E90FF;
   margin: 0;
   font-weight: 400;
 }
@@ -3206,15 +3206,15 @@ body.page-manage-church {
 /* Posts Management Section */
 .posts-management-section {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   margin-top: 32px;
 }
 
@@ -3237,7 +3237,7 @@ body.page-manage-church {
 
 .posts-management-section .header-content p {
   font-size: 14px;
-  color: #8B4513;
+  color: #1E90FF;
   margin: 0;
   font-weight: 400;
 }
@@ -3259,15 +3259,15 @@ body.page-manage-church {
   left: 12px;
   width: 18px;
   height: 18px;
-  color: #8B4513;
+  color: #1E90FF;
   pointer-events: none;
 }
 
 .posts-management-section .search-box .search-input {
   padding: 10px 12px 10px 40px;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
   border-radius: 8px;
-  background: rgba(255, 249, 230, 0.5);
+  background: rgba(240, 248, 255, 0.5);
   color: #2D1810;
   font-size: 14px;
   width: 280px;
@@ -3276,9 +3276,9 @@ body.page-manage-church {
 
 .posts-management-section .search-box .search-input:focus {
   outline: none;
-  border-color: #8B4513;
-  background: rgba(255, 249, 230, 0.8);
-  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  border-color: #1E90FF;
+  background: rgba(240, 248, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 }
 
 .posts-management-section .btn-create-post {
@@ -3286,22 +3286,22 @@ body.page-manage-church {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.2);
   white-space: nowrap;
 }
 
 .posts-management-section .btn-create-post:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.35);
-  background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.35);
+  background: linear-gradient(135deg, #4169E1 0%, #4A9EFF 100%);
 }
 
 .posts-management-section .btn-create-post svg {
@@ -3313,7 +3313,7 @@ body.page-manage-church {
 .posts-table-wrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -3324,7 +3324,7 @@ body.page-manage-church {
 }
 
 .posts-table thead {
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%);
 }
 
 .posts-table thead th {
@@ -3335,7 +3335,7 @@ body.page-manage-church {
   color: #2D1810;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.2);
   white-space: nowrap;
 }
 
@@ -3349,12 +3349,12 @@ body.page-manage-church {
 }
 
 .posts-table tbody tr {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
   transition: background-color 0.2s ease;
 }
 
 .posts-table tbody tr:hover {
-  background: rgba(139, 69, 19, 0.05);
+  background: rgba(30, 144, 255, 0.05);
 }
 
 .posts-table tbody tr:last-child {
@@ -3465,9 +3465,9 @@ body.page-manage-church {
 
 .btn-action {
   padding: 8px;
-  background: rgba(139, 69, 19, 0.08);
-  color: #8B4513;
-  border: 1px solid rgba(139, 69, 19, 0.15);
+  background: rgba(30, 144, 255, 0.08);
+  color: #1E90FF;
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -3482,8 +3482,8 @@ body.page-manage-church {
 }
 
 .btn-action:hover {
-  background: rgba(139, 69, 19, 0.15);
-  border-color: rgba(139, 69, 19, 0.3);
+  background: rgba(30, 144, 255, 0.15);
+  border-color: rgba(30, 144, 255, 0.3);
   transform: translateY(-1px);
 }
 
@@ -3548,9 +3548,9 @@ body.page-manage-church {
   align-items: center;
   margin-top: 24px;
   padding: 20px;
-  background: rgba(255, 249, 230, 0.4);
+  background: rgba(240, 248, 255, 0.4);
   border-radius: 12px;
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.1);
   gap: 16px;
 }
 
@@ -3566,7 +3566,7 @@ body.page-manage-church {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(160, 82, 45, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(160, 82, 45, 0.08) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3576,7 +3576,7 @@ body.page-manage-church {
 .summary-stat-item .stat-icon svg {
   width: 20px;
   height: 20px;
-  color: #8B4513;
+  color: #1E90FF;
 }
 
 .summary-stat-item .stat-info {
@@ -3589,7 +3589,7 @@ body.page-manage-church {
 .summary-stat-item .stat-label {
   font-size: 11px;
   font-weight: 600;
-  color: #8B4513;
+  color: #1E90FF;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -3633,15 +3633,15 @@ body.page-manage-church {
 /* Donations Table Section */
 .donations-table-section {
   background: 
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
   padding: 32px;
   box-shadow: 
-    0 8px 16px rgba(139, 69, 19, 0.12),
+    0 8px 16px rgba(30, 144, 255, 0.12),
     0 2px 4px rgba(101, 67, 33, 0.06),
-    inset 0 1px 0 rgba(255, 249, 230, 0.8);
-  border: 1px solid rgba(139, 69, 19, 0.15);
+    inset 0 1px 0 rgba(240, 248, 255, 0.8);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   margin-top: 32px;
 }
 
@@ -3664,7 +3664,7 @@ body.page-manage-church {
 
 .donations-table-section .header-content p {
   font-size: 14px;
-  color: #8B4513;
+  color: #1E90FF;
   margin: 0;
   font-weight: 400;
 }
@@ -3679,7 +3679,7 @@ body.page-manage-church {
 .donations-table-wrapper {
   overflow-x: auto !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(139, 69, 19, 0.15) !important;
+  border: 1px solid rgba(30, 144, 255, 0.15) !important;
   background: rgba(255, 255, 255, 0.5) !important;
   margin-top: 20px !important;
 }
@@ -3693,7 +3693,7 @@ body.page-manage-church {
 }
 
 .donations-table thead {
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%) !important;
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.12) 0%, rgba(160, 82, 45, 0.08) 100%) !important;
 }
 
 .donations-table thead th {
@@ -3704,7 +3704,7 @@ body.page-manage-church {
   color: #2D1810 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
-  border-bottom: 2px solid rgba(139, 69, 19, 0.2) !important;
+  border-bottom: 2px solid rgba(30, 144, 255, 0.2) !important;
   white-space: nowrap !important;
   position: relative !important;
   vertical-align: middle !important;
@@ -3718,7 +3718,7 @@ body.page-manage-church {
 }
 
 .donations-table thead th.sortable:hover {
-  background: rgba(139, 69, 19, 0.08) !important;
+  background: rgba(30, 144, 255, 0.08) !important;
 }
 
 .donations-table thead th .sort-icon {
@@ -3750,12 +3750,12 @@ body.page-manage-church {
 }
 
 .donations-table tbody tr {
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1) !important;
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1) !important;
   transition: background-color 0.2s ease !important;
 }
 
 .donations-table tbody tr:hover {
-  background: rgba(139, 69, 19, 0.05) !important;
+  background: rgba(30, 144, 255, 0.05) !important;
 }
 
 .donations-table tbody tr:last-child {
@@ -3793,8 +3793,8 @@ body.page-manage-church {
   border-radius: 50% !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2) !important;
-  border: 2px solid rgba(255, 249, 230, 0.8) !important;
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.2) !important;
+  border: 2px solid rgba(240, 248, 255, 0.8) !important;
 }
 
 .donor-avatar-small img {
@@ -3809,7 +3809,7 @@ body.page-manage-church {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%) !important;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
   color: #FFF9E6 !important;
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -3859,9 +3859,9 @@ body.page-manage-church {
 }
 
 .donations-table .badge-one-time {
-  background: rgba(139, 69, 19, 0.12) !important;
+  background: rgba(30, 144, 255, 0.12) !important;
   color: #654321 !important;
-  border: 1px solid rgba(139, 69, 19, 0.2) !important;
+  border: 1px solid rgba(30, 144, 255, 0.2) !important;
 }
 
 .donations-table .badge-monthly {

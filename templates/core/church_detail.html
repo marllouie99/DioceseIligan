@@ -6,9 +6,9 @@
 {% block body_class %}page-church-detail{% endblock %}
 
 {% block extra_css %}
-<!-- Centralized Warm Sacred Earth Theme -->
-<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<!-- Blue Sky Theme -->
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="church-detail-page warm-sacred-earth page-container">
+<div class="church-detail-page blue-sky page-container">
   <!-- CSRF token for AJAX actions -->
   <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
   {% include 'partials/church/header.html' %}

@@ -303,14 +303,14 @@
 }
 
 /* View Church Button - Match Preview Button Aesthetic */
-.view-church-btn {
-  display: inline-flex;
+.view-church-btn.action-btn {
+  display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(255, 249, 230, 0.9);
-  color: #2D1810;
-  border: 1px solid rgba(139, 69, 19, 0.25);
+  background: rgba(240, 248, 255, 0.9);
+  color: #1A3A52;
+  border: 1px solid rgba(30, 144, 255, 0.25);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
@@ -943,26 +943,26 @@
 .preview-title {
   font-size: 24px;
   font-weight: 800;
-  color: #2D1810;
+  color: #1A3A52;
   margin: 0 0 8px 0;
 }
 
 .preview-subtitle {
-  color: #6B4226;
+  color: #5A7A92;
   font-size: 16px;
   margin: 0;
 }
 
 .preview-card {
   background:
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(74, 158, 255, 0.04) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.015) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(65, 105, 225, 0.01) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
   border-radius: 16px;
-  box-shadow: 0 16px 32px rgba(139, 69, 19, 0.12), 0 6px 12px rgba(101, 67, 33, 0.06), inset 0 1px 0 rgba(255, 249, 230, 0.85);
-  border: 1px solid rgba(139, 69, 19, 0.18);
+  box-shadow: 0 16px 32px rgba(30, 144, 255, 0.12), 0 6px 12px rgba(30, 144, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   overflow: hidden;
   position: relative;
 }
@@ -974,7 +974,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #DAA520 0%, #A0522D 100%);
+  background: linear-gradient(90deg, #1E90FF 0%, #4169E1 100%);
   z-index: 1;
 }
 
@@ -982,7 +982,7 @@
 .preview-cover-section {
   position: relative;
   height: 200px;
-  background: rgba(255, 249, 230, 0.6);
+  background: rgba(240, 248, 255, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -999,13 +999,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6B4226;
+  color: #5A7A92;
   font-size: 14px;
   font-weight: 500;
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
-    linear-gradient(135deg, #F8F4E6 0%, #F0E2CC 100%);
-  border: 1px dashed rgba(139, 69, 19, 0.25);
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(30, 144, 255, 0.02) 2px, rgba(30, 144, 255, 0.02) 4px),
+    linear-gradient(135deg, #F0F8FF 0%, #E0F0FF 100%);
+  border: 1px dashed rgba(30, 144, 255, 0.25);
 }
 
 .preview-cover-placeholder svg {
@@ -1080,14 +1080,14 @@
 .preview-church-name {
   font-size: 20px;
   font-weight: 700;
-  color: #2D1810;
+  color: #1A3A52;
   margin: 0;
   line-height: 1.2;
 }
 
 .preview-branding-text {
   font-size: 14px;
-  color: #6B4226;
+  color: #5A7A92;
   margin: 0;
   font-weight: 500;
 }
@@ -1100,9 +1100,9 @@
 
 .preview-btn {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #FFF9E6;
-  border: 1px solid rgba(139, 69, 19, 0.28);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(30, 144, 255, 0.28);
   border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
@@ -1111,9 +1111,9 @@
 }
 
 .preview-btn:hover {
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  background: linear-gradient(135deg, #4169E1 0%, #4A9EFF 100%);
   transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(139, 69, 19, 0.32);
+  box-shadow: 0 12px 28px rgba(30, 144, 255, 0.32);
 }
 
 /* Upload progress overlay for branding preview */
@@ -1141,7 +1141,7 @@
 .upload-progress-bar {
   height: 8px;
   width: 0%;
-  background: linear-gradient(90deg, #DAA520 0%, #A0522D 100%);
+  background: linear-gradient(90deg, #1E90FF 0%, #4169E1 100%);
   border-radius: 9999px;
   transition: width 0.2s ease;
 }
@@ -1268,11 +1268,11 @@
 .tab-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 16px 20px;
   background: transparent;
   border: none;
-  color: #6B4226;
+  color: #5A7A92;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -1284,7 +1284,7 @@
   flex-shrink: 0;
   white-space: nowrap;
   
-  /* Warm Sacred Earth styling */
+  /* Blue Sky styling */
   font-family: Georgia, "Times New Roman", serif;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
   border-radius: 8px;
@@ -1292,16 +1292,16 @@
 }
 
 .tab-btn:hover {
-  background: rgba(218, 165, 32, 0.15);
-  color: #654321;
+  background: rgba(30, 144, 255, 0.08);
+  color: #1E90FF;
   transform: translateY(-1px);
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%);
-  color: #FFF9E6;
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.4);
   transform: translateY(-1px);
 }
 
@@ -1312,7 +1312,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #A0522D, #DAA520);
+  background: linear-gradient(90deg, #4169E1, #4A9EFF);
   border-radius: 2px 2px 0 0;
 }
 
@@ -1798,23 +1798,23 @@
   padding: 12px 16px;
   border-radius: 8px;
   text-decoration: none;
-  color: #64748b;
+  color: #1A3A52 !important; /* Match sidebar dark text color */
   transition: all 0.2s ease;
   border: 1px solid transparent;
   position: relative;
 }
 
 .settings-nav-link:hover {
-  background: #f8fafc;
-  color: #0f172a;
-  border-color: #e2e8f0;
+  background: rgba(30, 144, 255, 0.08); /* Blue hover background */
+  color: #1E90FF; /* Blue hover text */
+  border-color: rgba(30, 144, 255, 0.2);
 }
 
 .settings-nav-link.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-  color: #ffffff;
-  border-color: #7c3aed;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF !important;
+  border-color: #1E90FF;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
 }
 
 .settings-nav-link .icon {
@@ -1842,12 +1842,21 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
+  color: inherit !important; /* Inherit from parent link */
+}
+
+.settings-nav-link.active .nav-title {
+  color: #FFFFFF !important; /* White title on active state */
 }
 
 .nav-subtitle {
   font-size: 12px;
-  opacity: 0.8;
+  color: #7A9AB2 !important; /* Muted blue-gray for subtitle */
   line-height: 1.2;
+}
+
+.settings-nav-link.active .nav-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important; /* Light white for subtitle on active */
 }
 
 /* Warning Dot on Settings Nav Link */
@@ -6347,217 +6356,217 @@ select.editing:focus {
 }
 
 /* ==========================================
-   Warm Sacred Earth – Consolidated Overrides
+   Blue Sky Theme – Consolidated Overrides
    ========================================== */
 
 /* Page background + local design tokens */
 .manage-church-page {
   /* Local tokens to remap brand references on this page */
-  --brand: #8B4513;       /* Saddle Brown */
-  --brand-2: #DAA520;     /* Goldenrod */
-  --text: #2D1810;        /* Very dark brown */
-  --muted: #6B4226;       /* Medium brown */
-  --muted-2: #8B6F47;     /* Muted olive-brown */
-  --border: rgba(139, 69, 19, 0.18);
+  --brand: #1E90FF;       /* Dodger Blue */
+  --brand-2: #4A9EFF;     /* Bright Blue */
+  --text: #1A3A52;        /* Dark Blue-Gray */
+  --muted: #5A7A92;       /* Muted Blue-Gray */
+  --muted-2: #7A9AB2;     /* Light Muted Blue */
+  --border: rgba(30, 144, 255, 0.15);
 
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
-    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
-    linear-gradient(45deg, #F8F4E6 0%, #F0E2CC 50%, #F8F4E6 100%);
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(30, 144, 255, 0.02) 2px, rgba(30, 144, 255, 0.02) 4px),
+    radial-gradient(circle at 25% 25%, rgba(30, 144, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(45deg, #F0F8FF 0%, #E8F4FF 50%, #E0F0FF 100%);
 }
 
-/* Apply full Warm Sacred Earth background to body when manage church is active - matches dashboard */
+/* Apply full Blue Sky background to body when manage church is active - matches dashboard */
 body:has(.manage-church-page),
 body.page-manage-church {
   background:
-    /* Wood grain texture overlay */
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139, 69, 19, 0.02) 2px, rgba(139, 69, 19, 0.02) 4px),
-    /* Paper texture pattern */
-    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
-    /* Warm glow effects */
-    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.03) 40%, transparent 70%),
-    radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.06) 0%, rgba(139, 69, 19, 0.03) 50%, transparent 80%),
-    radial-gradient(90% 60% at 80% 80%, rgba(101, 67, 33, 0.08) 0%, rgba(139, 69, 19, 0.04) 40%, transparent 80%),
-    /* Main warm brown gradient */
-    linear-gradient(45deg, #FAF6E8 0%, #F4E6D0 25%, #F0E2CC 50%, #F4E6D0 75%, #FAF6E8 100%);
+    /* Subtle texture overlay */
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(30, 144, 255, 0.02) 2px, rgba(30, 144, 255, 0.02) 4px),
+    /* Light pattern */
+    radial-gradient(circle at 25% 25%, rgba(30, 144, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
+    /* Blue glow effects */
+    radial-gradient(70% 50% at 20% 20%, rgba(30, 144, 255, 0.06) 0%, rgba(30, 144, 255, 0.02) 40%, transparent 70%),
+    radial-gradient(80% 60% at 30% 50%, rgba(74, 158, 255, 0.04) 0%, rgba(30, 144, 255, 0.02) 50%, transparent 80%),
+    radial-gradient(90% 60% at 80% 80%, rgba(65, 105, 225, 0.05) 0%, rgba(30, 144, 255, 0.03) 40%, transparent 80%),
+    /* Main blue gradient */
+    linear-gradient(45deg, #F0F8FF 0%, #E8F4FF 25%, #E0F0FF 50%, #E8F4FF 75%, #F0F8FF 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
 
-/* Profile card to parchment */
+/* Profile card to white with blue accents */
 .church-profile-card {
   background:
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    linear-gradient(135deg, #FAF6E8 0%, #F4E6D0 50%, #F0E2CC 100%);
-  border: 2px solid rgba(139, 69, 19, 0.18);
-  box-shadow: 0 16px 32px rgba(139, 69, 19, 0.16), 0 6px 12px rgba(101, 67, 33, 0.08), inset 0 1px 0 rgba(255, 249, 230, 0.9);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(74, 158, 255, 0.04) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.015) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(65, 105, 225, 0.01) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
+  border: 2px solid rgba(30, 144, 255, 0.15);
+  box-shadow: 0 16px 32px rgba(30, 144, 255, 0.12), 0 6px 12px rgba(30, 144, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .cover-placeholder {
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
 }
 .cover-overlay {
-  background: linear-gradient(180deg, transparent 0%, rgba(139, 69, 19, 0.18) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(30, 144, 255, 0.15) 100%);
 }
 .edit-cover-btn {
-  background: rgba(255, 249, 230, 0.95);
-  color: #2D1810;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1A3A52;
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 .edit-cover-btn:hover {
-  background: rgba(255, 249, 230, 1);
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.15);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.15);
 }
 
-.avatar-placeholder { background: linear-gradient(145deg, #DAA520, #A0522D); }
-.edit-avatar-btn { background: linear-gradient(145deg, #8B4513, #A0522D); box-shadow: 0 4px 12px rgba(139,69,19,0.25); }
-.edit-avatar-btn:hover { background: linear-gradient(145deg, #A0522D, #DAA520); box-shadow: 0 6px 16px rgba(139,69,19,0.35); }
+.avatar-placeholder { background: linear-gradient(145deg, #1E90FF, #4169E1); }
+.edit-avatar-btn { background: linear-gradient(145deg, #1E90FF, #4169E1); box-shadow: 0 4px 12px rgba(30,144,255,0.25); }
+.edit-avatar-btn:hover { background: linear-gradient(145deg, #4169E1, #4A9EFF); box-shadow: 0 6px 16px rgba(30,144,255,0.35); }
 
 /* Title + location */
-.church-name { color: #2D1810; text-shadow: 0 1px 2px rgba(255,255,255,0.9); }
-.church-location { color: #6B4226; }
-.church-location svg { color: #654321; }
+.church-name { color: #1A3A52; text-shadow: 0 1px 2px rgba(255,255,255,0.9); }
+.church-location { color: #5A7A92; }
+.church-location svg { color: #1E90FF; }
 
 /* Badges */
 .denomination-badge {
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(255, 249, 230, 0.9);
-  color: #6B4226;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30, 144, 255, 0.02) 1px, rgba(30, 144, 255, 0.02) 2px),
+    rgba(240, 248, 255, 0.9);
+  color: #5A7A92;
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 .size-badge {
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(250, 240, 210, 0.9);
-  color: #654321;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30, 144, 255, 0.02) 1px, rgba(30, 144, 255, 0.02) 2px),
+    rgba(232, 244, 255, 0.9);
+  color: #1A3A52;
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
-.verified-badge { background: linear-gradient(135deg, #FBE8B5 0%, #F5D88A 100%); color: #2D1810; border: 1px solid rgba(218,165,32,0.4); }
+.verified-badge { background: linear-gradient(135deg, #4A9EFF 0%, #1E90FF 100%); color: #FFFFFF; border: 1px solid rgba(30,144,255,0.4); }
 
-/* Stats strip (neutral > warm) */
+/* Stats strip (neutral > blue) */
 .church-stats-card {
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139,69,19,0.02) 1px, rgba(139,69,19,0.02) 2px),
-    rgba(255, 249, 230, 0.7);
-  border: 1px solid rgba(139,69,19,0.18);
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30,144,255,0.02) 1px, rgba(30,144,255,0.02) 2px),
+    rgba(240, 248, 255, 0.7);
+  border: 1px solid rgba(30,144,255,0.15);
 }
-.stat-icon { background: linear-gradient(135deg, #DAA520 0%, #A0522D 100%); color: #FFF9E6; }
+.stat-icon { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: #FFFFFF; }
 
 /* Actions */
-.church-actions .btn-outline { background: rgba(255,249,230,0.8); color: #2D1810; border: 2px solid rgba(139,69,19,0.2); }
-.church-actions .btn-outline:hover { background: rgba(255,249,230,1); border-color: rgba(139,69,19,0.3); }
-.church-actions .btn-primary { background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: #FFF9E6; box-shadow: 0 8px 24px rgba(139,69,19,0.28); }
-.church-actions .btn-primary:hover { background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%); box-shadow: 0 12px 32px rgba(139,69,19,0.35); }
+.church-actions .btn-outline { background: rgba(255,255,255,0.8); color: #1A3A52; border: 2px solid rgba(30,144,255,0.2); }
+.church-actions .btn-outline:hover { background: rgba(255,255,255,1); border-color: rgba(30,144,255,0.3); }
+.church-actions .btn-primary { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: #FFFFFF; box-shadow: 0 8px 24px rgba(30,144,255,0.28); }
+.church-actions .btn-primary:hover { background: linear-gradient(135deg, #4169E1 0%, #4A9EFF 100%); box-shadow: 0 12px 32px rgba(30,144,255,0.35); }
 
 /* Tabs */
 .management-tabs {
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139, 69, 19, 0.02) 1px, rgba(139, 69, 19, 0.02) 2px),
-    rgba(255, 249, 230, 0.7);
-  border: 1px solid rgba(139, 69, 19, 0.18);
-  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.12), 0 8px 16px rgba(101, 67, 33, 0.06);
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30, 144, 255, 0.02) 1px, rgba(30, 144, 255, 0.02) 2px),
+    rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(30, 144, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(30, 144, 255, 0.12), 0 8px 16px rgba(30, 144, 255, 0.06);
 }
 .tabs-nav { background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139,69,19,0.02) 1px, rgba(139,69,19,0.02) 2px),
-    rgba(255,249,230,0.9); border-bottom: 1px solid rgba(139,69,19,0.2); }
-.tab-btn { color: #6B4226; font-weight: 700; }
-.tab-btn:hover { background: rgba(218, 165, 32, 0.15); color: #654321; }
-.tab-btn.active { background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%); color: #FFF9E6; box-shadow: 0 4px 12px rgba(139,69,19,0.25); }
-.tab-btn.active::after { background: linear-gradient(90deg, #A0522D, #DAA520); }
-.tabs-nav.sticky .tab-btn.active { background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%); }
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30,144,255,0.02) 1px, rgba(30,144,255,0.02) 2px),
+    rgba(240,248,255,0.9); border-bottom: 1px solid rgba(30,144,255,0.2); }
+.tab-btn { color: #5A7A92; font-weight: 700; }
+.tab-btn:hover { background: rgba(30, 144, 255, 0.08); color: #1E90FF; }
+.tab-btn.active { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: #FFFFFF; box-shadow: 0 4px 12px rgba(30,144,255,0.25); }
+.tab-btn.active::after { background: linear-gradient(90deg, #4169E1, #4A9EFF); }
+.tabs-nav.sticky .tab-btn.active { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); }
 
 /* Section header */
-.tab-header { border-bottom: 2px solid rgba(139, 69, 19, 0.2); }
-.tab-header h2 { color: #2D1810; text-shadow: 0 1px 2px rgba(255,255,255,0.9); }
+.tab-header { border-bottom: 2px solid rgba(30, 144, 255, 0.2); }
+.tab-header h2 { color: #1A3A52; text-shadow: 0 1px 2px rgba(255,255,255,0.9); }
 
 /* Lists and cards */
 .service-item,
 .day-hours { 
-  background: repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139,69,19,0.015) 1px, rgba(139,69,19,0.015) 2px), rgba(255,249,230,0.8);
-  border: 1px solid rgba(139,69,19,0.18);
+  background: repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30,144,255,0.015) 1px, rgba(30,144,255,0.015) 2px), rgba(240,248,255,0.8);
+  border: 1px solid rgba(30,144,255,0.15);
 }
-.btn-icon { border: 1px solid rgba(139,69,19,0.2); background: rgba(255,249,230,0.9); color: #654321; }
-.btn-icon:hover { background: rgba(218,165,32,0.2); color: #8B4513; border-color: rgba(139,69,19,0.3); }
+.btn-icon { border: 1px solid rgba(30,144,255,0.2); background: rgba(240,248,255,0.9); color: #1A3A52; }
+.btn-icon:hover { background: rgba(30,144,255,0.1); color: #1E90FF; border-color: rgba(30,144,255,0.3); }
 
 .other-content-sections .content-section {
   background:
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
-  border: 1px solid rgba(139,69,19,0.18);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(74, 158, 255, 0.04) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.015) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(65, 105, 225, 0.01) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
+  border: 1px solid rgba(30,144,255,0.15);
 }
 
 /* Followers */
 .followers-stats-wrapper {
   background:
-    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(139,69,19,0.02) 1px, rgba(139,69,19,0.02) 2px),
-    linear-gradient(135deg, rgba(210, 180, 140, 0.85) 0%, rgba(195, 165, 125, 0.75) 100%);
-  color: #2D1810;
-  box-shadow: 0 8px 32px rgba(139,69,19,0.22);
+    repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(30,144,255,0.02) 1px, rgba(30,144,255,0.02) 2px),
+    linear-gradient(135deg, rgba(240, 248, 255, 0.85) 0%, rgba(224, 240, 255, 0.75) 100%);
+  color: #1A3A52;
+  box-shadow: 0 8px 32px rgba(30,144,255,0.22);
 }
-.follower-item { background: rgba(255,249,230,0.9); border: 1px solid rgba(139,69,19,0.18); }
-.follower-item:hover { background: rgba(255,249,230,1); border-color: rgba(139,69,19,0.28); box-shadow: 0 2px 8px rgba(139,69,19,0.15); }
-.follower-avatar .avatar-placeholder { background: linear-gradient(145deg, #DAA520, #A0522D); box-shadow: 0 2px 8px rgba(139,69,19,0.2); }
+.follower-item { background: rgba(240,248,255,0.9); border: 1px solid rgba(30,144,255,0.15); }
+.follower-item:hover { background: rgba(240,248,255,1); border-color: rgba(30,144,255,0.25); box-shadow: 0 2px 8px rgba(30,144,255,0.15); }
+.follower-avatar .avatar-placeholder { background: linear-gradient(145deg, #1E90FF, #4169E1); box-shadow: 0 2px 8px rgba(30,144,255,0.2); }
 
 /* Empty state */
 .empty-state {
-  color: #6B4226;
+  color: #5A7A92;
   background:
-    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(139, 69, 19, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(160, 82, 45, 0.06) 0%, transparent 75%),
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.5px, transparent 2px),
-    repeating-linear-gradient(67deg, rgba(101, 67, 33, 0.015) 0.5px, transparent 2px),
-    linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 50%, #F0E2CC 100%);
-  border: 1px solid rgba(139, 69, 19, 0.18);
+    radial-gradient(ellipse 120px 80px at 90% 10%, rgba(30, 144, 255, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100px 60px at 10% 90%, rgba(74, 158, 255, 0.04) 0%, transparent 75%),
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.015) 0.5px, transparent 2px),
+    repeating-linear-gradient(67deg, rgba(65, 105, 225, 0.01) 0.5px, transparent 2px),
+    linear-gradient(135deg, #FFFFFF 0%, #F7FBFF 50%, #F0F8FF 100%);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 16px;
 }
-.empty-state svg { color: #8B6F47; }
-.empty-state h3 { color: #2D1810; }
+.empty-state svg { color: #1E90FF; }
+.empty-state h3 { color: #1A3A52; }
 
-/* Accent Remaps: enforce Warm Sacred Earth for lingering accents */
+/* Accent Remaps: enforce Blue Sky for lingering accents */
 .settings-nav-link:hover {
-  background: rgba(218, 165, 32, 0.12);
-  color: #2D1810;
-  border-color: rgba(139, 69, 19, 0.22);
+  background: rgba(30, 144, 255, 0.08);
+  color: #1A3A52;
+  border-color: rgba(30, 144, 255, 0.22);
 }
 .settings-nav-link.active {
-  background: linear-gradient(135deg, #8B4513 0%, #DAA520 100%);
-  color: #FFF9E6;
-  border-color: rgba(139, 69, 19, 0.25);
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.25);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
+  border-color: rgba(30, 144, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.25);
 }
 
 .social-link:hover {
-  background: linear-gradient(135deg, rgba(218,165,32,0.12), rgba(139,69,19,0.12));
-  color: #2D1810;
-  border-color: rgba(139,69,19,0.28);
+  background: linear-gradient(135deg, rgba(30,144,255,0.08), rgba(74,158,255,0.08));
+  color: #1A3A52;
+  border-color: rgba(30,144,255,0.28);
 }
 
 .calendar-nav:hover {
-  background: #8B4513;
-  color: #FFF9E6;
-  border-color: #8B4513;
+  background: #1E90FF;
+  color: #FFFFFF;
+  border-color: #1E90FF;
 }
 .calendar-day:hover {
-  background: #8B4513;
-  color: #FFF9E6;
-  border-color: #8B4513;
+  background: #1E90FF;
+  color: #FFFFFF;
+  border-color: #1E90FF;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
 .calendar-day:active {
-  background: #654321;
+  background: #4169E1;
   transform: translateY(0px) scale(0.95);
-  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.4);
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.4);
 }
 
 .calendar-day.past-date {
@@ -6577,39 +6586,39 @@ body.page-manage-church {
 
 .service-card:hover,
 .action-card:hover {
-  border-color: rgba(139,69,19,0.35);
-  box-shadow: 0 4px 12px rgba(139,69,19,0.18);
+  border-color: rgba(30,144,255,0.35);
+  box-shadow: 0 4px 12px rgba(30,144,255,0.18);
 }
 
 .sub-tab-btn:hover {
-  background: rgba(218,165,32,0.12);
-  color: #2D1810;
+  background: rgba(30,144,255,0.08);
+  color: #1A3A52;
 }
 .sub-tab-btn.active {
-  background: #FFF9E6;
-  color: #8B4513;
-  box-shadow: 0 2px 4px rgba(139,69,19,0.12);
-  border: 1px solid rgba(139,69,19,0.22);
+  background: #F0F8FF;
+  color: #1E90FF;
+  box-shadow: 0 2px 4px rgba(30,144,255,0.12);
+  border: 1px solid rgba(30,144,255,0.22);
 }
 
 .verified-tag {
-  background: linear-gradient(135deg, #FBE8B5, #F5D88A);
-  color: #2D1810;
+  background: linear-gradient(135deg, #4A9EFF, #1E90FF);
+  color: #FFFFFF;
 }
 
 .view-toggle:hover {
-  background: rgba(139,69,19,0.12);
-  color: #2D1810;
+  background: rgba(30,144,255,0.08);
+  color: #1A3A52;
 }
 .view-toggle.active {
-  background: #FFF9E6;
-  color: #8B4513;
-  box-shadow: 0 1px 3px rgba(139,69,19,0.22);
+  background: #F0F8FF;
+  color: #1E90FF;
+  box-shadow: 0 1px 3px rgba(30,144,255,0.22);
 }
-.count-highlight { color: #8B4513; }
-.query-highlight { color: #6B4226; background: rgba(255,249,230,0.9); }
+.count-highlight { color: #1E90FF; }
+.query-highlight { color: #5A7A92; background: rgba(240,248,255,0.9); }
 
 .analytics-icon,
 .action-icon {
-  background: linear-gradient(135deg, #DAA520 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
 }
