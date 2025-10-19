@@ -4,9 +4,9 @@
 {% block title %}My Profile - ChurchConnect{% endblock %}
 
 {% block extra_css %}
-  <!-- Centralized Warm Sacred Earth Theme -->
-  <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-  <link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+  <!-- Blue Sky Theme -->
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
@@ -32,8 +32,8 @@
     
     .searchable-select-input:focus {
       outline: none;
-      border-color: #DAA520;
-      box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+      border-color: #1E90FF;
+      box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
     }
     
     .searchable-select-input:disabled {
@@ -86,7 +86,7 @@
     }
     
     .searchable-select-option.selected {
-      background: #DAA520;
+      background: #1E90FF;
       color: white;
     }
     
@@ -106,6 +106,252 @@
       position: absolute;
       opacity: 0;
       pointer-events: none;
+    }
+    
+    /* ========== BLUE THEME OVERRIDES ========== */
+    
+    /* Page background */
+    body {
+      background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 50%, #E0F0FF 100%) !important;
+      background-attachment: fixed !important;
+    }
+    
+    /* Profile cards */
+    .profile-card,
+    .profile-section,
+    .card {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+      box-shadow: 0 4px 12px rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    /* Form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    textarea,
+    select {
+      background: #F7F9FC !important;
+      border: 2px solid #E4E6EB !important;
+      color: #1A3A52 !important;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+      background: #FFFFFF !important;
+      border-color: #1E90FF !important;
+      box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    /* Buttons */
+    .btn-primary,
+    button[type="submit"],
+    .save-btn {
+      background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+      border: none !important;
+      color: white !important;
+    }
+    
+    .btn-primary:hover,
+    button[type="submit"]:hover {
+      background: linear-gradient(135deg, #4169E1 0%, #1E90FF 100%) !important;
+    }
+    
+    .btn-secondary,
+    .cancel-btn {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 2px solid rgba(30, 144, 255, 0.2) !important;
+      color: #1A3A52 !important;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(30, 144, 255, 0.08) !important;
+      border-color: rgba(30, 144, 255, 0.3) !important;
+    }
+    
+    /* Section titles */
+    h1, h2, h3, h4, h5, h6 {
+      color: #1A3A52 !important;
+    }
+    
+    h2::after,
+    h3::after,
+    .section-title::after {
+      background: linear-gradient(90deg, #1E90FF, #4169E1) !important;
+    }
+    
+    /* Labels and text */
+    label {
+      color: #1A3A52 !important;
+    }
+    
+    .text-muted,
+    .help-text {
+      color: #7A9AB2 !important;
+    }
+    
+    /* Profile avatar upload */
+    .avatar-upload-btn {
+      background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+      color: white !important;
+    }
+    
+    /* Success messages */
+    .alert-success {
+      background: #D1FAE5 !important;
+      border-color: #10B981 !important;
+      color: #065F46 !important;
+    }
+    
+    /* Error messages */
+    .alert-error,
+    .alert-danger {
+      background: #FEE2E2 !important;
+      border-color: #EF4444 !important;
+      color: #991B1B !important;
+    }
+    
+    /* Tab navigation */
+    .tabs,
+    .tab-navigation,
+    .profile-tabs,
+    .nav-tabs,
+    .profile-nav,
+    [role="tablist"] {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+    }
+    
+    /* Tab container wrapper */
+    .tabs-container,
+    .profile-tabs-wrapper {
+      background: transparent !important;
+    }
+    
+    .tab,
+    .tab-btn,
+    .nav-tab {
+      background: transparent !important;
+      color: #5A7A92 !important;
+      border: none !important;
+    }
+    
+    .tab:hover,
+    .tab-btn:hover,
+    .nav-tab:hover {
+      background: rgba(30, 144, 255, 0.08) !important;
+      color: #1E90FF !important;
+    }
+    
+    .tab.active,
+    .tab-btn.active,
+    .nav-tab.active {
+      background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+      color: white !important;
+    }
+    
+    /* Recent Activity section */
+    .recent-activity,
+    .activity-list {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+    }
+    
+    .activity-item {
+      background: #FFFFFF !important;
+      border-bottom: 1px solid rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    .activity-item:hover {
+      background: rgba(240, 248, 255, 0.5) !important;
+    }
+    
+    .activity-icon {
+      background: rgba(30, 144, 255, 0.1) !important;
+      color: #1E90FF !important;
+    }
+    
+    /* Saved Posts section */
+    .saved-posts,
+    .saved-posts-section {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+    }
+    
+    .empty-state {
+      background: #FFFFFF !important;
+      color: #7A9AB2 !important;
+    }
+    
+    .empty-state svg {
+      color: #7A9AB2 !important;
+    }
+    
+    /* View All link */
+    .view-all,
+    a[href*="activity"] {
+      color: #1E90FF !important;
+    }
+    
+    .view-all:hover {
+      color: #4169E1 !important;
+    }
+    
+    /* Override any remaining beige/cream backgrounds */
+    div[style*="background: #FFF8DC"],
+    div[style*="background: #FAF6E8"],
+    div[style*="background: #F4E6D0"],
+    section[style*="background: #FFF8DC"],
+    div[style*="background-color: #FFF8DC"],
+    div[style*="background-color: #FAF6E8"],
+    div[style*="background-color: #F4E6D0"] {
+      background: rgba(255, 255, 255, 0.95) !important;
+      background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Aggressive override for all tab-related elements */
+    [class*="tab"][class*="container"],
+    [class*="tab"][class*="wrapper"],
+    [class*="profile"][class*="tab"] {
+      background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Settings sections - increase height and spacing */
+    .settings-section,
+    .notification-item,
+    .preference-item,
+    .setting-item {
+      padding: 1.5rem !important;
+      min-height: 80px !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .settings-section h3,
+    .setting-title {
+      margin-bottom: 0.5rem !important;
+      font-size: 1.1rem !important;
+    }
+    
+    .settings-section p,
+    .setting-description {
+      margin-bottom: 0 !important;
+      line-height: 1.6 !important;
+    }
+    
+    /* Settings sidebar items */
+    .settings-sidebar .nav-item,
+    .settings-nav-item {
+      padding: 1rem 1.25rem !important;
+      min-height: 60px !important;
+      margin-bottom: 0.5rem !important;
+    }
+    
+    /* Toggle switches - better alignment */
+    .toggle-switch,
+    .switch {
+      margin: 0.5rem 0 !important;
     }
   </style>
 {% endblock %}
