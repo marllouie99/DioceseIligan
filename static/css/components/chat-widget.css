@@ -965,3 +965,95 @@
     max-width: 250px;
   }
 }
+
+/* ============================================
+   CHURCH FILTER & BADGES
+   ============================================ */
+
+/* Church Filter Container */
+.chat-filter-container {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.chat-church-filter {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  color: #1f2937;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-church-filter:hover {
+  border-color: var(--primary-color, #8B4513);
+}
+
+.chat-church-filter:focus {
+  outline: none;
+  border-color: var(--primary-color, #8B4513);
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+/* Church Badge in Conversation List */
+.chat-church-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(30, 144, 255, 0.1);
+  border-radius: 12px;
+  font-size: 11px;
+  color: #1E90FF;
+  font-weight: 600;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  max-width: 100%;
+}
+
+.chat-church-badge img,
+.chat-church-badge svg {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.chat-church-badge span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Adjust conversation info to accommodate badge */
+.chat-conversation-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat-conversation-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-conversation-preview {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

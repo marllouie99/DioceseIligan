@@ -68,11 +68,21 @@ def conversations_api(request):
                     print(f"Error getting user avatar: {e}")
                     avatar = None
                 
+                # Get church logo for badge
+                managed_church_logo = None
+                try:
+                    if conv.church.logo:
+                        managed_church_logo = conv.church.logo.url
+                except Exception:
+                    managed_church_logo = None
+                
                 data.append({
                     'id': conv.id,
                     'church_id': conv.church.id,
                     'church_name': display_name,  # Show user name instead
                     'church_avatar': avatar,  # Show user avatar instead
+                    'managed_church_name': conv.church.name,  # Church context
+                    'managed_church_logo': managed_church_logo,  # Church logo for badge
                     'last_message': last_message.content if last_message else None,
                     'last_message_time': last_message.created_at.isoformat() if last_message else conv.created_at.isoformat(),
                     'unread_count': unread_count,

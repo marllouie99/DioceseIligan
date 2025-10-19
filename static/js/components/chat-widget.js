@@ -9,11 +9,13 @@ class ChatWidget {
     this.isMinimized = true;
     this.activeConversationId = null;
     this.conversations = [];
+    this.allConversations = []; // Store all conversations for filtering
     this.messages = [];
     this.unreadCount = 0;
     this.typingTimeout = null;
     this.messagePollingInterval = null;
     this.selectedFile = null;
+    this.selectedChurchFilter = 'all';
     
     this.initElements();
     this.initEventListeners();
@@ -39,6 +41,8 @@ class ChatWidget {
     this.conversationsList = document.getElementById('chat-conversations-list');
     this.conversationsScroll = document.getElementById('chat-conversations-scroll');
     this.newConversationBtn = document.getElementById('new-conversation-btn');
+    this.churchFilter = document.getElementById('chat-church-filter');
+    this.filterContainer = document.getElementById('chat-filter-container');
     
     // Active chat view
     this.activeView = document.getElementById('chat-active-view');
@@ -73,6 +77,11 @@ class ChatWidget {
     // Navigation
     this.backBtn.addEventListener('click', () => this.showConversationsList());
     this.newConversationBtn.addEventListener('click', () => this.handleNewConversation());
+    
+    // Church filter
+    if (this.churchFilter) {
+      this.churchFilter.addEventListener('change', (e) => this.filterByChurch(e.target.value));
+    }
     
     // Message form
     this.messageForm.addEventListener('submit', (e) => this.handleSendMessage(e));
@@ -181,13 +190,58 @@ class ChatWidget {
       
       if (response.ok) {
         const data = await response.json();
-        this.conversations = data.conversations || [];
+        this.allConversations = data.conversations || [];
+        this.conversations = this.allConversations;
+        this.populateChurchFilter();
         this.renderConversations();
         this.updateUnreadCount();
       }
     } catch (error) {
       console.error('Error loading conversations:', error);
     }
+  }
+
+  populateChurchFilter() {
+    // Check if user manages multiple churches
+    const managedChurches = new Map();
+    this.allConversations.forEach(conv => {
+      if (conv.is_church_owner && conv.managed_church_name) {
+        managedChurches.set(conv.church_id, conv.managed_church_name);
+      }
+    });
+
+    // Show filter only if managing multiple churches
+    if (managedChurches.size > 1 && this.churchFilter && this.filterContainer) {
+      this.filterContainer.style.display = 'block';
+      
+      // Clear existing options except "All Churches"
+      this.churchFilter.innerHTML = '<option value="all">All Churches</option>';
+      
+      // Add church options
+      managedChurches.forEach((name, id) => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = name;
+        this.churchFilter.appendChild(option);
+      });
+    } else if (this.filterContainer) {
+      this.filterContainer.style.display = 'none';
+    }
+  }
+
+  filterByChurch(churchId) {
+    this.selectedChurchFilter = churchId;
+    
+    if (churchId === 'all') {
+      this.conversations = this.allConversations;
+    } else {
+      this.conversations = this.allConversations.filter(conv => 
+        conv.church_id == churchId
+      );
+    }
+    
+    this.renderConversations();
+    this.updateUnreadCount();
   }
 
   renderConversations() {
@@ -204,29 +258,47 @@ class ChatWidget {
       return;
     }
 
-    const html = this.conversations.map(conv => `
-      <div class="chat-conversation-item ${conv.unread_count > 0 ? 'unread' : ''} ${conv.id === this.activeConversationId ? 'active' : ''}"
-           data-conversation-id="${conv.id}"
-           onclick="chatWidget.showActiveChat(${conv.id})">
-        <div class="chat-conversation-avatar">
-          ${conv.church_avatar 
-            ? `<img src="${conv.church_avatar}" alt="${conv.church_name}">` 
+    const html = this.conversations.map(conv => {
+      // Church badge for church owners
+      const churchBadge = conv.is_church_owner && conv.managed_church_name ? `
+        <div class="chat-church-badge">
+          ${conv.managed_church_logo 
+            ? `<img src="${conv.managed_church_logo}" alt="${conv.managed_church_name}">` 
             : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                  <circle cx="12" cy="10" r="3"/>
                </svg>`
           }
+          <span>${this.escapeHtml(conv.managed_church_name)}</span>
         </div>
-        <div class="chat-conversation-info">
-          <h4 class="chat-conversation-name">${this.escapeHtml(conv.church_name)}</h4>
-          <p class="chat-conversation-preview">${this.escapeHtml(conv.last_message || 'No messages yet')}</p>
+      ` : '';
+
+      return `
+        <div class="chat-conversation-item ${conv.unread_count > 0 ? 'unread' : ''} ${conv.id === this.activeConversationId ? 'active' : ''}"
+             data-conversation-id="${conv.id}"
+             data-church-id="${conv.church_id}"
+             onclick="chatWidget.showActiveChat(${conv.id})">
+          <div class="chat-conversation-avatar">
+            ${conv.church_avatar 
+              ? `<img src="${conv.church_avatar}" alt="${conv.church_name}">` 
+              : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                   <circle cx="12" cy="10" r="3"/>
+                 </svg>`
+            }
+          </div>
+          <div class="chat-conversation-info">
+            <h4 class="chat-conversation-name">${this.escapeHtml(conv.church_name)}</h4>
+            ${churchBadge}
+            <p class="chat-conversation-preview">${this.escapeHtml(conv.last_message || 'No messages yet')}</p>
+          </div>
+          <div class="chat-conversation-meta">
+            <span class="chat-conversation-time">${this.formatTime(conv.last_message_time)}</span>
+            ${conv.unread_count > 0 ? `<span class="chat-conversation-unread">${conv.unread_count}</span>` : ''}
+          </div>
         </div>
-        <div class="chat-conversation-meta">
-          <span class="chat-conversation-time">${this.formatTime(conv.last_message_time)}</span>
-          ${conv.unread_count > 0 ? `<span class="chat-conversation-unread">${conv.unread_count}</span>` : ''}
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     this.conversationsScroll.innerHTML = html;
   }

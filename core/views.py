@@ -351,19 +351,11 @@ def church_detail(request, slug):
 
 
 @login_required
-def manage_church(request):
-    """Manage user's church."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
+def select_church(request):
+    """Allow user to select which church to manage if they manage multiple churches."""
+    churches = request.user.owned_churches.all()
+    
+    if not churches.exists():
         if request.user.is_superuser:
             return redirect('core:super_admin_create_church')
         messages.info(
@@ -371,6 +363,61 @@ def manage_church(request):
             "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
         )
         return redirect('core:home')
+    
+    # If user only manages one church, redirect directly to manage_church
+    if churches.count() == 1:
+        return redirect('core:manage_church', church_id=churches.first().id)
+    
+    # Get notification counts for each church
+    for church in churches:
+        church.unread_booking_count = Notification.objects.filter(
+            user=request.user,
+            is_read=False,
+            notification_type__in=[
+                Notification.TYPE_BOOKING_REQUESTED,
+                Notification.TYPE_BOOKING_REVIEWED,
+                Notification.TYPE_BOOKING_APPROVED,
+                Notification.TYPE_BOOKING_DECLINED,
+                Notification.TYPE_BOOKING_CANCELED,
+                Notification.TYPE_BOOKING_COMPLETED
+            ],
+            church=church
+        ).count()
+    
+    ctx = {
+        'churches': churches,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/select_church.html', ctx)
+
+
+@login_required
+def manage_church(request, church_id=None):
+    """Manage user's church."""
+    try:
+        # If church_id is provided, get that specific church
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            # If no church_id, redirect to select_church page
+            churches = request.user.owned_churches.all()
+            if not churches.exists():
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(
+                    request,
+                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                )
+                return redirect('core:home')
+            # If only one church, use it directly
+            elif churches.count() == 1:
+                church = churches.first()
+            else:
+                # Multiple churches, redirect to selection page
+                return redirect('core:select_church')
+    except Church.DoesNotExist:
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     # Mark booking notifications as read when viewing appointments tab
     current_tab = request.GET.get('tab', 'overview')

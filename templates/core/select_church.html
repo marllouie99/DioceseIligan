@@ -1,0 +1,161 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+{% load media_extras %}
+
+{% block title %}Select Church to Manage - ChurchConnect{% endblock %}
+
+{% block body_class %}page-select-church{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="select-church-page blue-sky page-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+  
+  <!-- Page Header -->
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: #1A3A52; margin-bottom: 0.5rem;">
+      Select Church to Manage
+    </h1>
+    <p style="color: #64748b; font-size: 1rem;">
+      Choose which church you'd like to manage
+    </p>
+  </div>
+
+  <!-- Churches Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+    {% for church in churches %}
+    <a href="{% url 'core:manage_church' church_id=church.id %}" 
+       style="text-decoration: none; display: block; background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%); border: 2px solid rgba(30, 144, 255, 0.2); border-radius: 16px; padding: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden;"
+       onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(30, 144, 255, 0.15)'; this.style.borderColor='rgba(30, 144, 255, 0.4)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(30, 144, 255, 0.08)'; this.style.borderColor='rgba(30, 144, 255, 0.2)';">
+      
+      <!-- Notification Badge -->
+      {% if church.unread_booking_count > 0 %}
+      <div style="position: absolute; top: 1rem; right: 1rem; background: #ef4444; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);">
+        {{ church.unread_booking_count }}
+      </div>
+      {% endif %}
+      
+      <!-- Church Logo/Icon -->
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; border: 3px solid rgba(30, 144, 255, 0.3); box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2); flex-shrink: 0; overflow: hidden;">
+          {% if church.logo %}
+          <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          {% else %}
+          {{ church.name.0|upper }}
+          {% endif %}
+        </div>
+        
+        <div style="flex: 1; min-width: 0;">
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.25rem 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ church.name }}
+          </h3>
+          <p style="color: #64748b; font-size: 0.875rem; margin: 0; display: flex; align-items: center; gap: 0.25rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ church.city }}, {{ church.province }}
+          </p>
+        </div>
+      </div>
+      
+      <!-- Church Stats -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; padding-top: 1rem; border-top: 1px solid rgba(30, 144, 255, 0.15);">
+        <div style="text-align: center;">
+          <div style="font-size: 1.25rem; font-weight: 700; color: #1E90FF;">
+            {{ church.followers.count }}
+          </div>
+          <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.125rem;">
+            Followers
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.25rem; font-weight: 700; color: #1E90FF;">
+            {{ church.posts.count }}
+          </div>
+          <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.125rem;">
+            Posts
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.25rem; font-weight: 700; color: #1E90FF;">
+            {{ church.services.count }}
+          </div>
+          <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.125rem;">
+            Services
+          </div>
+        </div>
+      </div>
+      
+      <!-- Verification Badge -->
+      {% if church.is_verified %}
+      <div style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(34, 197, 94, 0.1); color: #16a34a; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 14px; height: 14px;">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Verified
+      </div>
+      {% else %}
+      <div style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(251, 191, 36, 0.1); color: #d97706; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Pending Verification
+      </div>
+      {% endif %}
+      
+      <!-- Manage Button -->
+      <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border-radius: 8px; text-align: center; font-weight: 600; font-size: 0.9375rem;">
+        Manage Church
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; margin-left: 0.5rem; vertical-align: middle;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Empty State -->
+  {% if not churches %}
+  <div style="text-align: center; padding: 4rem 2rem; background: rgba(255, 255, 255, 0.8); border: 2px dashed rgba(30, 144, 255, 0.3); border-radius: 16px;">
+    <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width: 40px; height: 40px;">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <h3 style="font-size: 1.5rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.5rem 0;">
+      No Churches to Manage
+    </h3>
+    <p style="color: #64748b; margin: 0 0 1.5rem 0;">
+      You haven't been assigned to manage any churches yet.
+    </p>
+    <a href="{% url 'core:home' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to Home
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-select-church {
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+}
+</style>
+{% endblock %}
