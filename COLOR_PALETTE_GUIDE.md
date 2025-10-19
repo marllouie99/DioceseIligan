@@ -97,6 +97,8 @@ box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 - Maintain high contrast ratios (WCAG AA minimum)
 - Keep backgrounds clean and minimal
 - Use subtle shadows for depth
+- **Keep navigation links dark by default, blue only on hover**
+- Use dark text (`#1A3A52`) for all non-interactive content
 
 ### ❌ DON'T
 - Don't make everything blue - use it sparingly as accent
@@ -104,6 +106,46 @@ box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 - Don't use heavy gradients or textures on main content areas
 - Don't use low-contrast color combinations
 - Don't mix warm and cool tones
+- **Don't make navigation links blue by default** - reduces readability
+
+---
+
+## Design Patterns
+
+### Navigation Link Pattern
+**Rule:** Navigation links should be dark by default, blue only on hover/active.
+
+**Applies to:**
+- Sidebar navigation links
+- Profile dropdown menu links
+- Any navigation menu
+- Breadcrumbs
+
+**Example:**
+```css
+/* Default state - dark for readability */
+.nav a, .dropdown a {
+  color: #1A3A52;
+}
+
+/* Hover state - blue for interactivity */
+.nav a:hover, .dropdown a:hover {
+  color: #1E90FF;
+  background: rgba(30, 144, 255, 0.08);
+}
+
+/* Active state - blue background */
+.nav a.active {
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
+}
+```
+
+### Text Color Hierarchy
+1. **Primary text:** `#1A3A52` - Headings, names, navigation, important content
+2. **Secondary text:** `#5A7A92` - Descriptions, labels, button text
+3. **Tertiary text:** `#7A9AB2` - Timestamps, metadata
+4. **Interactive text:** `#1E90FF` - Only on hover or as active links
 
 ---
 
@@ -187,8 +229,110 @@ border: 1px solid rgba(30, 144, 255, 0.15);
 
 ## Version History
 - **v1.0** (2025-10-19): Initial blue palette implementation
-- Based on Facebook's design system
-- Optimized for clean, professional appearance
+  - Based on Facebook's design system
+  - Optimized for clean, professional appearance
+- **v1.1** (2025-10-19): Dashboard implementation with inline CSS overrides
+  - Applied blue theme to dashboard page
+  - Resolved CSS specificity conflicts
+
+---
+
+## Implementation Notes & Issues Encountered
+
+### Issue 1: CSS Specificity Conflicts
+**Problem:** Multiple CSS files (`church_detail.css`, `warm-sacred-earth-theme.css`, etc.) had hardcoded brown/gold colors that overrode the new blue theme variables.
+
+**Solution:** Added inline CSS with `!important` flags in `dashboard.html` to override all hardcoded colors. This ensures the blue theme takes precedence.
+
+**Files Affected:**
+- `static/css/pages/church_detail.css` - Contains hardcoded brown colors
+- `static/css/themes/warm-sacred-earth-theme.css` - Old theme file
+- `static/css/components/chat-widget.css` - Brown color references
+
+### Issue 2: Browser Caching
+**Problem:** CSS changes not appearing immediately due to browser caching the old stylesheets.
+
+**Solution:** 
+- Run `python manage.py collectstatic --noinput` after every CSS change
+- Hard refresh browser (Ctrl+Shift+R) to clear cache
+- Use `?v={{ STATIC_VERSION }}` query parameters in template links
+
+### Issue 3: Template-Level Theme Loading
+**Problem:** `app_base.html` was loading `forest-serenity-theme.css` (green theme) before the blue theme.
+
+**Solution:** Replaced `forest-serenity-theme.css` with `blue-sky-vars.css` in the base template to ensure blue variables load first.
+
+### Issue 4: Component-Specific Overrides Needed
+**Problem:** Individual components (post cards, comments, chat widget, events, activity feed) retained old colors.
+
+**Solution:** Added comprehensive inline CSS overrides for:
+- Post cards and action buttons
+- Comments section
+- Chat widget (header, body, messages)
+- Upcoming Events section
+- Recent Activity section
+- All hover states
+
+### Issue 5: Hover State Colors
+**Problem:** Hover states were still showing brown/gold colors from hardcoded CSS.
+
+**Solution:** Added global hover state overrides with high specificity:
+```css
+.post-action:hover,
+[class*="action"]:hover {
+  background: rgba(30, 144, 255, 0.1) !important;
+  color: #1E90FF !important;
+}
+```
+
+### Issue 6: Chat Widget Inconsistency Across Pages
+**Problem:** Chat widget styling was only applied on dashboard page (inline CSS), but the widget appears on all pages, causing inconsistent appearance.
+
+**Solution:** Moved chat widget overrides from inline CSS in `dashboard.html` to `blue-sky-theme.css` to ensure global application across all pages.
+
+**Files Modified:**
+- `static/css/themes/blue-sky-theme.css` - Added chat widget section with `!important` flags
+
+---
+
+## Recommended Future Improvements
+
+### 1. Refactor CSS Files
+Instead of using inline overrides, update the source CSS files:
+- Replace all brown color codes in `church_detail.css` with CSS variables
+- Update `components/chat-widget.css` to use theme variables
+- Remove or archive `warm-sacred-earth-theme.css` and `forest-serenity-theme.css`
+
+### 2. Create Component-Specific Theme Files
+Split the large inline CSS block into separate files:
+- `themes/blue-sky-dashboard.css`
+- `themes/blue-sky-posts.css`
+- `themes/blue-sky-chat.css`
+
+### 3. Use CSS Custom Properties Consistently
+Replace all hardcoded colors with CSS variables:
+```css
+/* Instead of: */
+background: #8B4513;
+
+/* Use: */
+background: var(--brand);
+```
+
+### 4. Implement Theme Switcher
+Create a system to toggle between themes:
+- Store user preference in database
+- Load appropriate theme CSS based on preference
+- Add theme toggle in settings
+
+### 5. Update Other Pages
+Apply the blue theme to remaining pages:
+- Discover Churches page
+- Church Detail page
+- Events page
+- Appointments page
+- Profile page
+- Manage Church page
 
 ---
 

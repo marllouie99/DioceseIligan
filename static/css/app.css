@@ -276,11 +276,11 @@ body {
   grid-template-columns: 1fr auto auto auto; /* Flexible search bar */
   align-items: center; 
   gap: 10px; 
-  background: rgba(255, 255, 255, 0.063); 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+  background: rgba(255, 255, 255, 0.95); 
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1); 
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08); 
   padding: 10px 16px; 
   position: sticky; 
   top: 0 !important; 
@@ -294,10 +294,8 @@ body {
 
 .search { 
   display: block !important; 
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.015) 0px, rgba(139, 69, 19, 0.015) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #FFF9E6 0%, #F9F2E4 100%);
-  border: 2px solid rgba(139, 69, 19, 0.15); 
+  background: #F7F9FC;
+  border: 2px solid #E4E6EB; 
   border-radius: 24px; 
   padding: 0 18px; 
   width: 100% !important; 
@@ -319,13 +317,13 @@ body {
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  color: #654321;
+  color: #5A7A92;
   pointer-events: none;
   z-index: 10;
 }
 
 .search:focus-within::after {
-  color: #8B4513;
+  color: #1E90FF;
   transform: translateY(-50%) scale(1.1);
 }
 .search input { 
@@ -335,7 +333,7 @@ body {
   outline: none; 
   background: transparent; 
   font-size: 15px; 
-  color: #6B4226; 
+  color: #1A3A52; 
   font-weight: 600;
   font-family: Georgia, "Times New Roman", serif;
   padding: 0 !important;
@@ -344,32 +342,28 @@ body {
   line-height: 48px;
 }
 .search input::placeholder { 
-  color: #8B6F47; 
+  color: #7A9AB2; 
   font-weight: 500;
   font-style: italic;
 }
 .search:focus-within { 
-  border-color: rgba(139, 69, 19, 0.25); 
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #FFFAEC 0%, #FAF4E6 100%);
-  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.08); 
+  border-color: #1E90FF; 
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1); 
 }
 .search:hover {
-  border-color: rgba(139, 69, 19, 0.25);
-  background: 
-    repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.025) 0px, rgba(139, 69, 19, 0.025) 1px, transparent 1px, transparent 3px),
-    linear-gradient(135deg, #FFFAEC 0%, #FAF4E6 100%);
+  border-color: rgba(30, 144, 255, 0.3);
+  background: #FFFFFF;
 }
 
 .search-clear {
   width: 16px !important;
   height: 16px !important;
-  color: #654321;
+  color: #5A7A92;
   cursor: pointer;
   opacity: 0;
   transition: all 0.3s ease;
-  background: rgba(139, 69, 19, 0.1);
+  background: rgba(30, 144, 255, 0.1);
   border-radius: 50%;
   display: flex !important;
   align-items: center;
@@ -407,15 +401,15 @@ body {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 700;
   box-shadow: 
-    0 4px 12px rgba(218, 165, 32, 0.3),
-    0 2px 6px rgba(160, 82, 45, 0.2),
-    inset 0 1px 0 rgba(255, 249, 230, 0.3);
+    0 4px 12px rgba(30, 144, 255, 0.3),
+    0 2px 6px rgba(65, 105, 225, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.3px;
   animation: subtle-pulse 3s ease-in-out infinite;
@@ -435,31 +429,31 @@ body {
 @keyframes subtle-pulse {
   0%, 100% { 
     box-shadow: 
-      0 4px 12px rgba(218, 165, 32, 0.3),
-      0 2px 6px rgba(160, 82, 45, 0.2),
-      inset 0 1px 0 rgba(255, 249, 230, 0.3);
+      0 4px 12px rgba(30, 144, 255, 0.3),
+      0 2px 6px rgba(65, 105, 225, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   50% { 
     box-shadow: 
-      0 6px 16px rgba(218, 165, 32, 0.4),
-      0 3px 8px rgba(160, 82, 45, 0.3),
-      inset 0 1px 0 rgba(255, 249, 230, 0.4);
+      0 6px 16px rgba(30, 144, 255, 0.4),
+      0 3px 8px rgba(65, 105, 225, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 }
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; border: 0; text-decoration: none; cursor: pointer; font-weight: 800; min-height: 40px; }
 .btn.dark { 
-  background: linear-gradient(135deg, var(--btn-start) 0%, var(--brand) 100%); 
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); 
   color: #fff; 
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.35),
-              0 2px 8px rgba(160, 82, 45, 0.25); 
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.35),
+              0 2px 8px rgba(65, 105, 225, 0.25); 
   transition: all 0.3s ease;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn.dark:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(139, 69, 19, 0.45),
-              0 6px 12px rgba(160, 82, 45, 0.35);
+  box-shadow: 0 12px 24px rgba(30, 144, 255, 0.45),
+              0 6px 12px rgba(65, 105, 225, 0.35);
 }
 .btn.ghost { background: transparent; color: var(--text); padding: 8px 10px; }
 .icon-btn { 
@@ -469,20 +463,20 @@ body {
   width: 40px; 
   height: 40px; 
   border-radius: 999px; 
-  color: #654321; 
+  color: #5A7A92; 
   text-decoration: none; 
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 69, 19, 0.15);
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.12);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.08);
   transition: all 0.3s ease;
 }
 .icon-btn:hover { 
-  background: rgba(218, 165, 32, 0.2); 
-  color: #8B4513; 
+  background: rgba(30, 144, 255, 0.15); 
+  color: #1E90FF; 
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
-  border-color: rgba(139, 69, 19, 0.25);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.25);
 }
 /* Manage Church Link in Topbar */
 .manage-church-link {
@@ -491,32 +485,32 @@ body {
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(20px);
-  color: #2D1810;
+  color: #1A3A52;
   min-height: 40px;
   text-decoration: none;
   font-weight: 700;
   font-size: 14px;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+  text-shadow: none;
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.08);
 }
 
 .manage-church-link:hover {
   background: rgba(255, 255, 255, 0.45);
-  border-color: rgba(139, 69, 19, 0.3);
-  color: #654321;
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
+  border-color: rgba(30, 144, 255, 0.3);
+  color: #1E90FF;
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.15);
   transform: translateY(-1px);
 }
 
 .manage-church-link.active {
-  background: rgba(139, 69, 19, 0.1);
-  border-color: rgba(139, 69, 19, 0.4);
-  color: #654321;
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+  background: rgba(30, 144, 255, 0.1);
+  border-color: rgba(30, 144, 255, 0.4);
+  color: #1E90FF;
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
   font-weight: 800;
 }
 

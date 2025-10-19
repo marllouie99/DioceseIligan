@@ -1,0 +1,187 @@
+/* 
+ * Blue Sky Variables - ChurchIligan
+ * Central color and design token definitions (Facebook-inspired)
+ * Version: 1.0
+ */
+
+/* =============================================================================
+   ROOT VARIABLES - BLUE SKY PALETTE
+   Single source of truth for all theme colors
+   ============================================================================= */
+
+:root {
+  /* Primary Colors */
+  --brand: #1E90FF;           /* Dodger Blue - Primary brand color */
+  --brand-2: #4A9EFF;         /* Bright Blue - Secondary brand color */
+  --accent-blue: #4169E1;     /* Royal Blue - Accent color */
+  
+  /* Text Colors */
+  --text: #1A3A52;            /* Dark Blue-Gray - Primary text */
+  --text-light: #FFFFFF;      /* White - Light text on dark */
+  --muted: #5A7A92;           /* Muted Blue-Gray - Muted text */
+  --muted-2: #7A9AB2;         /* Light Muted Blue - Secondary muted */
+  
+  /* Background Colors */
+  --card-bg: #FFFFFF;         /* White - Card backgrounds */
+  --warm-white: #F5FAFF;      /* Very Light Blue-White - Light backgrounds */
+  --bg-start: #F0F8FF;        /* Alice Blue - Gradient start */
+  --bg-medium: #E8F4FF;       /* Very Light Blue - Gradient middle */
+  --bg-end: #E0F0FF;          /* Light Blue - Gradient end */
+  
+  /* Border and Shadow Colors */
+  --border: rgba(30, 144, 255, 0.15);           /* Primary border */
+  --border-light: rgba(30, 144, 255, 0.1);      /* Light border */
+  --border-dark: rgba(30, 144, 255, 0.25);      /* Dark border */
+  
+  /* Shadow Colors */
+  --shadow-primary: rgba(30, 144, 255, 0.12);   /* Primary shadow */
+  --shadow-secondary: rgba(65, 105, 225, 0.08); /* Secondary shadow */
+  --shadow-accent: rgba(30, 144, 255, 0.2);     /* Accent shadow */
+  
+  /* Button Specific Colors */
+  --btn-start: var(--brand);                    /* Button gradient start */
+  --btn-end: var(--accent-blue);                /* Button gradient end */
+  --btn-hover-start: #1C7FE6;                   /* Button hover start */
+  --btn-hover-end: #3A5FD1;                     /* Button hover end */
+  
+  /* State Colors (keeping blue theme) */
+  --success: #10B981;         /* Green success */
+  --warning: #F59E0B;         /* Amber warning */
+  --error: #EF4444;           /* Red error */
+  --info: #1E90FF;            /* Blue info */
+  
+  /* Badge Colors */
+  --badge-pending: #FEF3C7;   /* Light yellow background */
+  --badge-pending-text: #92400E;
+  --badge-approved: #D1FAE5;  /* Light green background */
+  --badge-approved-text: #065F46;
+  --badge-completed: #DBEAFE; /* Light blue background */
+  --badge-completed-text: #1E40AF;
+  --badge-declined: #FEE2E2;  /* Light red background */
+  --badge-declined-text: #991B1B;
+}
+
+/* =============================================================================
+   COMPONENT-SPECIFIC VARIABLES
+   Variables for specific component types
+   ============================================================================= */
+
+/* Typography Scale */
+:root {
+  --font-family-primary: Georgia, "Times New Roman", serif;
+  --font-family-secondary: "Times New Roman", serif;
+  
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.85rem;    /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.1rem;     /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: 2.5rem;    /* 40px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+}
+
+/* Spacing Scale */
+:root {
+  --spacing-xs: 0.25rem;      /* 4px */
+  --spacing-sm: 0.5rem;       /* 8px */
+  --spacing-md: 1rem;         /* 16px */
+  --spacing-lg: 1.5rem;       /* 24px */
+  --spacing-xl: 2rem;         /* 32px */
+  --spacing-2xl: 3rem;        /* 48px */
+  --spacing-3xl: 4rem;        /* 64px */
+}
+
+/* Border Radius Scale */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+}
+
+/* Shadow Presets */
+:root {
+  --shadow-sm: 0 2px 4px var(--shadow-primary);
+  --shadow-md: 0 4px 12px var(--shadow-primary);
+  --shadow-lg: 0 8px 24px var(--shadow-primary);
+  --shadow-xl: 0 16px 32px var(--shadow-primary);
+  --shadow-2xl: 0 20px 40px var(--shadow-primary);
+  
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-inset-hover: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Transition Presets */
+:root {
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Z-index Scale */
+:root {
+  --z-index-dropdown: 1000;
+  --z-index-modal: 1050;
+  --z-index-notification: 1100;
+  --z-index-tooltip: 1150;
+}
+
+/* =============================================================================
+   TEXTURE PATTERNS
+   Reusable texture pattern definitions
+   ============================================================================= */
+
+:root {
+  /* Subtle Texture */
+  --texture-subtle: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(30, 144, 255, 0.01) 2px, rgba(30, 144, 255, 0.01) 4px);
+  
+  /* Light Patterns */
+  --texture-light-1: radial-gradient(circle at 25% 25%, rgba(30, 144, 255, 0.03) 0%, transparent 50%);
+  --texture-light-2: radial-gradient(circle at 75% 75%, rgba(65, 105, 225, 0.02) 0%, transparent 50%);
+  
+  /* Glow Effects */
+  --glow-primary: radial-gradient(70% 50% at 20% 20%, rgba(30, 144, 255, 0.05) 0%, rgba(30, 144, 255, 0.02) 40%, transparent 70%);
+  --glow-secondary: radial-gradient(80% 60% at 30% 50%, rgba(65, 105, 225, 0.04) 0%, rgba(30, 144, 255, 0.02) 50%, transparent 80%);
+  --glow-accent: radial-gradient(90% 60% at 80% 80%, rgba(30, 144, 255, 0.06) 0%, rgba(30, 144, 255, 0.03) 40%, transparent 80%);
+  
+  /* Fine Grain */
+  --grain-fine: repeating-linear-gradient(25deg, rgba(30, 144, 255, 0.01) 0px, rgba(30, 144, 255, 0.01) 1px, transparent 1px, transparent 3px);
+  --grain-medium: repeating-linear-gradient(115deg, rgba(65, 105, 225, 0.008) 0px, rgba(65, 105, 225, 0.008) 1px, transparent 1px, transparent 4px);
+  
+  /* Subtle Spots */
+  --spot-1: radial-gradient(ellipse 120px 70px at 88% 12%, rgba(30, 144, 255, 0.04) 0%, transparent 70%);
+  --spot-2: radial-gradient(ellipse 100px 60px at 10% 88%, rgba(65, 105, 225, 0.03) 0%, transparent 75%);
+  --spot-3: radial-gradient(ellipse 80px 60px at 90% 80%, rgba(30, 144, 255, 0.03) 0%, transparent 60%);
+}
+
+/* =============================================================================
+   GRADIENT PRESETS
+   Common gradient combinations
+   ============================================================================= */
+
+:root {
+  /* Primary Brand Gradients */
+  --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--accent-blue) 100%);
+  --gradient-brand-hover: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
+  
+  /* Background Gradients */
+  --gradient-bg-main: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-medium) 50%, var(--bg-end) 100%);
+  --gradient-card: linear-gradient(135deg, var(--card-bg) 0%, var(--warm-white) 50%, var(--card-bg) 100%);
+  --gradient-card-hover: linear-gradient(135deg, #FFFFFF 0%, #F5FAFF 25%, #EBF5FF 50%, #F5FAFF 75%, #FFFFFF 100%);
+  
+  /* Badge Gradients */
+  --gradient-badge-pending: linear-gradient(135deg, var(--badge-pending) 0%, #FDE68A 100%);
+  --gradient-badge-approved: linear-gradient(135deg, var(--badge-approved) 0%, #A7F3D0 100%);
+  --gradient-badge-completed: linear-gradient(135deg, var(--badge-completed) 0%, #BFDBFE 100%);
+  --gradient-badge-declined: linear-gradient(135deg, var(--badge-declined) 0%, #FECACA 100%);
+}

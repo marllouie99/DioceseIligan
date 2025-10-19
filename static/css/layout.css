@@ -10,22 +10,22 @@
 }
 
 .sidebar { 
-  /* Warm Sacred Earth Glassmorphism - Church Theme */
+  /* Blue Sky Glassmorphism - Modern Theme */
   background: 
-    /* Subtle wood grain texture */
+    /* Subtle texture */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(218, 165, 32, 0.02) 2px,
-      rgba(218, 165, 32, 0.02) 4px
+      rgba(30, 144, 255, 0.02) 2px,
+      rgba(30, 144, 255, 0.02) 4px
     ),
     linear-gradient(145deg, 
-      rgba(255, 249, 230, 0.25) 0%, 
-      rgba(218, 165, 32, 0.15) 50%, 
-      rgba(160, 82, 45, 0.18) 100%);
+      rgba(255, 255, 255, 0.98) 0%, 
+      rgba(240, 248, 255, 0.95) 50%, 
+      rgba(232, 244, 255, 0.92) 100%);
   backdrop-filter: blur(25px);
-  border-right: 1px solid transparent;
+  border-right: 1px solid rgba(30, 144, 255, 0.1);
   padding: 18px 14px; 
   /* Pin to the viewport and scroll independently */
   position: fixed !important;
@@ -40,7 +40,7 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   z-index: 1000;
-  box-shadow: 4px 0 20px rgba(160, 82, 45, 0.15);
+  box-shadow: 4px 0 20px rgba(30, 144, 255, 0.12);
 }
 
 /* Custom Scrollbar Styling for Sidebar - Warm Sacred Earth Theme */
@@ -49,46 +49,46 @@
 }
 
 .sidebar::-webkit-scrollbar-track {
-  background: rgba(255, 249, 230, 0.1);
+  background: rgba(240, 248, 255, 0.1);
   border-radius: 10px;
   margin: 8px 0;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, 
-    rgba(218, 165, 32, 0.6) 0%, 
-    rgba(160, 82, 45, 0.7) 50%, 
-    rgba(139, 69, 19, 0.8) 100%);
+    rgba(30, 144, 255, 0.6) 0%, 
+    rgba(65, 105, 225, 0.7) 50%, 
+    rgba(30, 144, 255, 0.8) 100%);
   border-radius: 10px;
-  border: 1px solid rgba(255, 249, 230, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 
-    0 2px 4px rgba(101, 67, 33, 0.15),
-    inset 0 1px 0 rgba(255, 249, 230, 0.3);
+    0 2px 4px rgba(30, 144, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, 
-    rgba(218, 165, 32, 0.8) 0%, 
-    rgba(160, 82, 45, 0.9) 50%, 
-    rgba(139, 69, 19, 1) 100%);
+    rgba(30, 144, 255, 0.8) 0%, 
+    rgba(65, 105, 225, 0.9) 50%, 
+    rgba(30, 144, 255, 1) 100%);
   box-shadow: 
-    0 4px 8px rgba(101, 67, 33, 0.25),
-    inset 0 1px 0 rgba(255, 249, 230, 0.4);
+    0 4px 8px rgba(30, 144, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transform: scaleX(1.2);
 }
 
 .sidebar::-webkit-scrollbar-thumb:active {
   background: linear-gradient(180deg, 
-    rgba(139, 69, 19, 0.9) 0%, 
-    rgba(101, 67, 33, 1) 50%, 
-    rgba(139, 69, 19, 1) 100%);
+    rgba(30, 144, 255, 0.9) 0%, 
+    rgba(65, 105, 225, 1) 50%, 
+    rgba(30, 144, 255, 1) 100%);
 }
 
 /* Firefox Scrollbar Support */
 .sidebar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(160, 82, 45, 0.7) rgba(255, 249, 230, 0.1);
+  scrollbar-color: rgba(30, 144, 255, 0.7) rgba(240, 248, 255, 0.1);
 }
 
 .sidebar::after {
@@ -99,13 +99,13 @@
   width: 1px;
   height: 100%;
   background: linear-gradient(to bottom,
-    rgba(218, 165, 32, 0.25) 0%,
-    rgba(160, 82, 45, 0.2) 15%,
-    rgba(255, 249, 230, 0.12) 30%,
-    rgba(255, 249, 230, 0.06) 50%,
-    rgba(255, 249, 230, 0.12) 70%,
-    rgba(160, 82, 45, 0.2) 85%,
-    rgba(218, 165, 32, 0.25) 100%);
+    rgba(30, 144, 255, 0.25) 0%,
+    rgba(65, 105, 225, 0.2) 15%,
+    rgba(255, 255, 255, 0.12) 30%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.12) 70%,
+    rgba(65, 105, 225, 0.2) 85%,
+    rgba(30, 144, 255, 0.25) 100%);
   pointer-events: none;
 }
 
@@ -154,8 +154,8 @@
   font-weight: 800; 
   margin: 4px 8px 20px; 
   font-size: 18px;
-  color: #2D1810;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  color: #1A3A52;
+  text-shadow: none;
   padding: 8px;
   border-radius: 12px;
 }
@@ -164,33 +164,33 @@
   width: 36px; 
   height: 36px; 
   border-radius: 12px; 
-  background: linear-gradient(145deg, #DAA520, #A0522D); 
-  color: #FFF9E6; 
+  background: linear-gradient(145deg, #1E90FF, #4169E1); 
+  color: #FFFFFF; 
   display: grid; 
   place-items: center; 
   font-weight: 800; 
   font-size: 16px;
   box-shadow: 
-    0 8px 16px rgba(218, 165, 32, 0.4),
-    0 4px 8px rgba(160, 82, 45, 0.3),
-    inset 0 1px 0 rgba(255, 249, 230, 0.3); 
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.4);
+    0 8px 16px rgba(30, 144, 255, 0.4),
+    0 4px 8px rgba(65, 105, 225, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3); 
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.4);
   transition: all 0.3s ease;
 }
 
 .logo-badge:hover {
   transform: translateY(-1px);
   box-shadow: 
-    0 12px 24px rgba(218, 165, 32, 0.5),
-    0 6px 12px rgba(160, 82, 45, 0.4),
-    inset 0 1px 0 rgba(255, 249, 230, 0.4);
+    0 12px 24px rgba(30, 144, 255, 0.5),
+    0 6px 12px rgba(65, 105, 225, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .sidebar hr { 
   border: 0; 
-  border-top: 1px solid rgba(218, 165, 32, 0.25); 
+  border-top: 1px solid rgba(30, 144, 255, 0.15); 
   margin: 16px 8px 16px; 
-  background: linear-gradient(90deg, transparent 0%, rgba(218, 165, 32, 0.4) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(30, 144, 255, 0.3) 50%, transparent 100%);
   height: 1px;
 }
 
@@ -206,11 +206,11 @@
   gap: 12px; 
   padding: 12px 16px; 
   border-radius: 14px; 
-  color: #2D1810; 
+  color: #1A3A52; 
   text-decoration: none; 
   font-weight: 700; 
   font-size: 15px;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  text-shadow: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 2px 0;
   position: relative;
@@ -220,43 +220,43 @@
 .nav a .icon { 
   width: 20px; 
   height: 20px; 
-  color: #654321; 
+  color: #5A7A92; 
   fill: currentColor; 
   transition: all 0.3s ease;
   flex-shrink: 0;
-  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.6));
+  filter: none;
 }
 
 /* Hover effects with ultra-subtle glassmorphism */
 .nav a:hover {
-  background: rgba(218, 165, 32, 0.15);
-  color: #654321;
+  background: rgba(30, 144, 255, 0.08);
+  color: #1E90FF;
   transform: translateX(4px);
   box-shadow: 
-    0 4px 12px rgba(160, 82, 45, 0.15),
+    0 4px 12px rgba(30, 144, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .nav a:hover .icon {
-  color: #8B4513;
+  color: #1E90FF;
   transform: scale(1.1);
 }
 
 /* Active state with beautiful gradient and effects */
 .nav a.active,
 .nav a[aria-current="page"] { 
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
-  color: #FFF9E6;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: #FFFFFF;
   box-shadow: 
-    0 6px 20px rgba(218, 165, 32, 0.4),
-    0 2px 8px rgba(160, 82, 45, 0.3),
-    inset 0 1px 0 rgba(255, 249, 230, 0.3);
+    0 6px 20px rgba(30, 144, 255, 0.3),
+    0 2px 8px rgba(65, 105, 225, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateX(6px);
 }
 
 .nav a.active .icon,
 .nav a[aria-current="page"] .icon {
-  color: #FFF9E6;
+  color: #FFFFFF;
   transform: scale(1.1);
 }
 
@@ -289,14 +289,14 @@
 
 .section-label { 
   font-size: 11px; 
-  color: #6B4226; 
+  color: #5A7A92; 
   letter-spacing: 0.1em; 
   font-weight: 800; 
   margin: 24px 12px 12px; 
   text-transform: uppercase;
   position: relative;
   padding-left: 16px;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  text-shadow: none;
 }
 
 .section-label::before {
@@ -308,32 +308,32 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #A0522D, #DAA520);
-  box-shadow: 0 2px 4px rgba(218, 165, 32, 0.4);
+  background: linear-gradient(135deg, #1E90FF, #4169E1);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.4);
 }
 
 .activity-card { 
-  /* Warm Sacred Earth glassmorphism activity card */
-  background: rgba(255, 249, 230, 0.2); 
+  /* Blue Sky glassmorphism activity card */
+  background: rgba(255, 255, 255, 0.5); 
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(218, 165, 32, 0.15); 
+  border: 1px solid rgba(30, 144, 255, 0.12); 
   border-radius: 18px; 
   padding: 16px 20px; 
   box-shadow: 
-    0 8px 32px rgba(160, 82, 45, 0.1),
-    0 4px 16px rgba(101, 67, 33, 0.05),
-    inset 0 1px 0 rgba(255, 249, 230, 0.2); 
+    0 8px 32px rgba(30, 144, 255, 0.08),
+    0 4px 16px rgba(30, 144, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2); 
   margin: 12px; 
   transition: all 0.3s ease;
 }
 
 .activity-card:hover {
   transform: translateY(-2px);
-  background: rgba(255, 249, 230, 0.25);
+  background: rgba(255, 255, 255, 0.7);
   box-shadow: 
-    0 12px 40px rgba(160, 82, 45, 0.15),
-    0 6px 20px rgba(101, 67, 33, 0.08),
-    inset 0 1px 0 rgba(255, 249, 230, 0.25);
+    0 12px 40px rgba(30, 144, 255, 0.12),
+    0 6px 20px rgba(30, 144, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .activity-row { 
@@ -341,7 +341,7 @@
   justify-content: space-between; 
   align-items: center;
   padding: 12px 0; 
-  border-bottom: 1px solid rgba(218, 165, 32, 0.12); 
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1); 
   transition: all 0.3s ease;
 }
 
@@ -352,26 +352,26 @@
 
 .activity-row:hover {
   padding-left: 8px;
-  color: #2D1810;
+  color: #1A3A52;
 }
 
 .activity-row span {
   font-size: 14px;
-  color: #654321;
+  color: #5A7A92;
   font-weight: 600;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  text-shadow: none;
 }
 
 .activity-row strong {
   font-size: 16px;
   font-weight: 700;
-  color: #A0522D;
-  background: rgba(218, 165, 32, 0.08);
+  color: #1E90FF;
+  background: rgba(30, 144, 255, 0.08);
   padding: 4px 8px;
   border-radius: 8px;
   min-width: 28px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(160, 82, 45, 0.12);
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.12);
 }
 
 /* =============================================================================
@@ -390,7 +390,7 @@
     transform: translateX(-100%); /* Hide sidebar off-screen by default */
     transition: transform 0.3s ease;
     z-index: 9999; /* Higher z-index for mobile overlay */
-    box-shadow: 4px 0 20px rgba(160, 82, 45, 0.25); /* Stronger shadow for mobile overlay */
+    box-shadow: 4px 0 20px rgba(30, 144, 255, 0.25); /* Stronger shadow for mobile overlay */
   }
   
   .sidebar.mobile-open {

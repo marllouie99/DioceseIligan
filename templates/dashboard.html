@@ -3,16 +3,459 @@
 
 {% block title %}Dashboard • ChurchIligan{% endblock %}
 
-{% block body_class %}dashboard-page{% endblock %}
+{% block body_class %}dashboard-page blue-sky{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<style>
+  /* Force blue theme - override all brown colors */
+  body {
+    background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 50%, #E0F0FF 100%) !important;
+    background-attachment: fixed !important;
+  }
+  
+  /* Override section title underlines */
+  .section-title::after,
+  .sidebar-title::after,
+  h2::after,
+  h3::after {
+    background: linear-gradient(90deg, #1E90FF, #4169E1) !important;
+  }
+  
+  /* Override buttons */
+  .follow-btn,
+  .discover-btn,
+  button[style*="background"],
+  a[style*="background"] {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+    border-color: rgba(30, 144, 255, 0.3) !important;
+    color: white !important;
+  }
+  
+  /* Override cards */
+  .post-creation-card,
+  .sidebar-section,
+  .service-card,
+  .event-card,
+  .church-card,
+  .post-card,
+  .post,
+  article {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(30, 144, 255, 0.15) !important;
+  }
+  
+  /* Override post card actions bar */
+  .post-actions,
+  .post-action-bar {
+    background: rgba(240, 248, 255, 0.5) !important;
+    border-top: 1px solid rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override post action buttons */
+  .post-action,
+  .post-action button,
+  .post-action span,
+  .post-action svg,
+  .post-action * {
+    color: #5A7A92 !important;
+  }
+  
+  .post-action:hover,
+  .post-action:hover button,
+  .post-action:hover span,
+  .post-action:hover svg,
+  .post-action:hover * {
+    background: rgba(30, 144, 255, 0.1) !important;
+    color: #1E90FF !important;
+  }
+  
+  /* Force post actions bar to not use brown */
+  .dashboard-layout .post-action:hover {
+    color: #1E90FF !important;
+    background: rgba(30, 144, 255, 0.1) !important;
+    border: none !important;
+  }
+  
+  /* Override post card church name - keep it dark */
+  .post-author-name,
+  .post-church-name,
+  .church-name,
+  .post-header a,
+  .post-author a {
+    color: #1A3A52 !important;
+  }
+  
+  .post-author-name:hover,
+  .post-church-name:hover,
+  .church-name:hover,
+  .post-header a:hover,
+  .post-author a:hover {
+    color: #1E90FF !important;
+  }
+  
+  /* Override verified badge */
+  .verified-badge {
+    background: #DBEAFE !important;
+    color: #1E40AF !important;
+  }
+  
+  /* Override post content background */
+  .post-content,
+  .post-body,
+  .post-text-content {
+    background: #FFFFFF !important;
+  }
+  
+  /* Override post timestamp */
+  .post-time,
+  .post-timestamp,
+  .post-date,
+  .post-header .post-time,
+  .post-meta time,
+  time {
+    color: #7A9AB2 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  
+  /* Override post text/caption */
+  .post-text,
+  .post-caption,
+  .post-description {
+    color: #1A3A52 !important;
+  }
+  
+  /* Override post action button text and icons */
+  .post-action,
+  .post-action span,
+  .post-action svg {
+    color: #5A7A92 !important;
+  }
+  
+  .post-action:hover,
+  .post-action:hover span,
+  .post-action:hover svg {
+    color: #1E90FF !important;
+  }
+  
+  /* Override action count badges */
+  .post-action .count,
+  .action-count {
+    color: #7A9AB2 !important;
+    background: rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override text colors */
+  .section-title,
+  .sidebar-title,
+  h1, h2, h3, h4, h5, h6 {
+    color: #1A3A52 !important;
+  }
+  
+  /* Keep sidebar nav links dark (not blue) */
+  .sidebar .nav a {
+    color: #1A3A52 !important;
+  }
+  
+  .sidebar .nav a:hover {
+    color: #1E90FF !important;
+  }
+  
+  /* Override Upcoming Events section */
+  .upcoming-events,
+  .event-card,
+  .event-item {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(30, 144, 255, 0.15) !important;
+  }
+  
+  .event-card:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(30, 144, 255, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15) !important;
+  }
+  
+  .event-date-badge {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+    color: white !important;
+  }
+  
+  .event-view-btn,
+  .view-event-btn {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+    color: white !important;
+  }
+  
+  .event-view-btn:hover {
+    background: linear-gradient(135deg, #4169E1 0%, #1E90FF 100%) !important;
+  }
+  
+  .event-title,
+  .event-church,
+  .event-info {
+    color: #1A3A52 !important;
+  }
+  
+  .event-time,
+  .event-location {
+    color: #7A9AB2 !important;
+  }
+  
+  .event-icon {
+    color: #1E90FF !important;
+  }
+  
+  /* Override empty events state */
+  .empty-events,
+  .no-events,
+  .upcoming-events .empty-state {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(30, 144, 255, 0.1) !important;
+    color: #7A9AB2 !important;
+  }
+  
+  .empty-events svg,
+  .no-events svg {
+    color: #7A9AB2 !important;
+  }
+  
+  /* Override Recent Activity section */
+  .sidebar-activity-section,
+  .sidebar-activity-list,
+  .sidebar-activity-item {
+    background: #FFFFFF !important;
+    border-color: rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  .sidebar-activity-item {
+    border-bottom: 1px solid rgba(30, 144, 255, 0.1) !important;
+    background: #FFFFFF !important;
+  }
+  
+  .sidebar-activity-item:hover {
+    background: rgba(240, 248, 255, 0.5) !important;
+  }
+  
+  .sidebar-activity-icon {
+    background: rgba(30, 144, 255, 0.1) !important;
+    color: #1E90FF !important;
+  }
+  
+  .sidebar-activity-text {
+    color: #1A3A52 !important;
+  }
+  
+  .sidebar-activity-time {
+    color: #7A9AB2 !important;
+  }
+  
+  .sidebar-activity-see-more,
+  .sidebar-activity-footer a {
+    background: rgba(240, 248, 255, 0.5) !important;
+    color: #1E90FF !important;
+    border: 1px solid rgba(30, 144, 255, 0.15) !important;
+  }
+  
+  .sidebar-activity-see-more:hover {
+    background: rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  .sidebar-empty-activity {
+    color: #7A9AB2 !important;
+    background: #FFFFFF !important;
+  }
+  
+  /* Override empty state icons */
+  .empty-icon,
+  .empty-state svg {
+    color: #7A9AB2 !important;
+  }
+  
+  /* Override chat widget button */
+  .chat-widget-toggle {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+  }
+  
+  /* Override chat widget */
+  .chat-widget,
+  .chat-widget-container {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(30, 144, 255, 0.15) !important;
+  }
+  
+  .chat-widget-header {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+    color: white !important;
+  }
+  
+  .chat-widget-body,
+  .chat-messages,
+  .chat-conversations-list,
+  .chat-content,
+  .conversations-container {
+    background: #FFFFFF !important;
+  }
+  
+  .chat-message {
+    background: #F7F9FC !important;
+    border: 1px solid rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override chat empty state */
+  .chat-empty-state,
+  .no-conversations {
+    background: #FFFFFF !important;
+    color: #7A9AB2 !important;
+  }
+  
+  /* Override Messages header */
+  .chat-messages-header,
+  .conversations-header {
+    background: #F7F9FC !important;
+    color: #1A3A52 !important;
+    border-bottom: 1px solid rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override New button */
+  .chat-new-btn,
+  button[class*="new" i] {
+    color: #1E90FF !important;
+  }
+  
+  /* Override comments section */
+  .comments-section,
+  .comment-box,
+  .comment-item,
+  .comment-card {
+    background: #FFFFFF !important;
+    border-color: rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  .comment-input,
+  .comment-textarea,
+  textarea[placeholder*="comment" i] {
+    background: #F7F9FC !important;
+    border: 2px solid #E4E6EB !important;
+    color: #1A3A52 !important;
+  }
+  
+  .comment-input:focus,
+  .comment-textarea:focus {
+    background: #FFFFFF !important;
+    border-color: #1E90FF !important;
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override comment submit button */
+  .comment-submit,
+  button[type="submit"].post-comment-btn {
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+    color: white !important;
+  }
+  
+  /* Override comment author */
+  .comment-author,
+  .comment-user-name {
+    color: #1A3A52 !important;
+  }
+  
+  /* Override comment time */
+  .comment-time,
+  .comment-timestamp {
+    color: #7A9AB2 !important;
+  }
+  
+  /* Override comment text */
+  .comment-text,
+  .comment-content {
+    color: #1A3A52 !important;
+  }
+  
+  /* Aggressive override for all comment-related elements */
+  [class*="comment"] {
+    background: #FFFFFF !important;
+  }
+  
+  [class*="comment-box"],
+  [class*="comment-section"],
+  [class*="comments-container"] {
+    background: #FFFFFF !important;
+    border-color: rgba(30, 144, 255, 0.1) !important;
+  }
+  
+  /* Override any remaining beige/brown backgrounds */
+  div[style*="background: #FFF8DC"],
+  div[style*="background: #FAF6E8"],
+  div[style*="background: #F4E6D0"],
+  div[style*="background: rgb(255, 248, 220)"],
+  div[style*="background: rgb(250, 246, 232)"] {
+    background: #FFFFFF !important;
+  }
+  
+  /* Override hover states for comments and all elements */
+  [class*="comment"]:hover,
+  .comment-item:hover,
+  .comment-card:hover {
+    background: rgba(240, 248, 255, 0.5) !important;
+  }
+  
+  /* Override reply button */
+  .comment-reply,
+  .reply-btn,
+  button[class*="reply"] {
+    color: #1E90FF !important;
+  }
+  
+  .comment-reply:hover,
+  .reply-btn:hover {
+    background: rgba(30, 144, 255, 0.1) !important;
+    color: #1E90FF !important;
+  }
+  
+  /* Override any brown/gold hover states globally */
+  *:hover {
+    border-color: inherit !important;
+  }
+  
+  /* Force all interactive elements to use blue on hover */
+  button:not(.post-modal-close):hover,
+  a:not(.post-modal-close):hover,
+  .btn:hover,
+  [role="button"]:hover,
+  .clickable:hover,
+  .interactive:hover {
+    color: #1E90FF !important;
+  }
+  
+  /* Override specific hover backgrounds that might be brown */
+  .post-action:hover,
+  .comment-reply:hover,
+  .reply-btn:hover,
+  .action-btn:hover,
+  [class*="btn"]:hover,
+  [class*="action"]:hover {
+    background: rgba(30, 144, 255, 0.1) !important;
+    color: #1E90FF !important;
+  }
+  
+  /* Override any element with brown/gold colors on hover */
+  [style*="#8B4513"]:hover,
+  [style*="#DAA520"]:hover,
+  [style*="#A0522D"]:hover,
+  [style*="#654321"]:hover,
+  [style*="rgb(139, 69, 19)"]:hover,
+  [style*="rgb(218, 165, 32)"]:hover {
+    color: #1E90FF !important;
+    background: rgba(30, 144, 255, 0.1) !important;
+  }
+</style>
 {% endblock %}
 
 {% block sidebar %}{% include "partials/sidebar.html" %}{% endblock %}
