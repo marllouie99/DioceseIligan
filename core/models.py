@@ -15,30 +15,14 @@ class Church(models.Model):
     """Model representing a church organization."""
     
     DENOMINATION_CHOICES = [
-        # A. Christian Denominations
-        ('catholic', 'Roman Catholic Church'),  # keep existing code, update label
-        ('iglesia_ni_cristo', 'Iglesia ni Cristo (INC)'),
-        ('protestant', 'Protestant (Other)'),
-        ('uccp', 'United Church of Christ in the Philippines (UCCP)'),
-        ('baptist', 'Baptist'),
-        ('methodist', 'Methodist'),
-        ('presbyterian', 'Presbyterian'),
-        ('lutheran', 'Lutheran'),
-        ('adventist', 'Seventh-day Adventist'),
-        ('pentecostal', 'Pentecostal'),
-        ('evangelical', 'Evangelical'),
-        ('mormon', 'The Church of Jesus Christ of Latter-day Saints (Mormons)'),  # keep existing code
-        ('jehovah', 'Jehovah\'s Witnesses'),
-        ('orthodox', 'Orthodox'),
-
-        # B. Non-Christian Religions
-        ('islam', 'Islam'),
-        ('buddhism', 'Buddhism'),
-        ('hinduism', 'Hinduism'),
-        ('indigenous', 'Indigenous Beliefs'),
-
-        # Fallback
-        ('other', 'Other'),
+        # Roman Catholic Church - Diocese of Iligan
+        ('catholic', 'Roman Catholic Church'),
+        ('parish', 'Roman Catholic Parish'),
+        ('chapel', 'Roman Catholic Chapel'),
+        ('shrine', 'Roman Catholic Shrine'),
+        ('cathedral', 'Roman Catholic Cathedral'),
+        ('basilica', 'Roman Catholic Basilica'),
+        ('other', 'Other Catholic Community'),
     ]
     
     SIZE_CHOICES = [
@@ -52,7 +36,7 @@ class Church(models.Model):
     name = models.CharField(max_length=200, help_text="Church name")
     slug = models.SlugField(max_length=200, unique=True, help_text="URL-friendly version of the name")
     description = models.TextField(help_text="Brief description of the church")
-    denomination = models.CharField(max_length=20, choices=DENOMINATION_CHOICES, default='other')
+    denomination = models.CharField(max_length=20, choices=DENOMINATION_CHOICES, default='parish')
     size = models.CharField(max_length=10, choices=SIZE_CHOICES, default='medium')
     
     # Contact Information

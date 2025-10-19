@@ -6,8 +6,8 @@
 {% block body_class %}dashboard-page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
@@ -82,7 +82,7 @@
 }
 
 .stat-card-overview.primary .stat-icon-wrapper {
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white;
 }
 
@@ -296,7 +296,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -539,14 +539,14 @@ document.addEventListener('DOMContentLoaded', function() {
             'rgba(168, 85, 247, 0.8)',
             'rgba(16, 185, 129, 0.8)',
             'rgba(251, 191, 36, 0.8)',
-            'rgba(160, 82, 45, 0.8)'
+            'rgba(30, 144, 255, 0.8)'
           ],
           borderColor: [
             'rgba(59, 130, 246, 1)',
             'rgba(168, 85, 247, 1)',
             'rgba(16, 185, 129, 1)',
             'rgba(251, 191, 36, 1)',
-            'rgba(160, 82, 45, 1)'
+            'rgba(30, 144, 255, 1)'
           ],
           borderWidth: 2
         }]
@@ -635,14 +635,14 @@ document.addEventListener('DOMContentLoaded', function() {
           {
             label: 'Users',
             data: [{% for count in monthly_growth.users %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-            borderColor: 'rgba(160, 82, 45, 1)',
-            backgroundColor: 'rgba(160, 82, 45, 0.1)',
+            borderColor: 'rgba(30, 144, 255, 1)',
+            backgroundColor: 'rgba(30, 144, 255, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
-            pointBackgroundColor: 'rgba(160, 82, 45, 1)',
+            pointBackgroundColor: 'rgba(30, 144, 255, 1)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2
           }

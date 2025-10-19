@@ -447,6 +447,53 @@ border: 1px solid rgba(30, 144, 255, 0.15);
 
 ---
 
+## Super Admin Pages Recoloring (2025-10-20)
+
+**Templates Updated:**
+- `templates/core/super_admin.html` - System Overview dashboard
+- `templates/core/super_admin_church_detail.html` - Church detail view for admins
+- `templates/core/super_admin_churches.html` - Churches management page
+- `templates/core/super_admin_users.html` - Users management page
+- `templates/core/super_admin_bookings.html` - Bookings management page
+- `templates/core/super_admin_posts.html` - Posts management page
+- `templates/core/super_admin_services.html` - Services management page
+- `templates/core/super_admin_moderation.html` - Moderation dashboard
+- `templates/core/super_admin_post_detail.html` - Post detail view for admins
+- `templates/core/super_admin_profile.html` - Super admin profile page
+- `templates/core/super_admin_user_activities.html` - User activities tracking
+- `templates/core/super_admin_verifications.html` - Church verifications management
+- `templates/core/super_admin_create_church.html` - Church creation/edit form
+
+**Key Color Transformations:**
+- Theme CSS imports: Changed from `warm-sacred-earth-vars.css` and `warm-sacred-earth-theme.css` to `blue-sky-vars.css` and `blue-sky-theme.css`
+- Primary stat card icons: Brown/Gold gradient (`#A0522D` → `#DAA520`) → Blue gradient (`#1E90FF` → `#4169E1`)
+- User avatar placeholders: Brown/Gold gradient → Blue gradient
+- Church header backgrounds: Parchment gradient (`#F8F4E6` → `#F4E6D0`) → White to Alice Blue gradient (`#FFFFFF` → `#F0F8FF`)
+- Church logo placeholders: Brown gradient → Blue gradient (`#1E90FF` → `#4169E1`)
+- Denomination badges: Cream background (`#FFF9E6` → `#FFF5D6`) with brown text (`#654321`) → Light blue background (`#F0F8FF` → `#E8F4FF`) with dark blue text (`#1A3A52`)
+- Tab navigation: Cream background (`rgba(255, 249, 230, 0.6)`) with brown borders → Alice Blue background (`rgba(240, 248, 255, 0.6)`) with blue borders
+- Active tabs: Brown gradient (`#8B4513` → `#A0522D`) → Blue gradient (`#1E90FF` → `#4169E1`)
+- Tab hover states: Brown tint (`rgba(139, 69, 19, 0.08)`) → Blue tint (`rgba(30, 144, 255, 0.08)`)
+- Stat cards: Cream gradient backgrounds (`#FFF9E6` → `#FFF5D6`) → Alice Blue gradient (`#F0F8FF` → `#E8F4FF`)
+- Stat icons: Brown background (`rgba(160, 82, 45, 0.1)`) with brown color → Blue background (`rgba(30, 144, 255, 0.1)`) with blue color
+- Service card backgrounds: Parchment gradient → Alice Blue gradient
+- Service card icons: Brown (`#8B4513`, `#A0522D`) → Blue (`#1E90FF`, `#4169E1`)
+- Section headings: Brown text (`#654321`) → Dark blue text (`#1A3A52`)
+- Section borders: Brown (`rgba(139, 69, 19, 0.15)`) → Blue (`rgba(30, 144, 255, 0.15)`)
+- Action buttons: Brown/Gold gradient → Blue gradient
+- Secondary buttons: Brown borders → Blue borders with blue text
+- Chart colors: Brown data series (`rgba(160, 82, 45, ...)`) → Blue data series (`rgba(30, 144, 255, ...)`)
+- All shadows: Brown-tinted → Blue-tinted
+
+**Result:** All super admin pages now use the blue sky theme with consistent blue colors throughout the interface. The admin dashboard, church management, user management, and all related pages display clean, professional blue styling instead of the previous warm brown/gold theme.
+
+**Additional Updates (2025-10-20):**
+- ✅ Fixed `church_profile_admin.html` partial - Updated all brown colors to blue in the Church Profile tab
+- ✅ Fixed `super_admin_create_church.html` - Updated create/edit church form to use blue theme
+- ✅ Updated denomination choices to focus on Roman Catholic Church types only (Parish, Chapel, Shrine, Cathedral, Basilica)
+
+---
+
 ## Notifications Page Recoloring (2025-10-20)
 
 **Templates Updated:**

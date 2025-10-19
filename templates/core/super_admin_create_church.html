@@ -6,8 +6,8 @@
 {% block body_class %}dashboard-page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
@@ -22,7 +22,7 @@
 .page-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #8B4513;
+  color: #1A3A52;
   margin-bottom: 0.5rem;
 }
 
@@ -35,8 +35,8 @@
   background: white;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.1);
 }
 
 .form-section {
@@ -97,7 +97,7 @@
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.1);
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 }
 
 .form-checkbox {
@@ -142,13 +142,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #A0522D 0%, #DAA520 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(160, 82, 45, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
 .btn-secondary {
@@ -209,8 +209,8 @@
 
 .select2-container--default .select2-selection--single:focus,
 .select2-container--default.select2-container--focus .select2-selection--single {
-  border-color: #A0522D;
-  box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.1);
+  border-color: #1E90FF;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
   outline: none;
 }
 
@@ -240,17 +240,17 @@
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-  border-color: #A0522D;
+  border-color: #1E90FF;
   outline: none;
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background-color: rgba(160, 82, 45, 0.1);
-  color: #8B4513;
+  background-color: rgba(30, 144, 255, 0.1);
+  color: #1E90FF;
 }
 
 .select2-container--default .select2-results__option[aria-selected=true] {
-  background-color: #A0522D;
+  background-color: #1E90FF;
   color: white;
 }
 
@@ -278,7 +278,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="warm-sacred-earth page-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+<div class="blue-sky page-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
   <div class="page-header">
     <h1>{% if is_edit %}Edit Church{% else %}Create New Church{% endif %}</h1>
     <p>{% if is_edit %}Update church information and reassign manager if needed{% else %}Create a new church and assign a user to manage it{% endif %}</p>

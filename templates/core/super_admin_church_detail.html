@@ -6,8 +6,8 @@
 {% block body_class %}dashboard-page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
@@ -16,11 +16,11 @@
   .tab-navigation {
     display: flex;
     gap: 0.5rem;
-    background: rgba(255, 249, 230, 0.6);
+    background: rgba(240, 248, 255, 0.6);
     padding: 0.5rem;
     border-radius: 12px;
     margin-bottom: 2rem;
-    border: 1px solid rgba(139, 69, 19, 0.15);
+    border: 1px solid rgba(30, 144, 255, 0.15);
     overflow-x: auto;
     flex-wrap: wrap;
   }
@@ -47,14 +47,14 @@
   }
 
   .tab-btn:hover {
-    color: #8B4513;
-    background: rgba(139, 69, 19, 0.08);
+    color: #1E90FF;
+    background: rgba(30, 144, 255, 0.08);
   }
 
   .tab-btn.active {
     color: white;
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
   }
 
   /* Tab Content */
@@ -85,15 +85,15 @@
     align-items: center;
     gap: 1.25rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%);
-    border: 1px solid rgba(218, 165, 32, 0.2);
+    background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%);
+    border: 1px solid rgba(30, 144, 255, 0.2);
     border-radius: 12px;
     transition: all 0.3s ease;
   }
 
   .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(160, 82, 45, 0.15);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
   }
 
   .stat-icon {
@@ -103,8 +103,8 @@
     width: 56px;
     height: 56px;
     border-radius: 12px;
-    background: rgba(160, 82, 45, 0.1);
-    color: rgba(160, 82, 45, 1);
+    background: rgba(30, 144, 255, 0.1);
+    color: rgba(30, 144, 255, 1);
     flex-shrink: 0;
   }
 
@@ -142,11 +142,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="church-detail-page warm-sacred-earth page-container" style="max-width: 1600px; margin: 0 auto; padding: 2rem;">
+<div class="church-detail-page blue-sky page-container" style="max-width: 1600px; margin: 0 auto; padding: 2rem;">
   
   <!-- Back Button -->
   <div style="margin-bottom: 1.5rem;">
-    <a href="{% url 'core:super_admin_verifications' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(255, 255, 255, 0.8); color: #654321; border: 1px solid rgba(139, 69, 19, 0.3); border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+    <a href="{% url 'core:super_admin_verifications' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(255, 255, 255, 0.8); color: #1A3A52; border: 1px solid rgba(30, 144, 255, 0.3); border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
         <polyline points="15 18 9 12 15 6"/>
       </svg>
@@ -155,9 +155,9 @@
   </div>
 
   <!-- Church Header -->
-  <div style="background: linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%); border: 2px solid rgba(139, 69, 19, 0.2); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+  <div style="background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%); border: 2px solid rgba(30, 144, 255, 0.2); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(30, 144, 255, 0.08);">
     <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 1.5rem;">
-      <div style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; border: 3px solid rgba(139, 69, 19, 0.3); box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2); flex-shrink: 0; overflow: hidden;">
+      <div style="width: 120px; height: 120px; border-radius: 16px; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; border: 3px solid rgba(30, 144, 255, 0.3); box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2); flex-shrink: 0; overflow: hidden;">
         {% if church.logo %}
         <img src="{{ church.logo|storage_url }}" alt="{{ church.name }}" style="width: 100%; height: 100%; object-fit: cover;">
         {% else %}
@@ -165,10 +165,10 @@
         {% endif %}
       </div>
       <div style="flex: 1;">
-        <h1 style="font-size: 2.5rem; font-weight: 800; color: #2D1810; margin: 0 0 1rem 0; font-family: Georgia, 'Times New Roman', serif;">{{ church.name }}</h1>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1A3A52; margin: 0 0 1rem 0;">{{ church.name }}</h1>
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%); border: 1px solid rgba(218, 165, 32, 0.3); border-radius: 9999px; font-size: 0.875rem; color: #654321; font-weight: 600;">{{ church.get_denomination_display }}</span>
-          <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%); border: 1px solid rgba(218, 165, 32, 0.3); border-radius: 9999px; font-size: 0.875rem; color: #654321; font-weight: 600;">{{ church.get_size_display }}</span>
+          <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%); border: 1px solid rgba(30, 144, 255, 0.3); border-radius: 9999px; font-size: 0.875rem; color: #1A3A52; font-weight: 600;">{{ church.get_denomination_display }}</span>
+          <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%); border: 1px solid rgba(30, 144, 255, 0.3); border-radius: 9999px; font-size: 0.875rem; color: #1A3A52; font-weight: 600;">{{ church.get_size_display }}</span>
           {% if church.is_verified %}
           <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); color: #166534; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 9999px; font-size: 0.875rem; font-weight: 700; text-transform: uppercase;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
@@ -191,15 +191,15 @@
       </div>
     </div>
     
-    <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid rgba(139, 69, 19, 0.15);">
-      <a href="{% url 'core:super_admin_edit_church' church.id %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s;">
+    <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid rgba(30, 144, 255, 0.15);">
+      <a href="{% url 'core:super_admin_edit_church' church.id %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
         </svg>
         Edit Church
       </a>
-      <a href="{% url 'core:church_detail' church.slug %}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: white; color: #8B4513; border: 1px solid rgba(139, 69, 19, 0.3); border-radius: 8px; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s;">
+      <a href="{% url 'core:church_detail' church.slug %}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: white; color: #1E90FF; border: 1px solid rgba(30, 144, 255, 0.3); border-radius: 8px; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
           <polyline points="15 3 21 3 21 9"/>
@@ -314,9 +314,9 @@
 
   <!-- Services Tab -->
   <div class="tab-content" id="tab-services">
-    <div style="background: white; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid rgba(139, 69, 19, 0.1);">
-      <h2 style="font-size: 1.5rem; font-weight: 700; color: #654321; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(139, 69, 19, 0.15);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: #8B4513;">
+    <div style="background: white; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08); border: 1px solid rgba(30, 144, 255, 0.1);">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #1A3A52; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(30, 144, 255, 0.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: #1E90FF;">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12 6 12 12 16 14"/>
         </svg>
@@ -326,29 +326,29 @@
     {% if services %}
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
       {% for service in services %}
-      <div style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(139, 69, 19, 0.15); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;">
-        <div style="position: relative; width: 100%; height: 180px; background: linear-gradient(135deg, #F8F4E6 0%, #F4E6D0 100%); overflow: hidden;">
+      <div style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(30, 144, 255, 0.15); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;">
+        <div style="position: relative; width: 100%; height: 180px; background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%); overflow: hidden;">
           {% with images=service.get_images %}
             {% if images %}
             <img src="{{ images.0.image.url }}" alt="{{ service.name }}" style="width: 100%; height: 100%; object-fit: cover;">
             {% else %}
-            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; color: rgba(139, 69, 19, 0.6); background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(160, 82, 45, 0.1) 100%);">{{ service.name.0|upper }}</div>
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; color: rgba(30, 144, 255, 0.6); background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(65, 105, 225, 0.1) 100%);">{{ service.name.0|upper }}</div>
             {% endif %}
           {% endwith %}
         </div>
         <div style="padding: 1.5rem;">
-          <h4 style="font-size: 1.25rem; font-weight: 700; color: #2D1810; margin: 0 0 0.75rem 0; line-height: 1.3;">{{ service.name }}</h4>
+          <h4 style="font-size: 1.25rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.75rem 0; line-height: 1.3;">{{ service.name }}</h4>
           <p style="font-size: 0.9375rem; color: #6b7280; line-height: 1.6; margin: 0 0 1.25rem 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ service.description|default:"No description provided." }}</p>
-          <div style="display: flex; gap: 1.25rem; align-items: center; padding-top: 1.25rem; border-top: 1px solid rgba(139, 69, 19, 0.1);">
-            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #8B4513; font-weight: 600;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #A0522D;">
+          <div style="display: flex; gap: 1.25rem; align-items: center; padding-top: 1.25rem; border-top: 1px solid rgba(30, 144, 255, 0.1);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #1E90FF; font-weight: 600;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #4169E1;">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
               <span>{{ service.duration_display }}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #8B4513; font-weight: 600;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #A0522D;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #1E90FF; font-weight: 600;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #4169E1;">
                 <line x1="12" y1="1" x2="12" y2="23"/>
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
               </svg>
@@ -374,9 +374,9 @@
 
   <!-- Posts Tab -->
   <div class="tab-content" id="tab-posts">
-    <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid rgba(139, 69, 19, 0.1);">
-      <h2 style="font-size: 1.5rem; font-weight: 700; color: #654321; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(139, 69, 19, 0.15);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: #8B4513;">
+    <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08); border: 1px solid rgba(30, 144, 255, 0.1);">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #1A3A52; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(30, 144, 255, 0.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: #1E90FF;">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
         </svg>
