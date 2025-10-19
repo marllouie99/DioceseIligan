@@ -1,24 +1,24 @@
-/* Warm Sacred Earth Landing Page - Church & Religious */
-/* Using the same theme as the main app for consistency */
+/* Blue Sky Landing Page - Modern & Clean */
+/* New blue gradient color palette */
 :root {
-  /* Warm Sacred Earth Palette - Light Theme (matches main app) */
-  --bg-start: #FFF9E6; /* Cream White */
-  --bg-end: #F5E6D3; /* Light Beige */
-  --bg-medium: #E8D4B8; /* Warm Beige */
-  --text: #2D1810; /* Dark Brown */
-  --text-light: #654321; /* Medium Brown */
-  --muted: #8B6F47; /* Muted Brown */
-  --muted-2: #A0826D; /* Light Muted Brown */
-  --border: rgba(218, 165, 32, 0.25); /* Golden border */
-  --card-bg: #FFFBF0; /* Very Light Cream */
-  --pill-bg: #FFF8E7; /* Light Cream */
-  --pill-border: #DAA520; /* Goldenrod */
-  --btn-start: #DAA520; /* Goldenrod */
-  --btn-end: #A0522D; /* Sienna */
-  --brand: #A0522D; /* Sienna */
-  --accent-gold: #DAA520; /* Goldenrod */
-  --cream: #FDF5E6; /* Old Lace */
-  --warm-white: #FFF9E6; /* Cream White */
+  /* Blue Sky Palette - Light Theme */
+  --bg-start: #E8F4FF; /* Very Light Blue */
+  --bg-end: #C8E0F7; /* Light Blue */
+  --bg-medium: #A8D0F0; /* Medium Blue */
+  --text: #1A3A52; /* Dark Blue-Gray */
+  --text-light: #FFFFFF; /* White for text on blue */
+  --muted: #5A7A92; /* Muted Blue-Gray */
+  --muted-2: #7A9AB2; /* Light Muted Blue */
+  --border: rgba(30, 144, 255, 0.25); /* Blue border */
+  --card-bg: #F5FAFF; /* Very Light Blue-White */
+  --pill-bg: #E8F4FF; /* Light Blue */
+  --pill-border: #4A9EFF; /* Bright Blue */
+  --btn-start: #1E90FF; /* Dodger Blue */
+  --btn-end: #4169E1; /* Royal Blue */
+  --brand: #1E90FF; /* Dodger Blue */
+  --accent-blue: #4A9EFF; /* Bright Blue */
+  --cream: #F0F8FF; /* Alice Blue */
+  --warm-white: #FFFFFF; /* Pure White */
 }
 
 * { box-sizing: border-box; }
@@ -27,27 +27,21 @@ html, body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-/* Landing Page Body - Warm Sacred Earth Theme (Light) */
+/* Landing Page Body - Blue Sky Theme (Light) */
 body {
   font-family: Georgia, "Times New Roman", serif; /* Traditional church font */
   color: var(--text);
   background:
-    /* Subtle wood grain texture overlay */
+    /* Very subtle texture overlay */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(218, 165, 32, 0.02) 2px,
-      rgba(218, 165, 32, 0.02) 4px
+      rgba(30, 144, 255, 0.01) 2px,
+      rgba(30, 144, 255, 0.01) 4px
     ),
-    /* Paper texture pattern */
-    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.03) 0%, transparent 50%),
-    /* Warm glow effects */
-    radial-gradient(70% 50% at 20% 20%, rgba(218, 165, 32, 0.08) 0%, rgba(218, 165, 32, 0.02) 40%, transparent 70%),
-    radial-gradient(80% 60% at 30% 50%, rgba(160, 82, 45, 0.05) 0%, rgba(139, 69, 19, 0.02) 50%, transparent 80%),
-    /* Main light warm gradient */
-    linear-gradient(135deg, var(--bg-start) 0%, var(--bg-medium) 50%, var(--bg-end) 100%);
+    /* Soft light blue gradient - more subtle */
+    linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 50%, #E0F0FF 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-attachment: fixed;
@@ -77,15 +71,12 @@ body {
   right: 0;
   bottom: 0;
   background: 
-    /* Subtle parchment texture overlay */
-    radial-gradient(circle at 20% 30%, rgba(218, 165, 32, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.03) 0%, transparent 40%),
-    /* Warm top-to-bottom fade */
+    /* Very subtle overlay */
     linear-gradient(180deg, 
-      rgba(218, 165, 32, 0.05) 0%, 
+      rgba(30, 144, 255, 0.02) 0%, 
       transparent 30%, 
       transparent 70%, 
-      rgba(101, 67, 33, 0.08) 100%
+      rgba(65, 105, 225, 0.03) 100%
     );
   pointer-events: none;
   z-index: 0;
@@ -107,7 +98,7 @@ body {
 
 /* Left Side - Hero Carousel */
 .hero-content {
-  color: var(--text-light);
+  color: var(--text);
   padding: 60px 20px 0 20px;
   height: 100vh;
   max-height: 600px; /* Prevent overflow */
@@ -117,15 +108,8 @@ body {
   position: relative;
   overflow: hidden;
   max-width: 100%;
-  /* Add subtle parchment texture */
-  background: 
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 100px,
-      rgba(218, 165, 32, 0.02) 100px,
-      rgba(218, 165, 32, 0.02) 102px
-    );
+  /* Clean background */
+  background: transparent;
 }
 
 /* Carousel Container */
@@ -173,20 +157,20 @@ body {
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  background: linear-gradient(135deg, var(--text-light) 0%, #FFD700 100%);
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* Add warm glow with stronger contrast */
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  /* Add blue glow with stronger contrast */
+  filter: drop-shadow(0 4px 8px rgba(30, 144, 255, 0.5));
 }
 
 .hero-slide h2 {
   font-size: 2.8rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--text-light);
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  color: #1E90FF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* CTA Section for slide 3 */
@@ -197,17 +181,17 @@ body {
 
 .cta-text {
   font-size: 1.2rem;
-  color: var(--text-light);
+  color: var(--text);
   margin: 0 0 10px 0;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: none;
 }
 
 .cta-arrow {
   font-size: 2rem;
-  color: #FFD700;
+  color: #1E90FF;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 2px 4px rgba(30, 144, 255, 0.6));
 }
 
 @keyframes bounce {
@@ -245,9 +229,9 @@ body {
 }
 
 .dot.active {
-  background: #FFD700;
+  background: #1E90FF;
   transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.6);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.6);
 }
 
 .dot:hover {
@@ -278,37 +262,23 @@ body {
 }
 
 .nav-btn:hover {
-  background: rgba(255, 215, 0, 0.2);
-  border-color: rgba(255, 215, 0, 0.5);
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
   transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.4);
 }
 
 .mission-statement {
-  background: 
-    /* Parchment texture overlay */
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(218, 165, 32, 0.02) 2px,
-      rgba(218, 165, 32, 0.02) 4px
-    ),
-    /* Warm glassmorphism */
-    linear-gradient(135deg, 
-      rgba(255, 249, 230, 0.15) 0%, 
-      rgba(218, 165, 32, 0.08) 50%, 
-      rgba(160, 82, 45, 0.06) 100%
-    );
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(218, 165, 32, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 20px;
   padding: 30px;
   margin: 0 0 35px 0;
   position: relative;
   overflow: hidden;
-  /* Add warm shadow */
-  box-shadow: 0 8px 16px rgba(101, 67, 33, 0.2);
+  /* Subtle shadow */
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.1);
 }
 
 .mission-statement::before {
@@ -320,7 +290,7 @@ body {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(218, 165, 32, 0.4) 50%, 
+    rgba(30, 144, 255, 0.4) 50%, 
     transparent 100%
   );
 }
@@ -329,16 +299,16 @@ body {
   font-size: 1.4rem;
   font-weight: 700;
   margin: 0 0 15px 0;
-  color: var(--text-light);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  color: var(--text);
+  text-shadow: none;
 }
 
 .mission-statement p {
   font-size: 1.1rem;
   line-height: 1.7;
   margin: 0;
-  color: var(--text-light);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  text-shadow: none;
 }
 
 .testimonials {
@@ -349,53 +319,36 @@ body {
 }
 
 .testimonial {
-  background: 
-    /* Paper texture */
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 3px,
-      rgba(218, 165, 32, 0.015) 3px,
-      rgba(218, 165, 32, 0.015) 6px
-    ),
-    rgba(255, 249, 230, 0.1);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(218, 165, 32, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.12);
   border-radius: 16px;
   padding: 24px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(101, 67, 33, 0.15);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08);
 }
 
 .testimonial:hover {
-  background: 
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 3px,
-      rgba(218, 165, 32, 0.02) 3px,
-      rgba(218, 165, 32, 0.02) 6px
-    ),
-    rgba(255, 249, 230, 0.15);
-  border-color: rgba(218, 165, 32, 0.35);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(30, 144, 255, 0.25);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(101, 67, 33, 0.25);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15);
 }
 
 .testimonial-quote {
   font-size: 1.05rem;
   font-style: italic;
-  color: var(--text-light);
+  color: var(--text);
   margin: 0 0 12px 0;
   line-height: 1.6;
   position: relative;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
 .testimonial-quote::before {
   content: '"';
   font-size: 2rem;
-  color: #FFD700;
+  color: #1E90FF;
   position: absolute;
   left: -8px;
   top: -8px;
@@ -404,12 +357,12 @@ body {
 
 .testimonial-author {
   font-size: 0.9rem;
-  color: var(--text-light);
+  color: var(--muted);
   margin: 0;
   font-weight: 600;
   text-align: right;
   padding-left: 20px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
 .stats-bar {
@@ -417,27 +370,13 @@ body {
   gap: 40px;
   margin-top: 40px;
   padding: 20px;
-  background: 
-    /* Vintage paper texture */
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 8px,
-      rgba(218, 165, 32, 0.02) 8px,
-      rgba(218, 165, 32, 0.02) 10px
-    ),
-    /* Warm glassmorphism */
-    linear-gradient(135deg, 
-      rgba(255, 249, 230, 0.12) 0%, 
-      rgba(218, 165, 32, 0.06) 50%, 
-      rgba(160, 82, 45, 0.04) 100%
-    );
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(218, 165, 32, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 16px rgba(101, 67, 33, 0.2);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.1);
 }
 
 .stats-bar::before {
@@ -449,7 +388,7 @@ body {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(218, 165, 32, 0.3) 50%, 
+    rgba(30, 144, 255, 0.3) 50%, 
     transparent 100%
   );
 }
@@ -463,65 +402,42 @@ body {
 }
 
 .stat-item:hover {
-  background: rgba(218, 165, 32, 0.1);
+  background: rgba(30, 144, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(101, 67, 33, 0.2);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
 }
 
 .stat-number {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #FFD700;
+  color: #1E90FF;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   display: block;
   margin-bottom: 4px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 2px 4px rgba(30, 144, 255, 0.4));
 }
 
 .stat-label {
   font-size: 0.95rem;
-  color: var(--text-light);
+  color: var(--text);
   margin: 0;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
 /* Right Side - Glassmorphism Form Card */
 .card {
   width: 100%;
   max-width: min(520px, calc(100vw - 40px));
-  background: 
-    /* Parchment texture overlay */
-    repeating-linear-gradient(
-      15deg,
-      transparent,
-      transparent 4px,
-      rgba(218, 165, 32, 0.02) 4px,
-      rgba(218, 165, 32, 0.02) 8px
-    ),
-    repeating-linear-gradient(
-      75deg,
-      transparent,
-      transparent 6px,
-      rgba(160, 82, 45, 0.015) 6px,
-      rgba(160, 82, 45, 0.015) 12px
-    ),
-    /* Warm glassmorphism gradient */
-    linear-gradient(145deg, 
-      rgba(255, 249, 230, 0.25) 0%, 
-      rgba(218, 165, 32, 0.15) 50%, 
-      rgba(160, 82, 45, 0.12) 100%
-    );
-  backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
   border-radius: 28px;
-  border: 1px solid rgba(218, 165, 32, 0.35);
+  border: 1px solid rgba(30, 144, 255, 0.15);
   box-shadow: 
-    0 30px 60px rgba(101, 67, 33, 0.4),
-    0 16px 30px rgba(218, 165, 32, 0.25),
-    inset 0 1px 0 rgba(255, 249, 230, 0.4),
-    inset 0 -1px 0 rgba(218, 165, 32, 0.2);
+    0 20px 40px rgba(30, 144, 255, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.05);
   padding: 20px 28px 36px; /* Reduced top padding for logo */
   position: relative;
   margin-top: 80px; /* Push the form down */
@@ -537,7 +453,7 @@ body {
   height: 100%;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(218, 165, 32, 0.05) 50%, 
+    rgba(30, 144, 255, 0.05) 50%, 
     transparent 100%
   );
   animation: shimmer 4s ease-in-out infinite;
@@ -554,9 +470,9 @@ body {
 .logo-stack {
   display: grid;
   place-items: center;
-  margin-top: -38px; /* Better positioning to prevent cutoff */
+  margin-top: 0;
   margin-bottom: 18px;
-  padding-top: 10px; /* Optimized padding */
+  padding-top: 0;
   position: relative;
   z-index: 5; /* Lower than form content to avoid blocking */
 }
@@ -565,7 +481,7 @@ body {
   width: 92px;
   height: 92px;
   border-radius: 50%;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(218, 165, 32, 0.5) 0%, rgba(218, 165, 32, 0.0) 60%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(30, 144, 255, 0.5) 0%, rgba(30, 144, 255, 0.0) 60%);
   filter: blur(8px);
   position: absolute;
   z-index: 0;
@@ -575,7 +491,7 @@ body {
   width: 68px;
   height: 68px;
   border-radius: 20px;
-  background: linear-gradient(180deg, var(--accent-gold), var(--btn-start));
+  background: linear-gradient(180deg, var(--accent-blue), var(--btn-start));
   display: grid;
   place-items: center;
   color: var(--text-light);
@@ -584,10 +500,10 @@ body {
   position: relative;
   z-index: 1;
   box-shadow: 
-    0 20px 40px rgba(218, 165, 32, 0.5), 
-    0 0 40px rgba(160, 82, 45, 0.4),
-    inset 0 1px 0 rgba(255, 249, 230, 0.3);
-  text-shadow: 0 2px 4px rgba(101, 67, 33, 0.4);
+    0 20px 40px rgba(30, 144, 255, 0.5), 
+    0 0 40px rgba(65, 105, 225, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.4);
 }
 
 h1.title {
@@ -597,7 +513,7 @@ h1.title {
   margin: 12px 0 8px;
   text-align: center;
   color: var(--text);
-  text-shadow: 0 2px 4px rgba(101, 67, 33, 0.3);
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.3);
   font-weight: 700;
 }
 
@@ -605,7 +521,7 @@ p.subtitle {
   text-align: center;
   color: var(--muted);
   margin: 0 0 24px;
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.2);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.2);
   font-size: 15px;
   font-weight: 500;
 }
@@ -613,14 +529,14 @@ p.subtitle {
 .segmented {
   margin: 6px auto 22px;
   border-radius: 999px;
-  background: rgba(160, 82, 45, 0.15);
+  background: rgba(65, 105, 225, 0.15);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(218, 165, 32, 0.25);
+  border: 1px solid rgba(30, 144, 255, 0.25);
   padding: 6px;
   display: flex;
   gap: 6px;
   width: fit-content;
-  box-shadow: 0 4px 8px rgba(101, 67, 33, 0.2);
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
 }
 
 .segmented button {
@@ -638,13 +554,13 @@ p.subtitle {
 .segmented button.active {
   background: var(--warm-white);
   color: var(--text);
-  box-shadow: 0 6px 14px rgba(101, 67, 33, 0.25);
+  box-shadow: 0 6px 14px rgba(30, 144, 255, 0.25);
   transform: translateY(-1px);
-  border: 1px solid rgba(218, 165, 32, 0.2);
+  border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 .segmented button:hover:not(.active) {
-  background: rgba(218, 165, 32, 0.1);
+  background: rgba(30, 144, 255, 0.1);
   color: var(--text);
 }
 
@@ -659,38 +575,19 @@ p.subtitle {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: 
-    /* Subtle wood grain texture */
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 1px,
-      rgba(160, 82, 45, 0.02) 1px,
-      rgba(160, 82, 45, 0.02) 2px
-    ),
-    rgba(255, 249, 230, 0.2);
-  backdrop-filter: blur(15px);
-  border: 2px solid rgba(218, 165, 32, 0.25);
+  background: #F7F9FC;
+  border: 2px solid #E4E6EB;
   border-radius: 14px;
   padding: 14px 16px;
   transition: all 0.3s ease;
   min-height: 52px; /* Consistent height */
-  box-shadow: 0 2px 4px rgba(101, 67, 33, 0.1);
+  box-shadow: none;
 }
 
 .input:focus-within {
-  border-color: rgba(218, 165, 32, 0.5);
-  background: 
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 1px,
-      rgba(160, 82, 45, 0.03) 1px,
-      rgba(160, 82, 45, 0.03) 2px
-    ),
-    rgba(255, 249, 230, 0.3);
-  box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.15);
-  transform: translateY(-1px);
+  border-color: #1E90FF;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
 }
 .input input {
   flex: 1;
@@ -831,7 +728,7 @@ input[style*="background"] {
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.2);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.2);
 }
 
 .password-toggle {
@@ -852,7 +749,7 @@ input[style*="background"] {
 
 .password-toggle:hover {
   color: var(--text);
-  background: rgba(218, 165, 32, 0.15) !important;
+  background: rgba(30, 144, 255, 0.15) !important;
   transform: scale(1.1);
 }
 
@@ -869,28 +766,28 @@ input[style*="background"] {
   font-weight: 800;
   letter-spacing: 0.02em;
   background: 
-    /* Subtle wood grain texture */
+    /* Subtle texture */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(255, 249, 230, 0.05) 2px,
-      rgba(255, 249, 230, 0.05) 4px
+      rgba(255, 255, 255, 0.05) 2px,
+      rgba(255, 255, 255, 0.05) 4px
     ),
     linear-gradient(180deg, var(--btn-start), var(--btn-end));
   box-shadow: 
-    0 16px 28px rgba(160, 82, 45, 0.4), 
-    0 6px 10px rgba(218, 165, 32, 0.3);
+    0 16px 28px rgba(30, 144, 255, 0.4), 
+    0 6px 10px rgba(30, 144, 255, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(101, 67, 33, 0.3);
+  text-shadow: 0 1px 2px rgba(30, 144, 255, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 
-    0 20px 32px rgba(160, 82, 45, 0.5), 
-    0 8px 12px rgba(218, 165, 32, 0.4);
+    0 20px 32px rgba(30, 144, 255, 0.5), 
+    0 8px 12px rgba(30, 144, 255, 0.4);
   filter: brightness(1.05);
 }
 
@@ -909,7 +806,7 @@ input[style*="background"] {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(139, 69, 19, 0.3) 50%, 
+    rgba(30, 144, 255, 0.3) 50%, 
     transparent 100%
   );
 }
@@ -928,25 +825,25 @@ input[style*="background"] {
   width: 100%;
   padding: 14px 18px;
   border-radius: 999px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   color: var(--text);
   font-weight: 600;
   letter-spacing: 0.02em;
   background: 
-    /* Subtle parchment texture */
+    /* Subtle texture */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(139, 69, 19, 0.02) 2px,
-      rgba(139, 69, 19, 0.02) 4px
+      rgba(30, 144, 255, 0.02) 2px,
+      rgba(30, 144, 255, 0.02) 4px
     ),
     linear-gradient(135deg, 
-      rgba(255, 248, 220, 0.8) 0%, 
-      rgba(253, 245, 230, 0.6) 100%
+      rgba(255, 255, 255, 0.8) 0%, 
+      rgba(240, 248, 255, 0.6) 100%
     );
   box-shadow: 
-    0 4px 8px rgba(139, 69, 19, 0.1),
+    0 4px 8px rgba(30, 144, 255, 0.1),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -959,21 +856,21 @@ input[style*="background"] {
 
 .btn-secondary:hover {
   transform: translateY(-1px);
-  border-color: rgba(218, 165, 32, 0.4);
+  border-color: rgba(30, 144, 255, 0.4);
   background: 
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(139, 69, 19, 0.03) 2px,
-      rgba(139, 69, 19, 0.03) 4px
+      rgba(30, 144, 255, 0.03) 2px,
+      rgba(30, 144, 255, 0.03) 4px
     ),
     linear-gradient(135deg, 
-      rgba(255, 248, 220, 0.9) 0%, 
-      rgba(253, 245, 230, 0.7) 100%
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(240, 248, 255, 0.7) 100%
     );
   box-shadow: 
-    0 6px 12px rgba(139, 69, 19, 0.15),
+    0 6px 12px rgba(30, 144, 255, 0.15),
     inset 0 1px 2px rgba(255, 255, 255, 0.4);
   color: var(--brand);
 }
@@ -991,23 +888,23 @@ input[style*="background"] {
   z-index: 100; /* Ensure links are on top */
 }
 .links a {
-  color: var(--text-light);
+  color: #1E90FF;
   font-weight: 700;
   text-decoration: none;
   transition: color 0.2s ease;
   position: relative;
   z-index: 101; /* Ensure clickable area is accessible */
   pointer-events: auto; /* Explicitly enable pointer events */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Add shadow for better readability */
+  text-shadow: none;
 }
 
 .links a:hover {
-  color: #FFD700;
+  color: #1E90FF;
   text-decoration: underline;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.4);
 }
 .links .muted {
-  color: rgba(255, 249, 230, 0.8);
+  color: rgba(90, 122, 146, 0.8);
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -1038,25 +935,25 @@ input[style*="background"] {
 }
 
 .email-display .label {
-  color: var(--text-light);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
 .email-display .email-value {
-  color: var(--text-light);
+  color: var(--text);
   font-size: 16px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(218, 165, 32, 0.3);
+  border-bottom: 1px solid rgba(30, 144, 255, 0.3);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   opacity: 0.9;
 }
 
 .forgot-link {
   float: right;
-  color: var(--accent-gold) !important;
+  color: var(--accent-blue) !important;
   font-size: 13px;
   text-decoration: none;
   font-weight: 500;
@@ -1065,9 +962,9 @@ input[style*="background"] {
 }
 
 .forgot-link:hover {
-  color: #FFD700 !important;
+  color: #1E90FF !important;
   text-decoration: underline;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.4);
 }
 
 .back-link {
@@ -1078,19 +975,19 @@ input[style*="background"] {
 .go-back {
   background: none;
   border: none;
-  color: var(--text-light);
+  color: var(--muted);
   font-size: 14px;
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 6px;
   transition: all 0.2s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
 .go-back:hover {
-  background: rgba(218, 165, 32, 0.1);
-  color: var(--accent-gold);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 144, 255, 0.1);
+  color: var(--accent-blue);
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.4);
 }
 
 .signup-link {
@@ -1102,15 +999,15 @@ input[style*="background"] {
   width: 100%;
   padding: 14px 18px;
   border-radius: 999px;
-  border: 2px solid rgba(139, 69, 19, 0.2);
+  border: 2px solid rgba(30, 144, 255, 0.2);
   background: 
-    /* Parchment texture overlay */
-    radial-gradient(circle at 20% 30%, rgba(218, 165, 32, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.06) 0%, transparent 40%),
-    /* Wood grain texture */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.03) 0.8px, transparent 2.5px),
-    /* Base cream gradient */
-    linear-gradient(135deg, #FFF9E6 0%, #F5F5DC 50%, #FFF8DC 100%);
+    /* Light texture overlay */
+    radial-gradient(circle at 20% 30%, rgba(30, 144, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(65, 105, 225, 0.06) 0%, transparent 40%),
+    /* Subtle texture */
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.03) 0.8px, transparent 2.5px),
+    /* Base white gradient */
+    linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 50%, #E8F4FF 100%);
   color: var(--text);
   text-decoration: none;
   display: flex;
@@ -1123,8 +1020,8 @@ input[style*="background"] {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   box-shadow: 
-    0 8px 32px rgba(139, 69, 19, 0.15),
-    0 4px 16px rgba(139, 69, 19, 0.1),
+    0 8px 32px rgba(30, 144, 255, 0.15),
+    0 4px 16px rgba(30, 144, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
@@ -1138,9 +1035,9 @@ input[style*="background"] {
   right: 0;
   bottom: 0;
   background: linear-gradient(45deg, 
-    rgba(218, 165, 32, 0.05) 0%, 
+    rgba(30, 144, 255, 0.05) 0%, 
     transparent 50%, 
-    rgba(160, 82, 45, 0.08) 100%
+    rgba(65, 105, 225, 0.08) 100%
   );
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1149,10 +1046,10 @@ input[style*="background"] {
 
 .btn-google:hover {
   transform: translateY(-2px);
-  border-color: rgba(218, 165, 32, 0.4);
+  border-color: rgba(30, 144, 255, 0.4);
   box-shadow: 
-    0 12px 40px rgba(139, 69, 19, 0.2),
-    0 6px 20px rgba(139, 69, 19, 0.15),
+    0 12px 40px rgba(30, 144, 255, 0.2),
+    0 6px 20px rgba(30, 144, 255, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
@@ -1164,9 +1061,9 @@ input[style*="background"] {
 .btn-google:active {
   transform: translateY(0);
   box-shadow: 
-    0 4px 16px rgba(139, 69, 19, 0.2),
-    0 2px 8px rgba(139, 69, 19, 0.15),
-    inset 0 2px 4px rgba(139, 69, 19, 0.1);
+    0 4px 16px rgba(30, 144, 255, 0.2),
+    0 2px 8px rgba(30, 144, 255, 0.15),
+    inset 0 2px 4px rgba(30, 144, 255, 0.1);
 }
 
 .google-icon {
@@ -1180,16 +1077,16 @@ input[style*="background"] {
   width: 100%;
   padding: 14px 18px;
   border-radius: 999px;
-  border: 2px solid rgba(139, 69, 19, 0.1);
+  border: 2px solid rgba(30, 144, 255, 0.1);
   background: 
-    /* Lighter parchment texture */
-    radial-gradient(circle at 20% 30%, rgba(218, 165, 32, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.03) 0%, transparent 40%),
-    /* Subtle wood grain texture */
-    repeating-linear-gradient(23deg, rgba(139, 69, 19, 0.02) 0.8px, transparent 2.5px),
-    /* Muted cream gradient */
+    /* Lighter texture */
+    radial-gradient(circle at 20% 30%, rgba(30, 144, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(65, 105, 225, 0.03) 0%, transparent 40%),
+    /* Subtle texture */
+    repeating-linear-gradient(23deg, rgba(30, 144, 255, 0.02) 0.8px, transparent 2.5px),
+    /* Muted gradient */
     linear-gradient(135deg, #F8F8F8 0%, #F0F0F0 50%, #EEEEEE 100%);
-  color: rgba(45, 24, 16, 0.6);
+  color: rgba(26, 58, 82, 0.6);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -1201,8 +1098,8 @@ input[style*="background"] {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   cursor: not-allowed;
   box-shadow: 
-    0 4px 16px rgba(139, 69, 19, 0.08),
-    0 2px 8px rgba(139, 69, 19, 0.05),
+    0 4px 16px rgba(30, 144, 255, 0.08),
+    0 2px 8px rgba(30, 144, 255, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
