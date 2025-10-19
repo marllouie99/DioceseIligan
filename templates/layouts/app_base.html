@@ -36,8 +36,8 @@
     </div>
   </div>
 
-  <!-- Chat Widget -->
-  {% if user.is_authenticated %}
+  <!-- Chat Widget (hidden in super admin mode) -->
+  {% if user.is_authenticated and not is_admin_mode %}
   {% include 'partials/chat_widget.html' %}
   {% endif %}
 
@@ -71,8 +71,8 @@
   <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/post-bookmark.js' %}?v={{ STATIC_VERSION }}"></script>
   
-  <!-- Load chat widget -->
-  {% if user.is_authenticated %}
+  <!-- Load chat widget (hidden in super admin mode) -->
+  {% if user.is_authenticated and not is_admin_mode %}
   <script defer src="{% static 'js/components/chat-widget.js' %}?v={{ STATIC_VERSION }}"></script>
   {% endif %}
   
