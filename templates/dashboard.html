@@ -490,21 +490,47 @@
           <div class="main-content">
             <!-- Social Media Style Post Creation for Church Owners -->
             {% if owned_churches and post_form %}
+            
+            <!-- Church Context Selector (for multiple churches) -->
+            {% if owned_churches.count > 1 %}
+            <div class="church-context-selector" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(30, 144, 255, 0.15); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; color: #1E90FF; flex-shrink: 0;">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <div style="flex: 1;">
+                  <label for="dashboard-church-selector" style="display: block; font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 500;">Posting as:</label>
+                  <select id="dashboard-church-selector" class="form-select" style="width: 100%; padding: 10px 14px; border: 1px solid rgba(30, 144, 255, 0.2); border-radius: 8px; font-size: 14px; font-weight: 600; color: #1A3A52; background: white; cursor: pointer; transition: all 0.2s;">
+                    {% for church in owned_churches %}
+                      <option value="{{ church.id }}" 
+                              data-logo="{% if church.logo %}{{ church.logo.url }}{% endif %}"
+                              data-name="{{ church.name }}"
+                              {% if forloop.first %}selected{% endif %}>
+                        {{ church.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            
             <div class="social-post-creation">
               <div class="post-creation-card">
                 <!-- Church Avatar and Input Bar -->
                 <div class="post-input-section">
-                  <div class="church-avatar">
+                  <div class="church-avatar" id="dashboard-church-avatar">
                     {% if owned_churches.first %}
                       {% if owned_churches.first.logo %}
-                        <img src="{{ owned_churches.first.logo.url }}" alt="{{ owned_churches.first.name }}">
+                        <img src="{{ owned_churches.first.logo.url }}" alt="{{ owned_churches.first.name }}" id="dashboard-church-avatar-img">
                       {% else %}
-                        <div class="church-avatar-placeholder">
+                        <div class="church-avatar-placeholder" id="dashboard-church-avatar-placeholder">
                           {{ owned_churches.first.name|default:"C"|first|upper }}
                         </div>
                       {% endif %}
                     {% else %}
-                      <div class="church-avatar-placeholder">
+                      <div class="church-avatar-placeholder" id="dashboard-church-avatar-placeholder">
                         C
                       </div>
                     {% endif %}
@@ -1661,6 +1687,72 @@ document.addEventListener('DOMContentLoaded', function() {
             if (editModal.style.display === 'flex') closeEditModal();
         }
     });
+    
+    // ========================================
+    // Church Context Selector
+    // ========================================
+    const dashboardChurchSelector = document.getElementById('dashboard-church-selector');
+    const dashboardChurchAvatar = document.getElementById('dashboard-church-avatar');
+    const postInputTrigger = document.getElementById('post-input-trigger');
+    const churchSelectInModal = document.getElementById('church-select');
+    const hiddenChurchInput = document.querySelector('input[name="church_id"]');
+    
+    if (dashboardChurchSelector) {
+        // Load saved church selection from localStorage
+        const savedChurchId = localStorage.getItem('dashboard_selected_church_id');
+        if (savedChurchId) {
+            const option = dashboardChurchSelector.querySelector(`option[value="${savedChurchId}"]`);
+            if (option) {
+                dashboardChurchSelector.value = savedChurchId;
+                updateChurchContext(savedChurchId);
+            }
+        }
+        
+        // Handle church selection change
+        dashboardChurchSelector.addEventListener('change', function() {
+            const selectedChurchId = this.value;
+            const selectedOption = this.options[this.selectedIndex];
+            
+            // Save to localStorage
+            localStorage.setItem('dashboard_selected_church_id', selectedChurchId);
+            
+            // Update UI
+            updateChurchContext(selectedChurchId);
+        });
+        
+        function updateChurchContext(churchId) {
+            const option = dashboardChurchSelector.querySelector(`option[value="${churchId}"]`);
+            if (!option) return;
+            
+            const churchLogo = option.dataset.logo;
+            const churchName = option.dataset.name;
+            
+            // Update avatar in post creation card
+            if (dashboardChurchAvatar) {
+                if (churchLogo) {
+                    dashboardChurchAvatar.innerHTML = `<img src="${churchLogo}" alt="${churchName}" id="dashboard-church-avatar-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                } else {
+                    const initial = churchName.charAt(0).toUpperCase();
+                    dashboardChurchAvatar.innerHTML = `<div class="church-avatar-placeholder" id="dashboard-church-avatar-placeholder" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; font-weight: 700; font-size: 1.5rem; border-radius: 50%;">${initial}</div>`;
+                }
+            }
+            
+            // Update placeholder text
+            if (postInputTrigger) {
+                postInputTrigger.placeholder = `What's happening at ${churchName}?`;
+            }
+            
+            // Pre-select church in modal
+            if (churchSelectInModal) {
+                churchSelectInModal.value = churchId;
+            }
+            
+            // Update hidden input if exists
+            if (hiddenChurchInput) {
+                hiddenChurchInput.value = churchId;
+            }
+        }
+    }
 });
 </script>
 {% endblock %}
