@@ -192,6 +192,23 @@ class TabManager {
     if (activeButton) {
       activeButton.classList.add('active');
       activeButton.setAttribute('aria-selected', 'true');
+
+      // If switching to appointments, optimistically hide the badge and
+      // ask the backend to mark booking notifications as read for this church
+      if (targetTab === 'appointments') {
+        try {
+          const badge = activeButton.querySelector('.notification-badge');
+          if (badge) {
+            badge.style.display = 'none';
+          }
+          const url = new URL(window.location.href);
+          url.searchParams.set('ajax_mark_read', '1');
+          fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .catch(err => console.warn('Failed to mark booking notifications as read:', err));
+        } catch (e) {
+          console.warn('Error clearing appointment badge:', e);
+        }
+      }
     }
     if (activePanel) {
       activePanel.classList.add('active');

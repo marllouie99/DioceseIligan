@@ -368,22 +368,6 @@ def select_church(request):
     if churches.count() == 1:
         return redirect('core:manage_church', church_id=churches.first().id)
     
-    # Get notification counts for each church
-    for church in churches:
-        church.unread_booking_count = Notification.objects.filter(
-            user=request.user,
-            is_read=False,
-            notification_type__in=[
-                Notification.TYPE_BOOKING_REQUESTED,
-                Notification.TYPE_BOOKING_REVIEWED,
-                Notification.TYPE_BOOKING_APPROVED,
-                Notification.TYPE_BOOKING_DECLINED,
-                Notification.TYPE_BOOKING_CANCELED,
-                Notification.TYPE_BOOKING_COMPLETED
-            ],
-            church=church
-        ).count()
-    
     ctx = {
         'churches': churches,
     }
@@ -419,21 +403,29 @@ def manage_church(request, church_id=None):
         messages.error(request, "You don't have permission to manage this church.")
         return redirect('core:select_church')
     
-    # Mark booking notifications as read when viewing appointments tab
-    current_tab = request.GET.get('tab', 'overview')
-    if current_tab == 'appointments':
+    # AJAX: mark booking notifications as read when appointments tab is activated via JS
+    # This avoids requiring a full page reload just to clear the badge
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('ajax_mark_read') == '1':
+        # Only clear new booking request notifications for this church (owner-facing)
         Notification.objects.filter(
             user=request.user,
             is_read=False,
-            notification_type__in=[
-                Notification.TYPE_BOOKING_REQUESTED,
-                Notification.TYPE_BOOKING_REVIEWED,
-                Notification.TYPE_BOOKING_APPROVED,
-                Notification.TYPE_BOOKING_DECLINED,
-                Notification.TYPE_BOOKING_CANCELED,
-                Notification.TYPE_BOOKING_COMPLETED
-            ]
-        ).update(is_read=True)
+            notification_type=Notification.TYPE_BOOKING_REQUESTED,
+            church=church
+        ).update(is_read=True, read_at=timezone.now())
+        return JsonResponse({'success': True})
+    
+    # Mark booking notifications as read when viewing appointments tab
+    # Only mark notifications for THIS church's bookings
+    current_tab = request.GET.get('tab', 'overview')
+    if current_tab == 'appointments':
+        # Clear owner-facing booking request notifications for this church
+        Notification.objects.filter(
+            user=request.user,
+            is_read=False,
+            notification_type=Notification.TYPE_BOOKING_REQUESTED,
+            church=church
+        ).update(is_read=True, read_at=timezone.now())
     
     if request.method == 'POST' and request.POST.get('form_type') != 'verification':
         form = ChurchUpdateForm(request.POST, request.FILES, instance=church)
@@ -442,7 +434,7 @@ def manage_church(request, church_id=None):
             # when initialized with instance=church
             church = form.save()
             messages.success(request, 'Church information has been updated successfully!')
-            return redirect('core:manage_church')
+            return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -730,6 +722,15 @@ def manage_church(request, church_id=None):
     top_services_by_bookings = church.bookable_services.annotate(
         booking_count=Count('bookings')
     ).filter(booking_count__gt=0).order_by('-booking_count')[:5]
+    
+    # Get unread booking notifications for THIS specific church
+    # Only count REQUESTED bookings (pending appointments) for the badge
+    unread_booking_notifications_for_church = Notification.objects.filter(
+        user=request.user,
+        is_read=False,
+        notification_type=Notification.TYPE_BOOKING_REQUESTED,
+        church=church
+    ).count()
 
     ctx = {
         'active': 'manage',
@@ -744,6 +745,7 @@ def manage_church(request, church_id=None):
         'appt_status': appt_status,
         'latest_verification': church.verification_requests.order_by('-created_at').first(),
         'decline_reasons': list(church.decline_reasons.order_by('order', 'id')),
+        'unread_booking_notifications': unread_booking_notifications_for_church,
         'posts': posts,
         'posts_count': posts_count,
         'event_posts': event_posts,
@@ -788,6 +790,8 @@ def manage_church(request, church_id=None):
         'top_services_by_bookings': top_services_by_bookings,
     }
     ctx.update(_app_context(request))
+    # Override global unread count with church-specific pending count for this page
+    ctx['unread_booking_notifications'] = unread_booking_notifications_for_church
     # AJAX partial for appointments list
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('partial') == 'appointments_list':
         return render(request, 'core/partials/appointments_list.html', {
@@ -802,9 +806,17 @@ def update_church_logo(request):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
-    church = request.user.owned_churches.first()
-    if not church:
-        return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
+    # Get church_id from POST data
+    church_id = request.POST.get('church_id')
+    try:
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            church = request.user.owned_churches.first()
+            if not church:
+                return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
+    except Church.DoesNotExist:
+        return JsonResponse({'success': False, 'message': "You don't have permission to update this church."}, status=403)
 
     file_obj = request.FILES.get('logo') or request.FILES.get('file') or request.FILES.get('image')
     if not file_obj:
@@ -861,9 +873,27 @@ def update_church_cover(request):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
-    church = request.user.owned_churches.first()
-    if not church:
-        return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
+    # Get church_id from POST data
+    church_id = request.POST.get('church_id')
+    
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        if church_id:
+            try:
+                church_id = int(church_id)
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'message': 'Invalid church ID.'}, status=400)
+            church = request.user.owned_churches.get(id=church_id)
+            logger.info(f"update_church_cover: Using church_id={church_id} from POST data")
+        else:
+            logger.warning(f"update_church_cover: No church_id provided for user {request.user.id}, falling back to first church")
+            church = request.user.owned_churches.first()
+            if not church:
+                return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
+    except Church.DoesNotExist:
+        return JsonResponse({'success': False, 'message': "You don't have permission to update this church."}, status=403)
 
     file_obj = request.FILES.get('cover_image') or request.FILES.get('file') or request.FILES.get('image')
     if not file_obj:
@@ -1739,24 +1769,26 @@ def super_admin_users(request):
 @login_required
 def manage_services(request):
     """Manage bookable services for a church."""
+    # Get church_id from GET parameters
+    church_id = request.GET.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            # Fallback to first church if no church_id provided
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(
+                    request,
+                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                )
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     # Search and filter functionality
     search_query = request.GET.get('search', '')
@@ -1803,24 +1835,26 @@ def manage_services(request):
 @login_required
 def create_service(request):
     """Create a new bookable service."""
+    # Get church_id from GET or POST parameters
+    church_id = request.GET.get('church_id') or request.POST.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            # Fallback to first church if no church_id provided
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(
+                    request,
+                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                )
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = BookableServiceForm(request.POST, request.FILES, church=church)
@@ -1846,7 +1880,7 @@ def create_service(request):
                     'service_id': service.id
                 })
             messages.success(request, f'Service "{service.name}" has been created successfully!')
-            return HttpResponseRedirect(reverse('core:manage_church') + '?tab=services')
+            return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -1879,26 +1913,14 @@ def create_service(request):
 @login_required
 def edit_service(request, service_id):
     """Edit a bookable service."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+    # Get the service first to determine its church
+    service = get_object_or_404(BookableService, id=service_id)
+    church = service.church
     
-    service = get_object_or_404(BookableService, id=service_id, church=church)
+    # Verify user owns this church
+    if church.owner != request.user:
+        messages.error(request, "You don't have permission to edit this service.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = BookableServiceForm(request.POST, request.FILES, instance=service, church=church)
@@ -1911,7 +1933,7 @@ def edit_service(request, service_id):
                     'service_id': service.id
                 })
             messages.success(request, f'Service "{service.name}" has been updated successfully!')
-            return HttpResponseRedirect(reverse('core:manage_church') + '?tab=services')
+            return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -1946,9 +1968,25 @@ def edit_service(request, service_id):
 @login_required
 def delete_service(request, service_id):
     """Delete a bookable service."""
+    # Get the service first to determine its church
+    service = get_object_or_404(BookableService, id=service_id)
+    church = service.church
+    
+    # Verify user owns this church
+    if church.owner != request.user:
+        messages.error(request, "You don't have permission to delete this service.")
+        return redirect('core:select_church')
+    
+    if request.method == 'POST':
+        service_name = service.name
+        service.delete()
+        messages.success(request, f'Service "{service_name}" has been deleted successfully!')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
+    
+    # If GET request, show confirmation page (keeping old logic below for compatibility)
     try:
-        church = request.user.owned_churches.first()
-        if not church:
+        old_church = request.user.owned_churches.first()
+        if not old_church:
             if request.user.is_superuser:
                 return redirect('core:super_admin_create_church')
             messages.info(
@@ -1987,26 +2025,14 @@ def delete_service(request, service_id):
 @login_required
 def manage_service_images(request, service_id):
     """Manage images for a specific service."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+    # Get the service first to determine its church
+    service = get_object_or_404(BookableService, id=service_id)
+    church = service.church
     
-    service = get_object_or_404(BookableService, id=service_id, church=church)
+    # Verify user owns this church
+    if church.owner != request.user:
+        messages.error(request, "You don't have permission to manage this service's images.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = ServiceImageForm(request.POST, request.FILES)
@@ -2078,24 +2104,26 @@ def delete_service_image(request, image_id):
 @login_required
 def manage_availability(request):
     """Manage church availability and closed dates."""
+    # Get church_id from GET parameters
+    church_id = request.GET.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            # Fallback to first church if no church_id provided
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(
+                    request,
+                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                )
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     # Get availability entries for the next 3 months
     from datetime import date, timedelta
@@ -2321,7 +2349,7 @@ def manage_booking(request, booking_id):
     booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
     if booking.church.owner != request.user:
         messages.error(request, 'You do not have permission to manage this booking.')
-        return redirect('core:manage_church')
+        return redirect('core:manage_church', church_id=booking.church.id)
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -2457,34 +2485,52 @@ def manage_booking(request, booking_id):
 @login_required
 def create_decline_reason(request):
     """Create a new decline reason for the owner's church."""
+    # Get church_id from POST or JSON data
+    is_ajax = request.headers.get('Content-Type') == 'application/json'
+    
+    if is_ajax:
+        import json
+        data = json.loads(request.body)
+        church_id = data.get('church_id')
+        # Convert to int if it's a string
+        if church_id:
+            try:
+                church_id = int(church_id)
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'message': 'Invalid church ID.'}, status=400)
+    else:
+        church_id = request.POST.get('church_id')
+        if church_id:
+            try:
+                church_id = int(church_id)
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid church ID.")
+                return redirect('core:select_church')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.headers.get('Content-Type') == 'application/json':
-                return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            # Log warning when falling back to first church
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"create_decline_reason: No church_id provided for user {request.user.id}, falling back to first church")
+            church = request.user.owned_churches.first()
+            if not church:
+                if is_ajax:
+                    return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
+        if is_ajax:
+            return JsonResponse({'success': False, 'message': 'You don\'t have permission to manage this church.'}, status=403)
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
 
     if request.method != 'POST':
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
-
-    # Check if this is an AJAX/JSON request
-    is_ajax = request.headers.get('Content-Type') == 'application/json'
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
     
     if is_ajax:
         import json
@@ -2499,7 +2545,7 @@ def create_decline_reason(request):
         if is_ajax:
             return JsonResponse({'success': False, 'message': 'Reason label is required.'}, status=400)
         messages.error(request, 'Reason label is required.')
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
     # Determine next order
     next_order = (church.decline_reasons.aggregate(c=Count('id'))['c'] or 0)
@@ -2520,71 +2566,43 @@ def create_decline_reason(request):
         if is_ajax:
             return JsonResponse({'success': False, 'message': 'A reason with this label already exists.'}, status=400)
         messages.info(request, 'A reason with this label already exists.')
-    return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+    return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
 
 @login_required
 def delete_decline_reason(request, reason_id):
     """Delete a decline reason belonging to the owner's church."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.headers.get('Content-Type') == 'application/json':
-                return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
+    # Get the reason first to determine its church
+    reason = get_object_or_404(DeclineReason, id=reason_id)
+    church = reason.church
+    
+    # Verify user owns this church
+    if church.owner != request.user:
         if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
-
-    reason = get_object_or_404(DeclineReason, id=reason_id, church=church)
+            return JsonResponse({'success': False, 'message': 'You don\'t have permission to manage this church.'}, status=403)
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     if request.method == 'POST':
         reason.delete()
         if request.headers.get('Content-Type') == 'application/json':
             return JsonResponse({'success': True, 'message': 'Decline reason removed.'})
         messages.success(request, 'Decline reason removed.')
-    return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+    return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
 
 @login_required
 def toggle_decline_reason(request, reason_id):
     """Toggle active state of a decline reason belonging to the owner's church."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.headers.get('Content-Type') == 'application/json':
-                return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
+    # Get the reason first to determine its church
+    reason = get_object_or_404(DeclineReason, id=reason_id)
+    church = reason.church
+    
+    # Verify user owns this church
+    if church.owner != request.user:
         if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'You don\'t own any churches.'}, status=403)
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
-
-    reason = get_object_or_404(DeclineReason, id=reason_id, church=church)
+            return JsonResponse({'success': False, 'message': 'You don\'t have permission to manage this church.'}, status=403)
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     if request.method == 'POST':
         # Check if JSON request to parse body
         if request.headers.get('Content-Type') == 'application/json':
@@ -2635,27 +2653,30 @@ def booking_invoice(request, booking_id):
 @login_required
 def request_verification(request):
     """Owner submits legal documents for church verification (requires at least 2)."""
+    # Get church_id from POST parameters
+    church_id = request.POST.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            # JSON path for AJAX
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'message': "You don't own any churches yet."}, status=403)
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'message': "You don't own any churches yet."}, status=403)
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                return redirect('core:home')
     except Church.DoesNotExist:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'message': "You don't own any churches yet."}, status=403)
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-        return redirect('core:home')
+            return JsonResponse({'success': False, 'message': "You don't have permission to manage this church."}, status=403)
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
 
     if request.method != 'POST':
         # Redirect to settings tab where the form lives
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
     # Disallow multiple pending requests
     existing_pending = church.verification_requests.filter(status=ChurchVerificationRequest.STATUS_PENDING).first()
@@ -2663,7 +2684,7 @@ def request_verification(request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'message': 'You already have a pending verification request.'}, status=400)
         messages.info(request, 'You already have a pending verification request. Our team will review it soon.')
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
     form = ChurchVerificationUploadForm(request.POST, request.FILES)
     if not form.is_valid():
@@ -2674,7 +2695,7 @@ def request_verification(request):
         for field, errs in form.errors.items():
             for err in errs:
                 messages.error(request, f"{field}: {err}")
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
     # Create request and documents
     ver_req = ChurchVerificationRequest.objects.create(
@@ -2694,7 +2715,7 @@ def request_verification(request):
         return JsonResponse({'success': True, 'message': 'Verification request submitted', 'request_id': ver_req.id})
 
     messages.success(request, 'Your verification request has been submitted. We will notify you once it is reviewed.')
-    return HttpResponseRedirect(reverse('core:manage_church') + '?tab=settings')
+    return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=settings')
 
 
 @login_required
@@ -2967,18 +2988,22 @@ def reject_verification(request, request_id):
 @login_required
 def create_availability(request):
     """Create a new availability entry."""
+    # Get church_id from GET or POST parameters
+    church_id = request.GET.get('church_id') or request.POST.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-        return redirect('core:home')
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = AvailabilityForm(request.POST, church=church)
@@ -2986,7 +3011,7 @@ def create_availability(request):
             try:
                 availability = form.save()
                 messages.success(request, f'Availability entry for {availability.date} has been created successfully!')
-                return HttpResponseRedirect(reverse('core:manage_church') + '?tab=availability')
+                return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
             except IntegrityError:
                 # Handle duplicate entry - redirect to edit existing entry
                 existing_availability = Availability.objects.get(church=church, date=form.cleaned_data['date'])
@@ -3007,7 +3032,7 @@ def create_availability(request):
                 # Check if the date is in the past
                 if parsed_date < date.today():
                     messages.error(request, 'Cannot create availability entries for past dates.')
-                    return HttpResponseRedirect(reverse('core:manage_church') + '?tab=availability')
+                    return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
                 
                 initial_data['date'] = parsed_date
             except ValueError:
@@ -3028,27 +3053,21 @@ def create_availability(request):
 @login_required
 def edit_availability(request, availability_id):
     """Edit an availability entry."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-            return redirect('core:home')
-    except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-        return redirect('core:home')
+    # Get the availability first to determine its church
+    availability = get_object_or_404(Availability, id=availability_id)
+    church = availability.church
     
-    availability = get_object_or_404(Availability, id=availability_id, church=church)
+    # Verify user owns this church
+    if church.owner != request.user:
+        messages.error(request, "You don't have permission to edit this availability entry.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = AvailabilityForm(request.POST, instance=availability, church=church)
         if form.is_valid():
             form.save()
             messages.success(request, f'Availability entry for {availability.date} has been updated successfully!')
-            return HttpResponseRedirect(reverse('core:manage_church') + '?tab=availability')
+            return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -3068,26 +3087,20 @@ def edit_availability(request, availability_id):
 @login_required
 def delete_availability(request, availability_id):
     """Delete an availability entry."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-            return redirect('core:home')
-    except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-        return redirect('core:home')
+    # Get the availability first to determine its church
+    availability = get_object_or_404(Availability, id=availability_id)
+    church = availability.church
     
-    availability = get_object_or_404(Availability, id=availability_id, church=church)
+    # Verify user owns this church
+    if church.owner != request.user:
+        messages.error(request, "You don't have permission to delete this availability entry.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         availability_date = availability.date
         availability.delete()
         messages.success(request, f'Availability entry for {availability_date} has been deleted successfully!')
-        return HttpResponseRedirect(reverse('core:manage_church') + '?tab=availability')
+        return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
     
     ctx = {
         'active': 'manage',
@@ -3102,18 +3115,22 @@ def delete_availability(request, availability_id):
 @login_required
 def bulk_availability(request):
     """Handle bulk availability management."""
+    # Get church_id from POST parameters
+    church_id = request.POST.get('church_id')
+    
     try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-            return redirect('core:home')
+        if church_id:
+            church = request.user.owned_churches.get(id=church_id)
+        else:
+            church = request.user.owned_churches.first()
+            if not church:
+                if request.user.is_superuser:
+                    return redirect('core:super_admin_create_church')
+                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                return redirect('core:home')
     except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-        return redirect('core:home')
+        messages.error(request, "You don't have permission to manage this church.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = AvailabilityBulkForm(request.POST)
