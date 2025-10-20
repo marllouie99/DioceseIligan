@@ -80,6 +80,14 @@ class TabManager {
     if (activeButton) {
       activeButton.classList.add('active');
       activeButton.setAttribute('aria-selected', 'true');
+      
+      // Clear notification badge when appointments tab is clicked
+      if (targetTab === 'appointments') {
+        const badge = activeButton.querySelector('.notification-badge');
+        if (badge) {
+          badge.style.display = 'none';
+        }
+      }
     }
     if (activePanel) {
       activePanel.classList.add('active');

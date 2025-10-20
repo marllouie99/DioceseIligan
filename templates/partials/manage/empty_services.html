@@ -6,7 +6,7 @@
   </svg>
   <h3>No Bookable Services Yet</h3>
   <p>Create services that people can book appointments for, like counseling sessions, baptisms, or consultations.</p>
-  <a href="{% url 'core:create_service' %}" class="btn btn-primary">
+  <a href="{% url 'core:create_service' %}?church_id={{ church.id }}" class="btn btn-primary">
     {% include 'partials/icons/plus.html' %}
     Create First Service
   </a>

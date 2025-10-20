@@ -27,7 +27,7 @@
 
 {% block content %}
 {# Church Management Page #}
-<div class="manage-church-page blue-sky page-container">
+<div class="manage-church-page blue-sky page-container" data-church-id="{{ church.id }}">
   {# Page Header #}
   {% include 'partials/manage/page_header.html' %}
   
@@ -83,10 +83,33 @@
 
 {% block extra_js %}
 {# CSRF Token for AJAX requests #}
-{% csrf_token %}
 <script>
-  // Make CSRF token available for AJAX requests
+  const csrfToken = '{{ csrf_token }}';
   window.csrfToken = '{{ csrf_token }}';
+  
+  // Current church ID for multi-church context
+  const CURRENT_CHURCH_ID = {{ church.id }};
+  window.CURRENT_CHURCH_ID = {{ church.id }};
+  
+  // Helper function to build URLs with church_id
+  function buildChurchUrl(path, params = {}) {
+    // If path already includes church_id, return as is
+    if (path.includes(`/manage-church/${CURRENT_CHURCH_ID}/`)) {
+      const url = new URL(path, window.location.origin);
+      Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
+      return url.toString();
+    }
+    
+    // Add church_id to path
+    let newPath = path;
+    if (path.includes('/manage-church/') && !path.match(/\/manage-church\/\d+\//)) {
+      newPath = path.replace('/manage-church/', `/manage-church/${CURRENT_CHURCH_ID}/`);
+    }
+    
+    const url = new URL(newPath, window.location.origin);
+    Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
+    return url.toString();
+  }
 </script>
 {# External Libraries #}
 <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
@@ -97,7 +120,7 @@
     window.djangoUrls = {
       updateChurchLogo: "{% url 'core:update_church_logo' %}",
       updateChurchCover: "{% url 'core:update_church_cover' %}",
-      createAvailability: "{% url 'core:create_availability' %}?date=0",
+      createAvailability: "{% url 'core:create_availability' %}?church_id={{ church.id }}&date=0",
       manageServiceImages: "{% url 'core:manage_service_images' 0 %}",
       serviceGallery: "{% url 'core:service_gallery' 0 %}",
       requestVerification: "{% url 'core:request_verification' %}",

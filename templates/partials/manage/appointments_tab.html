@@ -130,11 +130,11 @@
     </div>
 
     <div class="status-pills">
-      <a class="status-pill {% if appt_status == 'all' %}active{% endif %}" data-status="all" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=all">All <span class="count">{{ booking_counts.all }}</span></a>
-      <a class="status-pill {% if appt_status == 'requested' %}active{% endif %}" data-status="requested" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=requested">Pending <span class="count">{{ booking_counts.requested }}</span></a>
-      <a class="status-pill {% if appt_status == 'reviewed' %}active{% endif %}" data-status="reviewed" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=reviewed">Reviewed <span class="count">{{ booking_counts.reviewed }}</span></a>
-      <a class="status-pill {% if appt_status == 'approved' %}active{% endif %}" data-status="approved" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=approved">Approved <span class="count">{{ booking_counts.approved }}</span></a>
-      <a class="status-pill {% if appt_status == 'completed' %}active{% endif %}" data-status="completed" href="{% url 'core:manage_church' %}?tab=appointments&appt_status=completed">Completed <span class="count">{{ booking_counts.completed }}</span></a>
+      <a class="status-pill {% if appt_status == 'all' %}active{% endif %}" data-status="all" href="{% url 'core:manage_church' church_id=church.id %}?tab=appointments&appt_status=all">All <span class="count">{{ booking_counts.all }}</span></a>
+      <a class="status-pill {% if appt_status == 'requested' %}active{% endif %}" data-status="requested" href="{% url 'core:manage_church' church_id=church.id %}?tab=appointments&appt_status=requested">Pending <span class="count">{{ booking_counts.requested }}</span></a>
+      <a class="status-pill {% if appt_status == 'reviewed' %}active{% endif %}" data-status="reviewed" href="{% url 'core:manage_church' church_id=church.id %}?tab=appointments&appt_status=reviewed">Reviewed <span class="count">{{ booking_counts.reviewed }}</span></a>
+      <a class="status-pill {% if appt_status == 'approved' %}active{% endif %}" data-status="approved" href="{% url 'core:manage_church' church_id=church.id %}?tab=appointments&appt_status=approved">Approved <span class="count">{{ booking_counts.approved }}</span></a>
+      <a class="status-pill {% if appt_status == 'completed' %}active{% endif %}" data-status="completed" href="{% url 'core:manage_church' church_id=church.id %}?tab=appointments&appt_status=completed">Completed <span class="count">{{ booking_counts.completed }}</span></a>
     </div>
     <div id="appointments-list">
       {% include 'core/partials/appointments_list.html' %}

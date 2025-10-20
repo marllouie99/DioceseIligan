@@ -2,7 +2,7 @@
 {# Settings Content Area #}
 <div class="settings-content">
   <div class="settings-container">
-    <form method="post" enctype="multipart/form-data" class="church-form" id="church-update-form">
+    <form method="post" action="{% url 'core:manage_church' church_id=church.id %}" enctype="multipart/form-data" class="church-form" id="church-update-form">
       {% csrf_token %}
 
       {# Basic Information Section #}

@@ -31,7 +31,7 @@
         <p class="page-subtitle">Manage booking information and status updates</p>
       </div>
       <div class="header-actions">
-        <a href="{% url 'core:manage_church' %}?tab=appointments" class="btn btn-secondary">Back to Appointments</a>
+        <a href="{% url 'core:manage_church' church_id=booking.church.id %}?tab=appointments" class="btn btn-secondary">Back to Appointments</a>
       </div>
     </div>
   </div>

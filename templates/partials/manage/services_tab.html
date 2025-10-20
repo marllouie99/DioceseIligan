@@ -166,7 +166,7 @@
     <div class="services-management">
       <div class="services-header">
         <h3>Available Services</h3>
-        <a href="{% url 'core:create_service' %}" class="btn btn-primary" aria-label="Create New Service">
+        <a href="{% url 'core:create_service' %}?church_id={{ church.id }}" class="btn btn-primary" aria-label="Create New Service">
           {% include 'partials/icons/plus.html' %}
           Create New Service
         </a>

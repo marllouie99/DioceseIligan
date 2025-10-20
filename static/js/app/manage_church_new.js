@@ -24,6 +24,48 @@ class ChurchManagementApp {
     };
     // Keep references to created charts so we can update/destroy
     this.chartInstances = {};
+    // Get and store the current church ID from the page
+    this.churchId = this.getCurrentChurchId();
+  }
+
+  /**
+   * Get the current church ID from the page data attribute
+   * @returns {string|null} The church ID or null if not found
+   */
+  getCurrentChurchId() {
+    const container = document.querySelector('.manage-church-page');
+    if (container) {
+      return container.getAttribute('data-church-id');
+    }
+    return null;
+  }
+
+  /**
+   * Build URL with church_id parameter
+   * @param {string} baseUrl - The base URL
+   * @param {object} params - Additional query parameters
+   * @returns {string} Complete URL with church_id
+   */
+  buildChurchUrl(baseUrl, params = {}) {
+    const url = new URL(baseUrl, window.location.origin);
+    
+    // Add church_id if available
+    if (this.churchId) {
+      // If baseUrl doesn't already include church_id in path
+      if (!baseUrl.includes(`/manage-church/${this.churchId}/`)) {
+        // Check if we need to modify the path
+        if (baseUrl.includes('/manage-church/') && !baseUrl.match(/\/manage-church\/\d+\//)) {
+          url.pathname = url.pathname.replace('/manage-church/', `/manage-church/${this.churchId}/`);
+        }
+      }
+    }
+    
+    // Add additional parameters
+    Object.keys(params).forEach(key => {
+      url.searchParams.set(key, params[key]);
+    });
+    
+    return url.toString();
   }
 
   /**
@@ -768,11 +810,14 @@ class ChurchManagementApp {
 
   /**
    * Initialize decline reasons functionality
+   * NOTE: The add button handler is now handled by the enhanced version below (line 3138+)
+   * which includes church_id in the request. This legacy handler is disabled to prevent
+   * duplicate POST requests.
    */
   initializeDeclineReasons() {
-    const addBtn = document.getElementById('add-decline-reason-btn');
-    const labelEl = document.getElementById('decline-reason-label');
-    const activeEl = document.getElementById('decline-reason-active');
+    // DISABLED: Legacy add button handler - now using enhanced version with church_id
+    // The enhanced handler is registered in the DOMContentLoaded event below (line 3138+)
+    
     const mainForm = document.getElementById('church-update-form');
     const csrfEl = mainForm ? mainForm.querySelector('input[name="csrfmiddlewaretoken"]') : null;
     const csrfToken = csrfEl ? csrfEl.value : '';
@@ -788,24 +833,6 @@ class ChurchManagementApp {
       const resp = await fetch(url, { method: 'POST', headers, body });
       return resp;
     };
-
-    if (addBtn && labelEl) {
-      addBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const label = (labelEl.value || '').trim();
-        if (!label) { labelEl.focus(); return; }
-        const is_active = activeEl && activeEl.checked ? 'on' : '';
-        const url = window.createDeclineReasonUrl;
-        try {
-          await post(url, { label, is_active });
-          // Keep user in settings -> decline reasons after reload
-          const base = window.location.pathname + '?tab=settings#decline-reasons-settings';
-          window.location.assign(base);
-        } catch (err) {
-          console.error('Failed to add decline reason', err);
-        }
-      });
-    }
 
     document.querySelectorAll('.dr-action[data-url]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -3113,6 +3140,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        const churchId = document.querySelector('.manage-church-page')?.dataset.churchId;
+        
+        console.log('Creating decline reason for church ID:', churchId);
+        
+        if (!churchId) {
+          console.error('Church ID not found! Check if .manage-church-page element has data-church-id attribute');
+          showDeclineReasonNotification('Error: Church ID not found. Please refresh the page.', 'error');
+          return;
+        }
+        
         const response = await fetch(window.createDeclineReasonUrl, {
           method: 'POST',
           headers: {
@@ -3121,7 +3158,8 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           body: JSON.stringify({
             label: label,
-            is_active: activeEl?.checked || false
+            is_active: activeEl?.checked || false,
+            church_id: churchId
           })
         });
 
@@ -3151,7 +3189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function addDeclineReasonToList(reason) {
-  const listContainer = document.querySelector('#decline-reasons-settings .setting-control ul.list');
+  let listContainer = document.querySelector('#decline-reasons-settings .setting-control ul.list');
   
   if (!listContainer) {
     // If no list exists, create one

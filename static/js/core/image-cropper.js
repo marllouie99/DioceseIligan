@@ -343,6 +343,11 @@ class ImageCropper {
     const fd = new FormData();
     if (type === 'logo') fd.append('logo', file);
     else fd.append('cover_image', file);
+    
+    // Add church_id if available
+    if (window.CURRENT_CHURCH_ID) {
+      fd.append('church_id', window.CURRENT_CHURCH_ID);
+    }
 
     const btnSelector = type === 'logo' ? '.preview-btn[data-target="id_logo"]' : '.preview-btn[data-target="id_cover_image"]';
     const btn = document.querySelector(btnSelector);
