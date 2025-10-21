@@ -1072,17 +1072,22 @@ def events(request):
         ChurchFollow.objects.filter(user=request.user).values_list('church_id', flat=True)
     )
 
-    # Common filter for upcoming, active event posts
-    base_filter = {
-        'is_active': True,
-        'post_type': 'event',
-        'church__is_active': True,
-        'event_start_date__gte': now,
-    }
+    # Common filter for active event posts including:
+    # - Upcoming events (start_date >= now)
+    # - Ongoing events (end_date >= now)
+    # - Undated events (both start and end are null)
+    base_q = (
+        Q(is_active=True, post_type='event', church__is_active=True)
+        & (
+            Q(event_start_date__gte=now)
+            | Q(event_end_date__gte=now)
+            | (Q(event_start_date__isnull=True) & Q(event_end_date__isnull=True))
+        )
+    )
 
     # Main events feed: from followed churches
     events_qs = (
-        Post.objects.filter(**base_filter, church_id__in=followed_ids)
+        Post.objects.filter(base_q, church_id__in=followed_ids)
         .select_related('church')
     )
 
@@ -1115,7 +1120,7 @@ def events(request):
     # Sidebar: other upcoming events from non-followed churches
     # Use a small limit for quick sidebar rendering
     other_events = (
-        Post.objects.filter(**base_filter)
+        Post.objects.filter(base_q)
         .exclude(church_id__in=followed_ids or [-1])
         .select_related('church')
         .order_by('event_start_date')[:5]
