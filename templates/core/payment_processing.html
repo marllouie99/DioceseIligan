@@ -1,0 +1,179 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}{{ payment_method }} Payment - ChurchConnect{% endblock %}
+
+{% block body_class %}page-payment{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
+  <style>
+    .payment-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+    
+    .payment-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .payment-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #E2E8F0;
+    }
+    
+    .payment-header h1 {
+      font-size: 2rem;
+      color: #1A3A52;
+      margin-bottom: 0.5rem;
+    }
+    
+    .payment-header p {
+      color: #64748B;
+      font-size: 1rem;
+    }
+    
+    .booking-summary {
+      background: #F8FAFC;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-label {
+      font-weight: 600;
+      color: #64748B;
+    }
+    
+    .summary-value {
+      font-weight: 700;
+      color: #1E293B;
+    }
+    
+    .payment-notice {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    
+    .payment-notice p {
+      margin: 0;
+      color: #78350F;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+    
+    .payment-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: #1E90FF;
+      color: white;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background: #1873CC;
+    }
+    
+    .btn-outline {
+      background: white;
+      color: #64748B;
+      border: 2px solid #E2E8F0;
+    }
+    
+    .btn-outline:hover {
+      border-color: #1E90FF;
+      color: #1E90FF;
+    }
+  </style>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+  <div class="payment-card">
+    <div class="payment-header">
+      <h1>{{ payment_method }} Payment</h1>
+      <p>Complete your appointment booking payment</p>
+    </div>
+    
+    <div class="booking-summary">
+      <h3 style="margin-top: 0; color: #1A3A52;">Booking Summary</h3>
+      <div class="summary-row">
+        <span class="summary-label">Appointment ID:</span>
+        <span class="summary-value">{{ booking.code }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Service:</span>
+        <span class="summary-value">{{ booking.service.name }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Church:</span>
+        <span class="summary-value">{{ booking.church.name }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Date:</span>
+        <span class="summary-value">{{ booking.date|date:"F j, Y" }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Time:</span>
+        <span class="summary-value">
+          {% if booking.start_time %}
+            {{ booking.start_time|time:"g:i A" }}
+            {% if booking.end_time %} - {{ booking.end_time|time:"g:i A" }}{% endif %}
+          {% else %}
+            Not set
+          {% endif %}
+        </span>
+      </div>
+    </div>
+    
+    <div class="payment-notice">
+      <p><strong>Payment Gateway Integration Coming Soon!</strong></p>
+      <p>{{ payment_method }} payment processing will be available soon. For now, please contact the church directly to arrange payment.</p>
+    </div>
+    
+    <div class="payment-actions">
+      <a href="{% url 'core:appointments' %}" class="btn btn-outline">Back to Appointments</a>
+      <a href="{% url 'core:church_detail' booking.church.slug %}" class="btn btn-primary">Contact Church</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

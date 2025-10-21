@@ -1178,8 +1178,13 @@
               </td>
               <td>
                 <div class="owner-cell">
+                  {% if church.owner %}
                   <div class="owner-name">{{ church.owner.get_full_name|default:church.owner.email }}</div>
                   <div class="owner-email">{{ church.owner.email }}</div>
+                  {% else %}
+                  <div class="owner-name" style="color: #ef4444; font-style: italic;">No Manager</div>
+                  <div class="owner-email" style="color: #9ca3af; font-size: 0.75rem;">—</div>
+                  {% endif %}
                 </div>
               </td>
               <td>

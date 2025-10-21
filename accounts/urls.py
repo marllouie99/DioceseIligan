@@ -21,6 +21,7 @@ urlpatterns = [
     path('google/callback/', views.google_callback, name='google_callback'),
     # API endpoints
     path('api/server-time/', views.server_time, name='server_time'),
+    path('api/load-more-activities/', views.load_more_activities, name='load_more_activities'),
     # Philippine Address API
     path('api/ph-regions/', ph_address_api.get_regions, name='ph_regions'),
     path('api/ph-provinces/', ph_address_api.get_provinces, name='ph_provinces'),

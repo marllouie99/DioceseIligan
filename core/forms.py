@@ -651,6 +651,9 @@ class BookingForm(forms.ModelForm):
         if self.service:
             booking.service = self.service
             booking.church = self.service.church
+            # Auto-populate payment amount from service price
+            if not self.service.is_free and self.service.price:
+                booking.payment_amount = self.service.price
         if self.user:
             booking.user = self.user
         booking.status = Booking.STATUS_REQUESTED
@@ -870,13 +873,13 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
     # User assignment field
     assigned_user = forms.ModelChoiceField(
         queryset=User.objects.none(),  # Will be set in __init__
-        required=True,
+        required=False,
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'required': True
+            'required': False
         }),
-        label="Assign Church Manager",
-        help_text="Select a user with complete profile (Name, Phone, Address, Date of Birth) to manage this church"
+        label="Assign Church Manager (Optional)",
+        help_text="Select a user with complete profile to manage this church. Leave empty for managerless church. Users who already manage another church are excluded."
     )
     
     class Meta:
@@ -1088,6 +1091,23 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
                 # Skip users without profiles or with errors
                 continue
         
+        # Exclude users who are already managing other churches
+        # (except the current owner if editing)
+        from .models import Church
+        existing_managers = Church.objects.exclude(
+            id=self.instance.pk if self.instance and self.instance.pk else None
+        ).filter(
+            owner__isnull=False
+        ).values_list('owner_id', flat=True)
+        
+        # Filter out users who are already managers
+        eligible_users = [uid for uid in eligible_users if uid not in existing_managers]
+        
+        # If editing and current owner exists, always include them in the list
+        if self.instance and self.instance.pk and self.instance.owner:
+            if self.instance.owner.id not in eligible_users:
+                eligible_users.append(self.instance.owner.id)
+        
         # Set queryset to only eligible users, ordered by email for easy selection
         self.fields['assigned_user'].queryset = User.objects.filter(
             id__in=eligible_users
@@ -1150,7 +1170,7 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
         
         # Make most fields optional for flexibility
         for field_name in self.fields:
-            if field_name not in ['name', 'description', 'email', 'phone', 'service_times', 'assigned_user']:
+            if field_name not in ['name', 'description', 'email', 'phone', 'service_times']:
                 self.fields[field_name].required = False
         
         # Set default values
@@ -1182,9 +1202,8 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
         is_reassignment = previous_owner and previous_owner != assigned_user
         is_new_assignment = not previous_owner and assigned_user
         
-        # Assign the selected user as the church owner
-        if assigned_user:
-            church.owner = assigned_user
+        # Assign the selected user as the church owner (or set to None if empty)
+        church.owner = assigned_user
         
         if commit:
             try:

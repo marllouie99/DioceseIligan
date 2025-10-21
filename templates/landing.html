@@ -16,7 +16,7 @@
         <div class="hero-carousel">
           <!-- Slide 1: Welcome & Mission -->
           <div class="hero-slide active" data-slide="0">
-            <h1>Connect Your Church Community</h1>
+            <h1>Connect Your Parish Community</h1>
             <p class="subtitle">Building stronger spiritual connections through technology and faith</p>
             
             <div class="mission-statement">
@@ -25,41 +25,46 @@
             </div>
           </div>
 
-          <!-- Slide 2: Testimonials -->
+          <!-- Slide 2: Community Posts -->
           <div class="hero-slide" data-slide="1">
-            <h2>What Church Leaders Say</h2>
-            <p class="subtitle">Trusted by pastors and church communities worldwide</p>
+            <h2>Community Highlights</h2>
+            <p class="subtitle">See what's happening in our church communities</p>
             
             <div class="testimonials">
-              <div class="testimonial">
-                <p class="testimonial-quote">"ChurchConnect has transformed how we manage our services and connect with our congregation. It's intuitive and perfectly designed for church needs."</p>
-                <p class="testimonial-author">— Pastor Maria Santos, Grace Community Church</p>
-              </div>
-              
-              <div class="testimonial">
-                <p class="testimonial-quote">"Our church growth increased by 40% since using ChurchConnect. The platform makes it easy for members to stay engaged and participate."</p>
-                <p class="testimonial-author">— Rev. David Kim, Faith Baptist Church</p>
-              </div>
+              {% if random_posts %}
+                {% for post in random_posts|slice:":2" %}
+                <div class="testimonial">
+                  <p class="testimonial-quote">"{{ post.content|truncatewords:30 }}"</p>
+                  <p class="testimonial-author">— {{ post.church.name }}</p>
+                  <p class="testimonial-date" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">{{ post.created_at|timesince }} ago</p>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="testimonial">
+                  <p class="testimonial-quote">"Join our growing community of churches connecting and sharing their faith journey."</p>
+                  <p class="testimonial-author">— ChurchConnect Community</p>
+                </div>
+              {% endif %}
             </div>
           </div>
 
           <!-- Slide 3: Stats & Impact -->
           <div class="hero-slide" data-slide="2">
             <h2>Growing Communities</h2>
-            <p class="subtitle">Join thousands of churches already using ChurchConnect</p>
+            <p class="subtitle">Real-time statistics from our active community</p>
             
             <div class="stats-bar">
               <div class="stat-item">
-                <span class="stat-number">500+</span>
-                <p class="stat-label">Churches</p>
+                <span class="stat-number">{{ total_churches|default:"0" }}</span>
+                <p class="stat-label">Active Churches</p>
               </div>
               <div class="stat-item">
-                <span class="stat-number">25K+</span>
-                <p class="stat-label">Members</p>
+                <span class="stat-number">{{ total_users|default:"0" }}</span>
+                <p class="stat-label">Total Users</p>
               </div>
               <div class="stat-item">
-                <span class="stat-number">98%</span>
-                <p class="stat-label">Satisfaction</p>
+                <span class="stat-number">{{ total_posts|default:"0" }}</span>
+                <p class="stat-label">Community Posts</p>
               </div>
             </div>
 

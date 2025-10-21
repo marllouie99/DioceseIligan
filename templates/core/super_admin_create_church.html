@@ -281,7 +281,7 @@
 <div class="blue-sky page-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
   <div class="page-header">
     <h1>{% if is_edit %}Edit Church{% else %}Create New Church{% endif %}</h1>
-    <p>{% if is_edit %}Update church information and reassign manager if needed{% else %}Create a new church and assign a user to manage it{% endif %}</p>
+    <p>{% if is_edit %}Update church information and reassign manager if needed. Church can be managerless or assigned to a new manager.{% else %}Create a new church and optionally assign a user to manage it. Users who already manage another church are excluded.{% endif %}</p>
   </div>
 
   {% if messages %}
@@ -297,7 +297,7 @@
     <div class="form-section">
       <h2 class="form-section-title">Church Manager Assignment</h2>
       <div class="form-group">
-        <label for="{{ form.assigned_user.id_for_label }}" class="form-label required">
+        <label for="{{ form.assigned_user.id_for_label }}" class="form-label">
           {{ form.assigned_user.label }}
         </label>
         {{ form.assigned_user }}
@@ -306,7 +306,7 @@
         {% endif %}
         {% if not form.assigned_user.field.queryset.exists %}
           <div style="background: #fef3c7; color: #92400e; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; font-size: 0.875rem; border: 1px solid #fbbf24;">
-            <strong>⚠️ No eligible users found.</strong> Users must complete their profile (Name, Phone, Address, Date of Birth) before they can be assigned as church managers.
+            <strong>⚠️ No eligible users found.</strong> Users must complete their profile (Name, Phone, Address, Date of Birth) before they can be assigned as church managers. You can still create a managerless church.
           </div>
         {% endif %}
         {% if form.assigned_user.errors %}

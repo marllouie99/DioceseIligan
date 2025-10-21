@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import api_views
 from . import donation_views
+from . import booking_payment_views
 from . import chat_api
 
 app_name = 'core'
@@ -143,4 +144,16 @@ urlpatterns = [
     path('api/conversations/<int:conversation_id>/messages/', chat_api.conversation_messages_api, name='conversation_messages_api'),
     path('api/conversations/<int:conversation_id>/read/', chat_api.mark_conversation_read, name='mark_conversation_read'),
     path('api/conversations/<int:conversation_id>/typing/', chat_api.conversation_typing, name='conversation_typing'),
+    
+    # Payment URLs (deprecated - keeping for backward compatibility)
+    path('payment/gcash/<int:booking_id>/', views.gcash_payment, name='gcash_payment'),
+    path('payment/paypal/<int:booking_id>/', views.paypal_payment, name='paypal_payment'),
+    
+    # Booking Payment API (PayPal)
+    path('api/booking/<int:booking_id>/payment/create/', booking_payment_views.create_booking_payment_order, name='create_booking_payment'),
+    path('api/booking/<int:booking_id>/payment/capture/', booking_payment_views.capture_booking_payment, name='capture_booking_payment'),
+    
+    # Booking Payment API (Stripe)
+    path('api/booking/<int:booking_id>/payment/stripe/create/', booking_payment_views.create_stripe_booking_payment, name='create_stripe_booking_payment'),
+    path('api/booking/<int:booking_id>/payment/stripe/confirm/', booking_payment_views.confirm_stripe_booking_payment, name='confirm_stripe_booking_payment'),
 ]

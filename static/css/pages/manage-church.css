@@ -937,6 +937,293 @@ body.page-manage-church {
   line-height: 1.5;
 }
 
+/* Transactions tab specific overrides to avoid oversized SVGs */
+.tab-panel#transactions .empty-state svg {
+  width: 48px !important;
+  height: 48px !important;
+}
+.tab-panel#transactions .empty-state .empty-icon {
+  width: 48px !important;
+  height: 48px !important;
+}
+.tab-panel#transactions .info-banner svg,
+.tab-panel#transactions .banner-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Final guard: never allow large SVGs inside the Transactions content section */
+.tab-panel#transactions svg {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+}
+.tab-panel#transactions .analytics-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+}
+
+/* Transaction Item Styles */
+/* Transactions Table Wrapper */
+.transactions-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(30, 144, 255, 0.15);
+  background: white;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08);
+}
+
+/* Transactions Table */
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.transactions-table thead {
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.08) 0%, rgba(135, 206, 250, 0.08) 100%);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.2);
+}
+
+.transactions-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.transactions-table tbody tr {
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.transactions-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.transactions-table tbody tr:hover {
+  background: rgba(240, 248, 255, 0.5);
+}
+
+.transactions-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Table Cell Styles */
+.transaction-code strong {
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.transaction-date {
+  font-size: 0.875rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.transaction-service {
+  font-weight: 500;
+  color: var(--text);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction-customer {
+  color: var(--muted);
+  font-size: 0.875rem;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction-amount {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--brand);
+  font-family: Georgia, serif;
+  white-space: nowrap;
+}
+
+/* Empty State for Table */
+.transactions-empty {
+  padding: 2rem;
+  text-align: center;
+}
+
+.transactions-table .empty-row {
+  border: none;
+}
+
+.transactions-table .empty-row:hover {
+  background: transparent;
+}
+
+.transactions-table .empty-cell {
+  padding: 3rem 2rem;
+  text-align: center;
+  border: none;
+}
+
+.transactions-table .empty-cell .empty-state h4 {
+  font-size: 1.125rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-family: Georgia, serif;
+}
+
+.transactions-table .empty-cell .empty-state p {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Responsive Design for Transactions Table */
+@media (max-width: 1200px) {
+  .transactions-table {
+    font-size: 0.85rem;
+  }
+  
+  .transactions-table thead th,
+  .transactions-table tbody td {
+    padding: 0.875rem;
+  }
+  
+  .transaction-service {
+    max-width: 150px;
+  }
+  
+  .transaction-customer {
+    max-width: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .transactions-table-wrapper {
+    border-radius: 8px;
+  }
+  
+  .transactions-table {
+    font-size: 0.8rem;
+  }
+  
+  .transactions-table thead th,
+  .transactions-table tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .transactions-table thead th {
+    font-size: 0.75rem;
+  }
+  
+  .transaction-code strong {
+    font-size: 0.85rem;
+  }
+  
+  .transaction-date {
+    font-size: 0.75rem;
+  }
+  
+  .transaction-service,
+  .transaction-customer {
+    max-width: 120px;
+    font-size: 0.8rem;
+  }
+  
+  .transaction-amount {
+    font-size: 0.95rem;
+  }
+  
+  .payment-badge,
+  .status-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .transactions-table thead th,
+  .transactions-table tbody td {
+    padding: 0.625rem 0.375rem;
+  }
+  
+  .transaction-service,
+  .transaction-customer {
+    max-width: 100px;
+  }
+}
+
+.payment-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payment-badge.paypal {
+  background: rgba(0, 48, 135, 0.1);
+  color: #003087;
+}
+
+.payment-badge.stripe {
+  background: rgba(99, 91, 255, 0.1);
+  color: #635BFF;
+}
+
+.payment-badge.gcash {
+  background: rgba(0, 119, 200, 0.1);
+  color: #0077C8;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.status-badge.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.empty-actions .tip {
+  display: inline-block;
+  padding: 1rem;
+  background: rgba(218, 165, 32, 0.1);
+  border: 1px solid rgba(218, 165, 32, 0.2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 /* View All Button */
 .view-all-donations {
   text-align: center;
@@ -2360,11 +2647,64 @@ body.page-manage-church {
 
 .appointments-table tbody tr {
   border-bottom: 1px solid rgba(30, 144, 255, 0.08);
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  background: transparent;
 }
 
 .appointments-table tbody tr:hover {
   background: rgba(30, 144, 255, 0.04);
+}
+
+/* Status-based row backgrounds - more specific */
+.appointments-table tbody tr.status-requested {
+  background: linear-gradient(90deg, rgba(234, 179, 8, 0.05) 0%, rgba(234, 179, 8, 0.02) 100%);
+  border-left: 3px solid rgba(234, 179, 8, 0.4);
+}
+
+.appointments-table tbody tr.status-requested:hover {
+  background: linear-gradient(90deg, rgba(234, 179, 8, 0.08) 0%, rgba(234, 179, 8, 0.03) 100%);
+}
+
+.appointments-table tbody tr.status-reviewed {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%);
+  border-left: 3px solid rgba(59, 130, 246, 0.4);
+}
+
+.appointments-table tbody tr.status-reviewed:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+}
+
+.appointments-table tbody tr.status-approved {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%);
+  border-left: 3px solid rgba(34, 197, 94, 0.4);
+}
+
+.appointments-table tbody tr.status-approved:hover {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.appointments-table tbody tr.status-completed {
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.05) 0%, rgba(139, 69, 19, 0.02) 100%);
+  border-left: 3px solid rgba(139, 69, 19, 0.4);
+}
+
+.appointments-table tbody tr.status-completed:hover {
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.08) 0%, rgba(139, 69, 19, 0.03) 100%);
+}
+
+.appointments-table tbody tr.status-canceled,
+.appointments-table tbody tr.status-cancelled,
+.appointments-table tbody tr.status-declined {
+  background: linear-gradient(90deg, rgba(156, 163, 175, 0.06) 0%, rgba(156, 163, 175, 0.02) 100%);
+  border-left: 3px solid rgba(156, 163, 175, 0.5);
+  opacity: 0.75;
+}
+
+.appointments-table tbody tr.status-canceled:hover,
+.appointments-table tbody tr.status-cancelled:hover,
+.appointments-table tbody tr.status-declined:hover {
+  background: linear-gradient(90deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.03) 100%);
+  opacity: 0.85;
 }
 
 .appointments-table tbody tr:last-child {
@@ -2493,10 +2833,11 @@ body.page-manage-church {
 }
 
 .appointments-table .status-badge.status-cancelled,
+.appointments-table .status-badge.status-canceled,
 .appointments-table .status-badge.status-declined {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(156, 163, 175, 0.15);
+  color: #6b7280;
+  border: 1px solid rgba(156, 163, 175, 0.3);
 }
 
 .appointments-table .status-badge.status-conflict {
@@ -2517,6 +2858,58 @@ body.page-manage-church {
 
 .appointments-table .appointment-row.conflict-row:hover {
   background: linear-gradient(90deg, rgba(254, 226, 226, 0.6) 0%, rgba(254, 226, 226, 0.2) 100%);
+}
+
+/* Row background colors based on status */
+.appointment-row.status-requested {
+  background: linear-gradient(90deg, rgba(234, 179, 8, 0.05) 0%, rgba(234, 179, 8, 0.02) 100%) !important;
+  border-left: 3px solid rgba(234, 179, 8, 0.4) !important;
+}
+
+.appointment-row.status-requested:hover {
+  background: linear-gradient(90deg, rgba(234, 179, 8, 0.08) 0%, rgba(234, 179, 8, 0.03) 100%) !important;
+}
+
+.appointment-row.status-reviewed {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%) !important;
+  border-left: 3px solid rgba(59, 130, 246, 0.4) !important;
+}
+
+.appointment-row.status-reviewed:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%) !important;
+}
+
+.appointment-row.status-approved {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%) !important;
+  border-left: 3px solid rgba(34, 197, 94, 0.4) !important;
+}
+
+.appointment-row.status-approved:hover {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%) !important;
+}
+
+.appointment-row.status-completed {
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.05) 0%, rgba(139, 69, 19, 0.02) 100%) !important;
+  border-left: 3px solid rgba(139, 69, 19, 0.4) !important;
+}
+
+.appointment-row.status-completed:hover {
+  background: linear-gradient(90deg, rgba(139, 69, 19, 0.08) 0%, rgba(139, 69, 19, 0.03) 100%) !important;
+}
+
+.appointment-row.status-canceled,
+.appointment-row.status-cancelled,
+.appointment-row.status-declined {
+  background: linear-gradient(90deg, rgba(156, 163, 175, 0.06) 0%, rgba(156, 163, 175, 0.02) 100%) !important;
+  border-left: 3px solid rgba(156, 163, 175, 0.5) !important;
+  opacity: 0.75 !important;
+}
+
+.appointment-row.status-canceled:hover,
+.appointment-row.status-cancelled:hover,
+.appointment-row.status-declined:hover {
+  background: linear-gradient(90deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.03) 100%) !important;
+  opacity: 0.85 !important;
 }
 
 /* Add a subtle pulsing animation for conflict badge */

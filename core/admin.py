@@ -138,24 +138,61 @@ class DeclineReasonAdmin(admin.ModelAdmin):
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = (
-        'code', 'service', 'church', 'user', 'date', 'status', 'created_at',
+        'code', 'service', 'church', 'user', 'date', 'status', 'payment_status', 'payment_method', 'created_at',
     )
-    list_filter = ('status', 'date', 'church', 'service', 'created_at')
-    search_fields = ('code', 'service__name', 'church__name', 'user__username', 'user__email')
+    list_filter = ('status', 'payment_status', 'payment_method', 'date', 'church', 'service', 'created_at')
+    search_fields = ('code', 'service__name', 'church__name', 'user__username', 'user__email', 'payment_transaction_id')
     autocomplete_fields = ('service', 'church', 'user')
     list_select_related = ('service', 'church', 'user')
+    fieldsets = (
+        ('Booking Information', {
+            'fields': ('code', 'user', 'church', 'service', 'date', 'start_time', 'end_time', 'notes')
+        }),
+        ('Status', {
+            'fields': ('status', 'cancel_reason', 'decline_reason', 'status_changed_at')
+        }),
+        ('Payment Information', {
+            'fields': ('payment_status', 'payment_method', 'payment_amount', 'payment_transaction_id', 'payment_date')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    readonly_fields = ('code', 'payment_transaction_id', 'payment_date', 'created_at', 'updated_at', 'status_changed_at')
+
+
+class DonationInline(admin.TabularInline):
+    model = Donation
+    extra = 0
+    fields = ('donor', 'amount', 'currency', 'payment_status', 'payment_method', 'is_anonymous', 'created_at')
+    readonly_fields = ('created_at',)
+    autocomplete_fields = ('donor',)
+    can_delete = False
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('donor')
 
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('church', 'short_content', 'is_active', 'created_at')
-    list_filter = ('is_active', 'church', 'created_at')
+    list_display = ('church', 'short_content', 'enable_donation', 'total_donations', 'is_active', 'created_at')
+    list_filter = ('is_active', 'enable_donation', 'church', 'created_at')
     search_fields = ('church__name', 'content')
     autocomplete_fields = ('church',)
+    inlines = [DonationInline]
 
     def short_content(self, obj):
         return (obj.content or '')[:60]
     short_content.short_description = 'Content'
+    
+    def total_donations(self, obj):
+        """Show total donations for this post."""
+        stats = obj.get_donation_stats()
+        if stats['total_raised']:
+            return f"₱{stats['total_raised']:,.2f} ({stats['donor_count']} donors)"
+        return "No donations yet"
+    total_donations.short_description = 'Donations'
 
 
 @admin.register(PostReport)

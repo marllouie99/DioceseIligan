@@ -525,148 +525,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Churches by Type Chart (Pie Chart)
-  const churchesByTypeCtx = document.getElementById('churchesByTypeChart');
-  if (churchesByTypeCtx) {
-    new Chart(churchesByTypeCtx, {
-      type: 'pie',
+  // Parish Outreach Chart (Bar Chart)
+  const parishReachCtx = document.getElementById('parishReachChart');
+  if (parishReachCtx) {
+    new Chart(parishReachCtx, {
+      type: 'bar',
       data: {
-        labels: ['Catholic', 'Protestant', 'Baptist', 'Methodist', 'Other'],
+        labels: ['Iligan City', 'Kauswagan', 'Linamon', 'Maigo', 'Matungao', 'Other Areas'],
         datasets: [{
-          data: [36, 31, 19, 10, 4],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(251, 191, 36, 0.8)',
-            'rgba(30, 144, 255, 0.8)'
-          ],
-          borderColor: [
-            'rgba(59, 130, 246, 1)',
-            'rgba(168, 85, 247, 1)',
-            'rgba(16, 185, 129, 1)',
-            'rgba(251, 191, 36, 1)',
-            'rgba(30, 144, 255, 1)'
-          ],
-          borderWidth: 2
+          label: 'Active Members',
+          data: [450, 120, 85, 95, 110, 140],
+          backgroundColor: 'rgba(30, 144, 255, 0.8)',
+          borderColor: 'rgba(30, 144, 255, 1)',
+          borderWidth: 2,
+          borderRadius: 6
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        indexAxis: 'y',
         plugins: {
           legend: {
-            display: true,
-            position: 'right',
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: {
-                size: 12,
-                weight: '600'
-              },
-              generateLabels: function(chart) {
-                const data = chart.data;
-                if (data.labels.length && data.datasets.length) {
-                  return data.labels.map((label, i) => {
-                    const value = data.datasets[0].data[i];
-                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
-                    return {
-                      text: `${label} ${percentage}%`,
-                      fillStyle: data.datasets[0].backgroundColor[i],
-                      hidden: false,
-                      index: i
-                    };
-                  });
-                }
-                return [];
-              }
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            padding: 12,
-            borderRadius: 8,
-            titleFont: {
-              size: 14,
-              weight: 'bold'
-            },
-            bodyFont: {
-              size: 13
-            },
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${percentage}%`;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // User & Church Growth Chart (Line Chart)
-  const growthCtx = document.getElementById('growthChart');
-  if (growthCtx) {
-    new Chart(growthCtx, {
-      type: 'line',
-      data: {
-        labels: [{% for label in monthly_growth.labels %}'{{ label }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-        datasets: [
-          {
-            label: 'Churches',
-            data: [{% for count in monthly_growth.churches %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-            borderColor: 'rgba(59, 130, 246, 1)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2
-          },
-          {
-            label: 'Users',
-            data: [{% for count in monthly_growth.users %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-            borderColor: 'rgba(30, 144, 255, 1)',
-            backgroundColor: 'rgba(30, 144, 255, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointBackgroundColor: 'rgba(30, 144, 255, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: {
-                size: 12,
-                weight: '600'
-              }
-            }
+            display: false
           },
           tooltip: {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -682,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         },
         scales: {
-          y: {
+          x: {
             beginAtZero: true,
             ticks: {
               precision: 0,
@@ -694,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
               color: 'rgba(0, 0, 0, 0.05)'
             }
           },
-          x: {
+          y: {
             ticks: {
               font: {
                 size: 11
@@ -852,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ church_stats.total_churches|default:0 }}</div>
-        <div class="stat-label">Active Churches</div>
+        <div class="stat-label">Active Parishes</div>
         <div class="stat-trend">
           <span class="trend-icon positive">↑</span>
           <span class="trend-text">+{{ church_stats.verified_churches|default:0 }} verified</span>
@@ -906,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ post_stats.total_followers|default:0 }}</div>
-        <div class="stat-label">Church Follows</div>
+        <div class="stat-label">Parish Follows</div>
         <div class="stat-trend">
           <span class="trend-icon positive">↑</span>
           <span class="trend-text">+{{ post_stats.new_followers_this_week|default:0 }} this week</span>
@@ -980,24 +861,16 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="chart-card">
-      <h3 class="chart-title">Churches by Type</h3>
-      <p class="chart-subtitle">Distribution of church categories</p>
+      <h3 class="chart-title">Parish Outreach</h3>
+      <p class="chart-subtitle">Engagement and reach across parishes</p>
       <div class="chart-container-large">
-        <canvas id="churchesByTypeChart"></canvas>
+        <canvas id="parishReachChart"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- 2 Column Charts (Row 2) -->
-  <div class="charts-section">
-    <div class="chart-card">
-      <h3 class="chart-title">User & Church Growth</h3>
-      <p class="chart-subtitle">Monthly growth trends over the last 6 months</p>
-      <div class="chart-container-large">
-        <canvas id="growthChart"></canvas>
-      </div>
-    </div>
-
+  <!-- Single Chart Row -->
+  <div class="charts-section" style="grid-template-columns: 1fr;">
     <div class="chart-card">
       <h3 class="chart-title">Appointment Status</h3>
       <p class="chart-subtitle">Breakdown by status over 6 months</p>
@@ -1007,11 +880,11 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- Recent Church Applications -->
+  <!-- Recent Parish Applications -->
   <div class="applications-section">
     <div class="section-header-applications">
-      <h2 class="section-title-applications">Recent Church Applications</h2>
-      <p class="section-subtitle">Latest user applications to join churches</p>
+      <h2 class="section-title-applications">Recent Parish Applications</h2>
+      <p class="section-subtitle">Latest user applications to join parishes</p>
     </div>
     
     <div class="applications-table-container">
@@ -1020,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <thead>
           <tr>
             <th>User</th>
-            <th>Church</th>
+            <th>Parish</th>
             <th>Date</th>
             <th>Status</th>
           </tr>
@@ -1055,7 +928,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <path d="M9 11l3 3L22 4"/>
           <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
         </svg>
-        <p class="empty-text">No pending church applications</p>
+        <p class="empty-text">No pending parish applications</p>
       </div>
       {% endif %}
     </div>

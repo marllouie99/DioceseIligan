@@ -716,7 +716,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <td>
               <div class="post-excerpt">{{ post.content|truncatechars:50 }}</div>
             </td>
-            <td>{{ post.church.owner.get_full_name|default:post.church.owner.username }}</td>
+            <td>{% if post.church.owner %}{{ post.church.owner.get_full_name|default:post.church.owner.username }}{% else %}<span style="color: #ef4444; font-style: italic;">No Manager</span>{% endif %}</td>
             <td><span class="type-badge">{{ post.get_post_type_display }}</span></td>
             <td>{{ post.created_at|date:"Y-m-d" }}</td>
             <td>{{ post.likes_count|default:0 }}</td>

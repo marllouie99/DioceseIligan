@@ -6,6 +6,65 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/booking.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/my_appointments.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/pages/appointments.css' %}?v={{ STATIC_VERSION }}">
+<style>
+  #invoiceModal.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 10000 !important;
+  }
+  
+  #invoiceModal.modal-overlay[style*="display: flex"] {
+    display: flex !important;
+  }
+  
+  #invoiceModal.modal-overlay[style*="display: none"] {
+    display: none !important;
+  }
+  
+  #invoiceModal .modal-container {
+    background: white;
+    border-radius: 12px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 10001 !important;
+  }
+  
+  #invoiceModal .modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #6b7280;
+    z-index: 10002;
+  }
+  
+  #invoiceModal .modal-close-btn:hover {
+    color: #111827;
+  }
+  
+  #invoiceModal .modal-body {
+    padding: 40px;
+  }
+  
+  #invoiceModal .modal-footer {
+    padding: 20px 40px;
+    border-top: 1px solid #e5e7eb;
+  }
+</style>
 {% endblock %}
 
 {% block sidebar %}
@@ -107,11 +166,36 @@
         <p>This booking is {{ booking.get_status_display|lower }}. Invoice is not available.</p>
       {% else %}
         <p>Once an appointment is reviewed, the client can print the invoice with details to bring to your church office for completion.</p>
-        <a href="{% url 'core:booking_invoice' booking.id %}" class="btn btn-outline">Open Invoice</a>
+        <button type="button" class="btn btn-outline" onclick="openInvoiceModal()">Open Invoice</button>
       {% endif %}
     </div>
   </div>
 </div>
+
+<!-- Invoice Modal -->
+<div id="invoiceModal" class="modal-overlay" style="display: none;">
+  <div class="modal-container appointment-summary-modal">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <button class="modal-close-btn" onclick="closeInvoiceModal()">&times;</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body">
+      {% include 'core/partials/booking_invoice_content.html' %}
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="display: flex; gap: 12px;">
+      <button type="button" class="btn btn-primary" onclick="printInvoice()" style="flex: 1;">
+        <i data-feather="printer" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+        Print
+      </button>
+      <button type="button" class="btn btn-outline" onclick="closeInvoiceModal()" style="flex: 1;">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   const statusSelect = document.querySelector('select[name="status"]');
@@ -131,5 +215,61 @@
   // Initial state
   refresh();
 })();
+
+// Invoice Modal Functions
+function openInvoiceModal() {
+  document.getElementById('invoiceModal').style.display = 'flex';
+  // Re-initialize Feather icons
+  if (typeof feather !== 'undefined') {
+    feather.replace();
+  }
+}
+
+function closeInvoiceModal() {
+  document.getElementById('invoiceModal').style.display = 'none';
+}
+
+function printInvoice() {
+  const modalBody = document.querySelector('#invoiceModal .modal-body');
+  if (!modalBody) return;
+  
+  const printContent = modalBody.cloneNode(true);
+  const printWindow = window.open('', '_blank');
+  
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Appointment Invoice - {{ booking.code }}</title>
+      <style>
+        @page { margin: 0.5in; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          margin: 0;
+          padding: 20px;
+          background: white;
+        }
+        * { box-sizing: border-box; }
+        .invoice { background: white; padding: 20px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .label { color: #6b7280; font-weight: 600; }
+        .value { font-weight: 500; }
+        hr { border: none; border-top: 1px solid #e5e7eb; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      ${printContent.innerHTML}
+    </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  printWindow.onload = function() {
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+}
 </script>
 {% endblock %}

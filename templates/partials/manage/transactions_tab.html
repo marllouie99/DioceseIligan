@@ -1,0 +1,146 @@
+{% load static %}
+{# Transactions Tab - Booking Payments #}
+<div class="tab-panel" id="transactions">
+  <div class="tab-header">
+    <h2>Booking Transactions</h2>
+    <p>Track and manage payment transactions from appointment bookings</p>
+  </div>
+  <style>
+    /* Scoped fixes to prevent oversized SVGs in Transactions tab */
+    #transactions svg { width: 48px !important; height: 48px !important; max-width: 48px !important; max-height: 48px !important; }
+    #transactions .analytics-icon svg { width: 24px !important; height: 24px !important; max-width: 24px !important; max-height: 24px !important; }
+  </style>
+  
+  <div class="tab-content">
+    <!-- 1x4 Analytics Cards Grid -->
+    <div class="analytics-grid-4">
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>₱{{ transactions.total_revenue|floatformat:2|default:"0.00" }}</h4>
+          <p>Total Revenue</p>
+          <span class="analytics-change">From booking payments</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ transactions.completed_transactions|default:"0" }}</h4>
+          <p>Completed</p>
+          <span class="analytics-change">Paid bookings</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>{{ transactions.pending_transactions|default:"0" }}</h4>
+          <p>Pending</p>
+          <span class="analytics-change">Awaiting payment</span>
+        </div>
+      </div>
+      
+      <div class="analytics-card">
+        <div class="analytics-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <h4>₱{{ transactions.this_month_revenue|floatformat:2|default:"0.00" }}</h4>
+          <p>This Month</p>
+          <span class="analytics-change">Current month revenue</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions Table -->
+    <div class="content-section">
+      <div class="section-header">
+        <h3>Recent Transactions</h3>
+        <p>Latest payment transactions from bookings</p>
+      </div>
+      
+      <div class="transactions-table-wrapper">
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Transaction Code</th>
+              <th>Date</th>
+              <th>Service</th>
+              <th>Customer</th>
+              <th>Payment Method</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if transactions.recent_transactions %}
+              {% for transaction in transactions.recent_transactions %}
+                <tr class="transaction-row">
+                  <td class="transaction-code">
+                    <strong>{{ transaction.code }}</strong>
+                  </td>
+                  <td class="transaction-date">
+                    {{ transaction.payment_date|date:"M d, Y" }}
+                  </td>
+                  <td class="transaction-service">
+                    {{ transaction.service.name }}
+                  </td>
+                  <td class="transaction-customer">
+                    {{ transaction.user.get_full_name|default:transaction.user.username }}
+                  </td>
+                  <td class="transaction-method">
+                    {% if transaction.payment_method == 'paypal' %}
+                      <span class="payment-badge paypal">PayPal</span>
+                    {% elif transaction.payment_method == 'stripe' %}
+                      <span class="payment-badge stripe">Credit Card</span>
+                    {% elif transaction.payment_method == 'gcash' %}
+                      <span class="payment-badge gcash">GCash</span>
+                    {% endif %}
+                  </td>
+                  <td class="transaction-amount">
+                    ₱{{ transaction.payment_amount|floatformat:2 }}
+                  </td>
+                  <td class="transaction-status">
+                    {% if transaction.payment_status == 'paid' %}
+                      <span class="status-badge success">Paid</span>
+                    {% elif transaction.payment_status == 'pending' %}
+                      <span class="status-badge warning">Pending</span>
+                    {% elif transaction.payment_status == 'failed' %}
+                      <span class="status-badge error">Failed</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr class="empty-row">
+                <td colspan="7" class="empty-cell">
+                  <div class="empty-state">
+                    <h4>No transactions yet</h4>
+                    <p>Payment transactions from bookings will appear here</p>
+                  </div>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

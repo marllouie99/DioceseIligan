@@ -723,6 +723,33 @@ def manage_church(request, church_id=None):
         booking_count=Count('bookings')
     ).filter(booking_count__gt=0).order_by('-booking_count')[:5]
     
+    # Transactions data for Transactions tab
+    # Get only bookings where online payment was actually initiated (has payment method)
+    transactions_queryset = Booking.objects.filter(
+        church=church,
+        payment_method__isnull=False  # Only show bookings with payment method (online payment)
+    ).exclude(
+        payment_method=''  # Exclude empty payment methods
+    ).select_related('service', 'user', 'user__profile').order_by('-payment_date', '-created_at')
+    
+    # Recent transactions (last 20)
+    recent_transactions = list(transactions_queryset[:20])
+    
+    # Transaction statistics
+    total_revenue = transactions_queryset.filter(payment_status='paid').aggregate(
+        total=Sum('payment_amount')
+    )['total'] or Decimal('0.00')
+    
+    completed_transactions = transactions_queryset.filter(payment_status='paid').count()
+    pending_transactions = transactions_queryset.filter(payment_status='pending').count()
+    
+    # This month's transactions
+    this_month_transactions = transactions_queryset.filter(
+        payment_status='paid',
+        payment_date__gte=current_month_start
+    )
+    this_month_revenue = this_month_transactions.aggregate(total=Sum('payment_amount'))['total'] or Decimal('0.00')
+    
     # Get unread booking notifications for THIS specific church
     # Only count REQUESTED bookings (pending appointments) for the badge
     unread_booking_notifications_for_church = Notification.objects.filter(
@@ -780,6 +807,14 @@ def manage_church(request, church_id=None):
             'this_year_count': this_year_count,
             'unique_donors': unique_donors,
             'top_donors': top_donors,
+        },
+        # Transactions data
+        'transactions': {
+            'recent_transactions': recent_transactions,
+            'total_revenue': total_revenue,
+            'completed_transactions': completed_transactions,
+            'pending_transactions': pending_transactions,
+            'this_month_revenue': this_month_revenue,
         },
         # Services statistics
         'total_services': total_services,
@@ -1572,10 +1607,16 @@ def super_admin_create_church(request):
             try:
                 church = form.save()
                 assigned_user = form.cleaned_data.get('assigned_user')
-                messages.success(
-                    request, 
-                    f'Church "{church.name}" has been created successfully and assigned to {assigned_user.get_full_name() or assigned_user.email}!'
-                )
+                if assigned_user:
+                    messages.success(
+                        request, 
+                        f'Church "{church.name}" has been created successfully and assigned to {assigned_user.get_full_name() or assigned_user.email}!'
+                    )
+                else:
+                    messages.success(
+                        request, 
+                        f'Church "{church.name}" has been created successfully without a manager.'
+                    )
                 return redirect('core:super_admin_church_detail', church_id=church.id)
             except Exception as e:
                 logger.error(f"Error creating church: {e}", exc_info=True)
@@ -1611,10 +1652,16 @@ def super_admin_edit_church(request, church_id):
         if form.is_valid():
             church = form.save()
             assigned_user = form.cleaned_data.get('assigned_user')
-            messages.success(
-                request, 
-                f'Church "{church.name}" has been updated successfully! Manager: {assigned_user.get_full_name() or assigned_user.email}'
-            )
+            if assigned_user:
+                messages.success(
+                    request, 
+                    f'Church "{church.name}" has been updated successfully! Manager: {assigned_user.get_full_name() or assigned_user.email}'
+                )
+            else:
+                messages.success(
+                    request, 
+                    f'Church "{church.name}" has been updated successfully! Church is now managerless.'
+                )
             return redirect('core:super_admin_church_detail', church_id=church.id)
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -2647,6 +2694,57 @@ def booking_invoice(request, booking_id):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/booking_invoice.html', ctx)
+
+
+# Payment Processing Views
+@login_required
+def gcash_payment(request, booking_id):
+    """GCash payment processing page"""
+    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    
+    # Check if user owns this booking
+    if request.user != booking.user:
+        messages.error(request, 'You do not have permission to pay for this booking.')
+        return redirect('core:appointments')
+    
+    # Check if booking is in requested status
+    if booking.status != Booking.STATUS_REQUESTED:
+        messages.info(request, 'This booking has already been processed.')
+        return redirect('core:appointments')
+    
+    ctx = {
+        'active': 'appointments',
+        'page_title': 'GCash Payment',
+        'booking': booking,
+        'payment_method': 'GCash',
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/payment_processing.html', ctx)
+
+
+@login_required
+def paypal_payment(request, booking_id):
+    """PayPal payment processing page"""
+    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    
+    # Check if user owns this booking
+    if request.user != booking.user:
+        messages.error(request, 'You do not have permission to pay for this booking.')
+        return redirect('core:appointments')
+    
+    # Check if booking is in requested status
+    if booking.status != Booking.STATUS_REQUESTED:
+        messages.info(request, 'This booking has already been processed.')
+        return redirect('core:appointments')
+    
+    ctx = {
+        'active': 'appointments',
+        'page_title': 'PayPal Payment',
+        'booking': booking,
+        'payment_method': 'PayPal',
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/payment_processing.html', ctx)
 
 
 # Church Verification Flow

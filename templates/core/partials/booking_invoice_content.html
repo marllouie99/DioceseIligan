@@ -1,0 +1,127 @@
+<!-- Invoice Header -->
+<div class="invoice-header">
+  <div class="invoice-title-section">
+    <h1 class="invoice-title">APPOINTMENT CONFIRMATION</h1>
+    <div class="invoice-number">
+      <span class="label">Appointment No:</span>
+      <span class="value">{{ booking.code }}</span>
+    </div>
+    <div class="invoice-status">
+      <span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+    </div>
+  </div>
+  <div class="invoice-dates">
+    <div class="date-item">
+      <span class="label">Issued:</span>
+      <span class="value">{{ booking.created_at|date:'F j, Y' }}</span>
+    </div>
+    <div class="date-item">
+      <span class="label">Last Updated:</span>
+      <span class="value">{{ booking.updated_at|date:'F j, Y' }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Parties Section -->
+<div class="invoice-parties">
+  <div class="party-box">
+    <h3 class="party-title">CHURCH INFORMATION</h3>
+    <div class="party-name">{{ booking.church.name }}</div>
+    <div class="party-detail">{{ booking.church.full_address }}</div>
+    <div class="party-detail">{{ booking.church.email }}</div>
+    <div class="party-detail">{{ booking.church.phone }}</div>
+  </div>
+  <div class="party-box">
+    <h3 class="party-title">REQUESTER INFORMATION</h3>
+    <div class="party-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+    <div class="party-detail">{{ booking.user.email }}</div>
+    {% if booking.user.profile.phone %}
+      <div class="party-detail">{{ booking.user.profile.phone }}</div>
+    {% endif %}
+    {% if booking.user.profile.full_address %}
+      <div class="party-detail">{{ booking.user.profile.full_address }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Service Details -->
+<div class="invoice-details">
+  <h3 class="section-title">APPOINTMENT DETAILS</h3>
+  <table class="details-table">
+    <tr>
+      <td class="detail-label">Service Type:</td>
+      <td class="detail-value">{{ booking.service.name }}</td>
+    </tr>
+    <tr>
+      <td class="detail-label">Appointment Date:</td>
+      <td class="detail-value">{{ booking.date|date:'l, F j, Y' }}</td>
+    </tr>
+    <tr>
+      <td class="detail-label">Appointment Time:</td>
+      <td class="detail-value">{% if booking.start_time and booking.end_time %}{{ booking.start_time|time:'g:i A' }} - {{ booking.end_time|time:'g:i A' }}{% else %}To be scheduled{% endif %}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Payment Information Section -->
+<div class="invoice-details">
+  <h3 class="section-title">PAYMENT INFORMATION</h3>
+  <table class="details-table">
+    <tr>
+      <td class="detail-label">Payment Status:</td>
+      <td class="detail-value">
+        {% if booking.payment_status == 'paid' %}
+          <span style="color:#16a34a; font-weight:600;">✓ Paid</span>
+        {% elif booking.payment_status == 'pending' %}
+          <span style="color:#ca8a04; font-weight:600;">⏳ Pending</span>
+        {% elif booking.payment_status == 'failed' %}
+          <span style="color:#dc2626; font-weight:600;">✗ Failed</span>
+        {% elif booking.payment_status == 'canceled' %}
+          <span style="color:#6b7280; font-weight:600;">✗ Canceled</span>
+        {% elif booking.payment_status == 'refunded' %}
+          <span style="color:#3b82f6; font-weight:600;">↩ Refunded</span>
+        {% else %}
+          {{ booking.get_payment_status_display }}
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="detail-label">Amount:</td>
+      <td class="detail-value">₱{{ booking.payment_amount|default:"0.00"|floatformat:2 }}</td>
+    </tr>
+    {% if booking.payment_status == 'paid' %}
+      {% if booking.payment_method %}
+        <tr>
+          <td class="detail-label">Payment Method:</td>
+          <td class="detail-value">{{ booking.get_payment_method_display }}</td>
+        </tr>
+      {% endif %}
+      {% if booking.payment_date %}
+        <tr>
+          <td class="detail-label">Payment Date:</td>
+          <td class="detail-value">{{ booking.payment_date|date:'M j, Y g:i A' }}</td>
+        </tr>
+      {% endif %}
+      {% if booking.payment_transaction_id %}
+        <tr>
+          <td class="detail-label">Transaction ID:</td>
+          <td class="detail-value" style="font-family: monospace; font-size: 12px;">{{ booking.payment_transaction_id }}</td>
+        </tr>
+      {% endif %}
+    {% endif %}
+  </table>
+</div>
+
+<!-- Notes Section -->
+{% if booking.notes %}
+  <div class="invoice-notes">
+    <h3 class="section-title">ADDITIONAL NOTES</h3>
+    <p class="notes-content">{{ booking.notes }}</p>
+  </div>
+{% endif %}
+
+<!-- Footer Note -->
+<div class="invoice-footer-note">
+  <p>This is an automated appointment confirmation. Please keep this for your records.</p>
+  <p>For any inquiries, please contact the church directly using the information provided above.</p>
+</div>

@@ -16,6 +16,19 @@
   <link rel="stylesheet" href="{% static 'css/pages/appointments.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
 
+{% block extra_js %}
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=PHP"></script>
+  
+  <!-- Stripe SDK -->
+  <script src="https://js.stripe.com/v3/"></script>
+  
+  <!-- Payment Configuration -->
+  <script>
+    window.STRIPE_PUBLISHABLE_KEY = '{{ STRIPE_PUBLISHABLE_KEY }}';
+  </script>
+{% endblock %}
+
 {% block sidebar %}
   {% include 'partials/sidebar.html' %}
 {% endblock %}
@@ -42,92 +55,118 @@
   </div>
 
   {% if bookings %}
-    <div class="booking-list">
-      {% for b in bookings %}
-        <div class="booking-card">
-          <!-- Left Section: Service Info -->
-          <div class="booking-card-left">
-            <div class="booking-header-section">
-              <h3 class="booking-service-name">{{ b.service.name }}</h3>
-              <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
-            </div>
-            
-            <div class="booking-church-info">
-              <i data-feather="map-pin"></i>
-              <span>{{ b.church.name }}</span>
-            </div>
-            
-            <div class="booking-meta-row">
-              <div class="booking-meta-item">
-                <i data-feather="hash"></i>
-                <span class="meta-label">ID:</span>
-                <span class="meta-value">{{ b.code }}</span>
-              </div>
-              <div class="booking-meta-item">
-                <i data-feather="calendar"></i>
-                <span class="meta-label">Requested:</span>
-                <span class="meta-value">{{ b.created_at|date:'M j, Y' }}</span>
-              </div>
-            </div>
-            
+    <div class="appointments-table-container">
+      <table class="appointments-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Church</th>
+            <th>Appointment ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Requested</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr class="appointment-row">
+              <td class="service-cell">
+                <div class="service-name">{{ b.service.name }}</div>
+              </td>
+              <td class="church-cell">
+                <div class="church-info">
+                  <i data-feather="map-pin"></i>
+                  <span>{{ b.church.name }}</span>
+                </div>
+              </td>
+              <td class="id-cell">
+                <span class="appointment-id">{{ b.code }}</span>
+              </td>
+              <td class="date-cell">
+                <div class="date-info">
+                  <i data-feather="calendar"></i>
+                  <span>{{ b.date|date:'M j, Y' }}</span>
+                </div>
+              </td>
+              <td class="time-cell">
+                <div class="time-info">
+                  <i data-feather="clock"></i>
+                  <span>{% if b.start_time %}{{ b.start_time|time:'g:i A' }}{% if b.end_time %} - {{ b.end_time|time:'g:i A' }}{% endif %}{% else %}Not set{% endif %}</span>
+                </div>
+              </td>
+              <td class="requested-cell">
+                {{ b.created_at|date:'M j, Y' }}
+              </td>
+              <td class="status-cell">
+                <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
+                {% if b.status == 'declined' and b.decline_reason %}
+                  <div class="decline-reason-tooltip" title="{{ b.decline_reason }}">
+                    <i data-feather="alert-circle"></i>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <button class="booking-icon-btn" onclick="openAppointmentSummary(
+                    {{ b.id }}, 
+                    '{{ b.code }}',
+                    '{{ b.service.name|escapejs }}',
+                    '{{ b.church.name|escapejs }}',
+                    '{% if b.church.street_address %}{{ b.church.street_address }}, {% endif %}{% if b.church.barangay %}{{ b.church.barangay }}, {% endif %}{% if b.church.city_municipality %}{{ b.church.city_municipality }}, {% endif %}{% if b.church.province %}{{ b.church.province }} {% endif %}{% if b.church.postal_code %}{{ b.church.postal_code }}{% endif %}{% if not b.church.street_address and not b.church.city_municipality %}{{ b.church.address }}{% endif %}|escapejs',
+                    '{{ b.church.email|default:''|escapejs }}',
+                    '{{ b.church.phone|default:''|escapejs }}',
+                    '{{ b.church.paypal_email|default:''|escapejs }}',
+                    '{{ b.date|date:'F j, Y' }}',
+                    '{% if b.start_time %}{{ b.start_time|time:'g:i A' }}{% if b.end_time %} - {{ b.end_time|time:'g:i A' }}{% endif %}{% else %}Not set{% endif %}',
+                    '{{ b.get_status_display }}',
+                    '{{ b.status }}',
+                    '{{ b.created_at|date:'F j, Y' }}',
+                    '{{ b.updated_at|date:'F j, Y' }}',
+                    '{{ b.user.get_full_name|default:b.user.profile.display_name|default:b.user.username|escapejs }}',
+                    '{{ b.user.email|escapejs }}',
+                    '{{ b.user.profile.phone|default:''|escapejs }}',
+                    '{% if b.user.profile.street_address %}{{ b.user.profile.street_address }}, {% endif %}{% if b.user.profile.barangay %}{{ b.user.profile.barangay }}, {% endif %}{% if b.user.profile.city_municipality %}{{ b.user.profile.city_municipality }}, {% endif %}{% if b.user.profile.province %}{{ b.user.profile.province }} {% endif %}{% if b.user.profile.postal_code %}{{ b.user.profile.postal_code }}{% endif %}|escapejs',
+                    '{{ b.notes|escapejs }}',
+                    {{ b.service.price|default:'0' }},
+                    {{ b.service.is_free|yesno:'true,false' }},
+                    '{{ b.payment_status }}',
+                    {{ b.payment_amount|default:'0' }},
+                    '{{ b.get_payment_method_display|default:''|escapejs }}',
+                    '{% if b.payment_date %}{{ b.payment_date|date:'M j, Y g:i A' }}{% endif %}',
+                    '{{ b.payment_transaction_id|default:''|escapejs }}'
+                  )" title="View Summary">
+                    <i data-feather="eye"></i>
+                  </button>
+                  
+                  {% if b.status == 'completed' %}
+                    {% if b.user_has_reviewed %}
+                      <a href="{% url 'core:service_reviews' b.service.id %}" class="booking-icon-btn" title="Check Review">
+                        <i data-feather="check-circle"></i>
+                      </a>
+                    {% else %}
+                      <button class="booking-icon-btn" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})" title="Rate & Review">
+                        <i data-feather="star"></i>
+                      </button>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
             {% if b.status == 'declined' and b.decline_reason %}
-              <div class="booking-decline-reason">
-                <i data-feather="alert-circle"></i>
-                <span>{{ b.decline_reason }}</span>
-              </div>
+              <tr class="decline-reason-row">
+                <td colspan="8">
+                  <div class="booking-decline-reason">
+                    <i data-feather="alert-circle"></i>
+                    <span><strong>Decline Reason:</strong> {{ b.decline_reason }}</span>
+                  </div>
+                </td>
+              </tr>
             {% endif %}
-          </div>
-          
-          <!-- Center Section: Date & Time -->
-          <div class="booking-card-center">
-            <div class="booking-datetime-card">
-              <div class="datetime-item">
-                <i data-feather="calendar"></i>
-                <div class="datetime-content">
-                  <span class="datetime-label">Date</span>
-                  <span class="datetime-value">{{ b.date|date:'M j, Y' }}</span>
-                </div>
-              </div>
-              <div class="datetime-divider"></div>
-              <div class="datetime-item">
-                <i data-feather="clock"></i>
-                <div class="datetime-content">
-                  <span class="datetime-label">Time</span>
-                  <span class="datetime-value">{% if b.start_time %}{{ b.start_time|time:'g:i A' }}{% if b.end_time %} - {{ b.end_time|time:'g:i A' }}{% endif %}{% else %}Not set{% endif %}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Right Section: Actions -->
-          <div class="booking-card-right">
-            {% if b.church.slug %}
-              <a href="{% url 'core:church_detail' b.church.slug %}" class="booking-icon-btn" title="View Church">
-                <i data-feather="eye"></i>
-              </a>
-            {% endif %}
-            
-            {% if b.status == 'reviewed' or b.status == 'approved' %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="booking-icon-btn" title="Print Invoice">
-                <i data-feather="printer"></i>
-              </a>
-            {% elif b.status == 'completed' %}
-              {% if b.user_has_reviewed %}
-                <a href="{% url 'core:service_reviews' b.service.id %}" class="booking-icon-btn" title="Check Review">
-                  <i data-feather="check-circle"></i>
-                </a>
-              {% else %}
-                <button class="booking-icon-btn" onclick="openReviewModal({{ b.service.id }}, '{{ b.service.name|escapejs }}', '{{ b.church.name|escapejs }}', {{ b.id }})" title="Rate & Review">
-                  <i data-feather="star"></i>
-                </button>
-              {% endif %}
-              <a href="{% url 'core:booking_invoice' b.id %}" class="booking-icon-btn" title="View Invoice">
-                <i data-feather="file-text"></i>
-              </a>
-            {% endif %}
-          </div>
-        </div>
-      {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   {% else %}
     <div class="empty-state">
@@ -135,6 +174,183 @@
       <p>Request an appointment from a church page to get started.</p>
     </div>
   {% endif %}
+</div>
+
+<!-- Appointment Summary Modal -->
+<div id="appointmentSummaryModal" class="modal-overlay" style="display: none;">
+  <div class="modal-container appointment-summary-modal">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <button class="modal-close-btn" onclick="closeAppointmentSummary()">&times;</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Invoice Header -->
+      <div class="invoice-header">
+        <div class="invoice-title-section">
+          <h1 class="invoice-title">APPOINTMENT CONFIRMATION</h1>
+          <div class="invoice-number">
+            <span class="label">Appointment No:</span>
+            <span class="value" id="summary-code"></span>
+          </div>
+          <div class="invoice-status">
+            <span id="summary-status-badge" class="badge"></span>
+          </div>
+        </div>
+        <div class="invoice-dates">
+          <div class="date-item">
+            <span class="label">Issued:</span>
+            <span class="value" id="summary-created"></span>
+          </div>
+          <div class="date-item">
+            <span class="label">Last Updated:</span>
+            <span class="value" id="summary-updated"></span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Parties Section -->
+      <div class="invoice-parties">
+        <div class="party-box">
+          <h3 class="party-title">CHURCH INFORMATION</h3>
+          <div class="party-name" id="summary-church"></div>
+          <div class="party-detail" id="summary-church-address"></div>
+          <div class="party-detail" id="summary-church-email"></div>
+          <div class="party-detail" id="summary-church-phone"></div>
+        </div>
+        <div class="party-box">
+          <h3 class="party-title">REQUESTER INFORMATION</h3>
+          <div class="party-name" id="summary-user-name"></div>
+          <div class="party-detail" id="summary-user-email"></div>
+          <div class="party-detail" id="summary-user-phone"></div>
+          <div class="party-detail" id="summary-user-address"></div>
+        </div>
+      </div>
+      
+      <!-- Service Details -->
+      <div class="invoice-details">
+        <h3 class="section-title">APPOINTMENT DETAILS</h3>
+        <table class="details-table">
+          <tr>
+            <td class="detail-label">Service Type:</td>
+            <td class="detail-value" id="summary-service"></td>
+          </tr>
+          <tr>
+            <td class="detail-label">Appointment Date:</td>
+            <td class="detail-value" id="summary-date"></td>
+          </tr>
+          <tr>
+            <td class="detail-label">Appointment Time:</td>
+            <td class="detail-value" id="summary-time"></td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Payment Information Section -->
+      <div class="invoice-details" id="summary-payment-info-section">
+        <h3 class="section-title">PAYMENT INFORMATION</h3>
+        <table class="details-table">
+          <tr>
+            <td class="detail-label">Payment Status:</td>
+            <td class="detail-value" id="summary-payment-status"></td>
+          </tr>
+          <tr>
+            <td class="detail-label">Amount:</td>
+            <td class="detail-value" id="summary-payment-amount"></td>
+          </tr>
+          <tr id="summary-payment-method-row" style="display: none;">
+            <td class="detail-label">Payment Method:</td>
+            <td class="detail-value" id="summary-payment-method"></td>
+          </tr>
+          <tr id="summary-payment-date-row" style="display: none;">
+            <td class="detail-label">Payment Date:</td>
+            <td class="detail-value" id="summary-payment-date"></td>
+          </tr>
+          <tr id="summary-payment-transaction-row" style="display: none;">
+            <td class="detail-label">Transaction ID:</td>
+            <td class="detail-value" id="summary-payment-transaction" style="font-family: monospace; font-size: 12px;"></td>
+          </tr>
+        </table>
+      </div>
+      
+      <!-- Notes Section -->
+      <div class="invoice-notes" id="summary-notes-section" style="display: none;">
+        <h3 class="section-title">ADDITIONAL NOTES</h3>
+        <p class="notes-content" id="summary-notes"></p>
+      </div>
+      
+      <!-- Payment Method Section -->
+      <div class="invoice-payment" id="summary-payment-section" style="display: none;">
+        <h3 class="section-title">PAYMENT METHOD</h3>
+        <p class="payment-subtitle">Select your preferred payment method to proceed</p>
+        
+        <div class="payment-method-tabs">
+          <button type="button" class="payment-tab-btn active" data-method="paypal" onclick="switchPaymentTab('paypal')" title="PayPal">
+            <svg class="payment-logo" viewBox="0 0 124 33" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#003087" d="M46.211 6.749h-6.839a.95.95 0 0 0-.939.802l-2.766 17.537a.57.57 0 0 0 .564.658h3.265a.95.95 0 0 0 .939-.803l.746-4.73a.95.95 0 0 1 .938-.803h2.165c4.505 0 7.105-2.18 7.784-6.5.306-1.89.013-3.375-.872-4.415-.972-1.142-2.696-1.746-4.985-1.746zM47 13.154c-.374 2.454-2.249 2.454-4.062 2.454h-1.032l.724-4.583a.57.57 0 0 1 .563-.481h.473c1.235 0 2.4 0 3.002.704.359.42.469 1.044.332 1.906zM66.654 13.075h-3.275a.57.57 0 0 0-.563.481l-.145.916-.229-.332c-.709-1.029-2.29-1.373-3.868-1.373-3.619 0-6.71 2.741-7.312 6.586-.313 1.918.132 3.752 1.22 5.031.998 1.176 2.426 1.666 4.125 1.666 2.916 0 4.533-1.875 4.533-1.875l-.146.91a.57.57 0 0 0 .562.66h2.95a.95.95 0 0 0 .939-.803l1.77-11.209a.568.568 0 0 0-.561-.658zm-4.565 6.374c-.316 1.871-1.801 3.127-3.695 3.127-.951 0-1.711-.305-2.199-.883-.484-.574-.668-1.391-.514-2.301.295-1.855 1.805-3.152 3.67-3.152.93 0 1.686.309 2.184.892.499.589.697 1.411.554 2.317zM84.096 13.075h-3.291a.954.954 0 0 0-.787.417l-4.539 6.686-1.924-6.425a.953.953 0 0 0-.912-.678h-3.234a.57.57 0 0 0-.541.754l3.625 10.638-3.408 4.811a.57.57 0 0 0 .465.9h3.287a.949.949 0 0 0 .781-.408l10.946-15.8a.57.57 0 0 0-.468-.895z"/>
+              <path fill="#009cde" d="M94.992 6.749h-6.84a.95.95 0 0 0-.938.802l-2.766 17.537a.569.569 0 0 0 .562.658h3.51a.665.665 0 0 0 .656-.562l.785-4.971a.95.95 0 0 1 .938-.803h2.164c4.506 0 7.105-2.18 7.785-6.5.307-1.89.012-3.375-.873-4.415-.971-1.142-2.694-1.746-4.983-1.746zm.789 6.405c-.373 2.454-2.248 2.454-4.062 2.454h-1.031l.725-4.583a.568.568 0 0 1 .562-.481h.473c1.234 0 2.4 0 3.002.704.359.42.468 1.044.331 1.906zM115.434 13.075h-3.273a.567.567 0 0 0-.562.481l-.145.916-.23-.332c-.709-1.029-2.289-1.373-3.867-1.373-3.619 0-6.709 2.741-7.311 6.586-.312 1.918.131 3.752 1.219 5.031 1 1.176 2.426 1.666 4.125 1.666 2.916 0 4.533-1.875 4.533-1.875l-.146.91a.57.57 0 0 0 .564.66h2.949a.95.95 0 0 0 .938-.803l1.771-11.209a.571.571 0 0 0-.565-.658zm-4.565 6.374c-.314 1.871-1.801 3.127-3.695 3.127-.949 0-1.711-.305-2.199-.883-.484-.574-.666-1.391-.514-2.301.297-1.855 1.805-3.152 3.67-3.152.93 0 1.686.309 2.184.892.501.589.699 1.411.554 2.317z"/>
+              <path fill="#003087" d="M119.295 7.23l-2.807 17.858a.569.569 0 0 0 .562.658h2.822c.469 0 .867-.34.939-.803l2.768-17.536a.57.57 0 0 0-.562-.659h-3.16a.571.571 0 0 0-.562.482z"/>
+            </svg>
+          </button>
+          <button type="button" class="payment-tab-btn" data-method="stripe" onclick="switchPaymentTab('stripe')" title="Credit Card">
+            <div class="card-logos">
+              <svg class="card-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+                <rect fill="#EB001B" width="48" height="32" rx="4"/>
+                <circle fill="#FF5F00" cx="24" cy="16" r="10"/>
+                <circle fill="#F79E1B" cx="32" cy="16" r="10"/>
+              </svg>
+              <svg class="card-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+                <rect fill="#0066B2" width="48" height="32" rx="4"/>
+                <path fill="#FCD116" d="M18 11h12v10H18z"/>
+                <path fill="#0066B2" d="M19 16l5-5v10l-5-5z"/>
+                <path fill="#FCD116" d="M29 16l-5-5v10l5-5z"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+        
+        <!-- PayPal Payment Section -->
+        <div id="paypal-booking-section" class="booking-payment-section active">
+          <div id="paypal-booking-button" class="paypal-button-container"></div>
+          <div class="payment-note">
+            <i data-feather="info"></i>
+            <p>You'll be redirected to PayPal to complete your payment securely.</p>
+          </div>
+        </div>
+        
+        <!-- Stripe Payment Section -->
+        <div id="stripe-booking-section" class="booking-payment-section" style="display: none;">
+          <div id="stripe-booking-card" class="stripe-card-element"></div>
+          <div id="stripe-booking-errors" class="error-message" style="display: none;"></div>
+          <button type="button" id="stripe-booking-btn" class="btn btn-primary btn-block">
+            <span>Pay Now</span>
+          </button>
+          <div class="payment-note">
+            <i data-feather="shield"></i>
+            <p>Your payment is secured by Stripe. We never store your card details.</p>
+          </div>
+        </div>
+        
+        <div id="booking-payment-error" class="error-message" style="display: none;"></div>
+      </div>
+      
+      <!-- Footer Note -->
+      <div class="invoice-footer-note">
+        <p>This is an automated appointment confirmation. Please keep this for your records.</p>
+        <p>For any inquiries, please contact the church directly using the information provided above.</p>
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer" id="summary-footer" style="display: flex; gap: 12px;">
+      <button type="button" id="print-summary-btn" class="btn btn-primary" onclick="printAppointmentSummary()" style="flex: 1;">
+        <i data-feather="printer" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+        Print
+      </button>
+      <button type="button" class="btn btn-outline" onclick="closeAppointmentSummary()" style="flex: 1;">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- Review Modal -->
@@ -184,11 +400,19 @@
 </div>
 
 <!-- External JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <script>
   // Django template variables for JavaScript
   window.djangoUrls = {
     createReviewUrl: "{% url 'core:create_service_review' service_id=0 %}"
   };
+  
+  // Initialize Feather Icons
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof feather !== 'undefined') {
+      feather.replace();
+    }
+  });
 </script>
 <script src="{% static 'js/my_appointments.js' %}"></script>
 

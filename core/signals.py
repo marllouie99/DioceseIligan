@@ -13,15 +13,19 @@ User = get_user_model()
 @receiver(pre_save, sender=Booking)
 def cache_booking_old_status(sender, instance, **kwargs):
     """
-    Cache the previous status on the instance before saving so post_save can detect changes.
+    Cache the previous status and payment_status on the instance before saving so post_save can detect changes.
     """
     if instance.pk:
         try:
-            instance._old_status = Booking.objects.only('status').get(pk=instance.pk).status
+            old_booking = Booking.objects.only('status', 'payment_status').get(pk=instance.pk)
+            instance._old_status = old_booking.status
+            instance._old_payment_status = old_booking.payment_status
         except Booking.DoesNotExist:
             instance._old_status = None
+            instance._old_payment_status = None
     else:
         instance._old_status = None
+        instance._old_payment_status = None
 
 
 @receiver(post_save, sender=Booking)
@@ -61,6 +65,10 @@ def create_booking_notifications(sender, instance, created, **kwargs):
             elif instance.status == Booking.STATUS_CANCELED:
                 template = NotificationTemplates.booking_canceled(instance)
                 notification_type = Notification.TYPE_BOOKING_CANCELED
+                
+                # If booking is canceled and payment was pending, mark payment as canceled
+                if instance.payment_status == 'pending':
+                    Booking.objects.filter(pk=instance.pk).update(payment_status='canceled')
             elif instance.status == Booking.STATUS_COMPLETED:
                 template = NotificationTemplates.booking_completed(instance)
                 notification_type = Notification.TYPE_BOOKING_COMPLETED
@@ -83,6 +91,52 @@ def create_booking_notifications(sender, instance, created, **kwargs):
                     import logging
                     logger = logging.getLogger(__name__)
                     logger.error(f"Failed to send booking status email: {str(e)}")
+        
+        # Check if payment was just completed (payment_status changed to 'paid')
+        # Auto-approve booking and notify church owner
+        # Only trigger if this is an update (not creation) and payment status actually changed
+        if not created:
+            old_payment_status = getattr(instance, '_old_payment_status', None)
+            if old_payment_status and old_payment_status != 'paid' and instance.payment_status == 'paid':
+                try:
+                    # Auto-approve the booking when payment is received
+                    if instance.status == Booking.STATUS_REQUESTED:
+                        instance.status = Booking.STATUS_APPROVED
+                        # Use update to avoid triggering signals again
+                        Booking.objects.filter(pk=instance.pk).update(status=Booking.STATUS_APPROVED)
+                    
+                    # Auto-cancel conflicting bookings (same church, same date)
+                    conflicting_bookings = instance.conflicts_qs().filter(
+                        payment_status='pending'
+                    )
+                    
+                    cancelled_count = 0
+                    for conflict in conflicting_bookings:
+                        conflict.status = Booking.STATUS_CANCELED
+                        conflict.cancel_reason = f'Another booking was confirmed for {instance.church.name} on {instance.date}'
+                        conflict.save()
+                        cancelled_count += 1
+                    
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    if cancelled_count > 0:
+                        logger.info(f"Payment received for booking {instance.code}. Cancelled {cancelled_count} conflicting bookings.")
+                    
+                    church_owner = instance.church.owner if instance.church else None
+                    if church_owner:
+                        # Notify church owner about payment received and auto-approval
+                        create_church_notification(
+                            church_owner=church_owner,
+                            notification_type=Notification.TYPE_BOOKING_APPROVED,
+                            title=f'Payment Received & Booking Confirmed - {instance.code}',
+                            message=f'{instance.user.get_full_name() or instance.user.username} has paid ₱{instance.payment_amount} for {instance.service.name} on {instance.date}. The booking has been automatically confirmed.',
+                            priority='high',
+                            church=instance.church
+                        )
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Failed to auto-approve booking or create notification: {str(e)}")
 
 
 @receiver(post_save, sender=ChurchVerificationRequest)

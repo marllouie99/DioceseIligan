@@ -104,12 +104,56 @@ def landing(request: HttpRequest) -> HttpResponse:
         len(client_secret) > 10  # Valid secrets are much longer
     )
 
+    # Get real statistics from the database
+    from core.models import Church, Post
+    from django.contrib.auth import get_user_model
+    from django.db.models import Count, Q
+    from datetime import timedelta
+    from django.utils import timezone
+    
+    User = get_user_model()
+    
+    # Total churches
+    total_churches = Church.objects.filter(is_active=True).count()
+    
+    # Total users
+    total_users = User.objects.filter(is_active=True).count()
+    
+    # Active users (logged in within last 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    active_users = User.objects.filter(
+        is_active=True,
+        last_login__gte=thirty_days_ago
+    ).count()
+    
+    # Total posts across all churches
+    total_posts = Post.objects.filter(is_active=True).count()
+    
+    # Get random posts from churches (3 posts, rotated every minute)
+    # Use current minute as seed for consistent rotation within the same minute
+    current_minute = timezone.now().replace(second=0, microsecond=0)
+    minute_seed = int(current_minute.timestamp() / 60)  # Changes every minute
+    
+    # Get random posts with church and author info
+    random_posts = Post.objects.filter(
+        is_active=True,
+        church__is_active=True
+    ).select_related('church').order_by('?')[:3]
+    
     context = {
         'login_form': login_form,
         'signup_form': signup_form,
         'active_tab': active_tab,
         'debug': settings.DEBUG,
         'google_oauth_configured': google_oauth_configured,
+        # Statistics
+        'total_churches': total_churches,
+        'total_users': total_users,
+        'active_users': active_users,
+        'total_posts': total_posts,
+        # Random posts
+        'random_posts': random_posts,
+        'minute_seed': minute_seed,
     }
     
     return render(request, 'landing.html', context)
@@ -436,17 +480,37 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
     ).select_related('church').prefetch_related('likes', 'comments').order_by('-bookmarks__created_at')[:10]
     
     # Get user's post interaction activities
-    from core.models import UserInteraction
+    from core.models import UserInteraction, Donation
     
-    # For sidebar - limit to 3
+    # For sidebar - limit to 3, exclude post views
     recent_activities = UserInteraction.objects.filter(
         user=request.user
+    ).exclude(
+        activity_type=UserInteraction.ACTIVITY_POST_VIEW
     ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:3]
     
-    # For profile page content - show 15
+    # For profile page content - show 10 initially (pagination will load more)
+    # Exclude post view activities
     profile_activities = UserInteraction.objects.filter(
         user=request.user
-    ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:15]
+    ).exclude(
+        activity_type=UserInteraction.ACTIVITY_POST_VIEW
+    ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:10]
+    
+    # Get user's donations
+    user_donations = Donation.objects.filter(
+        donor=request.user
+    ).select_related('post', 'post__church').order_by('-created_at')[:20]
+    
+    # Calculate donation statistics
+    from django.db.models import Sum, Count
+    donation_stats = Donation.objects.filter(
+        donor=request.user,
+        payment_status='completed'
+    ).aggregate(
+        total_donated=Sum('amount'),
+        donation_count=Count('id')
+    )
 
     context = {
         'form': form,
@@ -465,6 +529,9 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         'saved_posts': saved_posts,
         'recent_activities': recent_activities,  # 3 activities for sidebar
         'profile_activities': profile_activities,  # 15 activities for profile page content
+        'user_donations': user_donations,
+        'total_donated': donation_stats['total_donated'] or 0,
+        'donation_count': donation_stats['donation_count'] or 0,
         'is_admin_mode': bool(request.session.get('super_admin_mode', False)) if getattr(request.user, 'is_superuser', False) else False,
     }
     return render(request, 'manage_profile.html', context)
@@ -1199,6 +1266,67 @@ def google_callback(request):
         print(f"GOOGLE_CALLBACK ERROR: Unexpected error - {str(e)}")
         messages.error(request, 'An unexpected error occurred during Google login.')
         return redirect('landing')
+
+
+@login_required
+def load_more_activities(request):
+    """
+    API endpoint to load more activities with pagination
+    """
+    from core.models import UserInteraction
+    from django.template.loader import render_to_string
+    
+    offset = int(request.GET.get('offset', 10))
+    limit = 10
+    
+    # Exclude post view activities
+    activities = UserInteraction.objects.filter(
+        user=request.user
+    ).exclude(
+        activity_type=UserInteraction.ACTIVITY_POST_VIEW
+    ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[offset:offset + limit]
+    
+    # Render activities HTML with more details
+    activities_html = []
+    for activity in activities:
+        # Get additional details based on activity type
+        details = None
+        content_obj = activity.content_object
+        
+        if content_obj:
+            if hasattr(content_obj, 'church'):
+                # Post-related activity
+                details = {
+                    'church_name': content_obj.church.name,
+                    'content_preview': content_obj.content[:100] if hasattr(content_obj, 'content') else None
+                }
+            elif hasattr(content_obj, 'name'):
+                # Church or Service related
+                details = {
+                    'name': content_obj.name,
+                    'description': content_obj.description[:100] if hasattr(content_obj, 'description') else None
+                }
+        
+        activities_html.append({
+            'icon_class': activity.icon_class,
+            'activity_type': activity.activity_type,
+            'description': activity.activity_description,
+            'time_ago': activity.created_at,
+            'details': details
+        })
+    
+    has_more = UserInteraction.objects.filter(
+        user=request.user
+    ).exclude(
+        activity_type=UserInteraction.ACTIVITY_POST_VIEW
+    ).count() > (offset + limit)
+    
+    return JsonResponse({
+        'success': True,
+        'activities': activities_html,
+        'has_more': has_more,
+        'next_offset': offset + limit
+    })
 
 
 def server_time(request):

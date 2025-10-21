@@ -259,13 +259,31 @@
   
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-      <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Church Owner</span>
+      <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Church Manager</span>
+      {% if church.owner %}
       <span style="font-size: 1rem; font-weight: 600; color: #111827;">{{ church.owner.get_full_name|default:church.owner.email }}</span>
+      {% else %}
+      <span style="font-size: 1rem; font-weight: 600; color: #ef4444; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        No Manager Assigned
+      </span>
+      {% endif %}
     </div>
+    {% if church.owner %}
     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-      <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Owner Email</span>
+      <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Manager Email</span>
       <a href="mailto:{{ church.owner.email }}" style="font-size: 1rem; font-weight: 600; color: #1E90FF; text-decoration: none;">{{ church.owner.email }}</a>
     </div>
+    {% else %}
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Manager Email</span>
+      <span style="font-size: 1rem; font-weight: 600; color: #9ca3af;">—</span>
+    </div>
+    {% endif %}
     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
       <span style="font-size: 0.8125rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Created Date</span>
       <span style="font-size: 1rem; font-weight: 600; color: #111827;">{{ church.created_at|date:"F d, Y" }}</span>

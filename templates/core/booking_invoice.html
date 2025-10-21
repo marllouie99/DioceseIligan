@@ -81,6 +81,54 @@
 
     <hr/>
 
+    <div style="margin-top:16px;">
+      <div class="title" style="font-size:16px; margin-bottom:12px;">Payment Information</div>
+      <div class="row">
+        <div>
+          <div class="label">Payment Status</div>
+          <div class="value">
+            {% if booking.payment_status == 'paid' %}
+              <span style="color:#16a34a;">✓ Paid</span>
+            {% elif booking.payment_status == 'pending' %}
+              <span style="color:#ca8a04;">⏳ Pending</span>
+            {% elif booking.payment_status == 'failed' %}
+              <span style="color:#dc2626;">✗ Failed</span>
+            {% elif booking.payment_status == 'canceled' %}
+              <span style="color:#6b7280;">✗ Canceled</span>
+            {% elif booking.payment_status == 'refunded' %}
+              <span style="color:#3b82f6;">↩ Refunded</span>
+            {% else %}
+              <span style="color:#6b7280;">{{ booking.get_payment_status_display }}</span>
+            {% endif %}
+          </div>
+        </div>
+        <div>
+          <div class="label">Amount</div>
+          <div class="value">₱{{ booking.payment_amount|default:"0.00"|floatformat:2 }}</div>
+        </div>
+      </div>
+      {% if booking.payment_status == 'paid' %}
+        <div class="row" style="margin-top:12px;">
+          <div>
+            <div class="label">Payment Method</div>
+            <div class="value">{{ booking.get_payment_method_display|default:"N/A" }}</div>
+          </div>
+          <div>
+            <div class="label">Payment Date</div>
+            <div class="value">{{ booking.payment_date|date:'M j, Y g:i A'|default:"N/A" }}</div>
+          </div>
+        </div>
+        {% if booking.payment_transaction_id %}
+          <div style="margin-top:12px;">
+            <div class="label">Transaction ID</div>
+            <div class="value" style="font-family:monospace; font-size:12px;">{{ booking.payment_transaction_id }}</div>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <hr/>
+
     <div>
       <div class="label">Important</div>
       <p>Please bring this invoice and any required documents to the church office to complete your booking. The church reserves the right to reschedule in case of conflicts or unforeseen circumstances.</p>

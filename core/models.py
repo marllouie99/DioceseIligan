@@ -95,7 +95,7 @@ class Church(models.Model):
     paypal_email = models.EmailField(blank=True, null=True, help_text="PayPal email address for receiving donations (required to enable donations on posts)")
     
     # Status and Ownership
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_churches', help_text="User who created/manages this church")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_churches', null=True, blank=True, help_text="User who created/manages this church (can be null for managerless churches)")
     is_verified = models.BooleanField(default=False, help_text="Whether this church is verified by administrators")
     is_active = models.BooleanField(default=True, help_text="Whether this church is currently active")
     
@@ -537,6 +537,24 @@ class Booking(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_REQUESTED)
     cancel_reason = models.CharField(max_length=200, blank=True, help_text="Reason when canceled/auto-canceled")
     decline_reason = models.CharField(max_length=200, blank=True, help_text="Reason when declined")
+    
+    # Payment fields
+    payment_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('failed', 'Failed'),
+        ('canceled', 'Canceled'),
+        ('refunded', 'Refunded'),
+    ], default='pending', help_text="Payment status")
+    payment_method = models.CharField(max_length=20, choices=[
+        ('paypal', 'PayPal'),
+        ('stripe', 'Credit Card'),
+        ('gcash', 'GCash'),
+    ], blank=True, null=True, help_text="Payment method used")
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Payment amount")
+    payment_transaction_id = models.CharField(max_length=200, blank=True, null=True, help_text="Payment gateway transaction ID")
+    payment_date = models.DateTimeField(blank=True, null=True, help_text="Date when payment was completed")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status_changed_at = models.DateTimeField(null=True, blank=True)
@@ -555,11 +573,25 @@ class Booking(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         if is_new and not self.code:
-            # For new bookings, save first to get ID, then update code
-            super().save(*args, **kwargs)
-            self.code = f"APPT-{self.id:04d}"
-            # Use update() to avoid triggering signals again
-            Booking.objects.filter(pk=self.pk).update(code=self.code)
+            # Generate a unique code before saving
+            # Get the highest existing ID to avoid conflicts
+            last_booking = Booking.objects.order_by('-id').first()
+            next_id = (last_booking.id + 1) if last_booking else 1
+            self.code = f"APPT-{next_id:04d}"
+            
+            # Try to save, if code exists, increment and retry
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                try:
+                    super().save(*args, **kwargs)
+                    break
+                except Exception as e:
+                    if 'UNIQUE constraint failed' in str(e) and attempt < max_attempts - 1:
+                        # Code already exists, increment and try again
+                        next_id += 1
+                        self.code = f"APPT-{next_id:04d}"
+                    else:
+                        raise
         else:
             # For existing bookings, just save normally
             super().save(*args, **kwargs)

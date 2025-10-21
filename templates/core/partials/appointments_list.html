@@ -21,7 +21,8 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
       </thead>
       <tbody>
         {% for b in bookings %}
-          <tr class="appointment-row {% if b.is_conflict %}conflict-row{% endif %}">
+          <tr class="appointment-row status-{{ b.status }} {% if b.is_conflict %}conflict-row{% endif %}" 
+              style="{% if b.status == 'approved' %}background: rgba(34, 197, 94, 0.1) !important; border-left: 4px solid #22c55e !important;{% elif b.status == 'canceled' or b.status == 'cancelled' or b.status == 'declined' %}background: rgba(156, 163, 175, 0.15) !important; border-left: 4px solid #9ca3af !important; opacity: 0.7 !important;{% elif b.status == 'requested' %}background: rgba(234, 179, 8, 0.1) !important; border-left: 4px solid #eab308 !important;{% elif b.status == 'reviewed' %}background: rgba(59, 130, 246, 0.1) !important; border-left: 4px solid #3b82f6 !important;{% elif b.status == 'completed' %}background: rgba(139, 69, 19, 0.1) !important; border-left: 4px solid #8b4513 !important;{% endif %}">
             <td class="service-cell">
               <span class="service-name">{{ b.service.name }}</span>
             </td>
