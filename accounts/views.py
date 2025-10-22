@@ -140,6 +140,12 @@ def landing(request: HttpRequest) -> HttpResponse:
         church__is_active=True
     ).select_related('church').order_by('?')[:3]
     
+    # Get featured churches for the churches section (6 churches for 3-column grid)
+    # Prioritize verified churches with followers
+    featured_churches = Church.objects.filter(
+        is_active=True
+    ).select_related('owner').order_by('-is_verified', '-follower_count')[:6]
+    
     context = {
         'login_form': login_form,
         'signup_form': signup_form,
@@ -154,6 +160,8 @@ def landing(request: HttpRequest) -> HttpResponse:
         # Random posts
         'random_posts': random_posts,
         'minute_seed': minute_seed,
+        # Featured churches
+        'featured_churches': featured_churches,
     }
     
     return render(request, 'landing.html', context)

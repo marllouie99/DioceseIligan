@@ -595,7 +595,9 @@ function openReviewModal(serviceId, serviceName, churchName, bookingId) {
     currentServiceId = serviceId;
     document.getElementById('modal-service-name').textContent = serviceName;
     document.getElementById('modal-church-name').textContent = 'at ' + churchName;
-    document.getElementById('reviewModal').style.display = 'flex';
+    
+    const modal = document.getElementById('reviewModal');
+    modal.style.setProperty('display', 'flex', 'important');
     
     // Reset form
     document.getElementById('reviewForm').reset();

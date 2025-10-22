@@ -217,10 +217,21 @@
     </div>
     
     <div id="events" class="tab-panel">
-      <div class="empty-state">
-        <h3>No events yet</h3>
-        <p>Upcoming church events will appear here.</p>
-      </div>
+      {% if event_posts %}
+        <div class="posts-feed">
+          {% for post in event_posts %}
+            {% include 'partials/post_card.html' with post=post %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i data-feather="calendar"></i>
+          </div>
+          <h3>No events yet</h3>
+          <p>Upcoming church events will appear here.</p>
+        </div>
+      {% endif %}
     </div>
     
     <div id="appointments" class="tab-panel">

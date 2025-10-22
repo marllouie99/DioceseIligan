@@ -332,6 +332,12 @@ def church_detail(request, slug):
         image__isnull=False
     ).exclude(image='').order_by('-created_at')[:9]
     
+    # Get event posts for Events tab
+    event_posts = church.posts.filter(
+        is_active=True,
+        post_type='event'
+    ).select_related('church').order_by('-event_start_date')[:10]
+    
     ctx = {
         'page_title': church.name,
         'church': church,
@@ -345,6 +351,7 @@ def church_detail(request, slug):
         'can_request_appointment': can_request_appointment,
         'essential_missing': essential_missing,
         'photo_posts': photo_posts,
+        'event_posts': event_posts,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/church_detail.html', ctx)

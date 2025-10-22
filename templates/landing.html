@@ -276,6 +276,136 @@
       </div>
     </div>
   </div>
+
+  <!-- Featured Churches Section -->
+  <div class="churches-section">
+      <div class="churches-container">
+        <div class="churches-header">
+          <h2 class="churches-title">Discover Churches</h2>
+          <p class="churches-subtitle">Connect with faith communities in your area</p>
+        </div>
+
+        {% if featured_churches %}
+        <div class="churches-grid">
+          {% for church in featured_churches %}
+          <div class="church-card">
+            <div class="church-card-image">
+              {% if church.cover_image %}
+                <img src="{{ church.cover_image.url }}" alt="{{ church.name }}" loading="lazy">
+              {% else %}
+                <div class="church-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 9v11a2 2 0 002 2h14a2 2 0 002-2V9l-9-7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              {% endif %}
+              {% if church.is_verified %}
+              <div class="verified-badge" title="Verified Church">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              {% endif %}
+            </div>
+            <div class="church-card-content">
+              <h3 class="church-name">{{ church.name }}</h3>
+              <p class="church-location">
+                <svg class="location-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                {{ church.city|default:"Location not set" }}
+              </p>
+              {% if church.description %}
+              <p class="church-description">{{ church.description|truncatewords:15 }}</p>
+              {% endif %}
+              <div class="church-stats">
+                <span class="church-stat">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                  {{ church.follower_count }} follower{{ church.follower_count|pluralize }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="churches-footer">
+          <a href="{% url 'core:discover' %}" class="btn-explore">
+            Explore More Parishes
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+        {% else %}
+        <div class="churches-empty">
+          <p>No churches available at the moment. Check back soon!</p>
+        </div>
+        {% endif %}
+      </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div class="footer-content">
+        <!-- About Section -->
+        <div class="footer-section">
+          <h3 class="footer-title">Diocese of Iligan</h3>
+          <p class="footer-description">Building stronger spiritual connections through technology and faith. Connect with your parish community and grow together.</p>
+          <div class="footer-logo">
+            <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan" class="footer-logo-img">
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'core:discover' %}">Discover Churches</a></li>
+            <li><a href="{% url 'landing' %}">Sign In</a></li>
+            <li><a href="{% url 'landing' %}?tab=signup">Sign Up</a></li>
+            <li><a href="{% url 'core:create_church' %}">Create Church</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="footer-section">
+          <h4 class="footer-heading">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div class="footer-section">
+          <h4 class="footer-heading">Connect With Us</h4>
+          <ul class="footer-links">
+            <li><a href="mailto:support@churchconnect.com">support@churchconnect.com</a></li>
+            <li><a href="#">Community Forum</a></li>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Twitter</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p class="footer-copyright">&copy; {% now "Y" %} Diocese of Iligan. All rights reserved.</p>
+        <p class="footer-tagline">Empowering faith communities in the digital age</p>
+      </div>
+    </div>
+  </footer>
+
   <script defer src="{% static 'js/landing.js' %}"></script>
   <script defer src="{% static 'js/hero-carousel.js' %}"></script>
   <script defer src="{% static 'js/utils/clock-sync.js' %}"></script>
