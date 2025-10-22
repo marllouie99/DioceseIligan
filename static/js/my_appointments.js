@@ -390,7 +390,7 @@ function initializePayPalButton(bookingId, churchPaypal) {
     paypal.Buttons({
         createOrder: function(data, actions) {
             // Call backend to create PayPal order with service price
-            return fetch(`/api/booking/${bookingId}/payment/create/`, {
+            return fetch(`/app/api/booking/${bookingId}/payment/create/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -415,7 +415,7 @@ function initializePayPalButton(bookingId, churchPaypal) {
         },
         onApprove: function(data, actions) {
             // Call backend to capture payment
-            return fetch(`/api/booking/${bookingId}/payment/capture/`, {
+            return fetch(`/app/api/booking/${bookingId}/payment/capture/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -508,7 +508,7 @@ function initializeStripeElement() {
                 btnText.textContent = 'Processing...';
                 
                 // Create payment intent with service price
-                const response = await fetch(`/api/booking/${currentBookingId}/payment/stripe/create/`, {
+                const response = await fetch(`/app/api/booking/${currentBookingId}/payment/stripe/create/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -535,7 +535,7 @@ function initializeStripeElement() {
                 }
                 
                 // Confirm payment on backend
-                const confirmResponse = await fetch(`/api/booking/${currentBookingId}/payment/stripe/confirm/`, {
+                const confirmResponse = await fetch(`/app/api/booking/${currentBookingId}/payment/stripe/confirm/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
