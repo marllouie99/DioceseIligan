@@ -189,16 +189,17 @@ def conversation_messages_api(request, conversation_id):
                 # Use church logo for church owner messages
                 try:
                     if conversation.church.logo:
-                        avatar = conversation.church.logo.url
-                except Exception:
+                        avatar = request.build_absolute_uri(conversation.church.logo.url)
+                except Exception as e:
+                    print(f"Error getting church logo: {e}")
                     avatar = None
             else:
                 # Use user profile avatar
                 try:
-                    if hasattr(msg.sender, 'profile'):
-                        profile = getattr(msg.sender, 'profile', None)
-                        if profile and hasattr(profile, 'profile_image') and profile.profile_image:
-                            avatar = profile.profile_image.url
+                    if hasattr(msg.sender, 'profile') and msg.sender.profile:
+                        profile = msg.sender.profile
+                        if profile.profile_image:
+                            avatar = request.build_absolute_uri(profile.profile_image.url)
                 except Exception as e:
                     print(f"Error getting message sender avatar: {e}")
                     avatar = None

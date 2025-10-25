@@ -145,6 +145,39 @@
   height: 100% !important;
 }
 
+/* Time Filter Buttons */
+.chart-time-filter, .stats-time-filter {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.time-filter-btn, .stats-filter-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--muted);
+}
+
+.time-filter-btn:hover, .stats-filter-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.time-filter-btn.active, .stats-filter-btn.active {
+  background: var(--gradient-brand);
+  color: var(--text-light);
+  box-shadow: var(--shadow-md);
+}
+
 /* Posts Section */
 .posts-section {
   background: white;
@@ -258,7 +291,7 @@
   text-align: left;
   font-weight: 700;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -276,11 +309,13 @@
   padding: 1rem;
   color: var(--text);
   vertical-align: middle;
+  font-size: 0.875rem;
 }
 
-.church-name {
+.parish-name {
   font-weight: 600;
   color: var(--brand);
+  font-size: 0.875rem;
 }
 
 .post-excerpt {
@@ -289,17 +324,41 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.875rem;
 }
 
 .type-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%);
-  color: #654321;
-  border: 1px solid rgba(218, 165, 32, 0.2);
+  text-transform: capitalize;
+}
+
+/* Post type specific colors */
+.type-badge.type-general {
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  color: #1e40af;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.type-badge.type-photo {
+  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+  color: #166534;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.type-badge.type-event {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.type-badge.type-prayer {
+  background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+  color: #6b21a8;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .status-badge {
@@ -461,15 +520,33 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Weekly Engagement Trends Chart
   const engagementCtx = document.getElementById('engagementTrendsChart');
-  if (engagementCtx) {
-    new Chart(engagementCtx, {
+  let engagementChart = null;
+  
+  // Initial data (7 days)
+  const engagementData = {
+    7: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      comments: {{ engagement_data.comments|safe }},
+      likes: {{ engagement_data.likes|safe }},
+      shares: {{ engagement_data.shares|safe }}
+    }
+  };
+  
+  function createEngagementChart(days) {
+    const data = engagementData[days];
+    
+    if (engagementChart) {
+      engagementChart.destroy();
+    }
+    
+    engagementChart = new Chart(engagementCtx, {
       type: 'line',
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: data.labels,
         datasets: [
           {
             label: 'Comments',
-            data: {{ engagement_data.comments|safe }},
+            data: data.comments,
             borderColor: 'rgba(59, 130, 246, 1)',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             borderWidth: 3,
@@ -480,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           {
             label: 'Likes',
-            data: {{ engagement_data.likes|safe }},
+            data: data.likes,
             borderColor: 'rgba(239, 68, 68, 1)',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             borderWidth: 3,
@@ -491,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           {
             label: 'Shares',
-            data: {{ engagement_data.shares|safe }},
+            data: data.shares,
             borderColor: 'rgba(16, 185, 129, 1)',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             borderWidth: 3,
@@ -508,18 +585,90 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: {
           legend: {
             display: true,
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 12,
+                weight: '600'
+              },
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
             ticks: {
-              precision: 0
+              precision: 0,
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              display: false
             }
           }
         }
       }
+    });
+  }
+  
+  if (engagementCtx) {
+    createEngagementChart(7);
+    
+    // Time filter buttons
+    const timeFilterBtns = document.querySelectorAll('.time-filter-btn');
+    const engagementSubtitle = document.getElementById('engagementSubtitle');
+    
+    timeFilterBtns.forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const days = parseInt(this.dataset.days);
+        
+        // Update active state
+        timeFilterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update subtitle
+        engagementSubtitle.textContent = `Post interactions over the last ${days} days`;
+        
+        // If data doesn't exist, fetch it
+        if (!engagementData[days]) {
+          try {
+            const response = await fetch(`/app/super-admin/posts/engagement-data/?days=${days}`);
+            const data = await response.json();
+            engagementData[days] = data;
+            createEngagementChart(days);
+          } catch (error) {
+            console.error('Error fetching engagement data:', error);
+          }
+        } else {
+          createEngagementChart(days);
+        }
+      });
     });
   }
 
@@ -529,14 +678,14 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(typeCtx, {
       type: 'bar',
       data: {
-        labels: ['Bulletin', 'Event', 'Announcement', 'Prayer'],
+        labels: ['Update', 'Event', 'Photo', 'Prayer'],
         datasets: [{
           data: {{ type_data|safe }},
           backgroundColor: [
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(139, 92, 246, 0.85)'
+            'rgba(59, 130, 246, 0.85)',   // Blue for Update
+            'rgba(245, 158, 11, 0.85)',   // Orange for Event
+            'rgba(16, 185, 129, 0.85)',   // Green for Photo
+            'rgba(139, 92, 246, 0.85)'    // Purple for Prayer
           ],
           borderWidth: 0,
           borderRadius: 8,
@@ -549,6 +698,27 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: {
           legend: {
             display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            borderRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            },
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed.y || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                return `${value} posts (${percentage}%)`;
+              }
+            }
           }
         },
         scales: {
@@ -562,7 +732,56 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // Stats Filter Functionality
+  const statsFilterBtns = document.querySelectorAll('.stats-filter-btn');
+  
+  statsFilterBtns.forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const period = this.dataset.period;
+      
+      // Update active state
+      statsFilterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Fetch stats data for the selected period
+      try {
+        const response = await fetch(`/app/super-admin/posts/stats-data/?period=${period}`);
+        const data = await response.json();
+        
+        // Update stat cards
+        document.getElementById('statTotalPosts').textContent = data.total_posts;
+        document.getElementById('statNewPosts').textContent = data.new_posts_text;
+        document.getElementById('statTotalLikes').textContent = data.total_likes;
+        document.getElementById('statAvgLikes').textContent = `${data.avg_likes_per_post} avg per post`;
+        document.getElementById('statTotalComments').textContent = data.total_comments;
+        document.getElementById('statAvgComments').textContent = `${data.avg_comments_per_post} avg per post`;
+        document.getElementById('statTotalShares').textContent = data.total_shares;
+        document.getElementById('statAvgShares').textContent = `${data.avg_shares_per_post} avg per post`;
+        
+        // Add animation
+        document.querySelectorAll('.stat-card-value').forEach(el => {
+          el.style.animation = 'none';
+          setTimeout(() => {
+            el.style.animation = 'fadeIn 0.3s ease';
+          }, 10);
+        });
+      } catch (error) {
+        console.error('Error fetching stats data:', error);
+      }
+    });
+  });
 });
+
+// Add fade animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
 
@@ -576,8 +795,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {% block content %}
 <div class="posts-container">
-  <h1 class="section-title" style="font-size: 28px; font-weight: 800; margin: 0 0 0.5rem 0;">Posts Management</h1>
-  <p style="font-size: 0.9375rem; margin-bottom: 1.5rem; color: var(--muted);">Monitor and moderate content across all churches</p>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="section-title" style="margin-bottom: 0.25rem;">Posts Management</h1>
+      <p style="font-size: 0.9375rem; margin: 0; color: var(--muted);">Monitor and moderate content across all parishes</p>
+    </div>
+    <div class="stats-time-filter">
+      <button class="stats-filter-btn active" data-period="all">All Time</button>
+      <button class="stats-filter-btn" data-period="7">7 Days</button>
+      <button class="stats-filter-btn" data-period="30">30 Days</button>
+      <button class="stats-filter-btn" data-period="90">90 Days</button>
+    </div>
+  </div>
   
   <!-- 4 Column Statistics Cards -->
   <div class="stats-grid-4col">
@@ -589,8 +818,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Posts</div>
-        <div class="stat-card-value">{{ stats.total_posts }}</div>
-        <div class="stat-card-subtitle brand">+{{ stats.new_posts_this_week }} this week</div>
+        <div class="stat-card-value" id="statTotalPosts">{{ stats.total_posts }}</div>
+        <div class="stat-card-subtitle brand" id="statNewPosts">+{{ stats.new_posts_this_week }} this week</div>
       </div>
     </div>
 
@@ -602,8 +831,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Likes</div>
-        <div class="stat-card-value">{{ stats.total_likes }}</div>
-        <div class="stat-card-subtitle">{{ stats.avg_likes_per_post }} avg per post</div>
+        <div class="stat-card-value" id="statTotalLikes">{{ stats.total_likes }}</div>
+        <div class="stat-card-subtitle" id="statAvgLikes">{{ stats.avg_likes_per_post }} avg per post</div>
       </div>
     </div>
 
@@ -615,8 +844,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Comments</div>
-        <div class="stat-card-value">{{ stats.total_comments }}</div>
-        <div class="stat-card-subtitle">{{ stats.avg_comments_per_post }} avg per post</div>
+        <div class="stat-card-value" id="statTotalComments">{{ stats.total_comments }}</div>
+        <div class="stat-card-subtitle" id="statAvgComments">{{ stats.avg_comments_per_post }} avg per post</div>
       </div>
     </div>
 
@@ -632,8 +861,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Shares</div>
-        <div class="stat-card-value">{{ stats.total_shares }}</div>
-        <div class="stat-card-subtitle">{{ stats.avg_shares_per_post }} avg per post</div>
+        <div class="stat-card-value" id="statTotalShares">{{ stats.total_shares }}</div>
+        <div class="stat-card-subtitle" id="statAvgShares">{{ stats.avg_shares_per_post }} avg per post</div>
       </div>
     </div>
   </div>
@@ -641,9 +870,16 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- 2 Column Charts -->
   <div class="charts-grid-2col">
     <div class="chart-card">
-      <div class="chart-header">
-        <h3 class="chart-title">Weekly Engagement Trends</h3>
-        <p class="chart-subtitle">Post interactions over the last 7 days</p>
+      <div class="chart-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 class="chart-title">Engagement Trends</h3>
+          <p class="chart-subtitle" id="engagementSubtitle">Post interactions over the last 7 days</p>
+        </div>
+        <div class="chart-time-filter">
+          <button class="time-filter-btn active" data-days="7">7 Days</button>
+          <button class="time-filter-btn" data-days="30">30 Days</button>
+          <button class="time-filter-btn" data-days="90">90 Days</button>
+        </div>
       </div>
       <div class="chart-container">
         <canvas id="engagementTrendsChart"></canvas>
@@ -666,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="section-header">
       <div class="section-title-group">
         <h2>Recent Posts</h2>
-        <p>Monitor and moderate content across all churches</p>
+        <p>Monitor and moderate content across all parishes</p>
       </div>
       <div class="section-actions">
         <div class="search-box">
@@ -678,16 +914,15 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <select class="filter-select" id="typeFilter">
           <option value="">All Types</option>
-          <option value="bulletin">Bulletin</option>
+          <option value="general">Update</option>
+          <option value="photo">Photo</option>
           <option value="event">Event</option>
-          <option value="announcement">Announcement</option>
           <option value="prayer">Prayer</option>
         </select>
         <select class="filter-select" id="statusFilter">
           <option value="">All Status</option>
-          <option value="published">Published</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="flagged">Flagged</option>
+          <option value="active">Published</option>
+          <option value="inactive">Flagged</option>
         </select>
       </div>
     </div>
@@ -697,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <table class="posts-table">
         <thead>
           <tr>
-            <th>Church</th>
+            <th>Parish</th>
             <th>Title</th>
             <th>Author</th>
             <th>Type</th>
@@ -712,12 +947,12 @@ document.addEventListener('DOMContentLoaded', function() {
         <tbody>
           {% for post in posts %}
           <tr>
-            <td class="church-name">{{ post.church.name }}</td>
+            <td class="parish-name">{{ post.church.name }}</td>
             <td>
               <div class="post-excerpt">{{ post.content|truncatechars:50 }}</div>
             </td>
             <td>{% if post.church.owner %}{{ post.church.owner.get_full_name|default:post.church.owner.username }}{% else %}<span style="color: #ef4444; font-style: italic;">No Manager</span>{% endif %}</td>
-            <td><span class="type-badge">{{ post.get_post_type_display }}</span></td>
+            <td><span class="type-badge type-{{ post.post_type }}">{{ post.get_post_type_display }}</span></td>
             <td>{{ post.created_at|date:"Y-m-d" }}</td>
             <td>{{ post.likes_count|default:0 }}</td>
             <td>{{ post.comments_count|default:0 }}</td>

@@ -303,8 +303,10 @@ class ChatWidget {
     this.conversationsScroll.innerHTML = html;
   }
 
-  async loadMessages(conversationId) {
-    this.showLoading();
+  async loadMessages(conversationId, silent = false) {
+    if (!silent) {
+      this.showLoading();
+    }
     
     try {
       const response = await fetch(`/app/api/conversations/${conversationId}/messages/`, {
@@ -315,14 +317,34 @@ class ChatWidget {
       
       if (response.ok) {
         const data = await response.json();
-        this.messages = data.messages || [];
-        this.renderMessages();
+        const newMessages = data.messages || [];
+        
+        // Only re-render if messages have changed
+        if (!silent || JSON.stringify(newMessages) !== JSON.stringify(this.messages)) {
+          // Save scroll position
+          const wasAtBottom = this.isScrolledToBottom();
+          
+          this.messages = newMessages;
+          this.renderMessages();
+          
+          // Restore scroll position (stay at bottom if was at bottom, or keep position)
+          if (wasAtBottom) {
+            this.scrollToBottom();
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading messages:', error);
     } finally {
-      this.hideLoading();
+      if (!silent) {
+        this.hideLoading();
+      }
     }
+  }
+  
+  isScrolledToBottom() {
+    const threshold = 100; // pixels from bottom
+    return this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop - this.messagesContainer.clientHeight < threshold;
   }
 
   renderMessages() {
@@ -572,9 +594,9 @@ class ChatWidget {
     // Poll for new messages every 10 seconds
     this.messagePollingInterval = setInterval(() => {
       if (this.activeConversationId) {
-        this.loadMessages(this.activeConversationId);
+        this.loadMessages(this.activeConversationId, true); // Silent mode to prevent flickering
       }
-      this.loadConversations();
+      this.loadConversations(); // Update conversation list for unread counts
     }, 10000);
   }
 

@@ -962,6 +962,49 @@ class PostReport(models.Model):
         return f"{self.user.get_full_name()} reported post by {self.post.church.name} - {self.get_reason_display()}"
 
 
+class CommentReport(models.Model):
+    """Model for users reporting inappropriate comments."""
+    
+    REASON_CHOICES = [
+        ('spam', 'Spam or misleading'),
+        ('inappropriate', 'Inappropriate content'),
+        ('harassment', 'Harassment or hate speech'),
+        ('violence', 'Violence or dangerous content'),
+        ('false_info', 'False information'),
+        ('offensive', 'Offensive language'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('reviewed', 'Reviewed'),
+        ('dismissed', 'Dismissed'),
+        ('action_taken', 'Action Taken'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_reports')
+    comment = models.ForeignKey(PostComment, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=20, choices=REASON_CHOICES)
+    description = models.TextField(help_text="Additional details about the report")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_comment_reports')
+    admin_notes = models.TextField(blank=True, help_text="Admin notes on the report")
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['user', 'comment']  # Prevent duplicate reports from same user
+        indexes = [
+            models.Index(fields=['comment', 'status']),
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['status', 'created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.get_full_name()} reported comment by {self.comment.user.get_full_name()} - {self.get_reason_display()}"
+
+
 class ChurchVerificationRequest(models.Model):
     """A verification request submitted by a church owner with legal documents."""
     STATUS_PENDING = 'pending'

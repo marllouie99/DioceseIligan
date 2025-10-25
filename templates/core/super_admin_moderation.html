@@ -17,6 +17,10 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Chart Data -->
+<script id="weeklyActivityData" type="application/json">{{ weekly_activity_json|safe }}</script>
+<script id="reportReasonsData" type="application/json">{{ report_reasons_json|safe }}</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="{% static 'js/super_admin_moderation.js' %}?v={{ STATIC_VERSION }}"></script>
 {% endblock %}

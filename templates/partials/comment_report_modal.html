@@ -1,0 +1,185 @@
+<!-- Comment Report Modal -->
+<div id="commentReportModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.5);">
+  <div class="modal-content" style="max-width: 500px; background: white; border-radius: 8px; position: relative; z-index: 10001;">
+    <div class="modal-header">
+      <h3 class="modal-title">Report Comment</h3>
+      <button type="button" class="modal-close" onclick="closeCommentReportModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <form id="commentReportForm" class="modal-body">
+      {% csrf_token %}
+      <input type="hidden" id="reportCommentId" name="comment_id">
+      
+      <div class="form-group">
+        <label for="reportReason">Reason for reporting *</label>
+        <select id="reportReason" name="reason" class="form-control" required>
+          <option value="">Select a reason...</option>
+          <option value="spam">Spam or misleading</option>
+          <option value="inappropriate">Inappropriate content</option>
+          <option value="harassment">Harassment or hate speech</option>
+          <option value="violence">Violence or dangerous content</option>
+          <option value="false_info">False information</option>
+          <option value="offensive">Offensive language</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="reportDescription">Additional details *</label>
+        <textarea 
+          id="reportDescription" 
+          name="description" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Please provide more details about why you're reporting this comment..."
+          required
+          maxlength="500"
+        ></textarea>
+        <small class="form-text text-muted">Maximum 500 characters</small>
+      </div>
+      
+      <div class="alert alert-info" style="font-size: 0.875rem; margin-top: 1rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Your report will be reviewed by our moderation team. False reports may result in account restrictions.
+      </div>
+    </form>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeCommentReportModal()">Cancel</button>
+      <button type="submit" form="commentReportForm" class="btn btn-danger">Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.comment-report-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+}
+
+.comment-report-btn:hover {
+  color: #ef4444;
+}
+
+.comment-report-btn svg {
+  width: 14px;
+  height: 14px;
+}
+</style>
+
+<script>
+function openCommentReportModal(commentId) {
+  const modal = document.getElementById('commentReportModal');
+  const commentIdInput = document.getElementById('reportCommentId');
+  
+  if (modal && commentIdInput) {
+    commentIdInput.value = commentId;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeCommentReportModal() {
+  const modal = document.getElementById('commentReportModal');
+  const form = document.getElementById('commentReportForm');
+  
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  
+  if (form) {
+    form.reset();
+  }
+}
+
+// Handle form submission
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('commentReportForm');
+  
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const modal = document.getElementById('commentReportModal');
+      const submitBtn = modal.querySelector('button[type="submit"]');
+      
+      if (!submitBtn) {
+        console.error('Submit button not found');
+        return;
+      }
+      
+      const originalText = submitBtn.textContent;
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+      
+      try {
+        const response = await fetch('/app/comments/report/', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Show success message
+          alert('Thank you for your report. Our moderation team will review it shortly.');
+          closeCommentReportModal();
+        } else {
+          alert(data.message || 'Failed to submit report. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error submitting report:', error);
+        alert('An error occurred. Please try again later.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+  }
+  
+  // Handle report button clicks
+  document.addEventListener('click', function(e) {
+    const reportBtn = e.target.closest('.comment-report-btn');
+    if (reportBtn) {
+      const commentId = reportBtn.dataset.commentId;
+      if (commentId) {
+        openCommentReportModal(commentId);
+      }
+    }
+  });
+  
+  // Close modal when clicking outside the modal content
+  const modal = document.getElementById('commentReportModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeCommentReportModal();
+      }
+    });
+  }
+});
+</script>

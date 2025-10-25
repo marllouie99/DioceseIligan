@@ -1,0 +1,215 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Booking Trends Chart
+  const bookingTrendsCtx = document.getElementById('bookingTrendsChart');
+  if (bookingTrendsCtx) {
+    const bookingTrendsData = {{ booking_trends|safe }};
+    new Chart(bookingTrendsCtx, {
+      type: 'line',
+      data: {
+        labels: bookingTrendsData.labels,
+        datasets: [{
+          label: 'Bookings',
+          data: bookingTrendsData.data,
+          borderColor: 'rgba(30, 144, 255, 1)',
+          backgroundColor: 'rgba(30, 144, 255, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: 'rgba(30, 144, 255, 1)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Most Popular Services Chart
+  const popularServicesCtx = document.getElementById('popularServicesChart');
+  if (popularServicesCtx) {
+    const popularServicesData = {{ popular_services|safe }};
+    new Chart(popularServicesCtx, {
+      type: 'bar',
+      data: {
+        labels: popularServicesData.labels,
+        datasets: [{
+          label: 'Bookings',
+          data: popularServicesData.data,
+          backgroundColor: [
+            'rgba(30, 144, 255, 0.8)',
+            'rgba(65, 105, 225, 0.8)',
+            'rgba(100, 149, 237, 0.8)',
+            'rgba(135, 206, 250, 0.8)',
+            'rgba(176, 224, 230, 0.8)'
+          ],
+          borderWidth: 0,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Service Bookings Trend Chart
+  const serviceBookingsTrendCtx = document.getElementById('serviceBookingsTrendChart');
+  if (serviceBookingsTrendCtx) {
+    const serviceBookingsTrendData = {{ service_bookings_trend|safe }};
+    new Chart(serviceBookingsTrendCtx, {
+      type: 'line',
+      data: {
+        labels: serviceBookingsTrendData.labels,
+        datasets: serviceBookingsTrendData.datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Service Performance Chart
+  const servicePerformanceCtx = document.getElementById('servicePerformanceChart');
+  if (servicePerformanceCtx) {
+    const servicePerformanceData = {{ service_performance|safe }};
+    new Chart(servicePerformanceCtx, {
+      type: 'doughnut',
+      data: {
+        labels: servicePerformanceData.labels,
+        datasets: [{
+          data: servicePerformanceData.data,
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+
+  // Engagement Trends Chart
+  const engagementTrendsCtx = document.getElementById('engagementTrendsChart');
+  if (engagementTrendsCtx) {
+    const engagementTrendsData = {{ engagement_trends|safe }};
+    new Chart(engagementTrendsCtx, {
+      type: 'line',
+      data: {
+        labels: engagementTrendsData.labels,
+        datasets: [
+          {
+            label: 'Likes',
+            data: engagementTrendsData.likes,
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+          },
+          {
+            label: 'Comments',
+            data: engagementTrendsData.comments,
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+          },
+          {
+            label: 'Bookmarks',
+            data: engagementTrendsData.bookmarks,
+            borderColor: 'rgba(245, 158, 11, 1)',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>

@@ -302,17 +302,24 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             user=request.user
         ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:3]
 
-    # Get upcoming events from all churches (not just followed)
+    # Get upcoming events from followed churches only
     from django.utils import timezone
+    from django.db.models import Q
     upcoming_events = []
     if request.user.is_authenticated:
         now = timezone.now()
+        # Get churches the user follows
+        followed_church_ids = ChurchFollow.objects.filter(
+            user=request.user
+        ).values_list('church_id', flat=True)
+        
+        # Get all event posts from followed churches
         upcoming_events = Post.objects.filter(
             post_type='event',
             is_active=True,
             church__is_active=True,  # Only from active churches
-            event_start_date__gte=now  # Only future events
-        ).select_related('church').order_by('event_start_date')[:5]  # Get next 5 upcoming events
+            church_id__in=followed_church_ids  # Only from followed churches
+        ).select_related('church').order_by('-created_at')[:5]  # Get 5 most recent event posts
         
         # Add interaction status to each event
         for event in upcoming_events:

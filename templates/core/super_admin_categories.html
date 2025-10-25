@@ -201,27 +201,30 @@
 }
 
 .category-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--border);
 }
 
 .btn-action {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: white;
   color: var(--text);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-action:hover {
@@ -391,6 +394,216 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Icon Picker Styles */
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.icon-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 50px;
+}
+
+.icon-picker-item:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  transform: scale(1.05);
+}
+
+.icon-picker-item.selected {
+  border-color: #3b82f6;
+  background: #dbeafe;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.icon-picker-item.custom-icon {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  grid-column: span 2;
+}
+
+.icon-picker-item.custom-icon:hover {
+  color: #3b82f6;
+}
+
+#icon[readonly] {
+  background: white;
+  cursor: default;
+}
+
+/* Primary button variant */
+.btn-action.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-action.primary:hover {
+  background: #2563eb;
+}
+
+.btn-action.primary svg {
+  stroke: white;
+}
+
+/* Services Modal */
+.services-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.services-modal.active {
+  display: flex;
+}
+
+.services-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 1000px;
+  width: 90%;
+  height: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.services-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.services-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.services-modal-close {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.services-modal-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.services-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.services-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.services-table th {
+  text-align: left;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.services-table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.services-table tr:hover {
+  background: #f9fafb;
+}
+
+.service-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.service-church {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.service-price {
+  font-weight: 600;
+  color: #059669;
+}
+
+.service-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.service-status.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.service-status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.no-services {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.no-services svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  color: #d1d5db;
+}
 </style>
 {% endblock %}
 
@@ -458,6 +671,13 @@
         </div>
 
         <div class="category-actions">
+          <button class="btn-action primary" onclick="viewCategoryServices({{ category.id }}, '{{ category.name|escapejs }}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            View Services
+          </button>
           <button class="btn-action" onclick="openEditModal({{ category.id }}, '{{ category.name|escapejs }}', '{{ category.description|escapejs }}', '{{ category.icon|escapejs }}', '{{ category.color }}', {{ category.order }}, {{ category.is_active|lower }})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
@@ -527,8 +747,37 @@
 
       <div class="form-group">
         <label for="icon" class="form-label">Icon</label>
-        <input type="text" id="icon" name="icon" class="form-input" placeholder="e.g., 🏛️, ⛪, 📖" maxlength="50">
-        <small class="form-help">Emoji or icon class to represent this category</small>
+        <input type="text" id="icon" name="icon" class="form-input" placeholder="Click an icon below or type your own" maxlength="50" readonly>
+        <small class="form-help">Select an icon or click "Custom" to type your own</small>
+        
+        <!-- Icon Picker Grid -->
+        <div class="icon-picker-grid">
+          <button type="button" class="icon-picker-item" data-icon="⛪">⛪</button>
+          <button type="button" class="icon-picker-item" data-icon="🏛️">🏛️</button>
+          <button type="button" class="icon-picker-item" data-icon="✝️">✝️</button>
+          <button type="button" class="icon-picker-item" data-icon="📖">📖</button>
+          <button type="button" class="icon-picker-item" data-icon="🙏">🙏</button>
+          <button type="button" class="icon-picker-item" data-icon="❤️">❤️</button>
+          <button type="button" class="icon-picker-item" data-icon="👨‍👩‍👧‍👦">👨‍👩‍👧‍👦</button>
+          <button type="button" class="icon-picker-item" data-icon="👶">👶</button>
+          <button type="button" class="icon-picker-item" data-icon="🎓">🎓</button>
+          <button type="button" class="icon-picker-item" data-icon="🎵">🎵</button>
+          <button type="button" class="icon-picker-item" data-icon="🎤">🎤</button>
+          <button type="button" class="icon-picker-item" data-icon="📚">📚</button>
+          <button type="button" class="icon-picker-item" data-icon="🕊️">🕊️</button>
+          <button type="button" class="icon-picker-item" data-icon="🌟">🌟</button>
+          <button type="button" class="icon-picker-item" data-icon="💒">💒</button>
+          <button type="button" class="icon-picker-item" data-icon="🎂">🎂</button>
+          <button type="button" class="icon-picker-item" data-icon="🍞">🍞</button>
+          <button type="button" class="icon-picker-item" data-icon="🍷">🍷</button>
+          <button type="button" class="icon-picker-item" data-icon="🕯️">🕯️</button>
+          <button type="button" class="icon-picker-item" data-icon="📿">📿</button>
+          <button type="button" class="icon-picker-item" data-icon="🔔">🔔</button>
+          <button type="button" class="icon-picker-item" data-icon="🎄">🎄</button>
+          <button type="button" class="icon-picker-item" data-icon="🌍">🌍</button>
+          <button type="button" class="icon-picker-item" data-icon="💡">💡</button>
+          <button type="button" class="icon-picker-item custom-icon" data-icon="">✏️ Custom</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -560,8 +809,61 @@
   </div>
 </div>
 
+<!-- Services Modal -->
+<div id="servicesModal" class="services-modal">
+  <div class="services-modal-content">
+    <div class="services-modal-header">
+      <h2 id="servicesModalTitle">Services</h2>
+      <button type="button" class="services-modal-close" onclick="closeServicesModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="services-modal-body" id="servicesModalBody">
+      <div style="text-align: center; padding: 2rem;">
+        <p>Loading services...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 let isEditMode = false;
+
+// Icon Picker Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const iconInput = document.getElementById('icon');
+  const iconPickerItems = document.querySelectorAll('.icon-picker-item');
+  
+  iconPickerItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const icon = this.dataset.icon;
+      
+      // Remove selected class from all items
+      iconPickerItems.forEach(i => i.classList.remove('selected'));
+      
+      if (this.classList.contains('custom-icon')) {
+        // Enable custom input
+        iconInput.removeAttribute('readonly');
+        iconInput.focus();
+        iconInput.placeholder = 'Type your custom icon or emoji...';
+      } else {
+        // Set selected icon
+        iconInput.value = icon;
+        iconInput.setAttribute('readonly', 'readonly');
+        this.classList.add('selected');
+      }
+    });
+  });
+  
+  // When icon input changes (for custom input), remove all selections
+  iconInput.addEventListener('input', function() {
+    iconPickerItems.forEach(i => i.classList.remove('selected'));
+  });
+});
 
 function openCreateModal() {
   isEditMode = false;
@@ -571,6 +873,14 @@ function openCreateModal() {
   document.getElementById('categoryId').value = '';
   document.getElementById('color').value = '#3B82F6';
   document.getElementById('is_active').checked = true;
+  
+  // Reset icon picker
+  const iconInput = document.getElementById('icon');
+  iconInput.value = '';
+  iconInput.setAttribute('readonly', 'readonly');
+  iconInput.placeholder = 'Click an icon below or type your own';
+  document.querySelectorAll('.icon-picker-item').forEach(i => i.classList.remove('selected'));
+  
   clearErrors();
   document.getElementById('categoryModal').classList.add('active');
 }
@@ -586,6 +896,15 @@ function openEditModal(id, name, description, icon, color, order, isActive) {
   document.getElementById('color').value = color;
   document.getElementById('order').value = order;
   document.getElementById('is_active').checked = isActive;
+  
+  // Highlight selected icon if it matches one in the picker
+  document.querySelectorAll('.icon-picker-item').forEach(item => {
+    item.classList.remove('selected');
+    if (item.dataset.icon === icon) {
+      item.classList.add('selected');
+    }
+  });
+  
   clearErrors();
   document.getElementById('categoryModal').classList.add('active');
 }
@@ -676,6 +995,117 @@ function toggleCategory(id, name, isActive) {
     showNotification('An error occurred. Please try again.', 'error');
   });
 }
+
+// View Category Services
+async function viewCategoryServices(categoryId, categoryName) {
+  const modal = document.getElementById('servicesModal');
+  const modalTitle = document.getElementById('servicesModalTitle');
+  const modalBody = document.getElementById('servicesModalBody');
+  
+  // Set title
+  modalTitle.textContent = `Services in "${categoryName}"`;
+  
+  // Show loading state
+  modalBody.innerHTML = `
+    <div style="text-align: center; padding: 2rem;">
+      <p>Loading services...</p>
+    </div>
+  `;
+  
+  // Open modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  try {
+    const response = await fetch(`/app/super-admin/categories/${categoryId}/services/`);
+    const data = await response.json();
+    
+    if (data.success) {
+      if (data.services.length === 0) {
+        modalBody.innerHTML = `
+          <div class="no-services">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <h3>No Services Found</h3>
+            <p>There are no services in this category yet.</p>
+          </div>
+        `;
+      } else {
+        let tableHTML = `
+          <table class="services-table">
+            <thead>
+              <tr>
+                <th>Service Name</th>
+                <th>Parish</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        
+        data.services.forEach(service => {
+          tableHTML += `
+            <tr>
+              <td>
+                <div class="service-name">${service.name}</div>
+              </td>
+              <td>
+                <div class="service-church">${service.church_name}</div>
+              </td>
+              <td>
+                <div class="service-price">₱${parseFloat(service.price).toFixed(2)}</div>
+              </td>
+              <td>${service.duration} mins</td>
+              <td>
+                <span class="service-status ${service.is_active ? 'active' : 'inactive'}">
+                  ${service.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+        
+        tableHTML += `
+            </tbody>
+          </table>
+        `;
+        
+        modalBody.innerHTML = tableHTML;
+      }
+    } else {
+      modalBody.innerHTML = `
+        <div class="no-services">
+          <p style="color: #dc2626;">Error loading services: ${data.message || 'Unknown error'}</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    modalBody.innerHTML = `
+      <div class="no-services">
+        <p style="color: #dc2626;">Failed to load services. Please try again.</p>
+      </div>
+    `;
+  }
+}
+
+function closeServicesModal() {
+  const modal = document.getElementById('servicesModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Close services modal when clicking outside
+document.getElementById('servicesModal')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeServicesModal();
+  }
+});
 
 function deleteCategory(id, name, serviceCount) {
   if (serviceCount > 0) {

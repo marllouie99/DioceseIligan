@@ -1235,6 +1235,9 @@ def super_admin_dashboard(request):
     User = get_user_model()
     from django.utils import timezone
     from datetime import timedelta
+    from django.db.models import Count, Sum, Q
+    from accounts.models import Profile
+    from .models import Post, PostLike, PostComment, PostBookmark, ChurchFollow
 
     # User Statistics
     total_users = User.objects.count()
@@ -1312,8 +1315,6 @@ def super_admin_dashboard(request):
         verif_counts = {'pending': 0, 'approved': 0, 'rejected': 0}
     
     # Post Statistics
-    from .models import Post, PostLike, PostComment, PostBookmark, ChurchFollow
-    
     total_posts = Post.objects.filter(is_active=True).count()
     posts_this_month = Post.objects.filter(
         created_at__gte=first_day_of_month,
@@ -1352,6 +1353,74 @@ def super_admin_dashboard(request):
     except:
         total_donations = 0
         donations_this_month = 0
+    
+    # Daily Post Engagement Data (last 7 days)
+    daily_post_engagement = {
+        'labels': [],
+        'posts': [],
+        'likes': [],
+        'comments': []
+    }
+    
+    for i in range(6, -1, -1):  # Last 7 days (Mon to Sun)
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        # Day label
+        daily_post_engagement['labels'].append(day.strftime('%a'))  # Mon, Tue, Wed, etc.
+        
+        # Posts count
+        posts_count = Post.objects.filter(
+            created_at__gte=day_start,
+            created_at__lt=day_end,
+            is_active=True
+        ).count()
+        daily_post_engagement['posts'].append(posts_count)
+        
+        # Likes count
+        likes_count = PostLike.objects.filter(
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).count()
+        daily_post_engagement['likes'].append(likes_count)
+        
+        # Comments count
+        comments_count = PostComment.objects.filter(
+            created_at__gte=day_start,
+            created_at__lt=day_end,
+            is_active=True
+        ).count()
+        daily_post_engagement['comments'].append(comments_count)
+    
+    # Parish Outreach Data (Active members by city/municipality)
+    # Get active users (logged in within last 30 days) grouped by city
+    parish_outreach = Profile.objects.filter(
+        user__last_login__gte=thirty_days_ago,
+        city_municipality__isnull=False
+    ).exclude(
+        city_municipality=''
+    ).values('city_municipality').annotate(
+        count=Count('id')
+    ).order_by('-count')[:6]  # Top 6 cities
+    
+    parish_outreach_data = {
+        'labels': [],
+        'counts': []
+    }
+    
+    for item in parish_outreach:
+        city = item['city_municipality'] or 'Unknown'
+        # Truncate long city names
+        if len(city) > 20:
+            city = city[:17] + '...'
+        parish_outreach_data['labels'].append(city)
+        parish_outreach_data['counts'].append(item['count'])
+    
+    # If we have less than 6 cities, ensure we have at least some data
+    if len(parish_outreach_data['labels']) == 0:
+        parish_outreach_data['labels'] = ['No Data']
+        parish_outreach_data['counts'] = [0]
     
     # Monthly growth data (last 6 months)
     monthly_growth_labels = []
@@ -1459,9 +1528,504 @@ def super_admin_dashboard(request):
             'total_donations': total_donations,
             'donations_this_month': donations_this_month,
         },
+        'daily_post_engagement': daily_post_engagement,
+        'parish_outreach': parish_outreach_data,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin.html', ctx)
+
+
+@login_required
+def super_admin_export(request, format_type):
+    """Export super admin overview data in various formats (CSV, Excel, PDF).
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    import csv
+    import io
+    from django.utils import timezone
+    from datetime import timedelta, datetime
+    
+    User = get_user_model()
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Gather all statistics
+    total_users = User.objects.count()
+    active_users = User.objects.filter(last_login__gte=thirty_days_ago).count() if hasattr(User, 'last_login') else 0
+    new_users_this_month = User.objects.filter(date_joined__gte=first_day_of_month).count() if hasattr(User, 'date_joined') else 0
+    
+    total_churches = Church.objects.count()
+    verified_churches = Church.objects.filter(is_verified=True).count() if hasattr(Church, 'is_verified') else 0
+    new_churches_this_month = Church.objects.filter(created_at__gte=first_day_of_month).count()
+    
+    total_services = BookableService.objects.count()
+    total_bookings = Booking.objects.count()
+    
+    total_posts = Post.objects.filter(is_active=True).count()
+    posts_this_month = Post.objects.filter(created_at__gte=first_day_of_month, is_active=True).count()
+    
+    total_likes = PostLike.objects.count()
+    total_comments = PostComment.objects.filter(is_active=True).count()
+    total_bookmarks = PostBookmark.objects.count()
+    total_engagement = total_likes + total_comments + total_bookmarks
+    
+    total_followers = ChurchFollow.objects.count()
+    
+    # Try to get donation data
+    try:
+        from .models import Donation
+        total_donations = Donation.objects.filter(status='completed').aggregate(total=Sum('amount'))['total'] or 0
+        donations_this_month = Donation.objects.filter(created_at__gte=first_day_of_month, status='completed').aggregate(total=Sum('amount'))['total'] or 0
+    except:
+        total_donations = 0
+        donations_this_month = 0
+    
+    if format_type == 'csv':
+        # Create CSV
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="ChurchConnect_Overview_{timezone.now().strftime("%Y%m%d")}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['ChurchConnect System Overview Report'])
+        writer.writerow(['Generated:', timezone.now().strftime('%Y-%m-%d %H:%M:%S')])
+        writer.writerow([])
+        
+        writer.writerow(['Category', 'Metric', 'Value'])
+        writer.writerow(['Users', 'Total Users', total_users])
+        writer.writerow(['Users', 'Active Users (30 days)', active_users])
+        writer.writerow(['Users', 'New Users This Month', new_users_this_month])
+        writer.writerow([])
+        
+        writer.writerow(['Churches', 'Total Churches', total_churches])
+        writer.writerow(['Churches', 'Verified Churches', verified_churches])
+        writer.writerow(['Churches', 'New Churches This Month', new_churches_this_month])
+        writer.writerow([])
+        
+        writer.writerow(['Services & Bookings', 'Total Services', total_services])
+        writer.writerow(['Services & Bookings', 'Total Bookings', total_bookings])
+        writer.writerow([])
+        
+        writer.writerow(['Posts & Engagement', 'Total Posts', total_posts])
+        writer.writerow(['Posts & Engagement', 'Posts This Month', posts_this_month])
+        writer.writerow(['Posts & Engagement', 'Total Likes', total_likes])
+        writer.writerow(['Posts & Engagement', 'Total Comments', total_comments])
+        writer.writerow(['Posts & Engagement', 'Total Bookmarks', total_bookmarks])
+        writer.writerow(['Posts & Engagement', 'Total Engagement', total_engagement])
+        writer.writerow(['Posts & Engagement', 'Total Followers', total_followers])
+        writer.writerow([])
+        
+        writer.writerow(['Donations', 'Total Donations (₱)', total_donations])
+        writer.writerow(['Donations', 'Donations This Month (₱)', donations_this_month])
+        
+        return response
+    
+    elif format_type == 'excel':
+        # Create Excel file using openpyxl
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Font, Alignment, PatternFill
+            
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Overview"
+            
+            # Title
+            ws['A1'] = 'ChurchConnect System Overview Report'
+            ws['A1'].font = Font(size=16, bold=True)
+            ws['A2'] = f'Generated: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'
+            
+            # Headers
+            row = 4
+            ws[f'A{row}'] = 'Category'
+            ws[f'B{row}'] = 'Metric'
+            ws[f'C{row}'] = 'Value'
+            
+            for cell in [ws[f'A{row}'], ws[f'B{row}'], ws[f'C{row}']]:
+                cell.font = Font(bold=True)
+                cell.fill = PatternFill(start_color='1E90FF', end_color='1E90FF', fill_type='solid')
+                cell.font = Font(bold=True, color='FFFFFF')
+            
+            # Data
+            data = [
+                ['Users', 'Total Users', total_users],
+                ['Users', 'Active Users (30 days)', active_users],
+                ['Users', 'New Users This Month', new_users_this_month],
+                ['', '', ''],
+                ['Churches', 'Total Churches', total_churches],
+                ['Churches', 'Verified Churches', verified_churches],
+                ['Churches', 'New Churches This Month', new_churches_this_month],
+                ['', '', ''],
+                ['Services & Bookings', 'Total Services', total_services],
+                ['Services & Bookings', 'Total Bookings', total_bookings],
+                ['', '', ''],
+                ['Posts & Engagement', 'Total Posts', total_posts],
+                ['Posts & Engagement', 'Posts This Month', posts_this_month],
+                ['Posts & Engagement', 'Total Likes', total_likes],
+                ['Posts & Engagement', 'Total Comments', total_comments],
+                ['Posts & Engagement', 'Total Bookmarks', total_bookmarks],
+                ['Posts & Engagement', 'Total Engagement', total_engagement],
+                ['Posts & Engagement', 'Total Followers', total_followers],
+                ['', '', ''],
+                ['Donations', 'Total Donations (₱)', total_donations],
+                ['Donations', 'Donations This Month (₱)', donations_this_month],
+            ]
+            
+            for idx, row_data in enumerate(data, start=row+1):
+                ws[f'A{idx}'] = row_data[0]
+                ws[f'B{idx}'] = row_data[1]
+                ws[f'C{idx}'] = row_data[2]
+            
+            # Adjust column widths
+            ws.column_dimensions['A'].width = 20
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 15
+            
+            # Save to response
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="ChurchConnect_Overview_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+            wb.save(response)
+            return response
+            
+        except ImportError:
+            messages.error(request, 'Excel export requires openpyxl library. Please install it.')
+            return redirect('core:super_admin_dashboard')
+    
+    elif format_type == 'pdf':
+        # Create PDF using reportlab
+        try:
+            from reportlab.lib.pagesizes import letter, A4
+            from reportlab.lib import colors
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import inch
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT
+            
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            elements = []
+            styles = getSampleStyleSheet()
+            
+            # Title
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=20,
+                textColor=colors.HexColor('#1E90FF'),
+                spaceAfter=30,
+                alignment=TA_CENTER
+            )
+            elements.append(Paragraph('ChurchConnect System Overview Report', title_style))
+            elements.append(Paragraph(f'Generated: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}', styles['Normal']))
+            elements.append(Spacer(1, 0.3*inch))
+            
+            # Data table
+            data = [
+                ['Category', 'Metric', 'Value'],
+                ['Users', 'Total Users', str(total_users)],
+                ['Users', 'Active Users (30 days)', str(active_users)],
+                ['Users', 'New Users This Month', str(new_users_this_month)],
+                ['', '', ''],
+                ['Churches', 'Total Churches', str(total_churches)],
+                ['Churches', 'Verified Churches', str(verified_churches)],
+                ['Churches', 'New Churches This Month', str(new_churches_this_month)],
+                ['', '', ''],
+                ['Services & Bookings', 'Total Services', str(total_services)],
+                ['Services & Bookings', 'Total Bookings', str(total_bookings)],
+                ['', '', ''],
+                ['Posts & Engagement', 'Total Posts', str(total_posts)],
+                ['Posts & Engagement', 'Posts This Month', str(posts_this_month)],
+                ['Posts & Engagement', 'Total Likes', str(total_likes)],
+                ['Posts & Engagement', 'Total Comments', str(total_comments)],
+                ['Posts & Engagement', 'Total Bookmarks', str(total_bookmarks)],
+                ['Posts & Engagement', 'Total Engagement', str(total_engagement)],
+                ['Posts & Engagement', 'Total Followers', str(total_followers)],
+                ['', '', ''],
+                ['Donations', 'Total Donations (₱)', f'₱{total_donations}'],
+                ['Donations', 'Donations This Month (₱)', f'₱{donations_this_month}'],
+            ]
+            
+            table = Table(data, colWidths=[2*inch, 3*inch, 1.5*inch])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1E90FF')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            
+            elements.append(table)
+            doc.build(elements)
+            
+            buffer.seek(0)
+            response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="ChurchConnect_Overview_{timezone.now().strftime("%Y%m%d")}.pdf"'
+            return response
+            
+        except ImportError:
+            messages.error(request, 'PDF export requires reportlab library. Please install it.')
+            return redirect('core:super_admin_dashboard')
+    
+    else:
+        messages.error(request, 'Invalid export format.')
+        return redirect('core:super_admin_dashboard')
+
+
+@login_required
+def super_admin_churches_export(request, format_type):
+    """Export churches data in various formats (CSV, Excel).
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    import csv
+    from django.utils import timezone
+    
+    # Get all churches with related data
+    churches = Church.objects.select_related('owner').order_by('-created_at')
+    
+    if format_type == 'csv':
+        # Create CSV
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="ChurchConnect_Churches_{timezone.now().strftime("%Y%m%d")}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['ChurchConnect Churches Export'])
+        writer.writerow(['Generated:', timezone.now().strftime('%Y-%m-%d %H:%M:%S')])
+        writer.writerow([])
+        
+        # Headers
+        writer.writerow([
+            'Church Name',
+            'Denomination',
+            'City/Municipality',
+            'Province',
+            'Region',
+            'Owner Name',
+            'Owner Email',
+            'Followers',
+            'Verified',
+            'Created Date',
+            'Website',
+            'Phone'
+        ])
+        
+        # Data rows
+        for church in churches:
+            writer.writerow([
+                church.name,
+                church.denomination or 'N/A',
+                church.city_municipality or church.city or 'N/A',
+                church.province or 'N/A',
+                church.region or 'N/A',
+                church.owner.get_full_name() if church.owner else 'N/A',
+                church.owner.email if church.owner else 'N/A',
+                church.follower_count,
+                'Yes' if church.is_verified else 'No',
+                church.created_at.strftime('%Y-%m-%d'),
+                church.website or 'N/A',
+                church.phone or 'N/A'
+            ])
+        
+        return response
+    
+    elif format_type == 'excel':
+        # Create Excel file using openpyxl
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Font, Alignment, PatternFill
+            
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Churches"
+            
+            # Title
+            ws['A1'] = 'ChurchConnect Churches Export'
+            ws['A1'].font = Font(size=16, bold=True)
+            ws['A2'] = f'Generated: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'
+            
+            # Headers
+            headers = [
+                'Church Name', 'Denomination', 'City/Municipality', 'Province', 'Region',
+                'Owner Name', 'Owner Email', 'Followers', 'Verified', 'Created Date',
+                'Website', 'Phone'
+            ]
+            
+            row = 4
+            for col, header in enumerate(headers, start=1):
+                cell = ws.cell(row=row, column=col)
+                cell.value = header
+                cell.font = Font(bold=True, color='FFFFFF')
+                cell.fill = PatternFill(start_color='1E90FF', end_color='1E90FF', fill_type='solid')
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+            
+            # Data rows
+            for idx, church in enumerate(churches, start=row+1):
+                ws.cell(row=idx, column=1, value=church.name)
+                ws.cell(row=idx, column=2, value=church.denomination or 'N/A')
+                ws.cell(row=idx, column=3, value=church.city_municipality or church.city or 'N/A')
+                ws.cell(row=idx, column=4, value=church.province or 'N/A')
+                ws.cell(row=idx, column=5, value=church.region or 'N/A')
+                ws.cell(row=idx, column=6, value=church.owner.get_full_name() if church.owner else 'N/A')
+                ws.cell(row=idx, column=7, value=church.owner.email if church.owner else 'N/A')
+                ws.cell(row=idx, column=8, value=church.follower_count)
+                ws.cell(row=idx, column=9, value='Yes' if church.is_verified else 'No')
+                ws.cell(row=idx, column=10, value=church.created_at.strftime('%Y-%m-%d'))
+                ws.cell(row=idx, column=11, value=church.website or 'N/A')
+                ws.cell(row=idx, column=12, value=church.phone or 'N/A')
+            
+            # Adjust column widths
+            ws.column_dimensions['A'].width = 30
+            ws.column_dimensions['B'].width = 15
+            ws.column_dimensions['C'].width = 20
+            ws.column_dimensions['D'].width = 15
+            ws.column_dimensions['E'].width = 25
+            ws.column_dimensions['F'].width = 20
+            ws.column_dimensions['G'].width = 30
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+            ws.column_dimensions['J'].width = 15
+            ws.column_dimensions['K'].width = 25
+            ws.column_dimensions['L'].width = 15
+            
+            # Save to response
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="ChurchConnect_Churches_{timezone.now().strftime("%Y%m%d")}.xlsx"'
+            wb.save(response)
+            return response
+            
+        except ImportError:
+            messages.error(request, 'Excel export requires openpyxl library. Please install it.')
+            return redirect('core:super_admin_churches')
+    
+    else:
+        messages.error(request, 'Invalid export format.')
+        return redirect('core:super_admin_churches')
+
+
+@login_required
+def super_admin_posts_engagement_data(request):
+    """API endpoint to fetch engagement data for different time ranges.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from datetime import timedelta
+    import json
+    
+    days = int(request.GET.get('days', 7))
+    today = timezone.now().date()
+    
+    engagement_comments = []
+    engagement_likes = []
+    engagement_shares = []
+    labels = []
+    
+    for i in range(days - 1, -1, -1):
+        day = today - timedelta(days=i)
+        day_comments = PostComment.objects.filter(created_at__date=day, is_active=True).count()
+        day_likes = PostLike.objects.filter(created_at__date=day).count()
+        day_shares = PostView.objects.filter(viewed_at__date=day).count()
+        
+        engagement_comments.append(day_comments)
+        engagement_likes.append(day_likes)
+        engagement_shares.append(day_shares)
+        
+        # Format label based on time range
+        if days <= 7:
+            labels.append(day.strftime('%a'))  # Mon, Tue, Wed
+        elif days <= 30:
+            labels.append(day.strftime('%m/%d'))  # 01/15
+        else:
+            labels.append(day.strftime('%m/%d'))  # 01/15
+    
+    return JsonResponse({
+        'labels': labels,
+        'comments': engagement_comments,
+        'likes': engagement_likes,
+        'shares': engagement_shares
+    })
+
+
+@login_required
+def super_admin_posts_stats_data(request):
+    """API endpoint to fetch posts statistics for different time periods.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from datetime import timedelta
+    from django.db.models import Sum
+    
+    period = request.GET.get('period', 'all')
+    today = timezone.now().date()
+    
+    # Determine date filter
+    if period == '7':
+        start_date = today - timedelta(days=7)
+        period_text = 'this week'
+    elif period == '30':
+        start_date = today - timedelta(days=30)
+        period_text = 'this month'
+    elif period == '90':
+        start_date = today - timedelta(days=90)
+        period_text = 'last 90 days'
+    else:  # 'all'
+        start_date = None
+        period_text = 'all time'
+    
+    # Filter posts
+    if start_date:
+        posts_qs = Post.objects.filter(created_at__date__gte=start_date)
+        likes_qs = PostLike.objects.filter(created_at__date__gte=start_date)
+        comments_qs = PostComment.objects.filter(created_at__date__gte=start_date, is_active=True)
+        views_qs = PostView.objects.filter(viewed_at__date__gte=start_date)
+    else:
+        posts_qs = Post.objects.all()
+        likes_qs = PostLike.objects.all()
+        comments_qs = PostComment.objects.filter(is_active=True)
+        views_qs = PostView.objects.all()
+    
+    # Calculate stats
+    total_posts = posts_qs.count()
+    total_likes = likes_qs.count()
+    total_comments = comments_qs.count()
+    total_shares = views_qs.count()
+    
+    # Calculate averages
+    avg_likes_per_post = round(total_likes / total_posts) if total_posts > 0 else 0
+    avg_comments_per_post = round(total_comments / total_posts) if total_posts > 0 else 0
+    avg_shares_per_post = round(total_shares / total_posts) if total_posts > 0 else 0
+    
+    # New posts text
+    if period == 'all':
+        new_posts_text = f'{total_posts} total'
+    else:
+        new_posts_text = f'+{total_posts} {period_text}'
+    
+    return JsonResponse({
+        'total_posts': total_posts,
+        'new_posts_text': new_posts_text,
+        'total_likes': total_likes,
+        'avg_likes_per_post': avg_likes_per_post,
+        'total_comments': total_comments,
+        'avg_comments_per_post': avg_comments_per_post,
+        'total_shares': total_shares,
+        'avg_shares_per_post': avg_shares_per_post
+    })
 
 
 @login_required
@@ -2836,6 +3400,10 @@ def super_admin_church_detail(request, church_id):
         messages.error(request, 'You do not have permission to access Super Admin.')
         return redirect('core:home')
     
+    from datetime import timedelta
+    from django.db.models import Count, Q, Avg
+    import json
+    
     church = get_object_or_404(Church.objects.select_related('owner'), id=church_id, is_active=True)
     
     # Get church services
@@ -2843,9 +3411,6 @@ def super_admin_church_detail(request, church_id):
     
     # Get recent posts
     posts = church.posts.filter(is_active=True).select_related('church').order_by('-created_at')[:10]
-    
-    # Get upcoming events (if you have events model)
-    # events = church.events.filter(is_active=True, start_date__gte=timezone.now()).order_by('start_date')[:10]
     
     # Get followers count
     followers_count = ChurchFollow.objects.filter(church=church).count()
@@ -2855,6 +3420,148 @@ def super_admin_church_detail(request, church_id):
         church=church
     ).select_related('submitted_by', 'reviewed_by').prefetch_related('documents').order_by('-created_at')
     
+    # === CHART DATA CALCULATIONS ===
+    
+    # 1. Booking Trends (Last 30 days)
+    booking_trends_labels = []
+    booking_trends_data = []
+    for i in range(29, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        count = Booking.objects.filter(
+            church=church,
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).count()
+        
+        booking_trends_labels.append(day.strftime('%b %d'))
+        booking_trends_data.append(count)
+    
+    booking_trends = json.dumps({
+        'labels': booking_trends_labels,
+        'data': booking_trends_data
+    })
+    
+    # 2. Most Popular Services (Top 5)
+    popular_services_data = Booking.objects.filter(
+        church=church
+    ).values('service__name').annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+    
+    popular_services = json.dumps({
+        'labels': [item['service__name'] for item in popular_services_data],
+        'data': [item['count'] for item in popular_services_data]
+    })
+    
+    # 3. Service Bookings Trend by Category (Last 30 days)
+    from core.models import ServiceCategory
+    categories = ServiceCategory.objects.filter(is_active=True)[:3]  # Top 3 categories
+    
+    service_trend_labels = []
+    service_trend_datasets = []
+    
+    # Generate labels
+    for i in range(29, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        service_trend_labels.append(day.strftime('%b %d'))
+    
+    # Generate datasets for each category
+    colors = [
+        'rgba(30, 144, 255, 1)',
+        'rgba(65, 105, 225, 1)',
+        'rgba(100, 149, 237, 1)'
+    ]
+    
+    for idx, category in enumerate(categories):
+        category_data = []
+        for i in range(29, -1, -1):
+            day = timezone.now() - timedelta(days=i)
+            day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+            day_end = day_start + timedelta(days=1)
+            
+            count = Booking.objects.filter(
+                church=church,
+                service__category=category,
+                created_at__gte=day_start,
+                created_at__lt=day_end
+            ).count()
+            
+            category_data.append(count)
+        
+        service_trend_datasets.append({
+            'label': category.name,
+            'data': category_data,
+            'borderColor': colors[idx % len(colors)],
+            'backgroundColor': colors[idx % len(colors)].replace('1)', '0.1)'),
+            'borderWidth': 2,
+            'fill': False,
+            'tension': 0.4
+        })
+    
+    service_bookings_trend = json.dumps({
+        'labels': service_trend_labels,
+        'datasets': service_trend_datasets
+    })
+    
+    # 4. Service Performance (Completion Rate)
+    total_bookings = Booking.objects.filter(church=church).count()
+    completed_bookings = Booking.objects.filter(church=church, status=Booking.STATUS_COMPLETED).count()
+    pending_bookings = Booking.objects.filter(church=church, status=Booking.STATUS_REQUESTED).count()
+    cancelled_bookings = Booking.objects.filter(
+        church=church
+    ).filter(
+        Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED)
+    ).count()
+    
+    service_performance = json.dumps({
+        'labels': ['Completed', 'Pending', 'Cancelled'],
+        'data': [completed_bookings, pending_bookings, cancelled_bookings]
+    })
+    
+    # 5. Engagement Trends (Last 30 days)
+    engagement_labels = []
+    engagement_likes = []
+    engagement_comments = []
+    engagement_bookmarks = []
+    
+    for i in range(29, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        likes = PostLike.objects.filter(
+            post__church=church,
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).count()
+        
+        comments = PostComment.objects.filter(
+            post__church=church,
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).count()
+        
+        bookmarks = PostBookmark.objects.filter(
+            post__church=church,
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).count()
+        
+        engagement_labels.append(day.strftime('%b %d'))
+        engagement_likes.append(likes)
+        engagement_comments.append(comments)
+        engagement_bookmarks.append(bookmarks)
+    
+    engagement_trends = json.dumps({
+        'labels': engagement_labels,
+        'likes': engagement_likes,
+        'comments': engagement_comments,
+        'bookmarks': engagement_bookmarks
+    })
+    
     ctx = {
         'active': 'super_admin_verifications',
         'page_title': f'{church.name} - Church Details',
@@ -2863,6 +3570,12 @@ def super_admin_church_detail(request, church_id):
         'posts': posts,
         'followers_count': followers_count,
         'verification_requests': verification_requests,
+        # Chart data
+        'booking_trends': booking_trends,
+        'popular_services': popular_services,
+        'service_bookings_trend': service_bookings_trend,
+        'service_performance': service_performance,
+        'engagement_trends': engagement_trends,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_church_detail.html', ctx)
@@ -4036,6 +4749,135 @@ def track_post_view(request, post_id):
         return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
 
+@login_required
+def report_comment(request):
+    """AJAX endpoint to report a comment."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
+    
+    try:
+        comment_id = request.POST.get('comment_id')
+        reason = request.POST.get('reason')
+        description = request.POST.get('description', '').strip()
+        
+        if not comment_id or not reason or not description:
+            return JsonResponse({
+                'success': False,
+                'message': 'Comment ID, reason, and description are required'
+            }, status=400)
+        
+        # Get the comment
+        comment = get_object_or_404(PostComment, id=comment_id, is_active=True)
+        
+        # Check if user already reported this comment
+        from core.models import CommentReport
+        existing_report = CommentReport.objects.filter(
+            user=request.user,
+            comment=comment
+        ).first()
+        
+        if existing_report:
+            return JsonResponse({
+                'success': False,
+                'message': 'You have already reported this comment'
+            }, status=400)
+        
+        # Create the report
+        report = CommentReport.objects.create(
+            user=request.user,
+            comment=comment,
+            reason=reason,
+            description=description,
+            status='pending'
+        )
+        
+        # TODO: Send notification to admins about new report
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Report submitted successfully',
+            'report_id': report.id
+        })
+        
+    except PostComment.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Comment not found'}, status=404)
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error reporting comment: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'An error occurred while submitting your report'}, status=500)
+
+
+@login_required
+def delete_reported_comment(request, comment_id):
+    """Delete a reported comment (super admin only)."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
+    
+    try:
+        comment = get_object_or_404(PostComment, id=comment_id)
+        
+        # Mark comment as inactive instead of deleting
+        comment.is_active = False
+        comment.save()
+        
+        # Update all reports for this comment to 'action_taken'
+        from core.models import CommentReport
+        CommentReport.objects.filter(comment=comment, status='pending').update(
+            status='action_taken',
+            reviewed_at=timezone.now(),
+            reviewed_by=request.user,
+            admin_notes='Comment deleted by admin'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Comment deleted successfully'
+        })
+        
+    except PostComment.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Comment not found'}, status=404)
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error deleting comment: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
+
+
+@login_required
+def dismiss_comment_report(request, report_id):
+    """Dismiss a comment report (super admin only)."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
+    
+    try:
+        from core.models import CommentReport
+        report = get_object_or_404(CommentReport, id=report_id)
+        
+        report.status = 'dismissed'
+        report.reviewed_at = timezone.now()
+        report.reviewed_by = request.user
+        report.admin_notes = request.POST.get('notes', 'Report dismissed by admin')
+        report.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Report dismissed successfully'
+        })
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error dismissing report: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
+
+
 def get_client_ip(request):
     """Helper function to get client IP address."""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -4555,12 +5397,214 @@ def super_admin_services(request):
         messages.error(request, 'You do not have permission to access Super Admin.')
         return redirect('core:home')
 
+    from datetime import timedelta
+    from django.db.models import Sum, Avg, Count, Q
+    import json
+    
+    today = timezone.now().date()
+    last_7_days = today - timedelta(days=7)
+    last_30_days = today - timedelta(days=30)
+    
+    # Get all services and bookings with annotations
+    services = BookableService.objects.select_related('church', 'category').annotate(
+        booking_count=Count('bookings', distinct=True)
+    ).all()
+    bookings = Booking.objects.select_related('service', 'user').all()
+    
+    # Calculate stats
+    total_services = services.count()
+    total_bookings = bookings.count()
+    bookings_this_month = bookings.filter(created_at__date__gte=last_30_days).count()
+    
+    # Calculate revenue (paid bookings)
+    total_revenue = bookings.filter(payment_status='paid').aggregate(
+        total=Sum('service__price')
+    )['total'] or 0
+    revenue_this_month = bookings.filter(
+        payment_status='paid',
+        created_at__date__gte=last_30_days
+    ).aggregate(total=Sum('service__price'))['total'] or 0
+    
+    # Calculate average rating
+    from .models import ServiceReview
+    avg_rating = ServiceReview.objects.aggregate(avg=Avg('rating'))['avg'] or 0
+    total_reviews = ServiceReview.objects.count()
+    
+    # Booking trends (last 7 days)
+    booking_trends_labels = []
+    booking_trends_data = []
+    revenue_trends_data = []
+    
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        day_bookings = bookings.filter(created_at__date=day).count()
+        day_revenue = bookings.filter(
+            created_at__date=day,
+            payment_status='paid'
+        ).aggregate(total=Sum('service__price'))['total'] or 0
+        
+        booking_trends_labels.append(day.strftime('%a'))
+        booking_trends_data.append(day_bookings)
+        revenue_trends_data.append(float(day_revenue))
+    
+    # Services by category
+    category_stats = services.values('category__name').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    category_labels = []
+    category_data = []
+    for stat in category_stats:
+        category_labels.append(stat['category__name'] or 'Uncategorized')
+        category_data.append(stat['count'])
+    
+    # Recent reviews
+    recent_reviews = ServiceReview.objects.select_related(
+        'service', 'service__church', 'user'
+    ).order_by('-created_at')[:10]
+    
+    # Paginate services
+    from django.core.paginator import Paginator
+    paginator = Paginator(services.order_by('-created_at'), 20)
+    page_number = request.GET.get('page')
+    services_page = paginator.get_page(page_number)
+
     ctx = {
         'active': 'super_admin_services',
         'page_title': 'Services Management',
+        'stats': {
+            'total_services': total_services,
+            'total_bookings': total_bookings,
+            'bookings_this_month': bookings_this_month,
+            'total_revenue': total_revenue,
+            'revenue_this_month': revenue_this_month,
+            'avg_rating': round(avg_rating, 1),
+            'total_reviews': total_reviews,
+        },
+        'booking_trends': {
+            'labels': json.dumps(booking_trends_labels),
+            'bookings': json.dumps(booking_trends_data),
+            'revenue': json.dumps(revenue_trends_data),
+        },
+        'category_data': {
+            'labels': json.dumps(category_labels),
+            'data': json.dumps(category_data),
+        },
+        'services': services_page,
+        'recent_reviews': recent_reviews,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_services.html', ctx)
+
+
+@login_required
+def super_admin_services_booking_data(request):
+    """API endpoint to fetch booking data for different time ranges."""
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from datetime import timedelta
+    
+    days = int(request.GET.get('days', 7))
+    today = timezone.now().date()
+    
+    labels = []
+    bookings_data = []
+    revenue_data = []
+    
+    for i in range(days - 1, -1, -1):
+        day = today - timedelta(days=i)
+        day_bookings = Booking.objects.filter(created_at__date=day).count()
+        day_revenue = Booking.objects.filter(
+            created_at__date=day,
+            payment_status='paid'
+        ).aggregate(total=Sum('service__price'))['total'] or 0
+        
+        bookings_data.append(day_bookings)
+        revenue_data.append(float(day_revenue))
+        
+        # Format label based on time range
+        if days <= 7:
+            labels.append(day.strftime('%a'))
+        elif days <= 30:
+            labels.append(day.strftime('%m/%d'))
+        else:
+            labels.append(day.strftime('%m/%d'))
+    
+    return JsonResponse({
+        'labels': labels,
+        'bookings': bookings_data,
+        'revenue': revenue_data
+    })
+
+
+@login_required
+def super_admin_services_stats_data(request):
+    """API endpoint to fetch services statistics for different time periods."""
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from datetime import timedelta
+    from django.db.models import Sum, Avg
+    
+    period = request.GET.get('period', 'all')
+    today = timezone.now().date()
+    
+    # Determine date filter
+    if period == '7':
+        start_date = today - timedelta(days=7)
+        period_text = 'last 7 days'
+    elif period == '30':
+        start_date = today - timedelta(days=30)
+        period_text = 'last 30 days'
+    elif period == '90':
+        start_date = today - timedelta(days=90)
+        period_text = 'last 90 days'
+    else:  # 'all'
+        start_date = None
+        period_text = 'all time'
+    
+    # Filter data
+    if start_date:
+        services_qs = BookableService.objects.filter(created_at__date__gte=start_date)
+        bookings_qs = Booking.objects.filter(created_at__date__gte=start_date)
+        reviews_qs = ServiceReview.objects.filter(created_at__date__gte=start_date)
+    else:
+        services_qs = BookableService.objects.all()
+        bookings_qs = Booking.objects.all()
+        reviews_qs = ServiceReview.objects.all()
+    
+    # Calculate stats
+    total_services = services_qs.count()
+    total_bookings = bookings_qs.count()
+    total_revenue = bookings_qs.filter(payment_status='paid').aggregate(
+        total=Sum('service__price')
+    )['total'] or 0
+    avg_rating = reviews_qs.aggregate(avg=Avg('rating'))['avg'] or 0
+    total_reviews = reviews_qs.count()
+    
+    # Subtitles
+    if period == 'all':
+        services_subtitle = 'All services'
+        bookings_subtitle = f'{total_bookings} total bookings'
+        revenue_subtitle = f'₱{total_revenue:,.0f} total'
+        rating_subtitle = f'From {total_reviews} reviews'
+    else:
+        services_subtitle = f'{total_services} in {period_text}'
+        bookings_subtitle = f'+{total_bookings} in {period_text}'
+        revenue_subtitle = f'+₱{total_revenue:,.0f} in {period_text}'
+        rating_subtitle = f'From {total_reviews} reviews'
+    
+    return JsonResponse({
+        'total_services': total_services,
+        'services_subtitle': services_subtitle,
+        'total_bookings': total_bookings,
+        'bookings_subtitle': bookings_subtitle,
+        'total_revenue': float(total_revenue),
+        'revenue_subtitle': revenue_subtitle,
+        'avg_rating': round(avg_rating, 1),
+        'rating_subtitle': rating_subtitle
+    })
 
 
 # Super Admin - Service Categories Management
@@ -4693,6 +5737,52 @@ def super_admin_toggle_category(request, category_id):
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
 
+@login_required
+def super_admin_category_services(request, category_id):
+    """Get all services for a specific category across all parishes."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    try:
+        from .models import BookableService
+        
+        category = get_object_or_404(ServiceCategory, id=category_id)
+        
+        # Get all services with this category
+        services = BookableService.objects.filter(category=category).select_related(
+            'church', 'category'
+        ).order_by('church__name', 'name')
+        
+        services_data = []
+        for service in services:
+            services_data.append({
+                'id': service.id,
+                'name': service.name,
+                'church_name': service.church.name,
+                'church_id': service.church.id,
+                'price': str(service.price),
+                'duration': service.duration,
+                'is_active': service.is_active,
+                'description': service.description or '',
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'services': services_data,
+            'category_name': category.name,
+            'total_count': len(services_data)
+        })
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching category services: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'An error occurred while fetching services'
+        }, status=500)
+
+
 # Super Admin - Bookings Management
 @login_required
 def super_admin_bookings(request):
@@ -4703,24 +5793,46 @@ def super_admin_bookings(request):
     from django.db.models import Count, Q
     from datetime import datetime, timedelta
     
+    # Get time period filter from request
+    period = request.GET.get('period', 'all')  # all, 7, 30, 90
+    trend_days = int(request.GET.get('trend_days', 30))
+    service_days = request.GET.get('service_days', 'all')
+    
     # Get all bookings with related data
     bookings = Booking.objects.select_related(
         'user', 'church', 'service', 'service__category'
     ).order_by('-created_at')
     
-    # Calculate statistics
-    total_bookings = bookings.count()
-    completed_bookings = bookings.filter(status=Booking.STATUS_COMPLETED).count()
-    pending_bookings = bookings.filter(status=Booking.STATUS_REQUESTED).count()
-    reviewed_bookings = bookings.filter(status=Booking.STATUS_REVIEWED).count()
-    confirmed_bookings = bookings.filter(status=Booking.STATUS_APPROVED).count()
-    cancelled_bookings = bookings.filter(
+    # Apply period filter for statistics
+    if period != 'all':
+        period_days = int(period)
+        period_start = timezone.now() - timedelta(days=period_days)
+        bookings_filtered = bookings.filter(created_at__gte=period_start)
+    else:
+        bookings_filtered = bookings
+    
+    # Calculate statistics (use filtered bookings)
+    total_bookings = bookings_filtered.count()
+    completed_bookings = bookings_filtered.filter(status=Booking.STATUS_COMPLETED).count()
+    pending_bookings = bookings_filtered.filter(status=Booking.STATUS_REQUESTED).count()
+    reviewed_bookings = bookings_filtered.filter(status=Booking.STATUS_REVIEWED).count()
+    confirmed_bookings = bookings_filtered.filter(status=Booking.STATUS_APPROVED).count()
+    cancelled_bookings = bookings_filtered.filter(
         Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED)
     ).count()
+    
+    # Calculate online paid bookings
+    online_paid_bookings = bookings_filtered.filter(payment_status='paid').count()
     
     # Calculate this week's bookings
     week_ago = timezone.now() - timedelta(days=7)
     this_week_bookings = bookings.filter(created_at__gte=week_ago).count()
+    
+    # Calculate this week's online paid bookings
+    this_week_paid_bookings = bookings.filter(
+        payment_status='paid',
+        payment_date__gte=week_ago
+    ).count()
     
     # Calculate completion rate
     completion_rate = (completed_bookings / total_bookings * 100) if total_bookings > 0 else 0
@@ -4731,45 +5843,66 @@ def super_admin_bookings(request):
     # Calculate cancellation rate
     cancellation_rate = (cancelled_bookings / total_bookings * 100) if total_bookings > 0 else 0
     
-    # Get booking trends (last 6 months)
-    six_months_ago = timezone.now() - timedelta(days=180)
-    monthly_trends = []
-    for i in range(6):
-        month_start = timezone.now() - timedelta(days=30 * (5 - i))
-        month_end = timezone.now() - timedelta(days=30 * (4 - i))
+    # Calculate online payment rate
+    online_payment_rate = (online_paid_bookings / total_bookings * 100) if total_bookings > 0 else 0
+    
+    # Get booking trends (based on trend_days filter)
+    daily_trends = []
+    for i in range(trend_days - 1, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
         
         completed = bookings.filter(
             status=Booking.STATUS_COMPLETED,
-            updated_at__gte=month_start,
-            updated_at__lt=month_end
+            updated_at__gte=day_start,
+            updated_at__lt=day_end
         ).count()
         
         cancelled = bookings.filter(
             Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED),
-            updated_at__gte=month_start,
-            updated_at__lt=month_end
+            updated_at__gte=day_start,
+            updated_at__lt=day_end
         ).count()
         
         pending = bookings.filter(
             status=Booking.STATUS_REQUESTED,
-            created_at__gte=month_start,
-            created_at__lt=month_end
+            created_at__gte=day_start,
+            created_at__lt=day_end
         ).count()
         
-        monthly_trends.append({
-            'month': month_start.strftime('%b'),
+        # Format label based on days
+        if trend_days <= 7:
+            label = day.strftime('%a')  # Mon, Tue, etc.
+        elif trend_days <= 30:
+            label = day.strftime('%b %d')  # Jan 15
+        else:
+            label = day.strftime('%m/%d')  # 01/15
+        
+        daily_trends.append({
+            'month': label,
             'completed': completed,
             'cancelled': cancelled,
             'pending': pending
         })
     
-    # Get bookings by service category
+    monthly_trends = daily_trends
+    
+    # Get bookings by service category (based on service_days filter)
     from core.models import ServiceCategory
     category_stats = []
     categories = ServiceCategory.objects.filter(is_active=True)
     
+    # Apply service days filter
+    if service_days != 'all':
+        service_period_days = int(service_days)
+        service_period_start = timezone.now() - timedelta(days=service_period_days)
+        bookings_for_categories = bookings.filter(created_at__gte=service_period_start)
+    else:
+        bookings_for_categories = bookings
+    
     for category in categories:
-        count = bookings.filter(service__category=category).count()
+        count = bookings_for_categories.filter(service__category=category).count()
         if count > 0:
             category_stats.append({
                 'name': category.name,
@@ -4778,7 +5911,7 @@ def super_admin_bookings(request):
             })
     
     # Add uncategorized services
-    uncategorized_count = bookings.filter(service__category__isnull=True).count()
+    uncategorized_count = bookings_for_categories.filter(service__category__isnull=True).count()
     if uncategorized_count > 0:
         category_stats.append({
             'name': 'Uncategorized',
@@ -4810,10 +5943,13 @@ def super_admin_bookings(request):
         'reviewed_bookings': reviewed_bookings,
         'confirmed_bookings': confirmed_bookings,
         'cancelled_bookings': cancelled_bookings,
+        'online_paid_bookings': online_paid_bookings,
         'this_week_bookings': this_week_bookings,
+        'this_week_paid_bookings': this_week_paid_bookings,
         'completion_rate': round(completion_rate, 1),
         'reviewed_percentage': round(reviewed_percentage, 1),
         'cancellation_rate': round(cancellation_rate, 1),
+        'online_payment_rate': round(online_payment_rate, 1),
         'monthly_trends': monthly_trends_json,
         'category_stats': category_stats_json,
     }
@@ -4830,10 +5966,16 @@ def super_admin_moderation(request):
         return redirect('core:home')
     
     from datetime import timedelta
+    from core.models import CommentReport
     
     # Get post reports
-    reports = PostReport.objects.select_related(
+    post_reports = PostReport.objects.select_related(
         'post', 'post__church', 'user'
+    ).order_by('-created_at')[:20]
+    
+    # Get comment reports
+    comment_reports = CommentReport.objects.select_related(
+        'comment', 'comment__post', 'comment__post__church', 'comment__user', 'user'
     ).order_by('-created_at')[:20]
     
     # Get church verification requests
@@ -4844,10 +5986,11 @@ def super_admin_moderation(request):
     ).order_by('created_at')[:20]
     
     # Calculate statistics
-    pending_reports = PostReport.objects.filter(status='pending').count()
-    high_severity_reports = PostReport.objects.filter(
-        status='pending'
-    ).count()  # You can add severity field later
+    pending_post_reports = PostReport.objects.filter(status='pending').count()
+    pending_comment_reports = CommentReport.objects.filter(status='pending').count()
+    pending_reports = pending_post_reports + pending_comment_reports
+    
+    high_severity_reports = pending_reports  # You can add severity field later
     
     church_verifications = ChurchVerificationRequest.objects.filter(
         status=ChurchVerificationRequest.STATUS_PENDING
@@ -4855,21 +5998,119 @@ def super_admin_moderation(request):
     
     # Resolved this week
     seven_days_ago = timezone.now() - timedelta(days=7)
-    resolved_this_week = PostReport.objects.filter(
+    resolved_post_reports = PostReport.objects.filter(
         status__in=['reviewed', 'dismissed', 'action_taken'],
         reviewed_at__isnull=False,
         reviewed_at__gte=seven_days_ago
     ).count()
+    resolved_comment_reports = CommentReport.objects.filter(
+        status__in=['reviewed', 'dismissed', 'action_taken'],
+        reviewed_at__isnull=False,
+        reviewed_at__gte=seven_days_ago
+    ).count()
+    resolved_this_week = resolved_post_reports + resolved_comment_reports
     
     # Calculate resolution rate
-    total_reports = PostReport.objects.count()
-    resolved_reports = PostReport.objects.filter(
+    total_post_reports = PostReport.objects.count()
+    total_comment_reports = CommentReport.objects.count()
+    total_reports = total_post_reports + total_comment_reports
+    
+    resolved_post_reports_all = PostReport.objects.filter(
         status__in=['reviewed', 'dismissed', 'action_taken']
     ).count()
+    resolved_comment_reports_all = CommentReport.objects.filter(
+        status__in=['reviewed', 'dismissed', 'action_taken']
+    ).count()
+    resolved_reports = resolved_post_reports_all + resolved_comment_reports_all
+    
     resolution_rate = int((resolved_reports / total_reports * 100)) if total_reports > 0 else 0
+    
+    # Calculate weekly activity data for chart (last 4 weeks)
+    from django.db.models import Count, Q
+    from django.db.models.functions import TruncWeek
+    
+    weekly_activity = []
+    for i in range(3, -1, -1):  # Last 4 weeks
+        week_start = timezone.now() - timedelta(days=(i+1)*7)
+        week_end = timezone.now() - timedelta(days=i*7)
+        
+        # New reports this week
+        new_post_reports = PostReport.objects.filter(
+            created_at__gte=week_start,
+            created_at__lt=week_end
+        ).count()
+        new_comment_reports = CommentReport.objects.filter(
+            created_at__gte=week_start,
+            created_at__lt=week_end
+        ).count()
+        new_reports = new_post_reports + new_comment_reports
+        
+        # Resolved this week
+        resolved_post = PostReport.objects.filter(
+            reviewed_at__gte=week_start,
+            reviewed_at__lt=week_end,
+            status__in=['reviewed', 'action_taken']
+        ).count()
+        resolved_comment = CommentReport.objects.filter(
+            reviewed_at__gte=week_start,
+            reviewed_at__lt=week_end,
+            status__in=['reviewed', 'action_taken']
+        ).count()
+        resolved = resolved_post + resolved_comment
+        
+        # Dismissed this week
+        dismissed_post = PostReport.objects.filter(
+            reviewed_at__gte=week_start,
+            reviewed_at__lt=week_end,
+            status='dismissed'
+        ).count()
+        dismissed_comment = CommentReport.objects.filter(
+            reviewed_at__gte=week_start,
+            reviewed_at__lt=week_end,
+            status='dismissed'
+        ).count()
+        dismissed = dismissed_post + dismissed_comment
+        
+        weekly_activity.append({
+            'new': new_reports,
+            'resolved': resolved,
+            'dismissed': dismissed
+        })
+    
+    # Calculate report reasons distribution
+    post_reasons = PostReport.objects.values('reason').annotate(count=Count('id'))
+    comment_reasons = CommentReport.objects.values('reason').annotate(count=Count('id'))
+    
+    # Combine and aggregate reasons
+    reason_counts = {}
+    for report in post_reasons:
+        reason = report['reason']
+        reason_counts[reason] = reason_counts.get(reason, 0) + report['count']
+    
+    for report in comment_reasons:
+        reason = report['reason']
+        reason_counts[reason] = reason_counts.get(reason, 0) + report['count']
+    
+    # Map reason codes to display names
+    reason_labels = {
+        'spam': 'Spam',
+        'inappropriate': 'Inappropriate Content',
+        'harassment': 'Harassment',
+        'violence': 'Violence',
+        'false_info': 'Misinformation',
+        'offensive': 'Suspicious Activity',
+        'other': 'Other'
+    }
+    
+    report_reasons = {
+        'labels': [reason_labels.get(k, k.title()) for k in reason_counts.keys()],
+        'data': list(reason_counts.values())
+    }
     
     stats = {
         'pending_reports': pending_reports,
+        'pending_post_reports': pending_post_reports,
+        'pending_comment_reports': pending_comment_reports,
         'high_severity_reports': high_severity_reports,
         'church_verifications': church_verifications,
         'resolved_this_week': resolved_this_week,
@@ -4877,12 +6118,16 @@ def super_admin_moderation(request):
         'avg_response_time': '2.3',  # You can calculate this based on your data
     }
     
+    import json
     ctx = {
         'active': 'super_admin_moderation',
         'page_title': 'Moderation',
-        'reports': reports,
+        'post_reports': post_reports,
+        'comment_reports': comment_reports,
         'verifications': verifications,
         'stats': stats,
+        'weekly_activity_json': json.dumps(weekly_activity),
+        'report_reasons_json': json.dumps(report_reasons),
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_moderation.html', ctx)

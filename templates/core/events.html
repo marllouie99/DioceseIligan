@@ -14,6 +14,128 @@
   <link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/donation.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+  <style>
+    /* Force Blue Theme on Post Cards */
+    .page-events .post-card {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+    }
+    
+    .page-events .post-header {
+      background: linear-gradient(135deg, rgba(240, 248, 255, 0.8) 0%, rgba(232, 244, 255, 0.8) 100%) !important;
+      border-bottom: 1px solid rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    .page-events .post-content {
+      background: #ffffff !important;
+    }
+    
+    .page-events .post-actions {
+      background: linear-gradient(135deg, rgba(240, 248, 255, 0.6) 0%, rgba(232, 244, 255, 0.6) 100%) !important;
+      border-top: 1px solid rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    .page-events .event-info-card {
+      background: linear-gradient(135deg, rgba(240, 248, 255, 0.9) 0%, rgba(232, 244, 255, 0.9) 100%) !important;
+      border: 1px solid rgba(30, 144, 255, 0.2) !important;
+      box-shadow: 0 4px 12px rgba(30, 144, 255, 0.08) !important;
+    }
+
+    .page-events .event-header {
+      border-bottom: 1px solid rgba(30, 144, 255, 0.15) !important;
+    }
+    
+    .page-events .post-badge.event-badge {
+      background: rgba(30, 144, 255, 0.1) !important;
+      border: 1px solid rgba(30, 144, 255, 0.2) !important;
+      color: #1E90FF !important;
+    }
+    
+    .page-events .event-location-badge {
+      background: rgba(30, 144, 255, 0.08) !important;
+      border: 1px solid rgba(30, 144, 255, 0.15) !important;
+      color: #1E90FF !important;
+    }
+    
+    .page-events .church-name-link {
+      color: #1E90FF !important;
+    }
+    
+    .page-events .church-name-link:hover {
+      color: #4169E1 !important;
+    }
+    
+    .page-events .post-action {
+      color: #1E90FF !important;
+    }
+    
+    .page-events .post-action:hover {
+      background: rgba(30, 144, 255, 0.08) !important;
+      color: #4169E1 !important;
+    }
+    
+    .page-events .post-action.liked .action-text,
+    .page-events .post-action.bookmarked .action-text {
+      color: #1E90FF !important;
+    }
+
+    .page-events .post-actions::before {
+      display: none !important;
+    }
+
+    .page-events .event-info-card .event-icon,
+    .page-events .event-location-badge .location-icon {
+      color: #1E90FF !important;
+      stroke: #1E90FF !important;
+    }
+
+    .page-events .event-detail-item {
+      border: 1px solid rgba(30, 144, 255, 0.12) !important;
+    }
+
+    .page-events .post-card:hover {
+      box-shadow: 0 20px 40px rgba(30, 144, 255, 0.15) !important;
+    }
+
+    /* Fix spacing issues */
+    .page-events .post-header {
+      padding: 20px !important;
+    }
+
+    .page-events .post-content {
+      padding: 20px !important;
+    }
+
+    .page-events .post-text {
+      margin-bottom: 16px !important;
+    }
+
+    .page-events .post-badges {
+      margin-bottom: 16px !important;
+    }
+
+    .page-events .event-info-card {
+      margin-top: 16px !important;
+      margin-bottom: 16px !important;
+    }
+
+    .page-events .post-actions {
+      padding: 16px 20px !important;
+    }
+
+    /* Events page grid (avoid dashboard-layout warm theme styles) */
+    .page-events .events-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+    }
+    @media (max-width: 1024px) {
+      .page-events .events-layout { grid-template-columns: 1fr; gap: 24px; }
+    }
+    @media (max-width: 768px) {
+      .page-events .events-layout { gap: 20px; }
+    }
+  </style>
 {% endblock %}
 
 {% block sidebar %}
@@ -34,7 +156,7 @@
     </div>
   </div>
 
-  <div class="dashboard-layout">
+  <div class="events-layout">
     <!-- Main: 1 column event feed -->
     <div class="main-content">
       {% if total_events %}
@@ -146,6 +268,9 @@
     </div>
   </div>
 </div>
+
+<!-- Comment Report Modal -->
+{% include 'partials/comment_report_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
@@ -171,4 +296,5 @@
   {# Donation Modal and handler #}
   {% include 'partials/donation_modal.html' %}
   <script defer src="{% static 'js/components/donation.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
 {% endblock %}

@@ -248,6 +248,33 @@
     color: #1E90FF !important;
   }
   
+  /* See more link styling */
+  .see-more-link {
+    font-size: 0.875rem;
+    color: #1E90FF;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .see-more-link:hover {
+    color: #4169E1;
+    text-decoration: underline;
+  }
+  
+  .see-more-link::after {
+    content: '→';
+    font-size: 1rem;
+    transition: transform 0.2s;
+  }
+  
+  .see-more-link:hover::after {
+    transform: translateX(3px);
+  }
+  
   .sidebar-activity-text {
     color: #1A3A52 !important;
   }
@@ -750,9 +777,12 @@
           </div>
           
           <div class="sidebar-content">
-            <!-- Upcoming Events Section -->
+            <!-- Community Events Section -->
             <div class="sidebar-section">
-              <h3 class="sidebar-title">Upcoming Events</h3>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 class="sidebar-title" style="margin: 0;">Community Events</h3>
+                <a href="{% url 'core:events' %}" class="see-more-link">See more</a>
+              </div>
               <div class="upcoming-events">
                 {% if upcoming_events %}
                   {% for event in upcoming_events %}
@@ -792,7 +822,7 @@
                       <line x1="8" y1="2" x2="8" y2="6"/>
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    <p class="empty-text">No upcoming events</p>
+                    <p class="empty-text">No community events</p>
                   </div>
                 {% endif %}
               </div>
@@ -979,6 +1009,9 @@
             </form>
           </div>
         </div>
+        
+        <!-- Comment Report Modal -->
+        {% include 'partials/comment_report_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}

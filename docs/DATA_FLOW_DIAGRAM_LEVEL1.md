@@ -547,7 +547,7 @@ Process 10.0 (Administration) → All Processes
 **Data Stores Accessed**:
 - DS1: User Database (Read/Write)
 - DS2: Profile Database (Read/Write)
-- DS3: Email Verification Database (Read/Write)
+- DS3: Email Verification Database (Read/Write) 
 - DS4: User Activity Log (Write)
 
 ---

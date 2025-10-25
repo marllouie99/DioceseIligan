@@ -450,6 +450,13 @@ class DashboardPosts {
         <div class="comment-meta">
           <span class="comment-time">${this.formatRelativeTime(comment.created_at)}</span>
           <button class="comment-reply-btn" data-comment-id="${comment.id}">Reply</button>
+          <button class="comment-report-btn" data-comment-id="${comment.id}" title="Report comment">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+              <line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+            Report
+          </button>
         </div>
         ${comment.replies ? comment.replies.map(reply => 
           `<div class="comment comment-reply">
@@ -461,6 +468,13 @@ class DashboardPosts {
               <div class="comment-text">${this.escapeHtml(reply.content)}</div>
               <div class="comment-meta">
                 <span class="comment-time">${this.formatRelativeTime(reply.created_at)}</span>
+                <button class="comment-report-btn" data-comment-id="${reply.id}" title="Report comment">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                  </svg>
+                  Report
+                </button>
               </div>
             </div>
           </div>`
