@@ -62,70 +62,75 @@ Arrows showing data movement with labels
 ---
 
 ### **Process 2.0: Church Profile Management**
-**Description**: Manages church updates, verification requests, and church information display. Church creation is now handled by Super Admin (Process 10.0).
+**Description**: Manages church updates and church information display. **Church creation, manager assignment, and verification are handled by Super Admin in Process 10.0**. All churches created by Super-Admin are automatically verified.
 
 **Inputs**:
-- Church updates (from Church Owner)
-- Verification documents (from Church Owner)
-- Verification decisions (from Admin)
-- Church search queries (from User)
-- Church creation data (from Process 10.0)
+- Church updates (from Parish Manager)
+- Church search queries (from Regular User)
+- Church creation data with assigned manager (from Process 10.0) - automatically verified
+- User credentials for ownership verification (from Process 1.0)
 
 **Outputs**:
-- Church listings (to User)
-- Church details (to User, Church Owner)
-- Verification status (to Church Owner)
-- Church analytics (to Church Owner)
+- Church listings (to Regular User)
+- Church details (to Regular User, Parish Manager)
+- Church analytics (to Parish Manager)
 - Church created confirmation (to Process 10.0)
+- Church data for services (to Process 3.0)
 
 **Data Stores Used**:
 - DS5: Church Database
-- DS6: Church Verification Database
-- DS1: User Database
+- DS1: User Database (read-only for ownership verification)
 
 **Process Logic**:
-1. Store church profiles created by Super Admin
-2. Validate and store church updates
-3. Process verification requests
-4. Upload and optimize images
-5. Calculate church statistics
-6. Generate church listings
-7. Track follower counts
+1. Receive and store church profiles created by Super Admin (with assigned manager, auto-verified)
+2. Validate ownership: verify Parish Manager is assigned to the church
+3. Validate and store church updates from assigned Parish Manager only
+4. Upload and optimize church images
+5. Calculate church statistics (views, followers, engagement)
+6. Generate church listings for public search
+7. Track follower counts and analytics
 
 ---
 
 ### **Process 3.0: Service & Booking Management**
-**Description**: Handles bookable services, availability calendar, booking requests, and booking workflow.
+**Description**: Handles bookable services, availability calendar, booking requests with online payment, and booking workflow.
 
 **Inputs**:
-- Service creation (from Church Owner)
-- Service images (from Church Owner)
-- Availability updates (from Church Owner)
-- Booking requests (from User)
-- Booking decisions (from Church Owner)
+- Service creation (from Parish Manager)
+- Service images (from Parish Manager)
+- Availability updates (from Parish Manager)
+- Booking requests with payment (from Regular User)
+- Payment confirmations (from Payment Gateway)
+- Payment webhooks (from Payment Gateway)
+- Booking decisions (from Parish Manager)
 
 **Outputs**:
-- Service catalog (to User)
-- Availability calendar (to User)
-- Booking confirmations (to User)
-- Booking notifications (to Church Owner, Email Service)
-- Booking status updates (to User)
+- Service catalog (to Regular User)
+- Availability calendar (to Regular User)
+- Payment requests (to Payment Gateway)
+- Booking confirmations (to Regular User)
+- Payment receipts (to Regular User, Email Service)
+- Booking notifications (to Parish Manager, Email Service)
+- Booking status updates (to Regular User)
 
 **Data Stores Used**:
 - DS7: Bookable Service Database
-- DS8: Booking Database
+- DS8: Booking Database (includes payment fields)
 - DS9: Availability Database
 - DS5: Church Database
 
 **Process Logic**:
-1. Create and manage services
+1. Create and manage services (with pricing)
 2. Manage availability calendar
 3. Check booking conflicts
-4. Process booking requests
-5. Update booking status workflow
-6. Generate booking codes (APPT-XXXX)
-7. Send notifications
-8. Track booking statistics
+4. Process booking requests with payment
+5. Validate payment before confirming booking
+6. Handle PayPal/Stripe webhooks for booking payments
+7. Update booking status workflow
+8. Generate booking codes (APPT-XXXX)
+9. Generate payment receipts
+10. Send notifications
+11. Track booking and payment statistics
 
 ---
 
@@ -164,7 +169,7 @@ Arrows showing data movement with labels
 
 ---
 
-### **Process 5.0: Donation Processing**
+### **Process 5.0:      **
 **Description**: Handles donation enabling, payment processing, donation tracking, and receipt generation.
 
 **Inputs**:
@@ -380,7 +385,7 @@ Arrows showing data movement with labels
 | DS5 | Church Database | Church profiles and information | core_church, core_churchfollow |
 | DS6 | Church Verification Database | Verification requests and documents | core_churchverificationrequest, core_churchverificationdocument |
 | DS7 | Bookable Service Database | Services and service images | core_bookableservice, core_serviceimage |
-| DS8 | Booking Database | Bookings and availability | core_booking, core_availability, core_declinereason |
+| DS8 | Booking Database | Bookings with payment info | core_booking (includes payment fields), core_availability, core_declinereason |
 | DS9 | Availability Database | Church availability calendar | core_availability |
 | DS10 | Post Database | Church posts and content | core_post |
 | DS11 | Post Interaction Database | Likes, comments, bookmarks, views | core_postlike, core_postcomment, core_commentlike, core_postbookmark, core_postview |
@@ -552,32 +557,32 @@ Process 10.0 (Administration) → All Processes
 **Process Number**: 2.0  
 **Process Name**: Church Profile Management
 
+**Key Concept**: Super-Admin creates churches and assigns Parish Managers in Process 10.0. All churches are automatically verified upon creation. Process 2.0 receives the created church data and manages updates from the assigned Parish Manager.
+
 **Input Data Flows**:
 | From | Data Flow | Data Elements |
 |------|-----------|---------------|
-| Process 10.0 | Church Creation Data | Name, Description, Contact, Address, Images, Assigned Manager |
-| Church Owner | Church Update | Updated Church Data |
-| Church Owner | Verification Request | Church ID, Documents |
-| Admin | Verification Decision | Approved/Rejected, Notes |
-| User | Search Query | Keywords, Filters, Location |
+| Process 10.0 | Church Creation Data with Assigned Manager | Name, Description, Contact, Address, Images, Assigned Manager User ID, is_verified=True |
+| Process 1.0 | User Credentials | User ID, Authentication Token (for ownership verification) |
+| Parish Manager | Church Update | Updated Church Data (name, description, contact, images) |
+| Regular User | Church Search Query | Keywords, Filters, Location |
 | Cloud Storage | Image URL | CDN URL, File ID |
 
 **Output Data Flows**:
 | To | Data Flow | Data Elements |
 |----|-----------|---------------|
-| User | Church Listings | Church List, Filters Applied |
-| User | Church Details | Full Church Profile |
-| Church Owner | Church Analytics | Views, Followers, Statistics |
-| Church Owner | Verification Status | Status, Admin Notes |
-| Process 10.0 | Church Created Confirmation | Church ID, Status |
-| Cloud Storage | Image Upload | Image File, Metadata |
-| DS5 | Church Record | Church Data |
-| DS6 | Verification Record | Request, Documents, Status |
+| Regular User | Church Listings | Church List, Filters Applied |
+| Regular User | Church Details | Full Church Profile |
+| Parish Manager | Church Details | Full Church Profile (for their church) |
+| Parish Manager | Church Analytics | Views, Followers, Engagement Statistics |
+| Process 10.0 | Church Created Confirmation | Church ID, Status, Assigned Manager |
+| Process 3.0 | Church Data for Services | Church ID, Church Name, Church Details |
+| Cloud Storage | Image Upload Request | Image File, Metadata |
+| DS5 | Church Record | Church Data (with is_verified=True) |
 
 **Data Stores Accessed**:
 - DS5: Church Database (Read/Write)
-- DS6: Church Verification Database (Read/Write)
-- DS1: User Database (Read)
+- DS1: User Database (Read - for ownership verification)
 
 ---
 
@@ -586,31 +591,38 @@ Process 10.0 (Administration) → All Processes
 **Process Number**: 3.0  
 **Process Name**: Service & Booking Management
 
+**Key Update**: Users can now pay online for booking requests. Payment is processed before booking confirmation.
+
 **Input Data Flows**:
 | From | Data Flow | Data Elements |
 |------|-----------|---------------|
-| Church Owner | Service Creation | Name, Description, Price, Duration, Images |
-| Church Owner | Availability Update | Date, Type, Reason, Hours |
-| User | Booking Request | Service ID, Date, Time, Notes |
-| Church Owner | Booking Decision | Booking ID, Approve/Decline, Reason |
-| Process 2.0 | Church Data | Church ID, Church Details |
+| Parish Manager | Service Creation | Name, Description, Price, Duration, Images, Payment Required (Yes/No) |
+| Parish Manager | Availability Update | Date, Type, Reason, Hours |
+| Regular User | Booking Request with Payment | Service ID, Date, Time, Notes, Payment Method |
+| Payment Gateway | Payment Confirmation | Transaction ID, Status, Payer Info, Amount |
+| Payment Gateway | Webhook Notification | Order ID, Status Update |
+| Parish Manager | Booking Decision | Booking ID, Approve/Decline, Reason |
+| Process 2.0 | Church Data | Church ID, Church Details, PayPal Email |
 
 **Output Data Flows**:
 | To | Data Flow | Data Elements |
 |----|-----------|---------------|
-| User | Service Catalog | Services List, Details |
-| User | Availability Calendar | Available Dates, Closed Dates |
-| User | Booking Confirmation | Booking Code, Status, Details |
-| Church Owner | Booking Notification | New Booking Alert |
-| Process 8.0 | Booking Event | Event Type, Booking Data |
+| Regular User | Service Catalog | Services List, Details, Prices |
+| Regular User | Availability Calendar | Available Dates, Closed Dates |
+| Payment Gateway | Payment Request | Amount, Currency, Order ID, Service Details |
+| Regular User | Booking Confirmation | Booking Code, Status, Payment Receipt |
+| Regular User | Payment Receipt | Amount, Transaction ID, Receipt Details |
+| Parish Manager | Booking Notification | New Booking Alert, Payment Status |
+| Email Service | Booking & Payment Notification | Booking Details, Payment Receipt |
+| Process 8.0 | Booking Event | Event Type, Booking Data, Payment Status |
 | Process 7.0 | Completed Booking | Booking ID, Service ID, User ID |
-| DS7 | Service Record | Service Data, Images |
-| DS8 | Booking Record | Booking Data, Status |
+| DS7 | Service Record | Service Data, Images, Price |
+| DS8 | Booking Record | Booking Data, Status, Payment Status, Payment Details |
 | DS9 | Availability Record | Date, Type, Hours |
 
 **Data Stores Accessed**:
 - DS7: Bookable Service Database (Read/Write)
-- DS8: Booking Database (Read/Write)
+- DS8: Booking Database (Read/Write) - includes payment fields
 - DS9: Availability Database (Read/Write)
 - DS5: Church Database (Read)
 
@@ -878,6 +890,7 @@ Process 10.0 (Administration) → All Processes
 |-----------|-------|
 | **Processes** | 10 |
 | **Data Stores** | 18 (grouped into 10 primary) |
+| **Database Tables** | 32 |
 | **External Entities** | 8 |
 | **Major Data Flows** | 100+ |
 | **Inter-Process Flows** | 15+ |
@@ -895,22 +908,41 @@ Process 10.0 (Administration) → All Processes
 
 ---
 
-## 🔄 Recent Changes (2025-10-17)
+## 🔄 Recent Changes
 
-### **Church Creation Flow Update**
+### **2025-10-23: Online Booking Payment**
+- **New Feature**: Users can now pay online for booking requests
+- **Payment Gateway**: PayPal/Stripe/GCash integration for booking payments
+- **Updated Data Store**: DS8 - Booking Database now includes payment fields
+- **Payment Fields in core_booking**:
+  - payment_status (pending, paid, failed, canceled, refunded)
+  - payment_method (paypal, stripe, gcash)
+  - payment_amount
+  - payment_transaction_id
+  - payment_date
+- **Updated Process**: Process 3.0 now handles payment processing
+- **Payment Flow**: Payment → Confirmation → Booking Approval
+- **Features**:
+  1. **Optional Payment**: Services can be free or require payment
+  2. **Payment Receipts**: Automatic receipt generation
+  3. **Webhook Support**: Real-time payment status updates
+  4. **Payment Validation**: Booking confirmed only after successful payment
+
+### **2025-10-17: Church Creation Flow Update**
 - **Old Flow**: Users could create churches directly through Process 2.0
 - **New Flow**: Only Super Admins can create churches through Process 10.0
 - **Reason**: Centralized control, quality assurance, proper manager assignment
 
-### **New Features Added**:
+### **Features Added (2025-10-17)**:
 1. **Profile Validation**: System checks if assigned user has complete profile (Name, Phone, Address, DOB)
 2. **Dual Notifications**: Both email and system notifications sent to assigned managers
 3. **Cascading Location**: Philippine address dropdowns (Region → Province → City → Barangay)
 4. **Auto-fill Leadership**: Pastor fields auto-populate from assigned manager's profile
+5. **Auto-Verification**: Churches created by Super-Admin are automatically verified
 
 ---
 
 *Document Created: 2025-10-16*  
-*Last Updated: 2025-10-17*  
+*Last Updated: 2025-10-23*  
 *System: ChurchIligan v1.0*  
-*Diagram Type: Level 1 DFD (10 Processes)*
+*Diagram Type: Level 1 DFD (10 Processes, 18 Data Stores)*

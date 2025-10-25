@@ -56,6 +56,14 @@
       </a>
     </li>
     <li>
+      <a class="{% if active == 'super_admin_categories' %}active{% endif %}"
+         {% if active == 'super_admin_categories' %}aria-current="page"{% endif %}
+         href="{% url 'core:super_admin_categories' %}">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg></span>
+        Categories
+      </a>
+    </li>
+    <li>
       <a class="{% if active == 'super_admin_bookings' %}active{% endif %}"
          {% if active == 'super_admin_bookings' %}aria-current="page"{% endif %}
          href="{% url 'core:super_admin_bookings' %}">

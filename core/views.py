@@ -20,6 +20,7 @@ from .models import (
     Church,
     ChurchFollow,
     BookableService,
+    ServiceCategory,
     Availability,
     ServiceImage,
     Booking,
@@ -459,7 +460,7 @@ def manage_church(request, church_id=None):
     bookings_all = (
         Booking.objects
         .filter(church=church)
-        .select_related('service', 'user', 'user__profile')
+        .select_related('service', 'service__category', 'user', 'user__profile')
         .order_by('-created_at')
     )
     counts = {
@@ -737,7 +738,7 @@ def manage_church(request, church_id=None):
         payment_method__isnull=False  # Only show bookings with payment method (online payment)
     ).exclude(
         payment_method=''  # Exclude empty payment methods
-    ).select_related('service', 'user', 'user__profile').order_by('-payment_date', '-created_at')
+    ).select_related('service', 'service__category', 'user', 'user__profile').order_by('-payment_date', '-created_at')
     
     # Recent transactions (last 20)
     recent_transactions = list(transactions_queryset[:20])
@@ -1149,7 +1150,7 @@ def events(request):
 def appointments(request):
     """User's appointments page with status filters and counts."""
     status_filter = request.GET.get('status', 'all')
-    bookings_qs = Booking.objects.filter(user=request.user).select_related('service', 'church').order_by('-created_at')
+    bookings_qs = Booking.objects.filter(user=request.user).select_related('service', 'service__category', 'church').order_by('-created_at')
 
     counts = {
         'all': bookings_qs.count(),
@@ -1286,7 +1287,7 @@ def super_admin_dashboard(request):
     # Recent activity
     recent_churches = Church.objects.select_related('owner').order_by('-created_at')[:8]
     recent_users = User.objects.order_by('-date_joined')[:8] if hasattr(User, 'date_joined') else User.objects.order_by('-id')[:8]
-    recent_bookings = Booking.objects.select_related('service', 'church', 'user').order_by('-created_at')[:8]
+    recent_bookings = Booking.objects.select_related('service', 'service__category', 'church', 'user').order_by('-created_at')[:8]
 
     # Booking status breakdown
     booking_by_status = list(
@@ -2405,7 +2406,7 @@ def create_booking_api(request):
 @login_required
 def manage_booking(request, booking_id):
     """Owner view to review/update a single booking and handle conflicts."""
-    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    booking = get_object_or_404(Booking.objects.select_related('service', 'service__category', 'church', 'user'), id=booking_id)
     if booking.church.owner != request.user:
         messages.error(request, 'You do not have permission to manage this booking.')
         return redirect('core:manage_church', church_id=booking.church.id)
@@ -2685,7 +2686,7 @@ def toggle_decline_reason(request, reason_id):
 @login_required
 def booking_invoice(request, booking_id):
     """Printable invoice page for a booking. Accessible by the booking user or the church owner."""
-    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    booking = get_object_or_404(Booking.objects.select_related('service', 'service__category', 'church', 'user'), id=booking_id)
     is_owner = request.user == booking.user
     is_church_owner = request.user == booking.church.owner
     if not (is_owner or is_church_owner):
@@ -2712,7 +2713,7 @@ def booking_invoice(request, booking_id):
 @login_required
 def gcash_payment(request, booking_id):
     """GCash payment processing page"""
-    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    booking = get_object_or_404(Booking.objects.select_related('service', 'service__category', 'church', 'user'), id=booking_id)
     
     # Check if user owns this booking
     if request.user != booking.user:
@@ -2737,7 +2738,7 @@ def gcash_payment(request, booking_id):
 @login_required
 def paypal_payment(request, booking_id):
     """PayPal payment processing page"""
-    booking = get_object_or_404(Booking.objects.select_related('service', 'church', 'user'), id=booking_id)
+    booking = get_object_or_404(Booking.objects.select_related('service', 'service__category', 'church', 'user'), id=booking_id)
     
     # Check if user owns this booking
     if request.user != booking.user:
@@ -3671,7 +3672,13 @@ def api_get_service(request, service_id):
             'is_free': service.is_free,
             'currency': service.currency,
             'raw_price': float(service.price) if service.price else 0.0,
-            'duration_minutes': service.duration
+            'duration_minutes': service.duration,
+            'category': {
+                'id': service.category.id,
+                'name': service.category.name,
+                'icon': service.category.icon,
+                'color': service.category.color
+            } if service.category else None
         }
         
         # Prepare church data
@@ -4556,6 +4563,136 @@ def super_admin_services(request):
     return render(request, 'core/super_admin_services.html', ctx)
 
 
+# Super Admin - Service Categories Management
+@login_required
+def super_admin_categories(request):
+    """Manage service categories."""
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    from .forms import ServiceCategoryForm
+    
+    categories = ServiceCategory.objects.all().order_by('order', 'name')
+    
+    ctx = {
+        'active': 'super_admin_categories',
+        'page_title': 'Service Categories',
+        'categories': categories,
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_categories.html', ctx)
+
+
+@login_required
+def super_admin_create_category(request):
+    """Create a new service category."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    from .forms import ServiceCategoryForm
+    
+    if request.method == 'POST':
+        form = ServiceCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Category "{category.name}" created successfully!')
+            return JsonResponse({
+                'success': True,
+                'message': f'Category "{category.name}" created successfully!',
+                'category_id': category.id
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Please correct the errors below.',
+                'errors': form.errors
+            }, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
+@login_required
+def super_admin_edit_category(request, category_id):
+    """Edit a service category."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    from .forms import ServiceCategoryForm
+    
+    category = get_object_or_404(ServiceCategory, id=category_id)
+    
+    if request.method == 'POST':
+        form = ServiceCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Category "{category.name}" updated successfully!')
+            return JsonResponse({
+                'success': True,
+                'message': f'Category "{category.name}" updated successfully!',
+                'category_id': category.id
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Please correct the errors below.',
+                'errors': form.errors
+            }, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
+@login_required
+def super_admin_delete_category(request, category_id):
+    """Delete a service category."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    category = get_object_or_404(ServiceCategory, id=category_id)
+    
+    if request.method == 'POST':
+        # Check if category has services
+        service_count = category.services.count()
+        if service_count > 0:
+            return JsonResponse({
+                'success': False,
+                'message': f'Cannot delete category "{category.name}" because it has {service_count} service(s) associated with it. Please reassign or delete those services first.'
+            }, status=400)
+        
+        category_name = category.name
+        category.delete()
+        messages.success(request, f'Category "{category_name}" deleted successfully!')
+        return JsonResponse({
+            'success': True,
+            'message': f'Category "{category_name}" deleted successfully!'
+        })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
+@login_required
+def super_admin_toggle_category(request, category_id):
+    """Toggle category active status."""
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied'}, status=403)
+    
+    category = get_object_or_404(ServiceCategory, id=category_id)
+    
+    if request.method == 'POST':
+        category.is_active = not category.is_active
+        category.save()
+        
+        status_text = 'activated' if category.is_active else 'deactivated'
+        messages.success(request, f'Category "{category.name}" {status_text} successfully!')
+        return JsonResponse({
+            'success': True,
+            'message': f'Category "{category.name}" {status_text} successfully!',
+            'is_active': category.is_active
+        })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
 # Super Admin - Bookings Management
 @login_required
 def super_admin_bookings(request):
@@ -4563,9 +4700,122 @@ def super_admin_bookings(request):
         messages.error(request, 'You do not have permission to access Super Admin.')
         return redirect('core:home')
 
+    from django.db.models import Count, Q
+    from datetime import datetime, timedelta
+    
+    # Get all bookings with related data
+    bookings = Booking.objects.select_related(
+        'user', 'church', 'service', 'service__category'
+    ).order_by('-created_at')
+    
+    # Calculate statistics
+    total_bookings = bookings.count()
+    completed_bookings = bookings.filter(status=Booking.STATUS_COMPLETED).count()
+    pending_bookings = bookings.filter(status=Booking.STATUS_REQUESTED).count()
+    reviewed_bookings = bookings.filter(status=Booking.STATUS_REVIEWED).count()
+    confirmed_bookings = bookings.filter(status=Booking.STATUS_APPROVED).count()
+    cancelled_bookings = bookings.filter(
+        Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED)
+    ).count()
+    
+    # Calculate this week's bookings
+    week_ago = timezone.now() - timedelta(days=7)
+    this_week_bookings = bookings.filter(created_at__gte=week_ago).count()
+    
+    # Calculate completion rate
+    completion_rate = (completed_bookings / total_bookings * 100) if total_bookings > 0 else 0
+    
+    # Calculate reviewed percentage
+    reviewed_percentage = (reviewed_bookings / total_bookings * 100) if total_bookings > 0 else 0
+    
+    # Calculate cancellation rate
+    cancellation_rate = (cancelled_bookings / total_bookings * 100) if total_bookings > 0 else 0
+    
+    # Get booking trends (last 6 months)
+    six_months_ago = timezone.now() - timedelta(days=180)
+    monthly_trends = []
+    for i in range(6):
+        month_start = timezone.now() - timedelta(days=30 * (5 - i))
+        month_end = timezone.now() - timedelta(days=30 * (4 - i))
+        
+        completed = bookings.filter(
+            status=Booking.STATUS_COMPLETED,
+            updated_at__gte=month_start,
+            updated_at__lt=month_end
+        ).count()
+        
+        cancelled = bookings.filter(
+            Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED),
+            updated_at__gte=month_start,
+            updated_at__lt=month_end
+        ).count()
+        
+        pending = bookings.filter(
+            status=Booking.STATUS_REQUESTED,
+            created_at__gte=month_start,
+            created_at__lt=month_end
+        ).count()
+        
+        monthly_trends.append({
+            'month': month_start.strftime('%b'),
+            'completed': completed,
+            'cancelled': cancelled,
+            'pending': pending
+        })
+    
+    # Get bookings by service category
+    from core.models import ServiceCategory
+    category_stats = []
+    categories = ServiceCategory.objects.filter(is_active=True)
+    
+    for category in categories:
+        count = bookings.filter(service__category=category).count()
+        if count > 0:
+            category_stats.append({
+                'name': category.name,
+                'count': count,
+                'color': category.color
+            })
+    
+    # Add uncategorized services
+    uncategorized_count = bookings.filter(service__category__isnull=True).count()
+    if uncategorized_count > 0:
+        category_stats.append({
+            'name': 'Uncategorized',
+            'count': uncategorized_count,
+            'color': '#9CA3AF'
+        })
+    
+    # Sort by count descending
+    category_stats = sorted(category_stats, key=lambda x: x['count'], reverse=True)[:5]
+    
+    # Paginate bookings (20 per page)
+    from django.core.paginator import Paginator
+    paginator = Paginator(bookings, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Convert data to JSON for JavaScript
+    import json
+    monthly_trends_json = json.dumps(monthly_trends)
+    category_stats_json = json.dumps(category_stats)
+    
     ctx = {
         'active': 'super_admin_bookings',
         'page_title': 'Bookings Management',
+        'bookings': page_obj,
+        'total_bookings': total_bookings,
+        'completed_bookings': completed_bookings,
+        'pending_bookings': pending_bookings,
+        'reviewed_bookings': reviewed_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'this_week_bookings': this_week_bookings,
+        'completion_rate': round(completion_rate, 1),
+        'reviewed_percentage': round(reviewed_percentage, 1),
+        'cancellation_rate': round(cancellation_rate, 1),
+        'monthly_trends': monthly_trends_json,
+        'category_stats': category_stats_json,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_bookings.html', ctx)

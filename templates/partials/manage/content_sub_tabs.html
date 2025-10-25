@@ -61,21 +61,27 @@
       </div>
     </div>
     
-    {# 1x1 Grid Chart - Weekly Engagement #}
+    {# 1x1 Grid Chart - Engagement Trends #}
     <div class="weekly-engagement-section">
       <div class="chart-container">
         <div class="chart-header">
-          <h4>Weekly Engagement</h4>
-          <p>Post performance metrics over the last 7 days</p>
+          <div class="chart-title-group">
+            <h4>Engagement Trends</h4>
+            <p id="engagementChartSubtitle">Post performance metrics over the last 7 days</p>
+          </div>
+          <div class="chart-controls">
+            <select id="engagementTimeRange" class="time-range-selector">
+              <option value="daily">Daily (7 days)</option>
+              <option value="weekly" selected>Weekly (4 weeks)</option>
+              <option value="monthly">Monthly (6 months)</option>
+              <option value="yearly">Yearly (12 months)</option>
+            </select>
+          </div>
         </div>
         <div class="chart-content">
           <canvas id="weeklyEngagementChart" 
                   width="800" 
-                  height="300"
-                  data-total-posts="{{ analytics.total_posts|default:'0' }}"
-                  data-total-likes="{{ analytics.total_likes|default:'0' }}"
-                  data-total-comments="{{ analytics.total_comments|default:'0' }}"
-                  data-total-views="{{ analytics.total_views|default:'0' }}"></canvas>
+                  height="300"></canvas>
         </div>
       </div>
     </div>

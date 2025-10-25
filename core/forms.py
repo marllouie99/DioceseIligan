@@ -4,6 +4,7 @@ from .models import (
     Church,
     ChurchFollow,
     BookableService,
+    ServiceCategory,
     Availability,
     ServiceImage,
     Booking,
@@ -452,7 +453,7 @@ class BookableServiceForm(forms.ModelForm):
     class Meta:
         model = BookableService
         fields = [
-            'name', 'description', 'image', 'price', 'is_free', 'currency', 'duration', 
+            'name', 'category', 'description', 'image', 'price', 'is_free', 'currency', 'duration', 
             'max_bookings_per_day', 'advance_booking_days', 'is_active', 
             'requires_approval', 'preparation_notes', 'cancellation_policy'
         ]
@@ -461,6 +462,9 @@ class BookableServiceForm(forms.ModelForm):
                 'class': 'form-input',
                 'placeholder': 'e.g., Counseling Session, Baptism, Wedding Consultation',
                 'maxlength': 200
+            }),
+            'category': forms.Select(attrs={
+                'class': 'form-select'
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-textarea',
@@ -509,6 +513,10 @@ class BookableServiceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.church = kwargs.pop('church', None)
         super().__init__(*args, **kwargs)
+        
+        # Filter category queryset to only show active categories
+        self.fields['category'].queryset = ServiceCategory.objects.filter(is_active=True).order_by('order', 'name')
+        self.fields['category'].empty_label = "Select a category (optional)"
         
         # Set initial value for is_free checkbox
         if self.instance and self.instance.pk:
@@ -1361,3 +1369,50 @@ class PostForm(forms.ModelForm):
                 )
         
         return cleaned_data
+
+
+class ServiceCategoryForm(forms.ModelForm):
+    """Form for creating and editing service categories."""
+    
+    class Meta:
+        model = ServiceCategory
+        fields = ['name', 'description', 'icon', 'color', 'order', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'e.g., Parish Family, In-Person Services',
+                'maxlength': 100
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Description of the category (optional)',
+                'rows': 3
+            }),
+            'icon': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'e.g., 🏛️, ⛪, 📖 or icon class',
+                'maxlength': 50
+            }),
+            'color': forms.TextInput(attrs={
+                'class': 'form-input',
+                'type': 'color',
+                'placeholder': '#3B82F6'
+            }),
+            'order': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'min': 0,
+                'placeholder': '0'
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+        }
+    
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name:
+            # Check for duplicate names (excluding current instance if editing)
+            qs = ServiceCategory.objects.filter(name__iexact=name)
+            if self.instance and self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("A category with this name already exists.")
+        return name

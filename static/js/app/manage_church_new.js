@@ -248,321 +248,365 @@ class ChurchManagementApp {
   /**
    * Render donation trends chart (Monthly donation totals and donor count)
    */
-  renderDonationTrendsChart() {
+  async renderDonationTrendsChart() {
     const canvas = document.getElementById('donationTrendsChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Get monthly data from data attributes
-    let monthlyAmounts = [];
-    let monthlyDonors = [];
-    
     try {
-      const amountsAttr = canvas.getAttribute('data-monthly-amounts');
-      const donorsAttr = canvas.getAttribute('data-monthly-donors');
-      monthlyAmounts = amountsAttr ? JSON.parse(amountsAttr) : [];
-      monthlyDonors = donorsAttr ? JSON.parse(donorsAttr) : [];
-    } catch (e) {
-      console.error('Error parsing donation trends data:', e);
-    }
-
-    // Generate last 6 months labels
-    const months = [];
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      months.push(d.toLocaleDateString('en-US', { month: 'short' }));
-    }
-
-    // If no data, generate sample data
-    if (monthlyAmounts.length === 0) {
-      for (let i = 0; i < 6; i++) {
-        monthlyAmounts.push(Math.floor(Math.random() * 5000) + 3000);
-        monthlyDonors.push(Math.floor(Math.random() * 15) + 5);
+      // Fetch real data from API
+      const response = await fetch('/app/api/donations/trends-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
-    }
+      
+      const result = await response.json();
 
-    // Ensure we have 6 months of data
-    while (monthlyAmounts.length < 6) monthlyAmounts.unshift(0);
-    while (monthlyDonors.length < 6) monthlyDonors.unshift(0);
-    
-    monthlyAmounts = monthlyAmounts.slice(-6);
-    monthlyDonors = monthlyDonors.slice(-6);
+      if (!result.success) {
+        console.error('Failed to fetch donation trends data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    try { this.chartInstances.donationTrends?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const monthlyAmounts = data.map(item => item.amount);
+      const monthlyDonors = data.map(item => item.donors);
 
-    this.chartInstances.donationTrends = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [{
-          label: 'Amount ($)',
-          data: monthlyAmounts,
-          borderColor: 'rgba(45, 122, 62, 1)',
-          backgroundColor: 'rgba(45, 122, 62, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: 'rgba(45, 122, 62, 1)',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          yAxisID: 'y'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.8,
-        interaction: {
-          mode: 'index',
-          intersect: false
+      if (monthlyAmounts.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.donationTrends?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.donationTrends = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Amount (₱)',
+            data: monthlyAmounts,
+            borderColor: 'rgba(45, 122, 62, 1)',
+            backgroundColor: 'rgba(45, 122, 62, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: 'rgba(45, 122, 62, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            yAxisID: 'y'
+          }]
         },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(74, 158, 255, 0.8)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                const datasetIndex = context.datasetIndex;
-                if (datasetIndex === 0) {
-                  return `Amount: ₱${context.parsed.y.toFixed(2)}`;
-                } else {
-                  return `Donors: ${context.parsed.y}`;
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 1.8,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.9)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(74, 158, 255, 0.8)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  const datasetIndex = context.datasetIndex;
+                  if (datasetIndex === 0) {
+                    return `Amount: ₱${context.parsed.y.toFixed(2)}`;
+                  } else {
+                    return `Donors: ${context.parsed.y}`;
+                  }
                 }
               }
             }
-          }
-        },
-        scales: {
-          y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            beginAtZero: true,
-            ticks: {
-              font: { family: 'Georgia, serif' },
-              color: '#6B4226',
-              callback: function(value) {
-                return '₱' + value.toLocaleString();
-              }
-            },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
-          x: {
-            ticks: {
-              font: { family: 'Georgia, serif' },
-              color: '#6B4226'
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              ticks: {
+                font: { family: 'Georgia, serif' },
+                color: '#6B4226',
+                callback: function(value) {
+                  return '₱' + value.toLocaleString();
+                }
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
             },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+            x: {
+              ticks: {
+                font: { family: 'Georgia, serif' },
+                color: '#6B4226'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering donation trends chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
    * Render booking trends chart (Weekly status breakdown)
    */
-  renderBookingTrendsChart() {
+  async renderBookingTrendsChart() {
     const canvas = document.getElementById('bookingTrendsChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Read values from data attributes
-    const pending = parseInt(canvas.getAttribute('data-pending') || '0') || 0;
-    const approved = parseInt(canvas.getAttribute('data-approved') || '0') || 0;
-    const confirmed = parseInt(canvas.getAttribute('data-confirmed') || '0') || 0;
-    const completed = parseInt(canvas.getAttribute('data-completed') || '0') || 0;
-
-    // Generate 4 weeks of data
-    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    
-    // Distribute data across weeks with variation
-    const cancelledData = [];
-    const confirmedData = [];
-    const pendingData = [];
-    
-    const hasData = pending > 0 || approved > 0 || confirmed > 0 || completed > 0;
-    
-    for (let i = 0; i < 4; i++) {
-      if (hasData) {
-        const factor = 0.2 + Math.random() * 0.15;
-        cancelledData.push(Math.floor((pending + completed) * factor * 0.1)); // 10% cancelled
-        confirmedData.push(Math.floor((confirmed + approved) * factor));
-        pendingData.push(Math.floor(pending * factor));
-      } else {
-        // Sample data
-        cancelledData.push(Math.floor(Math.random() * 5) + 2);
-        confirmedData.push(Math.floor(Math.random() * 10) + 10);
-        pendingData.push(Math.floor(Math.random() * 8) + 3);
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/bookings/trends-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
-    }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.bookingTrends?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch booking trends data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.bookingTrends = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: weeks,
-        datasets: [
-          {
-            label: 'Cancelled',
-            data: cancelledData,
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Confirmed',
-            data: confirmedData,
-            borderColor: 'rgba(34, 197, 94, 1)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Pending',
-            data: pendingData,
-            borderColor: 'rgba(234, 179, 8, 1)',
-            backgroundColor: 'rgba(234, 179, 8, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.8,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
-            titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                return `Appointments: ${context.parsed.y}`;
+      const data = result.data;
+      const weeks = data.map(item => item.week);
+      const pendingData = data.map(item => item.pending);
+      const confirmedData = data.map(item => item.confirmed);
+      const cancelledData = data.map(item => item.cancelled);
+
+      // Check if all data is zero
+      if (pendingData.every(v => v === 0) && confirmedData.every(v => v === 0) && cancelledData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.bookingTrends?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.bookingTrends = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: weeks,
+          datasets: [
+            {
+              label: 'Cancelled',
+              data: cancelledData,
+              borderColor: 'rgba(239, 68, 68, 1)',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Confirmed',
+              data: confirmedData,
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Pending',
+              data: pendingData,
+              borderColor: 'rgba(234, 179, 8, 1)',
+              backgroundColor: 'rgba(234, 179, 8, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 1.8,
+          plugins: {
+            legend: { 
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: { family: 'Georgia, serif', size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(139, 69, 19, 0.9)',
+              titleColor: '#fff', bodyColor: '#fff',
+              borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y} bookings`;
+                }
               }
             }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              stepSize: 1,
-              font: { family: 'Georgia, serif' } 
-            },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
-          x: {
-            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                stepSize: 1,
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering booking trends chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
    * Render popular services chart (Bar chart)
    */
-  renderPopularServicesChart() {
+  async renderPopularServicesChart() {
     const canvas = document.getElementById('popularServicesChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Sample service data - in production this would come from backend
-    const services = ['Counseling', 'Prayer', 'Mentoring', 'Baptism'];
-    const bookingCounts = [24, 18, 14, 10];
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/bookings/popular-services-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.popularServices?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch popular services data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.popularServices = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: services,
-        datasets: [{
-          label: 'Bookings',
-          data: bookingCounts,
-          backgroundColor: 'rgba(59, 130, 246, 0.7)',
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 2,
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.8,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(59, 130, 246, 0.8)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                return `Bookings: ${context.parsed.y}`;
+      const data = result.data;
+      
+      if (data.length === 0) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      const services = data.map(item => item.category);
+      const bookingCounts = data.map(item => item.count);
+
+      try { this.chartInstances.popularServices?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.popularServices = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: services,
+          datasets: [{
+            label: 'Bookings',
+            data: bookingCounts,
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 1.8,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(139, 69, 19, 0.9)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(59, 130, 246, 0.8)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `Bookings: ${context.parsed.y}`;
+                }
               }
             }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              stepSize: 5,
-              font: { family: 'Georgia, serif' }
-            },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
-          x: {
-            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                stepSize: 1,
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering popular services chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
@@ -702,6 +746,7 @@ class ChurchManagementApp {
     this.initializeAnalyticsSorting();
     this.initializeAnalyticsCharts();
     this.initializeFollowersSearch();
+    this.initializeEngagementTimeRange();
   }
 
   /**
@@ -1037,6 +1082,12 @@ class ChurchManagementApp {
         setTimeout(() => this.renderCharts(), 150);
       });
     }
+    const transactionsTabBtn = document.querySelector('[data-tab="transactions"]');
+    if (transactionsTabBtn) {
+      transactionsTabBtn.addEventListener('click', () => {
+        setTimeout(() => this.renderCharts(), 150);
+      });
+    }
 
     // Also re-attempt shortly after load (in case posts are injected late)
     setTimeout(() => this.renderCharts(), 400);
@@ -1072,14 +1123,15 @@ class ChurchManagementApp {
     this.renderDonationTrendsChart();
     this.renderBookingTrendsChart();
     this.renderPopularServicesChart();
-    this.renderFollowersGrowthChart();
-    this.renderFollowersEngagementChart();
     this.renderFollowerGrowthChart();
     this.renderEngagementLevelsChart();
     this.renderWeeklyEngagementChart();
     this.renderServiceBookingsTrendChart();
     this.renderServicePerformanceChart();
     this.renderEngagementBars();
+    // Transaction charts
+    this.renderRevenueTrendChart();
+    this.renderPaymentMethodsChart();
     // Overview tab charts
     this.renderOverviewFollowerGrowthChart();
     this.renderOverviewWeeklyEngagementChart();
@@ -1637,13 +1689,28 @@ class ChurchManagementApp {
   /**
    * Show empty chart state
    */
-  showEmptyChartState(canvas) {
+  showEmptyChartState(canvas, customMessage = null) {
     const container = canvas.parentElement;
     canvas.style.display = 'none';
     
     // Remove any existing empty states to prevent duplicates
     const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
     existingEmptyStates.forEach(state => state.remove());
+    
+    // Determine message based on canvas ID or use custom message
+    let message = customMessage || 'No data available';
+    if (!customMessage) {
+      const canvasId = canvas.id;
+      if (canvasId.includes('revenue') || canvasId.includes('transaction') || canvasId.includes('payment')) {
+        message = 'No transaction data available';
+      } else if (canvasId.includes('follower') || canvasId.includes('engagement')) {
+        message = 'No engagement data available';
+      } else if (canvasId.includes('donation')) {
+        message = 'No donation data available';
+      } else if (canvasId.includes('booking') || canvasId.includes('appointment')) {
+        message = 'No booking data available';
+      }
+    }
     
     const emptyState = document.createElement('div');
     emptyState.className = 'chart-empty-state';
@@ -1654,7 +1721,7 @@ class ChurchManagementApp {
           <line x1="12" y1="20" x2="12" y2="4"/>
           <line x1="6" y1="20" x2="6" y2="14"/>
         </svg>
-        <p style="margin: 0; font-style: italic;">No engagement data available</p>
+        <p style="margin: 0; font-style: italic;">${message}</p>
       </div>
     `;
     
@@ -1841,253 +1908,506 @@ class ChurchManagementApp {
   /**
    * Render new follower growth chart (Area chart with total and new followers)
    */
-  renderFollowerGrowthChart() {
+  async renderFollowerGrowthChart() {
     const canvas = document.getElementById('followerGrowthChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Read values from data attributes
-    const total = parseInt(canvas.getAttribute('data-total') || '0') || 0;
-    const recent = parseInt(canvas.getAttribute('data-recent') || '0') || 0;
-
-    // Generate 6 months of data
-    const currentMonth = new Date().getMonth();
-    const months = [];
-    const totalData = [];
-    const newData = [];
-    
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      months.push(monthNames[monthIndex]);
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/followers/growth-chart/');
       
-      // Generate cumulative total data
-      const cumulativeTotal = Math.floor(total * (0.5 + (5-i) * 0.1));
-      totalData.push(i === 0 ? total : cumulativeTotal);
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
+      }
       
-      // Generate new followers data
-      const newFollowers = i === 0 ? recent : Math.floor(Math.random() * 50 + 20);
-      newData.push(newFollowers);
-    }
+      const result = await response.json();
 
-    if (totalData.every(v => v === 0) && newData.every(v => v === 0)) {
-      this.showEmptyChartState(canvas);
-      return;
-    }
+      if (!result.success) {
+        console.error('Failed to fetch follower growth data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    try { this.chartInstances.followerGrowth?.destroy(); } catch (_) {}
-    
-    // Remove any existing empty states and show canvas
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const totalData = data.map(item => item.total);
+      const newData = data.map(item => item.new);
 
-    this.chartInstances.followerGrowth = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [
-          {
-            label: 'Total Followers',
-            data: totalData,
-            borderColor: 'rgba(59, 130, 246, 1)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'New Followers',
-            data: newData,
-            borderColor: 'rgba(34, 197, 94, 1)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: { family: 'Georgia, serif', size: 12 }
+      if (totalData.every(v => v === 0) && newData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.followerGrowth?.destroy(); } catch (_) {}
+      
+      // Remove any existing empty states and show canvas
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.followerGrowth = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Total Followers',
+              data: totalData,
+              borderColor: 'rgba(59, 130, 246, 1)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'New Followers',
+              data: newData,
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: { family: 'Georgia, serif', size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.95)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(30, 144, 255, 0.3)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12
             }
           },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.95)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(30, 144, 255, 0.3)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            padding: 12
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              font: { family: 'Georgia, serif' },
-              color: '#654321'
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
             },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
           },
-          x: {
-            ticks: { 
-              font: { family: 'Georgia, serif', weight: 'bold' },
-              color: '#654321'
-            },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering follower growth chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
    * Render engagement levels chart (Multi-line chart)
    */
-  renderEngagementLevelsChart() {
+  async renderEngagementLevelsChart() {
     const canvas = document.getElementById('engagementLevelsChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Generate 6 months of engagement data
-    const currentMonth = new Date().getMonth();
-    const months = [];
-    const highEngagement = [];
-    const mediumEngagement = [];
-    const lowEngagement = [];
-    
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      months.push(monthNames[monthIndex]);
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/followers/engagement-chart/');
       
-      // Generate engagement level data with upward trends
-      highEngagement.push(Math.floor(300 + (5-i) * 50 + Math.random() * 50));
-      mediumEngagement.push(Math.floor(200 + (5-i) * 30 + Math.random() * 40));
-      lowEngagement.push(Math.floor(150 + (5-i) * 10 + Math.random() * 20));
-    }
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.engagementLevels?.destroy(); } catch (_) {}
-    
-    // Remove any existing empty states and show canvas
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch engagement levels data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.engagementLevels = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [
-          {
-            label: 'High',
-            data: highEngagement,
-            borderColor: 'rgba(251, 191, 36, 1)',
-            backgroundColor: 'rgba(251, 191, 36, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(251, 191, 36, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const highEngagement = data.map(item => item.high);
+      const mediumEngagement = data.map(item => item.medium);
+      const lowEngagement = data.map(item => item.low);
+
+      if (highEngagement.every(v => v === 0) && mediumEngagement.every(v => v === 0) && lowEngagement.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.engagementLevels?.destroy(); } catch (_) {}
+      
+      // Remove any existing empty states and show canvas
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.engagementLevels = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'High',
+              data: highEngagement,
+              borderColor: 'rgba(251, 191, 36, 1)',
+              backgroundColor: 'rgba(251, 191, 36, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(251, 191, 36, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Medium',
+              data: mediumEngagement,
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Low',
+              data: lowEngagement,
+              borderColor: 'rgba(156, 163, 175, 1)',
+              backgroundColor: 'rgba(156, 163, 175, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(156, 163, 175, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: { family: 'Georgia, serif', size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.95)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(30, 144, 255, 0.3)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12
+            }
           },
-          {
-            label: 'Medium',
-            data: mediumEngagement,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering engagement levels chart:', error);
+      this.showEmptyChartState(canvas);
+    }
+  }
+
+  /**
+   * Render revenue trend chart (Line chart showing monthly revenue)
+   */
+  async renderRevenueTrendChart() {
+    const canvas = document.getElementById('revenueTrendChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/transactions/revenue-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+      
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('Failed to fetch revenue trend data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const revenueData = data.map(item => item.revenue);
+
+      if (revenueData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.revenueTrend?.destroy(); } catch (_) {}
+      
+      // Remove any existing empty states and show canvas
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.revenueTrend = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Revenue (₱)',
+            data: revenueData,
             borderColor: 'rgba(34, 197, 94, 1)',
             backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            borderWidth: 2,
+            borderWidth: 3,
+            fill: true,
             tension: 0.4,
             pointBackgroundColor: 'rgba(34, 197, 94, 1)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Low',
-            data: lowEngagement,
-            borderColor: 'rgba(156, 163, 175, 1)',
-            backgroundColor: 'rgba(156, 163, 175, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(156, 163, 175, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: { family: 'Georgia, serif', size: 12 }
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: { family: 'Georgia, serif', size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(34, 197, 94, 0.9)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(34, 197, 94, 0.8)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12,
+              callbacks: {
+                label: function(context) {
+                  return `Revenue: ₱${context.parsed.y.toFixed(2)}`;
+                }
+              }
             }
           },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.95)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(30, 144, 255, 0.3)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            padding: 12
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              font: { family: 'Georgia, serif' },
-              color: '#654321'
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321',
+                callback: function(value) {
+                  return '₱' + value.toFixed(0);
+                }
+              },
+              grid: { color: 'rgba(34, 197, 94, 0.1)' }
             },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
           },
-          x: {
-            ticks: { 
-              font: { family: 'Georgia, serif', weight: 'bold' },
-              color: '#654321'
-            },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering revenue trend chart:', error);
+      this.showEmptyChartState(canvas);
+    }
+  }
+
+  /**
+   * Render payment methods chart (Doughnut chart showing distribution)
+   */
+  async renderPaymentMethodsChart() {
+    const canvas = document.getElementById('paymentMethodsChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/transactions/payment-methods-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
-    });
+      
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('Failed to fetch payment methods data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      const data = result.data;
+      
+      if (data.length === 0) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      const labels = data.map(item => item.method);
+      const counts = data.map(item => item.count);
+      const revenues = data.map(item => item.revenue);
+
+      try { this.chartInstances.paymentMethods?.destroy(); } catch (_) {}
+      
+      // Remove any existing empty states and show canvas
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      // Define colors for different payment methods
+      const colors = {
+        'PayPal': 'rgba(0, 48, 135, 0.8)',
+        'Credit Card': 'rgba(99, 102, 241, 0.8)',
+        'GCash': 'rgba(0, 119, 255, 0.8)'
+      };
+      
+      const backgroundColors = labels.map(label => colors[label] || 'rgba(156, 163, 175, 0.8)');
+      const borderColors = labels.map(label => {
+        const color = colors[label] || 'rgba(156, 163, 175, 1)';
+        return color.replace('0.8', '1');
+      });
+
+      this.chartInstances.paymentMethods = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 2,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 20,
+                font: { family: 'Georgia, serif', size: 12 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.95)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(30, 144, 255, 0.3)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12,
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const count = context.parsed;
+                  const revenue = revenues[context.dataIndex];
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((count / total) * 100).toFixed(1);
+                  return [
+                    `${label}: ${count} transactions (${percentage}%)`,
+                    `Revenue: ₱${revenue.toFixed(2)}`
+                  ];
+                }
+              }
+            }
+          },
+          animation: { animateRotate: true, duration: 1000 }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering payment methods chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
@@ -2140,454 +2460,525 @@ class ChurchManagementApp {
   /**
    * Render overview follower growth chart
    */
-  renderOverviewFollowerGrowthChart() {
+  async renderOverviewFollowerGrowthChart() {
     const canvas = document.getElementById('overviewFollowerGrowthChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
-    // Get data from data attributes
-    const total = parseInt(canvas.getAttribute('data-total') || '0') || 0;
-    const recent = parseInt(canvas.getAttribute('data-recent') || '0') || 0;
-    
-    // Generate 6 months of data
-    const currentMonth = new Date().getMonth();
-    const months = [];
-    const data = [];
-    
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      months.push(monthNames[monthIndex]);
+
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/overview/follower-growth-chart/');
       
-      // Simulate growth pattern - use sample data if no real data
-      if (total === 0) {
-        // Sample data for demonstration
-        data.push(Math.floor(Math.random() * 50) + (6 - i) * 10);
-      } else {
-        const baseGrowth = Math.floor(total / 6);
-        data.push(i === 0 ? total : Math.max(0, baseGrowth * (6 - i) + Math.floor(Math.random() * Math.max(recent, 1))));
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
-    }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.overviewFollowerGrowth?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch follower growth data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.overviewFollowerGrowth = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [{
-          label: 'Followers',
-          data: data,
-          borderColor: 'rgba(205, 127, 50, 1)',
-          backgroundColor: 'rgba(205, 127, 50, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(205, 127, 50, 1)',
-          pointBorderColor: 'rgba(205, 127, 50, 1)',
-          pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.8,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.9)',
-            titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                return `Followers: ${context.parsed.y}`;
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const followers = data.map(item => item.followers);
+
+      try { this.chartInstances.overviewFollowerGrowth?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.overviewFollowerGrowth = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Followers',
+            data: followers,
+            borderColor: 'rgba(205, 127, 50, 1)',
+            backgroundColor: 'rgba(205, 127, 50, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(205, 127, 50, 1)',
+            pointBorderColor: 'rgba(205, 127, 50, 1)',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 1.8,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.9)',
+              titleColor: '#fff', bodyColor: '#fff',
+              borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `Followers: ${context.parsed.y}`;
+                }
               }
             }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              stepSize: Math.max(1, Math.floor(total / 10)),
-              font: { family: 'Georgia, serif' } 
-            },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
-          x: {
-            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                stepSize: 1,
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering overview follower growth chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
    * Render overview weekly engagement chart
    */
-  renderOverviewWeeklyEngagementChart() {
+  async renderOverviewWeeklyEngagementChart() {
     const canvas = document.getElementById('overviewWeeklyEngagementChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
-    // Generate 7 days of data
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    
-    // Get base engagement data from the page
-    const viewsElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(1) .engagement-total');
-    const likesElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(2) .engagement-total');
-    const commentsElement = document.querySelector('.weekly-engagement .ranking-item:nth-child(3) .engagement-total');
-    
-    const totalViews = viewsElement ? parseInt(viewsElement.textContent.match(/\d+/)?.[0] || '0') : 0;
-    const totalLikes = likesElement ? parseInt(likesElement.textContent.match(/\d+/)?.[0] || '0') : 0;
-    const totalComments = commentsElement ? parseInt(commentsElement.textContent.match(/\d+/)?.[0] || '0') : 0;
-    
-    // Distribute across 7 days with some variation
-    const viewsData = [];
-    const likesData = [];
-    const commentsData = [];
-    
-    const hasData = totalViews > 0 || totalLikes > 0 || totalComments > 0;
-    
-    for (let i = 0; i < 7; i++) {
-      if (hasData) {
-        const factor = 0.1 + Math.random() * 0.2; // 10-30% of total per day
-        viewsData.push(Math.floor(totalViews * factor));
-        likesData.push(Math.floor(totalLikes * factor));
-        commentsData.push(Math.floor(totalComments * factor));
-      } else {
-        // Sample data for demonstration
-        viewsData.push(Math.floor(Math.random() * 100) + 50);
-        likesData.push(Math.floor(Math.random() * 30) + 10);
-        commentsData.push(Math.floor(Math.random() * 15) + 5);
+
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/overview/weekly-engagement-chart/');
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
+      
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('Failed to fetch weekly engagement data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      const data = result.data;
+      const days = data.map(item => item.day);
+      const viewsData = data.map(item => item.views);
+      const likesData = data.map(item => item.likes);
+      const commentsData = data.map(item => item.comments);
+
+      // Check if all data is zero
+      if (viewsData.every(v => v === 0) && likesData.every(v => v === 0) && commentsData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.overviewWeeklyEngagement?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.overviewWeeklyEngagement = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [
+            {
+              label: 'Views',
+              data: viewsData,
+              borderColor: 'rgba(59, 130, 246, 1)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Likes',
+              data: likesData,
+              borderColor: 'rgba(239, 68, 68, 1)',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Comments',
+              data: commentsData,
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 1.8,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 11 } }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.9)',
+              titleColor: '#fff', bodyColor: '#fff',
+              borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering overview weekly engagement chart:', error);
+      this.showEmptyChartState(canvas);
     }
-
-    try { this.chartInstances.overviewWeeklyEngagement?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
-
-    this.chartInstances.overviewWeeklyEngagement = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: days,
-        datasets: [
-          {
-            label: 'Views',
-            data: viewsData,
-            borderColor: 'rgba(59, 130, 246, 1)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Likes',
-            data: likesData,
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Comments',
-            data: commentsData,
-            borderColor: 'rgba(34, 197, 94, 1)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.8,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 11 } }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.9)',
-            titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(74, 158, 255, 0.8)', borderWidth: 1, cornerRadius: 8
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { font: { family: 'Georgia, serif' } },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
-          },
-          x: {
-            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
   }
 
   /**
    * Render overview revenue chart
    */
-  renderOverviewRevenueChart() {
+  async renderOverviewRevenueChart() {
     const canvas = document.getElementById('overviewRevenueChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
-    // Generate 6 months of revenue data
-    const currentMonth = new Date().getMonth();
-    const months = [];
-    const donationsData = [];
-    const servicesData = [];
-    
-    // Get current month revenue from the page
-    const thisMonthElement = document.querySelector('.revenue-chart-content .chart-details .engagement-stats .stat:nth-child(1)');
-    const thisMonthRevenue = thisMonthElement ? 
-      parseFloat(thisMonthElement.textContent.replace(/[^0-9.]/g, '') || '0') : 0;
-    
-    const hasRevenue = thisMonthRevenue > 0;
-    
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      months.push(monthNames[monthIndex]);
+
+    try {
+      // Fetch real data from API
+      const response = await fetch('/app/api/overview/revenue-chart/');
       
-      if (hasRevenue) {
-        // Simulate revenue pattern with real data
-        const baseDonations = i === 0 ? thisMonthRevenue : Math.floor(thisMonthRevenue * (0.6 + Math.random() * 0.8));
-        const baseServices = Math.floor(baseDonations * (0.4 + Math.random() * 0.6));
-        donationsData.push(baseDonations);
-        servicesData.push(baseServices);
-      } else {
-        // Sample data for demonstration
-        const sampleDonations = Math.floor(Math.random() * 3000) + 2000;
-        const sampleServices = Math.floor(Math.random() * 2000) + 1000;
-        donationsData.push(sampleDonations);
-        servicesData.push(sampleServices);
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
       }
-    }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.overviewRevenue?.destroy(); } catch (_) {}
-    
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch revenue data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.overviewRevenue = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: months,
-        datasets: [
-          {
-            label: 'Donations ($)',
-            data: donationsData,
-            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2,
-            borderRadius: 6
-          },
-          {
-            label: 'Services ($)',
-            data: servicesData,
-            backgroundColor: 'rgba(34, 197, 94, 0.7)',
-            borderColor: 'rgba(34, 197, 94, 1)',
-            borderWidth: 2,
-            borderRadius: 6
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 2.5,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 12 } }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(139, 69, 19, 0.9)',
-            titleColor: '#fff', bodyColor: '#fff',
-            borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                return `${context.dataset.label}: ₱${context.parsed.y.toFixed(2)}`;
+      const data = result.data;
+      const months = data.map(item => item.month);
+      const donationsData = data.map(item => item.donations);
+      const servicesData = data.map(item => item.services);
+
+      // Check if all data is zero
+      if (donationsData.every(v => v === 0) && servicesData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.overviewRevenue?.destroy(); } catch (_) {}
+      
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      this.chartInstances.overviewRevenue = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Donations (₱)',
+              data: donationsData,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 2,
+              borderRadius: 6
+            },
+            {
+              label: 'Services (₱)',
+              data: servicesData,
+              backgroundColor: 'rgba(34, 197, 94, 0.7)',
+              borderColor: 'rgba(34, 197, 94, 1)',
+              borderWidth: 2,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 2.5,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { usePointStyle: true, padding: 15, font: { family: 'Georgia, serif', size: 12 } }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(139, 69, 19, 0.9)',
+              titleColor: '#fff', bodyColor: '#fff',
+              borderColor: 'rgba(218, 165, 32, 0.8)', borderWidth: 1, cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ₱${context.parsed.y.toFixed(2)}`;
+                }
               }
             }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              font: { family: 'Georgia, serif' },
-              callback: function(value) {
-                return '₱' + value.toFixed(0);
-              }
-            },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
           },
-          x: {
-            ticks: { font: { family: 'Georgia, serif', weight: 'bold' } },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
-    });
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321',
+                callback: function(value) {
+                  return '₱' + value.toFixed(0);
+                }
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
+          },
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering overview revenue chart:', error);
+      this.showEmptyChartState(canvas);
+    }
   }
 
   /**
    * Render Weekly Engagement chart for Posts tab
    */
-  renderWeeklyEngagementChart() {
+  async renderWeeklyEngagementChart(timeRange = 'weekly') {
     const canvas = document.getElementById('weeklyEngagementChart');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
-    // Generate last 7 days data
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const bookmarksData = [25, 45, 35, 50, 80, 120, 95];
-    const commentsData = [35, 55, 45, 65, 95, 130, 115];
-    const likesData = [50, 75, 65, 90, 130, 180, 155];
-    const viewsData = [220, 300, 280, 380, 450, 680, 800];
+    try {
+      // Fetch real data from API
+      const response = await fetch(`/app/api/content/engagement-trends/?range=${timeRange}`);
+      
+      if (!response.ok) {
+        console.error('API request failed:', response.status, response.statusText);
+        this.showEmptyChartState(canvas);
+        return;
+      }
+      
+      const result = await response.json();
 
-    try { this.chartInstances.weeklyEngagement?.destroy(); } catch (_) {}
-    
-    // Remove any existing empty states and show canvas
-    const container = canvas.parentElement;
-    const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
-    existingEmptyStates.forEach(state => state.remove());
-    canvas.style.display = 'block';
+      if (!result.success) {
+        console.error('Failed to fetch engagement trends data:', result.error);
+        this.showEmptyChartState(canvas);
+        return;
+      }
 
-    this.chartInstances.weeklyEngagement = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: days,
-        datasets: [
-          {
-            label: 'Bookmarks',
-            data: bookmarksData,
-            borderColor: 'rgba(30, 144, 255, 1)',
-            backgroundColor: 'rgba(30, 144, 255, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(30, 144, 255, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          },
-          {
-            label: 'Comments',
-            data: commentsData,
-            borderColor: 'rgba(34, 197, 94, 1)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          },
-          {
-            label: 'Likes',
-            data: likesData,
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          },
-          {
-            label: 'Views',
-            data: viewsData,
-            borderColor: 'rgba(59, 130, 246, 1)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
-            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: { family: 'Georgia, serif', size: 13 }
+      const data = result.data;
+      const labels = data.map(item => item.label);
+      const likesData = data.map(item => item.likes);
+      const commentsData = data.map(item => item.comments);
+      const bookmarksData = data.map(item => item.bookmarks);
+      const viewsData = data.map(item => item.views);
+
+      // Check if all data is zero
+      if (likesData.every(v => v === 0) && commentsData.every(v => v === 0) && 
+          bookmarksData.every(v => v === 0) && viewsData.every(v => v === 0)) {
+        this.showEmptyChartState(canvas);
+        return;
+      }
+
+      try { this.chartInstances.weeklyEngagement?.destroy(); } catch (_) {}
+      
+      // Remove any existing empty states and show canvas
+      const container = canvas.parentElement;
+      const existingEmptyStates = container.querySelectorAll('.chart-empty-state');
+      existingEmptyStates.forEach(state => state.remove());
+      canvas.style.display = 'block';
+
+      // Update subtitle based on time range
+      const subtitle = document.getElementById('engagementChartSubtitle');
+      if (subtitle) {
+        const subtitles = {
+          'daily': 'Post performance metrics over the last 7 days',
+          'weekly': 'Post performance metrics over the last 4 weeks',
+          'monthly': 'Post performance metrics over the last 6 months',
+          'yearly': 'Post performance metrics over the last 12 months'
+        };
+        subtitle.textContent = subtitles[timeRange] || subtitles.weekly;
+      }
+
+      this.chartInstances.weeklyEngagement = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Bookmarks',
+              data: bookmarksData,
+              borderColor: 'rgba(30, 144, 255, 1)',
+              backgroundColor: 'rgba(30, 144, 255, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(30, 144, 255, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            {
+              label: 'Comments',
+              data: commentsData,
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            {
+              label: 'Likes',
+              data: likesData,
+              borderColor: 'rgba(239, 68, 68, 1)',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            {
+              label: 'Views',
+              data: viewsData,
+              borderColor: 'rgba(59, 130, 246, 1)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20,
+                font: { family: 'Georgia, serif', size: 13 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(30, 144, 255, 0.95)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(30, 144, 255, 0.3)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12,
+              displayColors: true
             }
           },
-          tooltip: {
-            backgroundColor: 'rgba(30, 144, 255, 0.95)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(30, 144, 255, 0.3)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            padding: 12,
-            displayColors: true
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              font: { family: 'Georgia, serif' },
-              color: '#654321'
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                font: { family: 'Georgia, serif' },
+                color: '#654321'
+              },
+              grid: { color: 'rgba(30, 144, 255, 0.1)' }
             },
-            grid: { color: 'rgba(30, 144, 255, 0.1)' }
+            x: {
+              ticks: { 
+                font: { family: 'Georgia, serif', weight: 'bold' },
+                color: '#654321'
+              },
+              grid: { display: false }
+            }
           },
-          x: {
-            ticks: { 
-              font: { family: 'Georgia, serif', weight: 'bold' },
-              color: '#654321'
-            },
-            grid: { display: false }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
+          animation: { duration: 1000, easing: 'easeInOutQuart' }
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering engagement trends chart:', error);
+      this.showEmptyChartState(canvas);
+    }
+  }
+
+  /**
+   * Initialize engagement time range selector
+   */
+  initializeEngagementTimeRange() {
+    const selector = document.getElementById('engagementTimeRange');
+    if (!selector) return;
+
+    selector.addEventListener('change', (e) => {
+      const timeRange = e.target.value;
+      this.renderWeeklyEngagementChart(timeRange);
     });
   }
 
@@ -2715,12 +3106,269 @@ window.exportFollowersList = function() {
   window.Utils?.showNotification('Followers list exported successfully', 'success');
 };
 
-// View follower profile function
+// View follower profile function - Show activity modal
 window.viewFollowerProfile = function(userId) {
-  if (!userId) return;
-  // Navigate to user profile page
-  window.location.href = `/profile/${userId}/`;
+  console.log('viewFollowerProfile called with userId:', userId);
+  
+  if (!userId) {
+    console.error('No userId provided');
+    return;
+  }
+  
+  // Get follower name from the table row
+  const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+  console.log('Found row:', row);
+  const followerName = row ? row.querySelector('.name').textContent : 'Follower';
+  console.log('Follower name:', followerName);
+  
+  // Update modal title
+  const titleElement = document.getElementById('followerActivityTitle');
+  console.log('Title element:', titleElement);
+  if (titleElement) {
+    titleElement.textContent = `${followerName}'s Activity`;
+  }
+  
+  // Show modal
+  const modal = document.getElementById('followerActivityModal');
+  console.log('Modal element:', modal);
+  
+  if (!modal) {
+    console.error('Modal not found!');
+    return;
+  }
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  
+  // Reset to first tab
+  document.querySelectorAll('.activity-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.activity-panel').forEach(panel => panel.classList.remove('active'));
+  
+  const firstTab = document.querySelector('.activity-tab[data-tab="interactions"]');
+  const firstPanel = document.getElementById('interactions-tab');
+  
+  if (firstTab) firstTab.classList.add('active');
+  if (firstPanel) firstPanel.classList.add('active');
+  
+  // Load interactions data
+  loadFollowerInteractions(userId);
+  
+  // Setup tab switching
+  setupActivityTabs(userId);
 };
+
+// Close follower activity modal
+window.closeFollowerActivity = function() {
+  const modal = document.getElementById('followerActivityModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+// Setup activity tabs
+function setupActivityTabs(userId) {
+  const tabs = document.querySelectorAll('.activity-tab');
+  tabs.forEach(tab => {
+    tab.onclick = function() {
+      const tabName = this.getAttribute('data-tab');
+      
+      // Update active states
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      document.querySelectorAll('.activity-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      // Load data for the selected tab
+      switch(tabName) {
+        case 'interactions':
+          loadFollowerInteractions(userId);
+          break;
+        case 'appointments':
+          loadFollowerAppointments(userId);
+          break;
+        case 'reviews':
+          loadFollowerReviews(userId);
+          break;
+        case 'timeline':
+          loadFollowerTimeline(userId);
+          break;
+      }
+    };
+  });
+}
+
+// Load follower interactions
+async function loadFollowerInteractions(userId) {
+  const container = document.getElementById('interactionsList');
+  const loading = document.querySelector('#interactions-tab .activity-loading');
+  
+  loading.style.display = 'flex';
+  container.style.display = 'none';
+  
+  try {
+    const response = await fetch(`/app/api/followers/${userId}/activity/interactions/`);
+    const result = await response.json();
+    
+    if (result.success && result.data.length > 0) {
+      container.innerHTML = result.data.map(item => `
+        <div class="activity-item">
+          <div class="activity-icon ${item.type}">
+            <i data-feather="${getActivityIcon(item.type)}"></i>
+          </div>
+          <div class="activity-details">
+            <p class="activity-text">${item.description}</p>
+            <span class="activity-time">${item.time_ago}</span>
+          </div>
+        </div>
+      `).join('');
+      
+      // Re-initialize feather icons
+      if (typeof feather !== 'undefined') feather.replace();
+    } else {
+      container.innerHTML = '<div class="empty-activity"><p>No interactions yet</p></div>';
+    }
+    
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  } catch (error) {
+    console.error('Error loading interactions:', error);
+    container.innerHTML = '<div class="empty-activity"><p>Failed to load interactions</p></div>';
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
+// Load follower appointments
+async function loadFollowerAppointments(userId) {
+  const container = document.getElementById('appointmentsList');
+  const loading = document.querySelector('#appointments-tab .activity-loading');
+  
+  loading.style.display = 'flex';
+  container.style.display = 'none';
+  
+  try {
+    const response = await fetch(`/app/api/followers/${userId}/activity/appointments/`);
+    const result = await response.json();
+    
+    if (result.success && result.data.length > 0) {
+      container.innerHTML = result.data.map(item => `
+        <div class="activity-item">
+          <div class="activity-icon appointment">
+            <i data-feather="calendar"></i>
+          </div>
+          <div class="activity-details">
+            <p class="activity-text"><strong>${item.service}</strong></p>
+            <p class="activity-subtext">${item.date} at ${item.time}</p>
+            <span class="status-badge status-${item.status}">${item.status}</span>
+          </div>
+        </div>
+      `).join('');
+      
+      if (typeof feather !== 'undefined') feather.replace();
+    } else {
+      container.innerHTML = '<div class="empty-activity"><p>No appointments yet</p></div>';
+    }
+    
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  } catch (error) {
+    console.error('Error loading appointments:', error);
+    container.innerHTML = '<div class="empty-activity"><p>Failed to load appointments</p></div>';
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
+// Load follower reviews
+async function loadFollowerReviews(userId) {
+  const container = document.getElementById('reviewsList');
+  const loading = document.querySelector('#reviews-tab .activity-loading');
+  
+  loading.style.display = 'flex';
+  container.style.display = 'none';
+  
+  try {
+    const response = await fetch(`/app/api/followers/${userId}/activity/reviews/`);
+    const result = await response.json();
+    
+    if (result.success && result.data.length > 0) {
+      container.innerHTML = result.data.map(item => `
+        <div class="activity-item">
+          <div class="activity-icon review">
+            <i data-feather="star"></i>
+          </div>
+          <div class="activity-details">
+            <div class="review-rating">${'★'.repeat(item.rating)}${'☆'.repeat(5-item.rating)}</div>
+            <p class="activity-text">${item.comment || 'No comment'}</p>
+            <span class="activity-time">${item.time_ago}</span>
+          </div>
+        </div>
+      `).join('');
+      
+      if (typeof feather !== 'undefined') feather.replace();
+    } else {
+      container.innerHTML = '<div class="empty-activity"><p>No reviews yet</p></div>';
+    }
+    
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  } catch (error) {
+    console.error('Error loading reviews:', error);
+    container.innerHTML = '<div class="empty-activity"><p>Failed to load reviews</p></div>';
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
+// Load follower timeline
+async function loadFollowerTimeline(userId) {
+  const container = document.getElementById('timelineList');
+  const loading = document.querySelector('#timeline-tab .activity-loading');
+  
+  loading.style.display = 'flex';
+  container.style.display = 'none';
+  
+  try {
+    const response = await fetch(`/app/api/followers/${userId}/activity/timeline/`);
+    const result = await response.json();
+    
+    if (result.success && result.data.length > 0) {
+      container.innerHTML = result.data.map(item => `
+        <div class="activity-item timeline-item">
+          <div class="timeline-marker"></div>
+          <div class="activity-details">
+            <p class="activity-text">${item.description}</p>
+            <span class="activity-time">${item.time_ago}</span>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      container.innerHTML = '<div class="empty-activity"><p>No activity yet</p></div>';
+    }
+    
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  } catch (error) {
+    console.error('Error loading timeline:', error);
+    container.innerHTML = '<div class="empty-activity"><p>Failed to load timeline</p></div>';
+    loading.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
+// Helper function to get activity icon
+function getActivityIcon(type) {
+  const icons = {
+    'like': 'heart',
+    'comment': 'message-circle',
+    'bookmark': 'bookmark',
+    'view': 'eye',
+    'share': 'share-2'
+  };
+  return icons[type] || 'activity';
+}
 
 // Post management functions
 window.viewPost = function(postId) {

@@ -24,7 +24,11 @@ from .models import (
     PostLike,
     PostComment,
     PostBookmark,
+    Donation,
+    BookableService,
+    ServiceCategory,
 )
+from django.db import models
 
 User = get_user_model()
 
@@ -74,7 +78,7 @@ def follower_activity_api(request, user_id, activity_type):
         
         return JsonResponse({
             'success': True,
-            'activities': activities,
+            'data': activities,
             'total_count': len(activities)
         })
         
@@ -693,6 +697,883 @@ def log_interaction_api(request):
             'success': False,
             'error': 'Invalid JSON data.'
         }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def follower_growth_chart_api(request):
+    """
+    API endpoint to get follower growth data for chart.
+    Returns monthly data for the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get total followers up to end of this month
+            total_followers = ChurchFollow.objects.filter(
+                church__in=user_churches,
+                followed_at__lt=next_month_start
+            ).count()
+            
+            # Get new followers in this month
+            new_followers = ChurchFollow.objects.filter(
+                church__in=user_churches,
+                followed_at__gte=month_start,
+                followed_at__lt=next_month_start
+            ).count()
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'total': total_followers,
+                'new': new_followers
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def engagement_levels_chart_api(request):
+    """
+    API endpoint to get engagement levels data for chart.
+    Returns monthly engagement distribution for the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Get content types for filtering
+        post_ct = ContentType.objects.get_for_model(Post)
+        church_ct = ContentType.objects.get_for_model(Church)
+        
+        # Get church post IDs
+        church_post_ids = Post.objects.filter(church__in=user_churches).values_list('id', flat=True)
+        church_ids = user_churches.values_list('id', flat=True)
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get followers who were active in this month
+            followers_in_month = ChurchFollow.objects.filter(
+                church__in=user_churches,
+                followed_at__lt=next_month_start
+            ).values_list('user_id', flat=True)
+            
+            # Count interactions per follower in this month (excluding post views)
+            follower_interactions = {}
+            
+            interactions = UserInteraction.objects.filter(
+                user_id__in=followers_in_month,
+                created_at__gte=month_start,
+                created_at__lt=next_month_start
+            ).filter(
+                Q(content_type=post_ct, object_id__in=church_post_ids) |
+                Q(content_type=church_ct, object_id__in=church_ids)
+            ).exclude(
+                activity_type=UserInteraction.ACTIVITY_POST_VIEW
+            ).values('user_id').annotate(
+                interaction_count=Count('id')
+            )
+            
+            for item in interactions:
+                follower_interactions[item['user_id']] = item['interaction_count']
+            
+            # Categorize followers by engagement level
+            high_engagement = 0
+            medium_engagement = 0
+            low_engagement = 0
+            
+            for follower_id in followers_in_month:
+                interaction_count = follower_interactions.get(follower_id, 0)
+                
+                if interaction_count >= 10:
+                    high_engagement += 1
+                elif interaction_count >= 3:
+                    medium_engagement += 1
+                else:
+                    low_engagement += 1
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'high': high_engagement,
+                'medium': medium_engagement,
+                'low': low_engagement
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def revenue_trend_chart_api(request):
+    """
+    API endpoint to get revenue trend data for chart.
+    Returns monthly revenue from paid bookings over the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get total revenue for this month from paid bookings
+            # Use payment_date if available, otherwise fall back to created_at
+            from django.db.models import Q, Case, When, F
+            
+            revenue = Booking.objects.filter(
+                church__in=user_churches,
+                payment_status='paid'
+            ).filter(
+                Q(payment_date__gte=month_start, payment_date__lt=next_month_start) |
+                Q(payment_date__isnull=True, created_at__gte=month_start, created_at__lt=next_month_start)
+            ).aggregate(
+                total=Count('id'),
+                revenue=models.Sum('payment_amount')
+            )
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'revenue': float(revenue['revenue'] or 0),
+                'count': revenue['total']
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def payment_methods_chart_api(request):
+    """
+    API endpoint to get payment methods distribution data.
+    Returns breakdown of payment methods used for paid bookings.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get payment method distribution for paid bookings
+        payment_methods = Booking.objects.filter(
+            church__in=user_churches,
+            payment_status='paid',
+            payment_method__isnull=False
+        ).values('payment_method').annotate(
+            count=Count('id'),
+            revenue=models.Sum('payment_amount')
+        ).order_by('-count')
+        
+        # Format the data
+        methods_data = []
+        for method in payment_methods:
+            method_name = {
+                'paypal': 'PayPal',
+                'stripe': 'Credit Card',
+                'gcash': 'GCash'
+            }.get(method['payment_method'], method['payment_method'])
+            
+            methods_data.append({
+                'method': method_name,
+                'count': method['count'],
+                'revenue': float(method['revenue'] or 0)
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': methods_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def donation_trends_chart_api(request):
+    """
+    API endpoint to get donation trends data for chart.
+    Returns monthly donation amounts and donor counts for the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Get all posts from user's churches
+        church_post_ids = Post.objects.filter(church__in=user_churches).values_list('id', flat=True)
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get donations for this month from church posts
+            donations = Donation.objects.filter(
+                post_id__in=church_post_ids,
+                payment_status='completed',
+                created_at__gte=month_start,
+                created_at__lt=next_month_start
+            ).aggregate(
+                total_amount=models.Sum('amount'),
+                donor_count=Count('donor', distinct=True)
+            )
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'amount': float(donations['total_amount'] or 0),
+                'donors': donations['donor_count'] or 0
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def engagement_trends_chart_api(request):
+    """
+    API endpoint to get engagement trends data for chart.
+    Supports daily, weekly, monthly, and yearly time ranges.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get time range parameter (default: weekly)
+        time_range = request.GET.get('range', 'weekly')
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Get all posts from user's churches
+        church_post_ids = Post.objects.filter(church__in=user_churches).values_list('id', flat=True)
+        
+        # Get content type for Post
+        post_ct = ContentType.objects.get_for_model(Post)
+        
+        periods_data = []
+        
+        if time_range == 'daily':
+            # Last 7 days
+            for i in range(6, -1, -1):
+                day_start = (now - timedelta(days=i)).replace(hour=0, minute=0, second=0, microsecond=0)
+                day_end = day_start + timedelta(days=1)
+                
+                # Get engagement metrics for this day
+                likes = PostLike.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=day_start,
+                    created_at__lt=day_end
+                ).count()
+                
+                comments = PostComment.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=day_start,
+                    created_at__lt=day_end
+                ).count()
+                
+                bookmarks = PostBookmark.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=day_start,
+                    created_at__lt=day_end
+                ).count()
+                
+                views = UserInteraction.objects.filter(
+                    content_type=post_ct,
+                    object_id__in=church_post_ids,
+                    activity_type=UserInteraction.ACTIVITY_POST_VIEW,
+                    created_at__gte=day_start,
+                    created_at__lt=day_end
+                ).count()
+                
+                periods_data.append({
+                    'label': day_start.strftime('%a'),  # Mon, Tue, etc.
+                    'likes': likes,
+                    'comments': comments,
+                    'bookmarks': bookmarks,
+                    'views': views
+                })
+        
+        elif time_range == 'weekly':
+            # Last 4 weeks
+            for i in range(3, -1, -1):
+                week_start = (now - timedelta(weeks=i)).replace(hour=0, minute=0, second=0, microsecond=0)
+                week_end = week_start + timedelta(weeks=1)
+                
+                likes = PostLike.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=week_start,
+                    created_at__lt=week_end
+                ).count()
+                
+                comments = PostComment.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=week_start,
+                    created_at__lt=week_end
+                ).count()
+                
+                bookmarks = PostBookmark.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=week_start,
+                    created_at__lt=week_end
+                ).count()
+                
+                views = UserInteraction.objects.filter(
+                    content_type=post_ct,
+                    object_id__in=church_post_ids,
+                    activity_type=UserInteraction.ACTIVITY_POST_VIEW,
+                    created_at__gte=week_start,
+                    created_at__lt=week_end
+                ).count()
+                
+                periods_data.append({
+                    'label': f'Week {4-i}',
+                    'likes': likes,
+                    'comments': comments,
+                    'bookmarks': bookmarks,
+                    'views': views
+                })
+        
+        elif time_range == 'monthly':
+            # Last 6 months
+            for i in range(5, -1, -1):
+                month_date = now - timedelta(days=30 * i)
+                month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                
+                if month_start.month == 12:
+                    next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+                else:
+                    next_month_start = month_start.replace(month=month_start.month + 1)
+                
+                likes = PostLike.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                comments = PostComment.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                bookmarks = PostBookmark.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                views = UserInteraction.objects.filter(
+                    content_type=post_ct,
+                    object_id__in=church_post_ids,
+                    activity_type=UserInteraction.ACTIVITY_POST_VIEW,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                periods_data.append({
+                    'label': month_start.strftime('%b'),
+                    'likes': likes,
+                    'comments': comments,
+                    'bookmarks': bookmarks,
+                    'views': views
+                })
+        
+        elif time_range == 'yearly':
+            # Last 12 months
+            for i in range(11, -1, -1):
+                month_date = now - timedelta(days=30 * i)
+                month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                
+                if month_start.month == 12:
+                    next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+                else:
+                    next_month_start = month_start.replace(month=month_start.month + 1)
+                
+                likes = PostLike.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                comments = PostComment.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                bookmarks = PostBookmark.objects.filter(
+                    post_id__in=church_post_ids,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                views = UserInteraction.objects.filter(
+                    content_type=post_ct,
+                    object_id__in=church_post_ids,
+                    activity_type=UserInteraction.ACTIVITY_POST_VIEW,
+                    created_at__gte=month_start,
+                    created_at__lt=next_month_start
+                ).count()
+                
+                periods_data.append({
+                    'label': month_start.strftime('%b %y'),
+                    'likes': likes,
+                    'comments': comments,
+                    'bookmarks': bookmarks,
+                    'views': views
+                })
+        
+        return JsonResponse({
+            'success': True,
+            'data': periods_data,
+            'range': time_range
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def booking_trends_chart_api(request):
+    """
+    API endpoint to get booking trends data for chart.
+    Returns weekly booking status breakdown for the last 4 weeks.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Generate data for last 4 weeks
+        weeks_data = []
+        
+        for i in range(3, -1, -1):
+            week_start = (now - timedelta(weeks=i)).replace(hour=0, minute=0, second=0, microsecond=0)
+            week_end = week_start + timedelta(weeks=1)
+            
+            # Get booking counts by status for this week
+            pending = Booking.objects.filter(
+                church__in=user_churches,
+                status__in=[Booking.STATUS_REQUESTED, Booking.STATUS_REVIEWED],
+                created_at__gte=week_start,
+                created_at__lt=week_end
+            ).count()
+            
+            confirmed = Booking.objects.filter(
+                church__in=user_churches,
+                status__in=[Booking.STATUS_APPROVED, Booking.STATUS_COMPLETED],
+                created_at__gte=week_start,
+                created_at__lt=week_end
+            ).count()
+            
+            cancelled = Booking.objects.filter(
+                church__in=user_churches,
+                status__in=[Booking.STATUS_DECLINED, Booking.STATUS_CANCELED],
+                created_at__gte=week_start,
+                created_at__lt=week_end
+            ).count()
+            
+            weeks_data.append({
+                'week': f'Week {4-i}',
+                'pending': pending,
+                'confirmed': confirmed,
+                'cancelled': cancelled
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': weeks_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def popular_services_chart_api(request):
+    """
+    API endpoint to get popular services data for chart.
+    Returns top service categories by booking count.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get booking counts by service category
+        category_bookings = Booking.objects.filter(
+            church__in=user_churches
+        ).values(
+            'service__category__name'
+        ).annotate(
+            count=Count('id')
+        ).order_by('-count')[:5]  # Top 5 categories
+        
+        # Format the data
+        services_data = []
+        for item in category_bookings:
+            category_name = item['service__category__name'] or 'Uncategorized'
+            services_data.append({
+                'category': category_name,
+                'count': item['count']
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': services_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def overview_follower_growth_chart_api(request):
+    """
+    API endpoint to get follower growth data for overview chart.
+    Returns monthly follower counts for the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get cumulative follower count up to the end of this month (using followed_at)
+            follower_count = ChurchFollow.objects.filter(
+                church__in=user_churches,
+                followed_at__lt=next_month_start
+            ).count()
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'followers': follower_count
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def overview_weekly_engagement_chart_api(request):
+    """
+    API endpoint to get weekly engagement data for overview chart.
+    Returns daily engagement metrics for the last 7 days.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Get all posts from user's churches
+        church_post_ids = Post.objects.filter(church__in=user_churches).values_list('id', flat=True)
+        
+        # Get content type for Post
+        post_ct = ContentType.objects.get_for_model(Post)
+        
+        # Generate data for last 7 days
+        days_data = []
+        
+        for i in range(6, -1, -1):
+            day_start = (now - timedelta(days=i)).replace(hour=0, minute=0, second=0, microsecond=0)
+            day_end = day_start + timedelta(days=1)
+            
+            # Get engagement metrics for this day
+            likes = PostLike.objects.filter(
+                post_id__in=church_post_ids,
+                created_at__gte=day_start,
+                created_at__lt=day_end
+            ).count()
+            
+            comments = PostComment.objects.filter(
+                post_id__in=church_post_ids,
+                created_at__gte=day_start,
+                created_at__lt=day_end
+            ).count()
+            
+            views = UserInteraction.objects.filter(
+                content_type=post_ct,
+                object_id__in=church_post_ids,
+                activity_type=UserInteraction.ACTIVITY_POST_VIEW,
+                created_at__gte=day_start,
+                created_at__lt=day_end
+            ).count()
+            
+            days_data.append({
+                'day': day_start.strftime('%a'),  # Mon, Tue, etc.
+                'likes': likes,
+                'comments': comments,
+                'views': views
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': days_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def overview_revenue_chart_api(request):
+    """
+    API endpoint to get revenue overview data for chart.
+    Returns monthly donations and service revenue for the last 6 months.
+    """
+    try:
+        user_churches = Church.objects.filter(owner=request.user)
+        
+        if not user_churches.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'You do not own any churches.'
+            }, status=404)
+        
+        # Get current date
+        now = timezone.now()
+        
+        # Get all posts from user's churches
+        church_post_ids = Post.objects.filter(church__in=user_churches).values_list('id', flat=True)
+        
+        # Generate data for last 6 months
+        months_data = []
+        
+        for i in range(5, -1, -1):
+            # Calculate the start and end of each month
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            
+            # Calculate next month start
+            if month_start.month == 12:
+                next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+            else:
+                next_month_start = month_start.replace(month=month_start.month + 1)
+            
+            # Get donations for this month
+            donations = Donation.objects.filter(
+                post_id__in=church_post_ids,
+                payment_status='completed',
+                created_at__gte=month_start,
+                created_at__lt=next_month_start
+            ).aggregate(
+                total=models.Sum('amount')
+            )
+            
+            # Get service revenue (paid bookings) for this month
+            services = Booking.objects.filter(
+                church__in=user_churches,
+                payment_status='paid',
+                created_at__gte=month_start,
+                created_at__lt=next_month_start
+            ).aggregate(
+                total=models.Sum('payment_amount')
+            )
+            
+            months_data.append({
+                'month': month_start.strftime('%b'),
+                'donations': float(donations['total'] or 0),
+                'services': float(services['total'] or 0)
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': months_data
+        })
+        
     except Exception as e:
         return JsonResponse({
             'success': False,

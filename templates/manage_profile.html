@@ -198,6 +198,184 @@
       color: white !important;
     }
     
+    /* Analytics Header */
+    .analytics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+    
+    .analytics-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1A3A52;
+      margin: 0;
+    }
+    
+    /* Analytics Grid */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .analytics-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(30, 144, 255, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(30, 144, 255, 0.08);
+    }
+    
+    .analytics-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(30, 144, 255, 0.15);
+      border-color: rgba(30, 144, 255, 0.25);
+    }
+    
+    .analytics-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .analytics-icon svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+      stroke-width: 2;
+    }
+    
+    .analytics-content {
+      flex: 1;
+    }
+    
+    .analytics-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1A3A52;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    
+    .analytics-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #7A9AB2;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      line-height: 1.4;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Responsive Analytics Grid */
+    @media (max-width: 1200px) {
+      .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .analytics-card {
+        padding: 20px;
+      }
+      
+      .analytics-icon {
+        width: 48px;
+        height: 48px;
+      }
+      
+      .analytics-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+      
+      .analytics-value {
+        font-size: 24px;
+      }
+      
+      .analytics-label {
+        font-size: 12px;
+      }
+    }
+    
+    /* Section Header Actions */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .section-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .sort-select {
+      padding: 8px 32px 8px 12px;
+      border: 2px solid rgba(30, 144, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      font-weight: 500;
+      color: #1A3A52;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231E90FF' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    
+    .sort-select:hover {
+      border-color: rgba(30, 144, 255, 0.4);
+      background-color: rgba(240, 248, 255, 0.9);
+    }
+    
+    .sort-select:focus {
+      outline: none;
+      border-color: #1E90FF;
+      box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+    }
+    
+    @media (max-width: 640px) {
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .section-header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .sort-select {
+        flex: 1;
+      }
+    }
+    
     /* Success messages */
     .alert-success {
       background: #D1FAE5 !important;
@@ -473,14 +651,103 @@
 
   <!-- Overview Tab Content -->
   <div id="overview-content" class="tab-content">
+    <!-- Analytics Header with Sorting -->
+    <div class="analytics-header">
+      <h3 class="analytics-title">Your Statistics</h3>
+      <select id="analytics-period" class="sort-select">
+        <option value="all">All Time</option>
+        <option value="month">This Month</option>
+        <option value="week">This Week</option>
+        <option value="today">Today</option>
+      </select>
+    </div>
+    
+    <!-- Analytics Cards -->
+    <div class="analytics-grid">
+      <div class="analytics-card" data-type="bookings" 
+           data-all="{{ total_bookings|default:0 }}"
+           data-month="{{ total_bookings_month|default:0 }}"
+           data-week="{{ total_bookings_week|default:0 }}"
+           data-today="{{ total_bookings_today|default:0 }}">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <div class="analytics-value">{{ total_bookings|default:0 }}</div>
+          <div class="analytics-label">Bookings</div>
+        </div>
+      </div>
+
+      <div class="analytics-card" data-type="donated"
+           data-all="{{ total_donated|default:0|floatformat:0 }}"
+           data-month="{{ total_donated_month|default:0|floatformat:0 }}"
+           data-week="{{ total_donated_week|default:0|floatformat:0 }}"
+           data-today="{{ total_donated_today|default:0|floatformat:0 }}">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <div class="analytics-value">₱{{ total_donated|default:0|floatformat:0 }}</div>
+          <div class="analytics-label">Donated</div>
+        </div>
+      </div>
+
+      <div class="analytics-card" data-type="parishes"
+           data-all="{{ total_parishes_followed|default:0 }}"
+           data-month="{{ total_parishes_followed_month|default:0 }}"
+           data-week="{{ total_parishes_followed_week|default:0 }}"
+           data-today="{{ total_parishes_followed_today|default:0 }}">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <div class="analytics-value">{{ total_parishes_followed|default:0 }}</div>
+          <div class="analytics-label">Parishes</div>
+        </div>
+      </div>
+
+      <div class="analytics-card" data-type="engagement"
+           data-all="{{ total_post_engagement|default:0 }}"
+           data-month="{{ total_post_engagement_month|default:0 }}"
+           data-week="{{ total_post_engagement_week|default:0 }}"
+           data-today="{{ total_post_engagement_today|default:0 }}">
+        <div class="analytics-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="analytics-content">
+          <div class="analytics-value">{{ total_post_engagement|default:0 }}</div>
+          <div class="analytics-label">Engagements</div>
+        </div>
+      </div>
+    </div>
+
     <div class="overview-grid">
       <!-- Recent Activity Section -->
       <div id="recent-activity-section" class="overview-section">
         <div class="section-header">
           <h3 class="section-title">Recent Activity</h3>
-          <a href="{% url 'core:user_activities' %}" class="view-all-link">View All</a>
+          <div class="section-header-actions">
+            <select id="activity-sort" class="sort-select">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="type">By Type</option>
+            </select>
+            <a href="{% url 'core:user_activities' %}" class="view-all-link">View All</a>
+          </div>
         </div>
-        <div class="activity-list">
+        <div class="activity-list" id="activity-list">
           {% if profile_activities %}
             {% for activity in profile_activities %}
               <div class="activity-item">
@@ -1897,7 +2164,158 @@ document.addEventListener('DOMContentLoaded', function() {
         const settingsManager = new window.SettingsManager();
         settingsManager.init();
     }
+    
+    // Initialize activity sorting
+    initializeActivitySorting();
+    
+    // Initialize analytics period filtering
+    initializeAnalyticsPeriodFilter();
 });
+
+// Activity Sorting Functionality
+function initializeActivitySorting() {
+    const sortSelect = document.getElementById('activity-sort');
+    const activityList = document.getElementById('activity-list');
+    
+    if (!sortSelect || !activityList) return;
+    
+    sortSelect.addEventListener('change', function() {
+        const sortType = this.value;
+        const activities = Array.from(activityList.querySelectorAll('.activity-item'));
+        
+        // Sort activities based on selected option
+        activities.sort((a, b) => {
+            if (sortType === 'newest') {
+                // Already in newest first order by default
+                const timeA = a.querySelector('.activity-meta').textContent;
+                const timeB = b.querySelector('.activity-meta').textContent;
+                return compareTimeAgo(timeA, timeB);
+            } else if (sortType === 'oldest') {
+                // Reverse order
+                const timeA = a.querySelector('.activity-meta').textContent;
+                const timeB = b.querySelector('.activity-meta').textContent;
+                return compareTimeAgo(timeB, timeA);
+            } else if (sortType === 'type') {
+                // Sort by activity type (icon class)
+                const typeA = getActivityType(a);
+                const typeB = getActivityType(b);
+                return typeA.localeCompare(typeB);
+            }
+            return 0;
+        });
+        
+        // Clear and re-append sorted activities
+        activityList.innerHTML = '';
+        activities.forEach(activity => activityList.appendChild(activity));
+    });
+}
+
+// Helper function to compare time ago strings
+function compareTimeAgo(timeA, timeB) {
+    const getMinutes = (timeStr) => {
+        if (timeStr.includes('just now')) return 0;
+        const match = timeStr.match(/(\d+)\s+(second|minute|hour|day|month|year)/);
+        if (!match) return 0;
+        
+        const value = parseInt(match[1]);
+        const unit = match[2];
+        
+        const multipliers = {
+            'second': 1 / 60,
+            'minute': 1,
+            'hour': 60,
+            'day': 1440,
+            'month': 43200,
+            'year': 525600
+        };
+        
+        return value * (multipliers[unit] || 0);
+    };
+    
+    return getMinutes(timeA) - getMinutes(timeB);
+}
+
+// Helper function to get activity type from icon
+function getActivityType(activityItem) {
+    const iconSvg = activityItem.querySelector('.activity-icon svg');
+    const text = activityItem.querySelector('.activity-text').textContent.toLowerCase();
+    
+    if (text.includes('liked')) return 'like';
+    if (text.includes('comment')) return 'comment';
+    if (text.includes('bookmark') || text.includes('saved')) return 'bookmark';
+    if (text.includes('follow')) return 'follow';
+    if (text.includes('booking') || text.includes('booked')) return 'booking';
+    
+    return 'other';
+}
+
+// Analytics Period Filter Functionality
+function initializeAnalyticsPeriodFilter() {
+    const periodSelect = document.getElementById('analytics-period');
+    const analyticsCards = document.querySelectorAll('.analytics-card');
+    
+    if (!periodSelect || analyticsCards.length === 0) return;
+    
+    periodSelect.addEventListener('change', function() {
+        const period = this.value;
+        
+        analyticsCards.forEach(card => {
+            const valueElement = card.querySelector('.analytics-value');
+            const labelElement = card.querySelector('.analytics-label');
+            const cardType = card.dataset.type;
+            const newValue = card.dataset[period];
+            
+            // Add animation class
+            card.classList.add('updating');
+            
+            setTimeout(() => {
+                // Update the value
+                if (cardType === 'donated') {
+                    valueElement.textContent = '₱' + newValue;
+                } else {
+                    valueElement.textContent = newValue;
+                }
+                
+                // Update label based on period
+                const labelText = labelElement.textContent.replace(/\(.*?\)\s*/, '');
+                let periodLabel = '';
+                
+                switch(period) {
+                    case 'month':
+                        periodLabel = '(Month) ';
+                        break;
+                    case 'week':
+                        periodLabel = '(Week) ';
+                        break;
+                    case 'today':
+                        periodLabel = '(Today) ';
+                        break;
+                    default:
+                        periodLabel = '';
+                }
+                
+                labelElement.textContent = periodLabel + labelText;
+                
+                // Remove animation class
+                card.classList.remove('updating');
+            }, 150);
+        });
+    });
+}
+
+// Add CSS animation for card updates
+const style = document.createElement('style');
+style.textContent = `
+    .analytics-card.updating {
+        opacity: 0.6;
+        transform: scale(0.98);
+    }
+    
+    .analytics-card {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+`;
+document.head.appendChild(style);
 
 // Handle show more/less functionality for saved posts
 document.addEventListener('DOMContentLoaded', function() {

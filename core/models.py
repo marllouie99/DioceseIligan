@@ -253,6 +253,47 @@ class ChurchFollow(models.Model):
         return f"{self.user.get_full_name()} follows {self.church.name}"
 
 
+class ServiceCategory(models.Model):
+    """Model for categorizing church services (e.g., Parish Family, In-Person Services)."""
+    
+    name = models.CharField(max_length=100, unique=True, help_text="Category name (e.g., Parish Family, In-Person Services)")
+    slug = models.SlugField(max_length=100, unique=True, help_text="URL-friendly version of the name")
+    description = models.TextField(blank=True, help_text="Description of the category")
+    icon = models.CharField(max_length=50, blank=True, help_text="Icon class or emoji for the category")
+    color = models.CharField(max_length=7, default='#3B82F6', help_text="Hex color code for the category")
+    order = models.PositiveIntegerField(default=0, help_text="Display order (0 = first)")
+    is_active = models.BooleanField(default=True, help_text="Whether this category is active")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = "Service Category"
+        verbose_name_plural = "Service Categories"
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        # Generate slug if not provided
+        if not self.slug:
+            self.slug = slugify(self.name)
+            # Ensure uniqueness
+            original_slug = self.slug
+            counter = 1
+            while ServiceCategory.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
+    
+    @property
+    def service_count(self):
+        """Get total number of services in this category."""
+        return self.services.filter(is_active=True).count()
+
+
 class BookableService(models.Model):
     """Model for church services that can be booked."""
     
@@ -280,6 +321,7 @@ class BookableService(models.Model):
     
     # Basic Information
     church = models.ForeignKey(Church, on_delete=models.CASCADE, related_name='bookable_services')
+    category = models.ForeignKey(ServiceCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='services', help_text="Service category")
     name = models.CharField(max_length=200, help_text="Service name (e.g., Counseling Session, Baptism)")
     description = models.TextField(blank=True, help_text="Description of the service (optional)")
     image = models.ImageField(upload_to='services/images/', null=True, blank=True, help_text="Service image")

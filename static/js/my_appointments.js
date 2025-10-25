@@ -14,7 +14,7 @@ let stripeCardElement = null;
 /**
  * Open the appointment summary modal with booking information
  */
-function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId) {
+function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor) {
     // Basic info
     document.getElementById('summary-code').textContent = code;
     document.getElementById('summary-service').textContent = serviceName;
@@ -22,6 +22,29 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     document.getElementById('summary-time').textContent = time;
     document.getElementById('summary-created').textContent = createdDate;
     document.getElementById('summary-updated').textContent = updatedDate;
+    
+    // Category badge
+    const categoryRow = document.getElementById('summary-category-row');
+    const categoryBadge = document.getElementById('summary-category-badge');
+    const categoryNameEl = document.getElementById('summary-category-name');
+    const categoryIconEl = document.getElementById('summary-category-icon');
+    const hasCategory = categoryName && categoryName.trim().length > 0;
+    
+    if (categoryRow && categoryBadge) {
+        if (hasCategory) {
+            const color = (categoryColor && categoryColor.trim()) ? categoryColor.trim() : '#3B82F6';
+            categoryRow.style.display = 'table-row';
+            categoryBadge.style.display = 'inline-flex';
+            categoryBadge.style.backgroundColor = color + '20';
+            categoryBadge.style.borderColor = color + '40';
+            categoryBadge.style.color = color;
+            if (categoryNameEl) categoryNameEl.textContent = categoryName;
+            if (categoryIconEl) categoryIconEl.textContent = (categoryIcon && categoryIcon.trim()) ? categoryIcon : '📁';
+        } else {
+            categoryRow.style.display = 'none';
+            categoryBadge.style.display = 'none';
+        }
+    }
     
     // Church info
     document.getElementById('summary-church').textContent = churchName;
@@ -320,6 +343,22 @@ function printAppointmentSummary() {
                     border-radius: 12px;
                     font-size: 12px;
                     font-weight: 600;
+                }
+                
+                /* Remove inline styles for print - clean text only */
+                #summary-category-badge,
+                #summary-payment-status span {
+                    background: none !important;
+                    border: none !important;
+                    color: #111827 !important;
+                    padding: 0 !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* Hide emoji icons in print */
+                #summary-category-icon,
+                #summary-payment-status span::before {
+                    display: none !important;
                 }
             </style>
         </head>

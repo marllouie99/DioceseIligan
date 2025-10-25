@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import (
     Church,
     ChurchFollow,
+    ServiceCategory,
     BookableService,
     ServiceImage,
     Availability,
@@ -83,6 +84,29 @@ class ChurchAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(ServiceCategory)
+class ServiceCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order', 'service_count', 'is_active', 'created_at')
+    search_fields = ('name', 'description')
+    list_filter = ('is_active', 'created_at')
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('order', 'name')
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+        ('Display Settings', {
+            'fields': ('icon', 'color', 'order')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
 class ServiceImageInline(admin.TabularInline):
     model = ServiceImage
     extra = 1
@@ -91,11 +115,11 @@ class ServiceImageInline(admin.TabularInline):
 @admin.register(BookableService)
 class BookableServiceAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'church', 'is_active', 'is_free', 'price', 'duration', 'created_at',
+        'name', 'church', 'category', 'is_active', 'is_free', 'price', 'duration', 'created_at',
     )
     search_fields = ('name', 'church__name')
-    list_filter = ('is_active', 'is_free', 'duration', 'church', 'created_at')
-    autocomplete_fields = ('church',)
+    list_filter = ('is_active', 'is_free', 'duration', 'category', 'church', 'created_at')
+    autocomplete_fields = ('church', 'category')
     inlines = [ServiceImageInline]
 
 

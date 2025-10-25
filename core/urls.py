@@ -37,6 +37,11 @@ urlpatterns = [
     path('super-admin/posts/<int:post_id>/toggle-active/', views.super_admin_toggle_post_active, name='super_admin_toggle_post_active'),
     path('super-admin/posts/<int:post_id>/delete/', views.super_admin_delete_post, name='super_admin_delete_post'),
     path('super-admin/services/', views.super_admin_services, name='super_admin_services'),
+    path('super-admin/categories/', views.super_admin_categories, name='super_admin_categories'),
+    path('super-admin/categories/create/', views.super_admin_create_category, name='super_admin_create_category'),
+    path('super-admin/categories/<int:category_id>/edit/', views.super_admin_edit_category, name='super_admin_edit_category'),
+    path('super-admin/categories/<int:category_id>/delete/', views.super_admin_delete_category, name='super_admin_delete_category'),
+    path('super-admin/categories/<int:category_id>/toggle/', views.super_admin_toggle_category, name='super_admin_toggle_category'),
     path('super-admin/bookings/', views.super_admin_bookings, name='super_admin_bookings'),
     path('super-admin/moderation/', views.super_admin_moderation, name='super_admin_moderation'),
     
@@ -122,6 +127,27 @@ urlpatterns = [
     path('api/followers/<int:user_id>/stats/', api_views.follower_stats_api, name='follower_stats_api'),
     path('api/followers/<int:user_id>/activity/<str:activity_type>/', api_views.follower_activity_api, name='follower_activity_api'),
     path('api/interactions/log/', api_views.log_interaction_api, name='log_interaction_api'),
+    path('api/followers/growth-chart/', api_views.follower_growth_chart_api, name='follower_growth_chart_api'),
+    path('api/followers/engagement-chart/', api_views.engagement_levels_chart_api, name='engagement_levels_chart_api'),
+    
+    # Transaction/Revenue API endpoints
+    path('api/transactions/revenue-chart/', api_views.revenue_trend_chart_api, name='revenue_trend_chart_api'),
+    path('api/transactions/payment-methods-chart/', api_views.payment_methods_chart_api, name='payment_methods_chart_api'),
+    
+    # Donation API endpoints
+    path('api/donations/trends-chart/', api_views.donation_trends_chart_api, name='donation_trends_chart_api'),
+    
+    # Content/Engagement API endpoints
+    path('api/content/engagement-trends/', api_views.engagement_trends_chart_api, name='engagement_trends_chart_api'),
+    
+    # Booking/Appointments API endpoints
+    path('api/bookings/trends-chart/', api_views.booking_trends_chart_api, name='booking_trends_chart_api'),
+    path('api/bookings/popular-services-chart/', api_views.popular_services_chart_api, name='popular_services_chart_api'),
+    
+    # Overview API endpoints
+    path('api/overview/follower-growth-chart/', api_views.overview_follower_growth_chart_api, name='overview_follower_growth_chart_api'),
+    path('api/overview/weekly-engagement-chart/', api_views.overview_weekly_engagement_chart_api, name='overview_weekly_engagement_chart_api'),
+    path('api/overview/revenue-chart/', api_views.overview_revenue_chart_api, name='overview_revenue_chart_api'),
     
     # Donation URLs (Orders API v2)
     path('donations/create/<int:post_id>/', donation_views.create_donation_order, name='create_donation'),

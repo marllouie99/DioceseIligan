@@ -1,9 +1,16 @@
 // ChurchIligan Database Schema - ERD for dbdiagram.io
 // Generated: 2025-10-16
-// Last Updated: 2025-10-17
+// Last Updated: 2025-10-23
 // This file contains the complete database schema with all models and relationships
+// Total Tables: 32 (18 Data Stores)
 //
-// RECENT CHANGES (2025-10-17):
+// RECENT CHANGES (2025-10-23):
+// - Payment fields already integrated in core_booking table
+// - Users can pay for bookings via PayPal/Stripe/GCash
+// - Payment fields: payment_status, payment_method, payment_amount, payment_transaction_id, payment_date
+// - Booking payments support webhooks for real-time status updates
+//
+// PREVIOUS CHANGES (2025-10-17):
 // - Church creation now restricted to Super Admins only
 // - Added profile completeness validation for church manager assignment
 // - Added manager assignment notification system (email + in-app)
@@ -282,6 +289,7 @@ Table core_bookableservice {
   // Pricing
   price decimal(10,2)
   is_free boolean [default: true]
+  payment_required boolean [default: false]
   currency varchar(3) [default: 'PHP']
   
   // Scheduling
@@ -301,7 +309,13 @@ Table core_bookableservice {
   created_at datetime [not null]
   updated_at datetime [not null]
   
-  Note: 'Church services that can be booked (counseling, baptism, etc.)'
+  Note: '''Church services that can be booked (counseling, baptism, etc.)
+  
+  PAYMENT UPDATE (2025-10-23):
+  - payment_required: If true, users must pay online before booking
+  - price: Service price (if payment_required is true)
+  - Payment processed through PayPal/Stripe
+  '''
 }
 
 Table core_serviceimage {
@@ -366,6 +380,14 @@ Table core_booking {
   status varchar(20) [not null, default: 'requested']
   cancel_reason varchar(200)
   decline_reason varchar(200)
+  
+  // Payment fields (integrated in booking table)
+  payment_status varchar(20) [default: 'pending']
+  payment_method varchar(20)
+  payment_amount decimal(10,2)
+  payment_transaction_id varchar(200)
+  payment_date datetime
+  
   created_at datetime [not null]
   updated_at datetime [not null]
   status_changed_at datetime
@@ -374,9 +396,19 @@ Table core_booking {
     (service_id, date, status)
     (church_id, status)
     (user_id, status)
+    (payment_status)
   }
   
-  Note: 'Service booking/appointment requests with status workflow'
+  Note: '''Service booking/appointment requests with status workflow
+  
+  PAYMENT FEATURE (2025-10-23):
+  - payment_status: pending, paid, failed, canceled, refunded
+  - payment_method: paypal, stripe, gcash
+  - payment_amount: Amount paid for the booking
+  - payment_transaction_id: Payment gateway transaction ID
+  - payment_date: When payment was completed
+  - If service requires payment, booking must be paid before confirmation
+  '''
 }
 
 // ============================================
@@ -756,6 +788,7 @@ Table core_userinteraction {
 
 // Booking Relationships:
 // - One Booking can have One Review (1:1)
+// - One Booking has integrated Payment fields (payment_status, payment_method, payment_amount, etc.)
 // - One Booking can have Many Notifications (1:N)
 
 // Comment Relationships:

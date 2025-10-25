@@ -492,14 +492,20 @@ document.addEventListener('DOMContentLoaded', function() {
   // Booking Trends Chart
   const trendsCtx = document.getElementById('bookingTrendsChart');
   if (trendsCtx) {
+    const monthlyTrends = {{ monthly_trends|safe }};
+    const labels = monthlyTrends.map(t => t.month);
+    const completedData = monthlyTrends.map(t => t.completed);
+    const cancelledData = monthlyTrends.map(t => t.cancelled);
+    const pendingData = monthlyTrends.map(t => t.pending);
+    
     new Chart(trendsCtx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        labels: labels,
         datasets: [
           {
             label: 'Completed',
-            data: [350, 400, 430, 500, 580, 640],
+            data: completedData,
             borderColor: 'rgba(16, 185, 129, 1)',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             borderWidth: 2,
@@ -510,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           {
             label: 'Cancelled',
-            data: [25, 30, 28, 35, 40, 45],
+            data: cancelledData,
             borderColor: 'rgba(239, 68, 68, 1)',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             borderWidth: 2,
@@ -521,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           {
             label: 'Pending',
-            data: [15, 20, 18, 22, 25, 30],
+            data: pendingData,
             borderColor: 'rgba(245, 158, 11, 1)',
             backgroundColor: 'rgba(245, 158, 11, 0.1)',
             borderWidth: 2,
@@ -565,13 +571,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Bookings by Service Type Chart
   const serviceTypeCtx = document.getElementById('bookingsByServiceTypeChart');
   if (serviceTypeCtx) {
+    const categoryStats = {{ category_stats|safe }};
+    const categoryLabels = categoryStats.map(c => c.name);
+    const categoryCounts = categoryStats.map(c => c.count);
+    const categoryColors = categoryStats.map(c => c.color || 'rgba(59, 130, 246, 0.85)');
+    
     new Chart(serviceTypeCtx, {
       type: 'bar',
       data: {
-        labels: ['Counseling', 'Wedding', 'Baptism', 'Prayer', 'Other'],
+        labels: categoryLabels.length > 0 ? categoryLabels : ['No Data'],
         datasets: [{
-          data: [240, 150, 190, 145, 85],
-          backgroundColor: 'rgba(59, 130, 246, 0.85)',
+          data: categoryCounts.length > 0 ? categoryCounts : [0],
+          backgroundColor: categoryColors,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false
@@ -672,8 +683,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Bookings</div>
-        <div class="stat-card-value">1,267</div>
-        <div class="stat-card-subtitle brand">+37 this week</div>
+        <div class="stat-card-value">{{ total_bookings|default:0|floatformat:0 }}</div>
+        <div class="stat-card-subtitle brand">+{{ this_week_bookings|default:0 }} this week</div>
       </div>
     </div>
 
@@ -686,8 +697,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Completed</div>
-        <div class="stat-card-value">1,095</div>
-        <div class="stat-card-subtitle">86.4% completion rate</div>
+        <div class="stat-card-value">{{ completed_bookings|default:0|floatformat:0 }}</div>
+        <div class="stat-card-subtitle">{{ completion_rate|default:0 }}% completion rate</div>
       </div>
     </div>
 
@@ -700,7 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Pending</div>
-        <div class="stat-card-value">45</div>
+        <div class="stat-card-value">{{ pending_bookings|default:0|floatformat:0 }}</div>
         <div class="stat-card-subtitle">Awaiting confirmation</div>
       </div>
     </div>
@@ -713,8 +724,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Reviewed</div>
-        <div class="stat-card-value">892</div>
-        <div class="stat-card-subtitle">81.5% reviewed</div>
+        <div class="stat-card-value">{{ reviewed_bookings|default:0|floatformat:0 }}</div>
+        <div class="stat-card-subtitle">{{ reviewed_percentage|default:0 }}% reviewed</div>
       </div>
     </div>
 
@@ -727,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Confirmed</div>
-        <div class="stat-card-value">98</div>
+        <div class="stat-card-value">{{ confirmed_bookings|default:0|floatformat:0 }}</div>
         <div class="stat-card-subtitle">Upcoming bookings</div>
       </div>
     </div>
@@ -742,8 +753,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Cancelled</div>
-        <div class="stat-card-value">127</div>
-        <div class="stat-card-subtitle">10.0% cancellation rate</div>
+        <div class="stat-card-value">{{ cancelled_bookings|default:0|floatformat:0 }}</div>
+        <div class="stat-card-subtitle">{{ cancellation_rate|default:0 }}% cancellation rate</div>
       </div>
     </div>
   </div>
@@ -812,192 +823,99 @@ document.addEventListener('DOMContentLoaded', function() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="booking-id">#BK-1267</td>
-            <td class="service-name">Marriage Counseling</td>
-            <td class="church-name">Grace Community Church</td>
-            <td class="user-name">John Smith</td>
-            <td>
-              <div class="booking-date">Oct 18, 2025</div>
-              <div class="booking-time">2:00 PM - 3:00 PM</div>
-            </td>
-            <td class="price-cell">$50</td>
-            <td>
-              <span class="status-badge status-confirmed">
+          {% if bookings %}
+            {% for booking in bookings %}
+            <tr>
+              <td class="booking-id">{{ booking.code }}</td>
+              <td class="service-name">{{ booking.service.name }}</td>
+              <td class="church-name">{{ booking.church.name }}</td>
+              <td class="user-name">{{ booking.user.get_full_name }}</td>
+              <td>
+                <div class="booking-date">{{ booking.date|date:"M d, Y" }}</div>
+                {% if booking.start_time and booking.end_time %}
+                <div class="booking-time">{{ booking.start_time|time:"g:i A" }} - {{ booking.end_time|time:"g:i A" }}</div>
+                {% else %}
+                <div class="booking-time">Time not set</div>
+                {% endif %}
+              </td>
+              <td class="price-cell">{{ booking.service.price_display }}</td>
+              <td>
+                {% if booking.status == 'completed' %}
+                <span class="status-badge status-completed">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  Completed
+                </span>
+                {% elif booking.status == 'requested' %}
+                <span class="status-badge status-pending">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Pending
+                </span>
+                {% elif booking.status == 'approved' %}
+                <span class="status-badge status-confirmed">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                  </svg>
+                  Confirmed
+                </span>
+                {% elif booking.status == 'reviewed' %}
+                <span class="status-badge status-reviewed">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  Reviewed
+                </span>
+                {% elif booking.status == 'canceled' or booking.status == 'declined' %}
+                <span class="status-badge status-cancelled">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  {{ booking.get_status_display }}
+                </span>
+                {% else %}
+                <span class="status-badge">{{ booking.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="actions-cell">
+                  <a href="{% url 'core:manage_booking' booking.id %}" class="btn-action" title="View Details">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </a>
+                  <button class="btn-action" title="More Options">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="1"/>
+                      <circle cx="12" cy="5" r="1"/>
+                      <circle cx="12" cy="19" r="1"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="empty-state">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 11l3 3L22 4"/>
-                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
-                Confirmed
-              </span>
-            </td>
-            <td>
-              <div class="actions-cell">
-                <button class="btn-action" title="View Details">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-                <button class="btn-action" title="More Options">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="booking-id">#BK-1266</td>
-            <td class="service-name">Wedding Ceremony</td>
-            <td class="church-name">St. Mary's Cathedral</td>
-            <td class="user-name">Sarah Johnson</td>
-            <td>
-              <div class="booking-date">Oct 12, 2025</div>
-              <div class="booking-time">10:00 AM - 12:00 PM</div>
-            </td>
-            <td class="price-cell">$500</td>
-            <td>
-              <span class="status-badge status-completed">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                Completed
-              </span>
-            </td>
-            <td>
-              <div class="actions-cell">
-                <button class="btn-action" title="View Details">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-                <button class="btn-action" title="More Options">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="booking-id">#BK-1265</td>
-            <td class="service-name">Baptism Service</td>
-            <td class="church-name">Faith Baptist Church</td>
-            <td class="user-name">Michael Brown</td>
-            <td>
-              <div class="booking-date">Oct 20, 2025</div>
-              <div class="booking-time">11:00 AM - 12:00 PM</div>
-            </td>
-            <td class="price-cell">Free</td>
-            <td>
-              <span class="status-badge status-pending">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                Pending
-              </span>
-            </td>
-            <td>
-              <div class="actions-cell">
-                <button class="btn-action" title="View Details">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-                <button class="btn-action" title="More Options">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="booking-id">#BK-1264</td>
-            <td class="service-name">Spiritual Guidance</td>
-            <td class="church-name">Hope Methodist Church</td>
-            <td class="user-name">Emily Davis</td>
-            <td>
-              <div class="booking-date">Oct 10, 2025</div>
-              <div class="booking-time">3:00 PM - 4:00 PM</div>
-            </td>
-            <td class="price-cell">$30</td>
-            <td>
-              <span class="status-badge status-completed">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                Completed
-              </span>
-            </td>
-            <td>
-              <div class="actions-cell">
-                <button class="btn-action" title="View Details">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-                <button class="btn-action" title="More Options">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="booking-id">#BK-1263</td>
-            <td class="service-name">Youth Mentoring</td>
-            <td class="church-name">Trinity Church</td>
-            <td class="user-name">Lisa Anderson</td>
-            <td>
-              <div class="booking-date">Oct 15, 2025</div>
-              <div class="booking-time">4:00 PM - 5:00 PM</div>
-            </td>
-            <td class="price-cell">Free</td>
-            <td>
-              <span class="status-badge status-cancelled">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                Cancelled
-              </span>
-            </td>
-            <td>
-              <div class="actions-cell">
-                <button class="btn-action" title="View Details">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-                <button class="btn-action" title="More Options">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
+                <p>No bookings found</p>
+              </td>
+            </tr>
+          {% endif %}
         </tbody>
       </table>
     </div>

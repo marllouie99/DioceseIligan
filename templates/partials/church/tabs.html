@@ -281,6 +281,12 @@
                     </div>
                   {% endif %}
                 </h4>
+                {% if service.category %}
+                  <div class="service-category-badge" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; background-color: {{ service.category.color }}20; color: {{ service.category.color }}; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; border: 1px solid {{ service.category.color }}40;">
+                    <span>{{ service.category.icon|default:"📁" }}</span>
+                    <span>{{ service.category.name }}</span>
+                  </div>
+                {% endif %}
                 <p class="service-location">
                   <i data-feather="map-pin"></i>
                   {% if church.street_address %}

@@ -2284,8 +2284,8 @@ body.page-church-detail {
    🌿 FOREST SERENITY POST CARDS - Glassmorphism Design
    ==================================================== */
 
-/* Post Card - Enhanced with Forest Serenity Glassmorphism */
-.post-card {
+/* Post Card - Enhanced with Forest Serenity Glassmorphism (scoped to church detail page only) */
+.church-detail-page .post-card {
   /* Multi-layer glassmorphism background */
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.25) 0%, 
@@ -2322,7 +2322,7 @@ body.page-church-detail {
 }
 
 /* Post Card Hover Effects */
-.post-card:hover {
+.church-detail-page .post-card:hover {
   /* Enhanced shadow on hover */
   box-shadow: 
     0 30px 60px rgba(0, 0, 0, 0.12),
@@ -2338,7 +2338,7 @@ body.page-church-detail {
 }
 
 /* Highlight effect when post is targeted via anchor link */
-.post-card:target {
+.church-detail-page .post-card:target {
   animation: highlightPost 2s ease-in-out;
   border-color: rgba(139, 69, 19, 0.4);
   box-shadow: 
@@ -2480,7 +2480,7 @@ body.page-church-detail {
   text-decoration: underline !important;
 }
 /* Forest Serenity Post Header */
-.post-header { 
+.church-detail-page .post-header { 
   display: flex; 
   align-items: center; 
   gap: 14px; 
@@ -2504,7 +2504,7 @@ body.page-church-detail {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 /* Enhanced Post Author Avatar */
-.post-author-avatar { 
+.church-detail-page .post-author-avatar { 
   width: 44px; 
   height: 44px; 
   border-radius: 50%; 
@@ -2523,7 +2523,7 @@ body.page-church-detail {
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.post-author-avatar:hover {
+.church-detail-page .post-author-avatar:hover {
   /* Enhanced border on hover */
   border-color: rgba(15, 118, 110, 0.4);
   
@@ -2536,18 +2536,18 @@ body.page-church-detail {
     0 0 0 2px rgba(15, 118, 110, 0.1);
 }
 
-.post-author-avatar img { 
+.church-detail-page .post-author-avatar img { 
   width: 100%; 
   height: 100%; 
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.post-author-avatar:hover img {
+.church-detail-page .post-author-avatar:hover img {
   transform: scale(1.1);
 }
 
-.post-author-avatar .avatar-placeholder { 
+.church-detail-page .post-author-avatar .avatar-placeholder { 
   width: 100%; 
   height: 100%; 
   
@@ -2565,9 +2565,9 @@ body.page-church-detail {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.post-author-info { flex: 1; }
+.church-detail-page .post-author-info { flex: 1; }
 /* Enhanced Post Author Name */
-.post-author-name { 
+.church-detail-page .post-author-name { 
   font-weight: 600; 
   color: #111827; 
   font-size: 15px; 
@@ -2578,7 +2578,7 @@ body.page-church-detail {
 }
 
 /* Forest Serenity Church Name Link */
-.church-name-link { 
+.church-detail-page .church-name-link { 
   color: inherit; 
   text-decoration: none; 
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2914,7 +2914,7 @@ body.page-church-detail {
 }
 
 /* Ensure all post cards have proper stacking context */
-.post-card {
+.church-detail-page .post-card {
   position: relative;
   z-index: 1;
 }
@@ -3104,13 +3104,13 @@ body.page-church-detail {
 .filter-sort { display: flex; align-items: center; }
 .sort-select { padding: 8px 12px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; background: #fff; font-size: 14px; color: var(--text, #111827); cursor: pointer; }
 /* Enhanced Post Content */
-.post-content { 
+.church-detail-page .post-content { 
   padding: 16px 20px 16px; /* Added top padding for proper spacing */
   position: relative;
   margin-top: -1px; /* Slight overlap to connect with header */
 }
 
-.post-text { 
+.church-detail-page .post-text { 
   color: #111827; 
   line-height: 1.6; 
   margin-bottom: 16px;
@@ -3123,7 +3123,7 @@ body.page-church-detail {
 }
 
 /* Beautiful Post Images */
-.post-image { 
+.church-detail-page .post-image { 
   width: 100%; 
   max-height: 420px; 
   object-fit: cover; 
@@ -3141,7 +3141,7 @@ body.page-church-detail {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.post-image:hover {
+.church-detail-page .post-image:hover {
   /* Enhanced shadow on hover */
   box-shadow: 
     0 12px 24px rgba(0, 0, 0, 0.15),
@@ -3154,7 +3154,7 @@ body.page-church-detail {
   border-color: rgba(15, 118, 110, 0.2);
 }
 /* Forest Serenity Post Actions */
-.post-actions { 
+.church-detail-page .post-actions { 
   display: flex; 
   align-items: center; 
   gap: 28px; 
@@ -3179,7 +3179,7 @@ body.page-church-detail {
 }
 
 /* Enhanced Post Action Buttons */
-.post-action { 
+.church-detail-page .post-action { 
   display: flex; 
   align-items: center; 
   gap: 8px; 
@@ -3201,7 +3201,7 @@ body.page-church-detail {
   border: none !important;
 }
 
-.post-action:hover { 
+.church-detail-page .post-action:hover { 
   color: white;
   
   /* Subtle hover background */
@@ -3218,36 +3218,36 @@ body.page-church-detail {
 }
 
 /* Active/Liked States */
-.post-action.liked {
+.church-detail-page .post-action.liked {
   color: white;
   background: rgba(5, 150, 105, 0.12);
   border: none;
 }
 
-.post-action.bookmarked {
+.church-detail-page .post-action.bookmarked {
   color: white;
   background: rgba(16, 185, 129, 0.12);
   border: none;
 }
 
-.post-action.saved {
+.church-detail-page .post-action.saved {
   color: white;
   background: rgba(16, 185, 129, 0.12);
   border: none;
 }
 
-.post-action svg { 
+.church-detail-page .post-action svg { 
   width: 18px; 
   height: 18px;
   transition: all 0.3s ease;
 }
 
-.post-action:hover svg {
+.church-detail-page .post-action:hover svg {
   transform: scale(1.1);
 }
 
 /* Action Count Styling */
-.action-count {
+.church-detail-page .action-count {
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 6px;

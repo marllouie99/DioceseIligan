@@ -111,7 +111,7 @@
       <hr/>
       <div>
         <div class="section-title">Appointment Information</div>
-        <div class="row"><div class="label">Service</div><div class="value">{{ booking.service.name }}</div></div>
+        <div class="row"><div class="label">Service</div><div class="value">{{ booking.service.name }}{% if booking.service.category %} <span style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; background-color: {{ booking.service.category.color }}20; color: {{ booking.service.category.color }}; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; margin-left: 0.5rem; border: 1px solid {{ booking.service.category.color }}40;"><span>{{ booking.service.category.icon|default:"📁" }}</span><span>{{ booking.service.category.name }}</span></span>{% endif %}</div></div>
         <div class="row"><div class="label">Date & Time</div><div class="value">{{ booking.date|date:'l, F j, Y' }} • {% if booking.start_time and booking.end_time %}{{ booking.start_time|time:'g:i A' }} - {{ booking.end_time|time:'g:i A' }}{% else %}Time not specified{% endif %}</div></div>
         <div class="row"><div class="label">Notes</div><div class="value">{{ booking.notes|default:'No additional notes provided' }}</div></div>
       </div>

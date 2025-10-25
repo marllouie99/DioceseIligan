@@ -135,7 +135,10 @@
                     {{ b.payment_amount|default:'0' }},
                     '{{ b.get_payment_method_display|default:''|escapejs }}',
                     '{% if b.payment_date %}{{ b.payment_date|date:'M j, Y g:i A' }}{% endif %}',
-                    '{{ b.payment_transaction_id|default:''|escapejs }}'
+                    '{{ b.payment_transaction_id|default:''|escapejs }}',
+                    '{{ b.service.category.name|default:''|escapejs }}',
+                    '{{ b.service.category.icon|default:''|escapejs }}',
+                    '{{ b.service.category.color|default:'' }}'
                   )" title="View Summary">
                     <i data-feather="eye"></i>
                   </button>
@@ -235,6 +238,15 @@
           <tr>
             <td class="detail-label">Service Type:</td>
             <td class="detail-value" id="summary-service"></td>
+          </tr>
+          <tr id="summary-category-row" style="display: none;">
+            <td class="detail-label">Category:</td>
+            <td class="detail-value">
+              <span id="summary-category-badge" style="display: none; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; background-color: #3B82F620; color: #3B82F6; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; border: 1px solid #3B82F640;">
+                <span id="summary-category-icon">📁</span>
+                <span id="summary-category-name">Category</span>
+              </span>
+            </td>
           </tr>
           <tr>
             <td class="detail-label">Appointment Date:</td>

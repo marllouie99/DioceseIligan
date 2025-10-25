@@ -274,7 +274,10 @@ class FollowersManager {
     }
 
     closeFollowerActivity() {
-        this.modal.classList.remove('active');
+        const modal = document.getElementById('followerActivityModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
         document.body.style.overflow = '';
         
         // Clear all activity data
@@ -530,11 +533,253 @@ class FollowersManager {
     }
 
     viewFollowerProfile(userId) {
-        // For now, show a simple alert - could be enhanced to show profile modal
-        const follower = this.followers.find(f => f.userId === userId);
-        if (follower) {
-            alert(`Profile feature coming soon!\n\nFollower: ${follower.name}\nEmail: ${follower.email}\nJoined: ${new Date(follower.joined).toLocaleDateString()}`);
+        console.log('FollowersManager.viewFollowerProfile called with userId:', userId);
+        
+        if (!userId) {
+            console.error('No userId provided');
+            return;
         }
+        
+        // Get follower name from the table row
+        const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+        const followerName = row ? row.querySelector('.name').textContent : 'Follower';
+        
+        // Update modal title
+        const titleElement = document.getElementById('followerActivityTitle');
+        if (titleElement) {
+            titleElement.textContent = `${followerName}'s Activity`;
+        }
+        
+        // Show modal
+        const modal = document.getElementById('followerActivityModal');
+        
+        if (!modal) {
+            console.error('Modal not found!');
+            return;
+        }
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset to first tab
+        document.querySelectorAll('.activity-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.activity-panel').forEach(panel => panel.classList.remove('active'));
+        
+        const firstTab = document.querySelector('.activity-tab[data-tab="interactions"]');
+        const firstPanel = document.getElementById('interactions-tab');
+        
+        if (firstTab) firstTab.classList.add('active');
+        if (firstPanel) firstPanel.classList.add('active');
+        
+        // Load interactions data
+        this.loadFollowerInteractions(userId);
+        
+        // Setup tab switching
+        this.setupActivityTabs(userId);
+    }
+    
+    setupActivityTabs(userId) {
+        const tabs = document.querySelectorAll('.activity-tab');
+        tabs.forEach(tab => {
+            tab.onclick = () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Update active states
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.activity-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                
+                // Load data for the selected tab
+                switch(tabName) {
+                    case 'interactions':
+                        this.loadFollowerInteractions(userId);
+                        break;
+                    case 'appointments':
+                        this.loadFollowerAppointments(userId);
+                        break;
+                    case 'reviews':
+                        this.loadFollowerReviews(userId);
+                        break;
+                    case 'timeline':
+                        this.loadFollowerTimeline(userId);
+                        break;
+                }
+            };
+        });
+    }
+    
+    async loadFollowerInteractions(userId) {
+        const container = document.getElementById('interactionsList');
+        const loading = document.querySelector('#interactions-tab .activity-loading');
+        
+        loading.style.display = 'flex';
+        container.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/app/api/followers/${userId}/activity/interactions/`);
+            const result = await response.json();
+            
+            if (result.success && result.data && Array.isArray(result.data) && result.data.length > 0) {
+                container.innerHTML = result.data.map(item => `
+                    <div class="activity-item">
+                        <div class="activity-icon ${item.type || 'interaction'}">
+                            <i data-feather="${this.getActivityIcon(item.type || 'interaction')}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-text"><strong>${item.title || 'Activity'}</strong></p>
+                            <p class="activity-subtext">${item.description}</p>
+                            <span class="activity-time">${item.date}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Re-initialize feather icons
+                if (typeof feather !== 'undefined') feather.replace();
+            } else {
+                container.innerHTML = '<div class="empty-activity"><p>No interactions yet</p></div>';
+            }
+            
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading interactions:', error);
+            container.innerHTML = '<div class="empty-activity"><p>Failed to load interactions</p></div>';
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        }
+    }
+    
+    async loadFollowerAppointments(userId) {
+        const container = document.getElementById('appointmentsList');
+        const loading = document.querySelector('#appointments-tab .activity-loading');
+        
+        loading.style.display = 'flex';
+        container.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/app/api/followers/${userId}/activity/appointments/`);
+            const result = await response.json();
+            
+            if (result.success && result.data && Array.isArray(result.data) && result.data.length > 0) {
+                container.innerHTML = result.data.map(item => `
+                    <div class="activity-item">
+                        <div class="activity-icon appointment">
+                            <i data-feather="calendar"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-text"><strong>${item.title || 'Appointment'}</strong></p>
+                            <p class="activity-subtext">${item.description}</p>
+                            <span class="activity-time">${item.date}</span>
+                            <span class="status-badge status-${(item.status || '').toLowerCase().replace(' ', '-')}">${item.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                if (typeof feather !== 'undefined') feather.replace();
+            } else {
+                container.innerHTML = '<div class="empty-activity"><p>No appointments yet</p></div>';
+            }
+            
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading appointments:', error);
+            container.innerHTML = '<div class="empty-activity"><p>Failed to load appointments</p></div>';
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        }
+    }
+    
+    async loadFollowerReviews(userId) {
+        const container = document.getElementById('reviewsList');
+        const loading = document.querySelector('#reviews-tab .activity-loading');
+        
+        loading.style.display = 'flex';
+        container.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/app/api/followers/${userId}/activity/reviews/`);
+            const result = await response.json();
+            
+            if (result.success && result.data && Array.isArray(result.data) && result.data.length > 0) {
+                container.innerHTML = result.data.map(item => `
+                    <div class="activity-item">
+                        <div class="activity-icon review">
+                            <i data-feather="star"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="review-rating">${'★'.repeat(item.rating || 0)}${'☆'.repeat(5-(item.rating || 0))}</div>
+                            <p class="activity-text"><strong>${item.title || 'Review'}</strong></p>
+                            <p class="activity-subtext">${item.description}</p>
+                            <span class="activity-time">${item.date}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                if (typeof feather !== 'undefined') feather.replace();
+            } else {
+                container.innerHTML = '<div class="empty-activity"><p>No reviews yet</p></div>';
+            }
+            
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading reviews:', error);
+            container.innerHTML = '<div class="empty-activity"><p>Failed to load reviews</p></div>';
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        }
+    }
+    
+    async loadFollowerTimeline(userId) {
+        const container = document.getElementById('timelineList');
+        const loading = document.querySelector('#timeline-tab .activity-loading');
+        
+        loading.style.display = 'flex';
+        container.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/app/api/followers/${userId}/activity/timeline/`);
+            const result = await response.json();
+            
+            if (result.success && result.data && Array.isArray(result.data) && result.data.length > 0) {
+                container.innerHTML = result.data.map(item => `
+                    <div class="activity-item timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="activity-details">
+                            <p class="activity-text"><strong>${item.title || 'Activity'}</strong></p>
+                            <p class="activity-subtext">${item.description}</p>
+                            <span class="activity-time">${item.date}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="empty-activity"><p>No activity yet</p></div>';
+            }
+            
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading timeline:', error);
+            container.innerHTML = '<div class="empty-activity"><p>Failed to load timeline</p></div>';
+            loading.style.display = 'none';
+            container.style.display = 'block';
+        }
+    }
+    
+    getActivityIcon(type) {
+        const icons = {
+            'like': 'heart',
+            'comment': 'message-circle',
+            'bookmark': 'bookmark',
+            'view': 'eye',
+            'share': 'share-2'
+        };
+        return icons[type] || 'activity';
     }
 }
 

@@ -422,6 +422,21 @@ class BookingModal {
       this.elements.serviceName.textContent = this.serviceData.name;
     }
     
+    // Update left panel - Category badge
+    const categoryBadge = this.modal.querySelector('#modalServiceCategory');
+    const categoryIcon = this.modal.querySelector('#modalCategoryIcon');
+    const categoryName = this.modal.querySelector('#modalCategoryName');
+    if (categoryBadge && this.serviceData.category) {
+      categoryBadge.style.display = 'inline-flex';
+      categoryBadge.style.backgroundColor = this.serviceData.category.color + '20';
+      categoryBadge.style.color = this.serviceData.category.color;
+      categoryBadge.style.borderColor = this.serviceData.category.color + '40';
+      if (categoryIcon) categoryIcon.textContent = this.serviceData.category.icon || '📁';
+      if (categoryName) categoryName.textContent = this.serviceData.category.name;
+    } else if (categoryBadge) {
+      categoryBadge.style.display = 'none';
+    }
+    
     // Update left panel - Church name with location
     if (this.elements.churchName) {
       const churchNameSpan = this.elements.churchName.querySelector('span');

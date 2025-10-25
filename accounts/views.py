@@ -519,6 +519,65 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         total_donated=Sum('amount'),
         donation_count=Count('id')
     )
+    
+    # Calculate analytics data
+    from core.models import Booking, ChurchFollow, PostLike, PostComment
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    # Date ranges
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+    
+    # Total bookings
+    total_bookings = Booking.objects.filter(user=request.user).count()
+    total_bookings_month = Booking.objects.filter(user=request.user, created_at__gte=month_ago).count()
+    total_bookings_week = Booking.objects.filter(user=request.user, created_at__gte=week_ago).count()
+    total_bookings_today = Booking.objects.filter(user=request.user, created_at__date=today).count()
+    
+    # Total parishes followed
+    total_parishes_followed = ChurchFollow.objects.filter(user=request.user).count()
+    total_parishes_followed_month = ChurchFollow.objects.filter(user=request.user, followed_at__gte=month_ago).count()
+    total_parishes_followed_week = ChurchFollow.objects.filter(user=request.user, followed_at__gte=week_ago).count()
+    total_parishes_followed_today = ChurchFollow.objects.filter(user=request.user, followed_at__date=today).count()
+    
+    # Total post engagement (likes + comments)
+    total_likes = PostLike.objects.filter(user=request.user).count()
+    total_comments = PostComment.objects.filter(user=request.user).count()
+    total_post_engagement = total_likes + total_comments
+    
+    # Period-specific engagement
+    likes_month = PostLike.objects.filter(user=request.user, created_at__gte=month_ago).count()
+    comments_month = PostComment.objects.filter(user=request.user, created_at__gte=month_ago).count()
+    total_post_engagement_month = likes_month + comments_month
+    
+    likes_week = PostLike.objects.filter(user=request.user, created_at__gte=week_ago).count()
+    comments_week = PostComment.objects.filter(user=request.user, created_at__gte=week_ago).count()
+    total_post_engagement_week = likes_week + comments_week
+    
+    likes_today = PostLike.objects.filter(user=request.user, created_at__date=today).count()
+    comments_today = PostComment.objects.filter(user=request.user, created_at__date=today).count()
+    total_post_engagement_today = likes_today + comments_today
+    
+    # Donations by period
+    total_donated_month = Donation.objects.filter(
+        donor=request.user,
+        payment_status='completed',
+        created_at__gte=month_ago
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    total_donated_week = Donation.objects.filter(
+        donor=request.user,
+        payment_status='completed',
+        created_at__gte=week_ago
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    total_donated_today = Donation.objects.filter(
+        donor=request.user,
+        payment_status='completed',
+        created_at__date=today
+    ).aggregate(total=Sum('amount'))['total'] or 0
 
     context = {
         'form': form,
@@ -540,6 +599,25 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         'user_donations': user_donations,
         'total_donated': donation_stats['total_donated'] or 0,
         'donation_count': donation_stats['donation_count'] or 0,
+        # Analytics data - All time
+        'total_bookings': total_bookings,
+        'total_parishes_followed': total_parishes_followed,
+        'total_post_engagement': total_post_engagement,
+        # Analytics data - This month
+        'total_bookings_month': total_bookings_month,
+        'total_donated_month': total_donated_month,
+        'total_parishes_followed_month': total_parishes_followed_month,
+        'total_post_engagement_month': total_post_engagement_month,
+        # Analytics data - This week
+        'total_bookings_week': total_bookings_week,
+        'total_donated_week': total_donated_week,
+        'total_parishes_followed_week': total_parishes_followed_week,
+        'total_post_engagement_week': total_post_engagement_week,
+        # Analytics data - Today
+        'total_bookings_today': total_bookings_today,
+        'total_donated_today': total_donated_today,
+        'total_parishes_followed_today': total_parishes_followed_today,
+        'total_post_engagement_today': total_post_engagement_today,
         'is_admin_mode': bool(request.session.get('super_admin_mode', False)) if getattr(request.user, 'is_superuser', False) else False,
     }
     return render(request, 'manage_profile.html', context)
