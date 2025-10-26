@@ -1425,10 +1425,27 @@ input[style*="background"] {
   margin: 0 0 12px 0;
 }
 
+.church-location-link {
+  text-decoration: none;
+  color: var(--muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.church-location-link:hover {
+  color: var(--primary);
+  transform: translateX(2px);
+}
+
+.church-location-link:hover .location-icon {
+  stroke: var(--primary);
+}
+
 .location-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  transition: stroke 0.2s ease;
 }
 
 .church-description {

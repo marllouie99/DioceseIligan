@@ -1,0 +1,126 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Help Center - Diocese of Iligan</title>
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/pages/resource-page.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body>
+  <div class="resource-page">
+    <!-- Header -->
+    <header class="resource-header">
+      <div class="header-container">
+        <a href="{% url 'landing' %}" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="logo">
+          <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan">
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="resource-content">
+      <div class="content-container">
+        <h1 class="page-title">Help Center</h1>
+        
+        <section class="content-section">
+          <h2>Getting Started</h2>
+          <div class="help-item">
+            <h3>How do I create an account?</h3>
+            <p>Click on the "Sign Up" tab on the landing page, fill in your details including your full name, email, and password. You'll receive a verification code via email to complete your registration.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I sign in?</h3>
+            <p>Use the "Sign In" tab on the landing page and enter your email and password. You can also use the "Login with Code" option for passwordless authentication.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>For Parishioners</h2>
+          <div class="help-item">
+            <h3>How do I discover parishes?</h3>
+            <p>Navigate to the "Discover Parishes" section from the landing page or dashboard. You can browse parishes in Iligan City and view their details, location, and activities.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I book a service?</h3>
+            <p>Visit a parish page, navigate to the "Services" section, select the service you need (baptism, wedding, confession, etc.), choose an available time slot, and complete the booking form.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I make a donation?</h3>
+            <p>You can donate goods or money to parishes through posts marked as "Fundraiser" or directly on a parish's page. Money donations are processed securely through PayPal or Stripe. The platform helps coordinate, track, and distribute donations for parish-led outreach programs.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I follow a parish?</h3>
+            <p>Visit the parish page and click the "Follow" button. You'll receive updates about their posts, events, and activities in your feed.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>For Parish Administrators</h2>
+          <div class="help-item">
+            <h3>How do I create a parish?</h3>
+            <p>Click on "Create Church" from the landing page or dashboard. Fill in the required information including parish name, description, location, and contact details.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I manage bookings?</h3>
+            <p>Access the "Bookings" section from your parish management dashboard. You can view, approve, reschedule, or cancel bookings as needed.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I create posts and bulletins?</h3>
+            <p>From your parish dashboard, navigate to "Posts" and click "Create Post". You can create general posts, digital bulletins, announcements, sermon summaries, events, or fundraiser posts with donation goals. This built-in feature provides a centralized alternative to third-party social media platforms.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I add staff members?</h3>
+            <p>Go to your parish settings, navigate to "Team Management", and add staff members by their email. You can assign roles such as Manager or Staff.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I set up payment for donations?</h3>
+            <p>In your parish settings, navigate to "Payment Information" and add your PayPal email address. This enables donation features on your posts.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Account & Security</h2>
+          <div class="help-item">
+            <h3>How do I reset my password?</h3>
+            <p>Click "Forgot Password?" on the sign-in page, enter your email, and follow the instructions sent to your email to reset your password.</p>
+          </div>
+          <div class="help-item">
+            <h3>How do I update my profile?</h3>
+            <p>Navigate to your profile page from the dashboard and click "Edit Profile". You can update your personal information, profile picture, and bio.</p>
+          </div>
+          <div class="help-item">
+            <h3>Is my data secure?</h3>
+            <p>Yes, we implement robust security measures including email verification, IP tracking, rate limiting, and secure payment processing to protect your data.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Need More Help?</h2>
+          <p>If you can't find the answer you're looking for, please contact our support team at <a href="mailto:support@dioceseofiligan.com">support@dioceseofiligan.com</a>. We're here to help!</p>
+          <p><strong>Note:</strong> This platform is a research project from St. Michael's College of Iligan City. Technical support after deployment may be limited.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="resource-footer">
+      <div class="footer-container">
+        <p>&copy; 2025 Diocese of Iligan. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="{% url 'about_us' %}">About Us</a>
+          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+          <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

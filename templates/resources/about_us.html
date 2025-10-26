@@ -1,0 +1,88 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us - Diocese of Iligan</title>
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/pages/resource-page.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body>
+  <div class="resource-page">
+    <!-- Header -->
+    <header class="resource-header">
+      <div class="header-container">
+        <a href="{% url 'landing' %}" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="logo">
+          <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan">
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="resource-content">
+      <div class="content-container">
+        <h1 class="page-title">About Us</h1>
+        
+        <section class="content-section">
+          <h2>Our Mission</h2>
+          <p>Diocese of Iligan is a comprehensive web-based platform designed to streamline parish administration and enhance community engagement for Roman Catholic parishes in Iligan City, Philippines. We are dedicated to building stronger spiritual connections through technology and faith, addressing the operational challenges faced by parish administrators in managing donations, service bookings, event coordination, and community communication.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>What We Do</h2>
+          <p>Our platform provides an integrated digital solution specifically designed for parishes in Iligan City to efficiently manage:</p>
+          <ul>
+            <li><strong>Donations Management:</strong> Centralized platform to coordinate, track, and distribute goods and money donations for parish-led outreach programs with secure payment processing through PayPal and Stripe</li>
+            <li><strong>Service Bookings:</strong> Sophisticated booking system for sacramental services including baptism, weddings, and confessions with intelligent scheduling and conflict detection to minimize scheduling conflicts</li>
+            <li><strong>Event Reservations:</strong> Efficient event management tools that enable parish staff to schedule, organize, and manage activities while optimizing parish resources</li>
+            <li><strong>Digital Bulletins:</strong> Built-in posting feature for sharing bulletins, announcements, and sermon summaries directly with members, providing a centralized alternative to third-party social media platforms</li>
+            <li><strong>Community Engagement:</strong> Social features including posts, comments, and real-time notifications to keep parishioners well-informed and connected</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Our Technology</h2>
+          <p>Built using Django 5.2.6 framework with PostgreSQL database and cloud-based storage, our system incorporates:</p>
+          <ul>
+            <li>Philippine-specific address structures (region, province, city/municipality, barangay)</li>
+            <li>Robust security measures including email verification, IP tracking, and rate limiting</li>
+            <li>Role-based access controls (owner, manager, staff)</li>
+            <li>Parish verification workflows and review systems</li>
+            <li>Comprehensive analytics dashboards and reporting tools</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Research Team</h2>
+          <p>This platform is developed by researchers from <strong>St. Michael's College of Iligan City</strong> as part of a comprehensive research study conducted in Iligan City, Philippines. The research demonstrates how modern web technologies can enhance transparency in charitable activities, improve parish-community communication, and allow parish staff to focus on their pastoral mission while efficiently managing administrative operations.</p>
+          <p>The study addresses key problems identified in parishes across Iligan City, including the lack of centralized donation management systems, reliance on third-party social media for communication, and inefficient manual event reservation methods.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Our Vision</h2>
+          <p>We envision a future where technology serves as a bridge between parishes and their communities in Iligan City, making it easier for parishioners to connect with their faith, participate in church activities, and support their local parishes. Through the Diocese of Iligan platform, we aim to empower parishes to better serve their communities while ensuring transparency, efficiency, and enhanced communication in the digital age.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="resource-footer">
+      <div class="footer-container">
+        <p>&copy; 2025 Diocese of Iligan. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+          <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+          <a href="{% url 'help_center' %}">Help Center</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

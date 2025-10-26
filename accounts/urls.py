@@ -30,4 +30,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.manage_profile, name='manage_profile'),
     path('logout/', views.logout_view, name='app_logout'),
+    # Resource Pages
+    path('about-us/', views.about_us, name='about_us'),
+    path('help-center/', views.help_center, name='help_center'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
+    path('terms-of-service/', views.terms_of_service, name='terms_of_service'),
 ]

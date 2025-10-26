@@ -1,0 +1,190 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terms of Service - Diocese of Iligan</title>
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/pages/resource-page.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body>
+  <div class="resource-page">
+    <!-- Header -->
+    <header class="resource-header">
+      <div class="header-container">
+        <a href="{% url 'landing' %}" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="logo">
+          <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan">
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="resource-content">
+      <div class="content-container">
+        <h1 class="page-title">Terms of Service</h1>
+        <p class="last-updated">Last Updated: January 2025</p>
+        
+        <section class="content-section">
+          <h2>1. Acceptance of Terms</h2>
+          <p>By accessing and using Diocese of Iligan platform, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>2. Description of Service</h2>
+          <p>Diocese of Iligan is a web-based platform designed to streamline parish administration and enhance community engagement for Roman Catholic parishes in Iligan City, Philippines. Our services include:</p>
+          <ul>
+            <li>Parish profile management and discovery</li>
+            <li>Service booking system (baptism, weddings, confessions, etc.) with intelligent scheduling and conflict detection</li>
+            <li>Donation management for goods and money with secure payment processing</li>
+            <li>Coordination, tracking, and distribution of donations for parish-led outreach programs</li>
+            <li>Event reservation and coordination tools</li>
+            <li>Digital bulletins, announcements, and sermon summaries</li>
+            <li>Community engagement features (posts, comments, notifications)</li>
+            <li>Analytics dashboards and reporting tools for parish operations</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>3. User Accounts</h2>
+          <h3>Registration</h3>
+          <p>To use certain features of our platform, you must register for an account. You agree to:</p>
+          <ul>
+            <li>Provide accurate and complete information</li>
+            <li>Maintain the security of your password</li>
+            <li>Notify us immediately of any unauthorized use</li>
+            <li>Be responsible for all activities under your account</li>
+          </ul>
+          
+          <h3>Account Termination</h3>
+          <p>We reserve the right to suspend or terminate your account if you violate these Terms of Service or engage in fraudulent or illegal activities.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>4. User Conduct</h2>
+          <p>You agree not to:</p>
+          <ul>
+            <li>Use the platform for any illegal or unauthorized purpose</li>
+            <li>Post false, misleading, or offensive content</li>
+            <li>Harass, abuse, or harm other users</li>
+            <li>Impersonate any person or entity</li>
+            <li>Interfere with the platform's operation or security</li>
+            <li>Collect or store personal data of other users</li>
+            <li>Use automated systems to access the platform</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>5. Parish Administration</h2>
+          <h3>Parish Verification</h3>
+          <p>Parishes in Iligan City may apply for verification to establish authenticity. Verified status does not constitute endorsement by Diocese of Iligan.</p>
+          
+          <h3>Parish Responsibilities</h3>
+          <p>Parish administrators agree to:</p>
+          <ul>
+            <li>Provide accurate information about their parish</li>
+            <li>Manage bookings and donations responsibly</li>
+            <li>Respond to parishioner inquiries in a timely manner</li>
+            <li>Comply with all applicable laws and regulations</li>
+            <li>Use donation funds for stated purposes</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>6. Payments and Donations</h2>
+          <h3>Payment Processing</h3>
+          <p>Payments are processed through third-party providers (PayPal, Stripe). You agree to comply with their terms of service.</p>
+          
+          <h3>Donations</h3>
+          <p>Donations (goods and money) made through the platform are:</p>
+          <ul>
+            <li>Voluntary and non-refundable</li>
+            <li>Sent directly to the designated parish for parish-led outreach programs</li>
+            <li>Subject to the parish's stated purpose and goals</li>
+            <li>Tracked and coordinated through the platform for transparency</li>
+          </ul>
+          
+          <h3>Service Fees</h3>
+          <p>Diocese of Iligan does not charge service fees for donations. Payment processing fees may apply as determined by the payment provider (PayPal or Stripe).</p>
+        </section>
+
+        <section class="content-section">
+          <h2>7. Content and Intellectual Property</h2>
+          <h3>User Content</h3>
+          <p>You retain ownership of content you post, including bulletins, announcements, and sermon summaries. By posting content, you grant Diocese of Iligan a non-exclusive license to use, display, and distribute your content on the platform.</p>
+          
+          <h3>Platform Content</h3>
+          <p>All platform content, design, and functionality are owned by Diocese of Iligan and protected by copyright and other intellectual property laws.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>8. Privacy</h2>
+          <p>Your use of the platform is also governed by our <a href="{% url 'privacy_policy' %}">Privacy Policy</a>. Please review it to understand how we collect and use your information.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>9. Disclaimers and Limitations</h2>
+          <h3>Service Availability</h3>
+          <p>The platform is provided "as is" without warranties of any kind. We do not guarantee:</p>
+          <ul>
+            <li>Uninterrupted or error-free service</li>
+            <li>Accuracy or reliability of content</li>
+            <li>Specific results from using the platform</li>
+          </ul>
+          
+          <h3>Limitation of Liability</h3>
+          <p>Diocese of Iligan shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the platform.</p>
+          
+          <h3>Research Project</h3>
+          <p>This platform is developed as a research project by researchers from St. Michael's College of Iligan City. The study is conducted in Iligan City, Philippines to address operational challenges faced by parish administrators. Technical support after deployment may be limited. The system relies on a stable internet connection and does not include advanced data protection features beyond basic security measures.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>10. Indemnification</h2>
+          <p>You agree to indemnify and hold harmless Diocese of Iligan and St. Michael's College of Iligan City from any claims, damages, or expenses arising from your use of the platform or violation of these Terms.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>11. Changes to Terms</h2>
+          <p>We reserve the right to modify these Terms of Service at any time. We will notify users of significant changes. Continued use of the platform after changes constitutes acceptance of the new terms.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>12. Governing Law</h2>
+          <p>These Terms shall be governed by the laws of the Republic of the Philippines. Any disputes shall be resolved in the courts of Iligan City, Philippines.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>13. Contact Information</h2>
+          <p>For questions about these Terms of Service, please contact us at:</p>
+          <p>Email: <a href="mailto:support@dioceseofiligan.com">support@dioceseofiligan.com</a></p>
+          <p><strong>Research Institution:</strong> St. Michael's College of Iligan City</p>
+        </section>
+
+        <section class="content-section">
+          <h2>14. Severability</h2>
+          <p>If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="resource-footer">
+      <div class="footer-container">
+        <p>&copy; 2025 Diocese of Iligan. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="{% url 'about_us' %}">About Us</a>
+          <a href="{% url 'help_center' %}">Help Center</a>
+          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

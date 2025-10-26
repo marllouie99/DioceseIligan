@@ -1,0 +1,157 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy - Diocese of Iligan</title>
+  <link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/pages/resource-page.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body>
+  <div class="resource-page">
+    <!-- Header -->
+    <header class="resource-header">
+      <div class="header-container">
+        <a href="{% url 'landing' %}" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="logo">
+          <img src="{% static 'images/diocese_of_Iligan.png' %}" alt="Diocese of Iligan">
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="resource-content">
+      <div class="content-container">
+        <h1 class="page-title">Privacy Policy</h1>
+        <p class="last-updated">Last Updated: January 2025</p>
+        
+        <section class="content-section">
+          <h2>1. Introduction</h2>
+          <p>Welcome to Diocese of Iligan. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform designed for Roman Catholic parishes in Iligan City, Philippines.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>2. Information We Collect</h2>
+          <h3>Personal Information</h3>
+          <p>We collect personal information that you voluntarily provide to us when you:</p>
+          <ul>
+            <li>Register for an account (name, email address, password)</li>
+            <li>Create or manage a parish profile</li>
+            <li>Book services or make donations</li>
+            <li>Post content or interact with other users</li>
+            <li>Contact us for support</li>
+          </ul>
+          
+          <h3>Automatically Collected Information</h3>
+          <p>When you use our platform, we automatically collect certain information, including:</p>
+          <ul>
+            <li>IP address and device information</li>
+            <li>Browser type and version</li>
+            <li>Usage data and activity logs</li>
+            <li>Cookies and similar tracking technologies</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>3. How We Use Your Information</h2>
+          <p>We use the information we collect to:</p>
+          <ul>
+            <li>Provide, maintain, and improve our services for parishes in Iligan City</li>
+            <li>Process your service bookings and donations (goods and money)</li>
+            <li>Coordinate, track, and distribute donations for parish-led outreach programs</li>
+            <li>Send you digital bulletins, announcements, sermon summaries, and notifications</li>
+            <li>Manage event reservations and parish activities</li>
+            <li>Respond to your inquiries and provide customer support</li>
+            <li>Detect and prevent fraud and security issues</li>
+            <li>Generate reports to support effective parish operations</li>
+            <li>Comply with legal obligations</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>4. Information Sharing and Disclosure</h2>
+          <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
+          <ul>
+            <li><strong>With Parish Administrators:</strong> When you book services or make donations, relevant information is shared with the parish</li>
+            <li><strong>With Service Providers:</strong> We use third-party services like PayPal and Stripe for payment processing</li>
+            <li><strong>For Legal Reasons:</strong> When required by law or to protect our rights and safety</li>
+            <li><strong>With Your Consent:</strong> When you explicitly agree to share your information</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>5. Data Security</h2>
+          <p>We implement robust security measures to protect your information, including:</p>
+          <ul>
+            <li>Email verification for account creation</li>
+            <li>Secure password hashing</li>
+            <li>IP tracking and rate limiting</li>
+            <li>Secure payment processing through trusted providers</li>
+            <li>Regular security audits and updates</li>
+          </ul>
+          <p>However, no method of transmission over the internet is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>6. Your Privacy Rights</h2>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access and review your personal information</li>
+            <li>Update or correct your information</li>
+            <li>Delete your account and associated data</li>
+            <li>Opt-out of marketing communications</li>
+            <li>Request a copy of your data</li>
+          </ul>
+          <p>To exercise these rights, please contact us at <a href="mailto:support@churchconnect.com">support@churchconnect.com</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>7. Cookies and Tracking</h2>
+          <p>We use cookies and similar tracking technologies to enhance your experience. You can control cookie settings through your browser preferences. However, disabling cookies may limit certain features of our platform.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>8. Data Retention</h2>
+          <p>We retain your personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>9. Children's Privacy</h2>
+          <p>Our platform is not intended for children under 13 years of age. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>10. Changes to This Privacy Policy</h2>
+          <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>11. Contact Us</h2>
+          <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+          <p>Email: <a href="mailto:support@dioceseofiligan.com">support@dioceseofiligan.com</a></p>
+          <p><strong>Research Institution:</strong> St. Michael's College of Iligan City</p>
+          <p><strong>Note:</strong> This platform is a research project. Technical support after deployment may be limited.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="resource-footer">
+      <div class="footer-container">
+        <p>&copy; 2025 Diocese of Iligan. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="{% url 'about_us' %}">About Us</a>
+          <a href="{% url 'help_center' %}">Help Center</a>
+          <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

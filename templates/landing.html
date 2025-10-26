@@ -56,7 +56,7 @@
             <div class="stats-bar">
               <div class="stat-item">
                 <span class="stat-number">{{ total_churches|default:"0" }}</span>
-                <p class="stat-label">Active Churches</p>
+                <p class="stat-label">Active Parishes</p>
               </div>
               <div class="stat-item">
                 <span class="stat-number">{{ total_users|default:"0" }}</span>
@@ -281,7 +281,7 @@
   <div class="churches-section">
       <div class="churches-container">
         <div class="churches-header">
-          <h2 class="churches-title">Discover Churches</h2>
+          <h2 class="churches-title">Discover Parishes</h2>
           <p class="churches-subtitle">Connect with faith communities in your area</p>
         </div>
 
@@ -310,13 +310,27 @@
             </div>
             <div class="church-card-content">
               <h3 class="church-name">{{ church.name }}</h3>
+              {% if church.street_address %}
+              <a href="https://www.google.com/maps/search/?api=1&query={{ church.street_address|urlencode }}" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="church-location church-location-link"
+                 title="Open in Google Maps">
+                <svg class="location-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                {{ church.street_address }}
+              </a>
+              {% else %}
               <p class="church-location">
                 <svg class="location-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.5"/>
                   <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/>
                 </svg>
-                {{ church.city|default:"Location not set" }}
+                Location not set
               </p>
+              {% endif %}
               {% if church.description %}
               <p class="church-description">{{ church.description|truncatewords:15 }}</p>
               {% endif %}
@@ -345,7 +359,7 @@
         </div>
         {% else %}
         <div class="churches-empty">
-          <p>No churches available at the moment. Check back soon!</p>
+          <p>No parishes available at the moment. Check back soon!</p>
         </div>
         {% endif %}
       </div>
@@ -368,7 +382,7 @@
         <div class="footer-section">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="{% url 'core:discover' %}">Discover Churches</a></li>
+            <li><a href="{% url 'core:discover' %}">Discover Parishes</a></li>
             <li><a href="{% url 'landing' %}">Sign In</a></li>
             <li><a href="{% url 'landing' %}?tab=signup">Sign Up</a></li>
             <li><a href="{% url 'core:create_church' %}">Create Church</a></li>
@@ -379,10 +393,10 @@
         <div class="footer-section">
           <h4 class="footer-heading">Resources</h4>
           <ul class="footer-links">
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
+            <li><a href="{% url 'about_us' %}">About Us</a></li>
+            <li><a href="{% url 'help_center' %}">Help Center</a></li>
+            <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'terms_of_service' %}">Terms of Service</a></li>
           </ul>
         </div>
 
@@ -390,7 +404,7 @@
         <div class="footer-section">
           <h4 class="footer-heading">Connect With Us</h4>
           <ul class="footer-links">
-            <li><a href="mailto:support@churchconnect.com">support@churchconnect.com</a></li>
+            <li><a href="mailto:support@dioceseofiligan.com">support@dioceseofiligan.com</a></li>
             <li><a href="#">Community Forum</a></li>
             <li><a href="#">Facebook</a></li>
             <li><a href="#">Twitter</a></li>

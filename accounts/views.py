@@ -1439,3 +1439,24 @@ def server_time(request):
         return JsonResponse({
             'error': str(e)
         }, status=500)
+
+
+# Resource Pages
+def about_us(request: HttpRequest) -> HttpResponse:
+    """About Us page"""
+    return render(request, 'resources/about_us.html')
+
+
+def help_center(request: HttpRequest) -> HttpResponse:
+    """Help Center page"""
+    return render(request, 'resources/help_center.html')
+
+
+def privacy_policy(request: HttpRequest) -> HttpResponse:
+    """Privacy Policy page"""
+    return render(request, 'resources/privacy_policy.html')
+
+
+def terms_of_service(request: HttpRequest) -> HttpResponse:
+    """Terms of Service page"""
+    return render(request, 'resources/terms_of_service.html')
