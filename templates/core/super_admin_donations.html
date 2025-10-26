@@ -1,0 +1,629 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+{% load dict_extras %}
+
+{% block title %}Donation Rankings • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/forms.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/super_admin_stat_cards.css' %}?v={{ STATIC_VERSION }}">
+<style>
+/* Container */
+.donations-container {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Rank Distribution Cards */
+.rank-distribution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Charts Grid - 2 columns */
+.charts-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.chart-header {
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.25rem 0;
+}
+
+.chart-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.rank-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-left: 4px solid;
+  transition: transform 0.2s;
+}
+
+.rank-card:hover {
+  transform: translateY(-2px);
+}
+
+.rank-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.rank-card-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.rank-card-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.rank-card-amount {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Filters */
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-select,
+.filter-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+/* Donors Table */
+.donors-table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.donors-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.donors-table thead {
+  background: #f9fafb;
+}
+
+.donors-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.donors-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.donor-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.donor-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.donor-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.donor-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.donor-email {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.rank-badge-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #059669;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="donations-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">Donation Rankings</h1>
+    <p class="page-description">View and manage donor rankings across the platform</p>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Donors</div>
+        <div class="stat-card-value">{{ total_donors }}</div>
+        <div class="stat-card-subtitle">Active contributors</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Total Donations</div>
+        <div class="stat-card-value">₱{{ total_donations_amount|floatformat:2 }}</div>
+        <div class="stat-card-subtitle">All-time contributions</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-card-content">
+        <div class="stat-card-title">Average Donation</div>
+        <div class="stat-card-value">
+          {% if total_donors > 0 %}
+            ₱{{ total_donations_amount|floatformat:2|add:"0"|floatformat:0|default:"0" }}
+          {% else %}
+            ₱0
+          {% endif %}
+        </div>
+        <div class="stat-card-subtitle">Per donor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rank Distribution -->
+  <h2 style="margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">Rank Distribution</h2>
+  <div class="rank-distribution-grid">
+    {% for tier in rank_tiers %}
+      <div class="rank-card" style="border-left-color: {{ tier.color }};">
+        <div class="rank-card-header">
+          <span class="rank-card-name" style="color: {{ tier.color }};">{{ tier.name }}</span>
+        </div>
+        <div class="rank-card-count">{{ rank_distribution|get_item:tier.icon|get_item:'count'|default:0 }}</div>
+        <div class="rank-card-amount">₱{{ rank_distribution|get_item:tier.icon|get_item:'total_amount'|floatformat:2|default:"0.00" }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Visual Charts -->
+  <div class="charts-grid-2col">
+    <!-- Rank Distribution Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Donor Rank Distribution</h3>
+        <p class="chart-subtitle">Breakdown of donors by rank tier</p>
+      </div>
+      <div class="chart-container">
+        <canvas id="rankDistributionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Top Donors Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Top 10 Donors</h3>
+        <p class="chart-subtitle">Highest contributing donors</p>
+      </div>
+      <div class="chart-container">
+        <canvas id="topDonorsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Donors Table -->
+  <div class="donors-table-container">
+    <!-- Filters -->
+    <div class="filters-section" style="background: transparent; padding: 0; margin-bottom: 1.5rem; box-shadow: none;">
+      <form method="get" action="{% url 'core:super_admin_donations' %}" style="display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 1rem; align-items: end;">
+        <div class="filter-group">
+          <label class="filter-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">• Search Donor</label>
+          <input type="text" name="search" class="filter-input" placeholder="Name or email..." value="{{ search_query }}" style="width: 100%;">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">• Rank Filter</label>
+          <select name="rank" class="filter-select" style="min-width: 150px;">
+            <option value="all" {% if rank_filter == 'all' %}selected{% endif %}>All Ranks</option>
+            {% for tier in rank_tiers %}
+              <option value="{{ tier.icon }}" {% if rank_filter == tier.icon %}selected{% endif %}>{{ tier.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">• Time Period</label>
+          <select name="time" class="filter-select" style="min-width: 140px;">
+            <option value="all" {% if time_filter == 'all' %}selected{% endif %}>All Time</option>
+            <option value="30days" {% if time_filter == '30days' %}selected{% endif %}>Last 30 Days</option>
+            <option value="90days" {% if time_filter == '90days' %}selected{% endif %}>Last 90 Days</option>
+            <option value="year" {% if time_filter == 'year' %}selected{% endif %}>Last Year</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">• Sort By</label>
+          <select name="sort" class="filter-select" style="min-width: 160px;">
+            <option value="amount" {% if sort_by == 'amount' %}selected{% endif %}>Donation Amount</option>
+            <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Recent Activity</option>
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+
+    <h2 style="margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">All Donors ({{ donor_data|length }})</h2>
+    
+    {% if donor_data %}
+      <table class="donors-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Donor</th>
+            <th>Rank</th>
+            <th>Total Donated</th>
+            <th>Donations Count</th>
+            <th>Visibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in donor_data %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                <div class="donor-info">
+                  <div class="donor-avatar">{{ data.display_name|first|upper }}</div>
+                  <div class="donor-details">
+                    <span class="donor-name">{{ data.display_name }}</span>
+                    <span class="donor-email">{{ data.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="rank-badge-cell">
+                  {% if data.rank %}
+                    <span class="donation-rank-badge" style="background: {{ data.rank.color }}22; color: {{ data.rank.color }}; border: 1px solid {{ data.rank.color }}44;">
+                      {{ data.rank.name }}
+                    </span>
+                  {% else %}
+                    <span style="color: #9ca3af;">No Rank</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="amount-cell">₱{{ data.total_donated|floatformat:2 }}</td>
+              <td>{{ data.donation_count }}</td>
+              <td>
+                {% if data.show_rank %}
+                  <span style="color: #059669;">✓ Public</span>
+                {% else %}
+                  <span class="privacy-badge">🔒 Private</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <p>No donors found matching your filters</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Auto-submit form on filter change
+document.querySelectorAll('.filter-select').forEach(select => {
+  select.addEventListener('change', function() {
+    this.form.submit();
+  });
+});
+
+// Chart.js initialization
+document.addEventListener('DOMContentLoaded', function() {
+  // Rank Distribution Pie Chart
+  const rankDistCtx = document.getElementById('rankDistributionChart');
+  if (rankDistCtx) {
+    const rankData = {{ rank_distribution_json|safe }};
+    const rankTiers = {{ rank_tiers_json|safe }};
+    
+    const labels = [];
+    const data = [];
+    const colors = [];
+    
+    rankTiers.forEach(tier => {
+      const tierData = rankData[tier.icon];
+      if (tierData && tierData.count > 0) {
+        labels.push(tier.name);
+        data.push(tierData.count);
+        colors.push(tier.color);
+      }
+    });
+    
+    new Chart(rankDistCtx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 12,
+                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return label + ': ' + value + ' donors (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Top 10 Donors Bar Chart
+  const topDonorsCtx = document.getElementById('topDonorsChart');
+  if (topDonorsCtx) {
+    const donorData = {{ donor_data_json|safe }};
+    
+    // Get top 10 donors
+    const top10 = donorData.slice(0, 10);
+    const labels = top10.map(d => d.display_name);
+    const amounts = top10.map(d => parseFloat(d.total_donated));
+    const rankColors = top10.map(d => d.rank ? d.rank.color : '#9ca3af');
+    
+    new Chart(topDonorsCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Total Donated',
+          data: amounts,
+          backgroundColor: rankColors.map(c => c + '33'),
+          borderColor: rankColors,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return '₱' + context.parsed.x.toLocaleString('en-PH', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '₱' + value.toLocaleString('en-PH');
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          y: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'partials/sidebar.html' %}
+{% endblock %}
+
+{% block topbar %}
+  {% include 'partials/topbar.html' %}
+{% endblock %}

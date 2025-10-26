@@ -4614,9 +4614,13 @@ def get_post_comments(request, post_id):
             parent__isnull=True
         ).select_related('user', 'user__profile').order_by('created_at')
         
+        # Import donation rank utility
+        from accounts.donation_utils import get_user_donation_rank
+        
         comments_data = []
         for comment in comments:
             user_display_name, user_initial = get_user_display_data(comment.user, getattr(comment.user, 'profile', None))
+            user_rank = get_user_donation_rank(comment.user)
             
             # Get replies for this comment
             replies = comment.replies.filter(is_active=True).select_related('user', 'user__profile').order_by('created_at')
@@ -4624,6 +4628,7 @@ def get_post_comments(request, post_id):
             
             for reply in replies:
                 reply_user_display_name, reply_user_initial = get_user_display_data(reply.user, getattr(reply.user, 'profile', None))
+                reply_rank = get_user_donation_rank(reply.user)
                 replies_data.append({
                     'id': reply.id,
                     'content': reply.content,
@@ -4631,7 +4636,8 @@ def get_post_comments(request, post_id):
                     'user_initial': reply_user_initial,
                     'created_at': reply.created_at.isoformat(),
                     'is_reply': True,
-                    'parent_id': comment.id
+                    'parent_id': comment.id,
+                    'donation_rank': reply_rank
                 })
             
             comments_data.append({
@@ -4642,7 +4648,8 @@ def get_post_comments(request, post_id):
                 'created_at': comment.created_at.isoformat(),
                 'is_reply': False,
                 'replies': replies_data,
-                'reply_count': len(replies_data)
+                'reply_count': len(replies_data),
+                'donation_rank': user_rank
             })
         
         return JsonResponse({
@@ -6149,6 +6156,182 @@ def super_admin_bookings_chart_data(request):
         
         revenue_trends.append({'date': label, 'revenue': float(revenue)})
     return JsonResponse({'revenue_trends': revenue_trends})
+
+
+# Super Admin - Donation Rankings
+@login_required
+def super_admin_donations(request):
+    """Super Admin donations and rankings page."""
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    from django.db.models import Sum, Count, Q
+    from django.contrib.auth.models import User
+    from accounts.donation_utils import RANK_TIERS, get_user_donation_rank
+    from datetime import datetime, timedelta
+    
+    # Get filter parameters
+    rank_filter = request.GET.get('rank', 'all')
+    time_filter = request.GET.get('time', 'all')
+    search_query = request.GET.get('search', '').strip()
+    sort_by = request.GET.get('sort', 'amount')  # amount, date, name
+    
+    # Get all users with completed donations
+    donors = User.objects.filter(
+        donations_made__payment_status='completed'
+    ).annotate(
+        total_donated=Sum('donations_made__amount', filter=Q(donations_made__payment_status='completed')),
+        donation_count=Count('donations_made', filter=Q(donations_made__payment_status='completed'))
+    ).filter(total_donated__gte=50).select_related('profile')
+    
+    # Apply time filter
+    if time_filter != 'all':
+        now = timezone.now()
+        if time_filter == '30days':
+            start_date = now - timedelta(days=30)
+        elif time_filter == '90days':
+            start_date = now - timedelta(days=90)
+        elif time_filter == 'year':
+            start_date = now - timedelta(days=365)
+        else:
+            start_date = None
+        
+        if start_date:
+            donors = donors.filter(donations_made__created_at__gte=start_date)
+    
+    # Apply search filter
+    if search_query:
+        donors = donors.filter(
+            Q(username__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(profile__display_name__icontains=search_query)
+        )
+    
+    # Build donor data with ranks
+    donor_data = []
+    for donor in donors:
+        rank = get_user_donation_rank(donor)
+        
+        # Apply rank filter
+        if rank_filter != 'all' and (not rank or rank['icon'] != rank_filter):
+            continue
+        
+        # Get user display name
+        display_name = donor.username
+        if hasattr(donor, 'profile') and donor.profile and donor.profile.display_name:
+            display_name = donor.profile.display_name
+        elif donor.get_full_name():
+            display_name = donor.get_full_name()
+        
+        donor_data.append({
+            'user': donor,
+            'display_name': display_name,
+            'email': donor.email,
+            'total_donated': donor.total_donated or 0,
+            'donation_count': donor.donation_count or 0,
+            'rank': rank,
+            'show_rank': donor.profile.show_donation_rank if hasattr(donor, 'profile') and donor.profile else True
+        })
+    
+    # Sort donors
+    if sort_by == 'amount':
+        donor_data.sort(key=lambda x: x['total_donated'], reverse=True)
+    elif sort_by == 'date':
+        # Get latest donation date for each donor
+        for data in donor_data:
+            latest = data['user'].donations_made.filter(
+                payment_status='completed'
+            ).order_by('-created_at').first()
+            data['latest_donation'] = latest.created_at if latest else timezone.now()
+        donor_data.sort(key=lambda x: x['latest_donation'], reverse=True)
+    elif sort_by == 'name':
+        donor_data.sort(key=lambda x: x['display_name'].lower())
+    
+    # Calculate statistics
+    total_donors = len(donor_data)
+    total_donations_amount = sum(d['total_donated'] for d in donor_data)
+    
+    # Rank distribution
+    rank_distribution = {}
+    for tier in RANK_TIERS:
+        rank_distribution[tier['icon']] = {
+            'name': tier['name'],
+            'color': tier['color'],
+            'count': 0,
+            'total_amount': 0
+        }
+    
+    for data in donor_data:
+        if data['rank']:
+            icon = data['rank']['icon']
+            rank_distribution[icon]['count'] += 1
+            rank_distribution[icon]['total_amount'] += data['total_donated']
+    
+    # Top donors (top 10)
+    top_donors = donor_data[:10]
+    
+    # Serialize data for JavaScript charts
+    import json
+    from decimal import Decimal
+    
+    # Convert rank_distribution to JSON-safe format
+    rank_distribution_json = {}
+    for icon, data in rank_distribution.items():
+        rank_distribution_json[icon] = {
+            'name': data['name'],
+            'color': data['color'],
+            'count': data['count'],
+            'total_amount': float(data['total_amount']) if data['total_amount'] else 0
+        }
+    
+    # Convert donor_data to JSON-safe format
+    donor_data_json = []
+    for data in donor_data:
+        donor_data_json.append({
+            'display_name': data['display_name'],
+            'email': data['email'],
+            'total_donated': float(data['total_donated']) if data['total_donated'] else 0,
+            'donation_count': data['donation_count'],
+            'rank': {
+                'name': data['rank']['name'],
+                'color': data['rank']['color'],
+                'icon': data['rank']['icon']
+            } if data['rank'] else None,
+            'show_rank': data['show_rank']
+        })
+    
+    # Convert rank_tiers to JSON-safe format
+    rank_tiers_json = []
+    for tier in RANK_TIERS:
+        rank_tiers_json.append({
+            'name': tier['name'],
+            'color': tier['color'],
+            'icon': tier['icon']
+        })
+    
+    context = {
+        'donor_data': donor_data,
+        'total_donors': total_donors,
+        'total_donations_amount': total_donations_amount,
+        'rank_distribution': rank_distribution,
+        'top_donors': top_donors,
+        'rank_tiers': RANK_TIERS,
+        'rank_filter': rank_filter,
+        'time_filter': time_filter,
+        'search_query': search_query,
+        'sort_by': sort_by,
+        'active': 'super_admin_donations',
+        # JSON data for charts
+        'rank_distribution_json': json.dumps(rank_distribution_json),
+        'donor_data_json': json.dumps(donor_data_json),
+        'rank_tiers_json': json.dumps(rank_tiers_json),
+    }
+    context.update(_app_context(request))
+    
+    return render(request, 'core/super_admin_donations.html', context)
 
 
 # Super Admin - Moderation Management
