@@ -4,9 +4,8 @@
 {% block title %}{{ service.name }} Reviews - ChurchConnect{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/themes/warm-sacred-earth-theme.css' %}?v={{ STATIC_VERSION }}">
-<link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}">
-<link rel="stylesheet" href="{% static 'css/service_reviews.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/service_reviews_redesign.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
 
 {% block sidebar %}
@@ -18,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="service-reviews-page warm-sacred-earth">
+<div class="service-reviews-page blue-sky">
   <!-- CSRF token for AJAX actions -->
   <form id="csrf-form" style="display:none;">{% csrf_token %}</form>
   
@@ -44,7 +43,7 @@
       </div>
       
       <div class="service-header-content">
-        <h1>{{ service.name }}</h1>
+        <h1 class="service-title">{{ service.name }}</h1>
         
         <div class="service-meta">
           <span class="duration">{{ service.duration_display }}</span>

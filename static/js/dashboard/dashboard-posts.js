@@ -440,12 +440,22 @@ class DashboardPosts {
   createCommentElement(comment) {
     const div = document.createElement('div');
     div.className = `comment ${comment.is_reply ? 'comment-reply' : ''}`;
+    
+    // Helper function to create rank badge HTML
+    const getRankBadgeHTML = (rank) => {
+      if (!rank) return '';
+      return `<span class="donation-rank-badge" style="background: ${rank.color}22; color: ${rank.color}; border: 1px solid ${rank.color}44;" title="${rank.name}">${rank.name}</span>`;
+    };
+    
     div.innerHTML = `
       <div class="comment-avatar">
         <div class="avatar-placeholder small">${comment.user_initial}</div>
       </div>
       <div class="comment-content">
-        <div class="comment-author">${comment.user_name}</div>
+        <div class="comment-author">
+          ${comment.user_name}
+          ${getRankBadgeHTML(comment.donation_rank)}
+        </div>
         <div class="comment-text">${this.escapeHtml(comment.content)}</div>
         <div class="comment-meta">
           <span class="comment-time">${this.formatRelativeTime(comment.created_at)}</span>
@@ -464,7 +474,10 @@ class DashboardPosts {
               <div class="avatar-placeholder small">${reply.user_initial}</div>
             </div>
             <div class="comment-content">
-              <div class="comment-author">${reply.user_name}</div>
+              <div class="comment-author">
+                ${reply.user_name}
+                ${getRankBadgeHTML(reply.donation_rank)}
+              </div>
               <div class="comment-text">${this.escapeHtml(reply.content)}</div>
               <div class="comment-meta">
                 <span class="comment-time">${this.formatRelativeTime(reply.created_at)}</span>

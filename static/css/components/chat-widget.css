@@ -474,6 +474,17 @@
   gap: 4px;
 }
 
+.chat-message-sender {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .chat-message-bubble {
   padding: 10px 14px;
   border-radius: 16px;

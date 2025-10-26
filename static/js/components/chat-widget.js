@@ -409,6 +409,12 @@ class ChatWidget {
         }
       }
       
+      // Build rank badge HTML if present
+      let rankBadgeHtml = '';
+      if (msg.donation_rank) {
+        rankBadgeHtml = `<span class="donation-rank-badge" style="background: ${msg.donation_rank.color}22; color: ${msg.donation_rank.color}; border: 1px solid ${msg.donation_rank.color}44;" title="${msg.donation_rank.name}">${msg.donation_rank.name}</span>`;
+      }
+      
       html += `
         <div class="chat-message ${isSent ? 'sent' : 'received'}">
           <div class="chat-message-avatar">
@@ -421,6 +427,7 @@ class ChatWidget {
             }
           </div>
           <div class="chat-message-content">
+            ${!isSent && rankBadgeHtml ? `<div class="chat-message-sender">${msg.sender_name} ${rankBadgeHtml}</div>` : ''}
             ${msg.content ? `<div class="chat-message-bubble">${this.escapeHtml(msg.content)}</div>` : ''}
             ${attachmentHtml}
             <span class="chat-message-time">${this.formatMessageTime(msg.created_at)}</span>

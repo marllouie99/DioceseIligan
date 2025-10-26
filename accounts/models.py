@@ -42,6 +42,10 @@ class Profile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     # Use callable that checks DEBUG setting to determine storage backend
     profile_image = models.ImageField(upload_to='profiles/', storage=get_profile_storage, null=True, blank=True)
+    
+    # Privacy Settings
+    show_donation_rank = models.BooleanField(default=True, help_text="Show donation rank badge publicly")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

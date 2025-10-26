@@ -3766,6 +3766,13 @@ body.page-church-detail {
   gap: 0.25rem;
 }
 
+.reviewer-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .reviewer-name {
   font-size: 1rem;
   font-weight: 600;

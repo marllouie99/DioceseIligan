@@ -3493,6 +3493,23 @@ input:checked + .toggle-slider:before {
   font-size: 13px;
   color: var(--text);
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Donation Rank Badge */
+.donation-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .comment-text {

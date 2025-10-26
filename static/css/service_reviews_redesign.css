@@ -1,0 +1,443 @@
+/*
+ * Service Reviews Page - Modern Blue Sky Design
+ * Clean, minimal, and beautiful
+ * Version: 3.0 - Complete Redesign
+ */
+
+/* =============================================================================
+   BASE PAGE STYLING
+   ============================================================================= */
+
+.service-reviews-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
+}
+
+/* =============================================================================
+   BACK NAVIGATION
+   ============================================================================= */
+
+.page-navigation {
+    margin-bottom: 2rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    color: #1A3A52;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 2px solid rgba(30, 144, 255, 0.15);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.back-button:hover {
+    background: #1E90FF;
+    color: white;
+    border-color: #1E90FF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.25);
+}
+
+.back-button i {
+    width: 18px;
+    height: 18px;
+}
+
+/* =============================================================================
+   SERVICE HEADER - MODERN CARD DESIGN
+   ============================================================================= */
+
+.service-header {
+    background: white;
+    border-radius: 24px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.05),
+        0 10px 25px rgba(30, 144, 255, 0.08);
+    border: 1px solid rgba(30, 144, 255, 0.1);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #F0F8FF;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #5A7A92;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(30, 144, 255, 0.1);
+}
+
+.breadcrumb a {
+    color: #1E90FF;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+    color: #4169E1;
+}
+
+.breadcrumb span {
+    color: #5A7A92;
+}
+
+/* Service Info Section */
+.service-header-content h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1A3A52;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+}
+
+.service-meta {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.service-meta span {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.25);
+}
+
+.service-description {
+    color: #5A7A92;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.btn-gallery {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: white;
+    color: #1E90FF;
+    border: 2px solid #1E90FF;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-gallery:hover {
+    background: #1E90FF;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+}
+
+.btn-gallery i {
+    width: 18px;
+    height: 18px;
+}
+
+/* =============================================================================
+   RATING CARD - CLEAN MINIMAL DESIGN
+   ============================================================================= */
+
+.service-header-rating {
+    background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid rgba(30, 144, 255, 0.15);
+}
+
+.rating-number {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #1E90FF;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.rating-stars .star {
+    width: 24px;
+    height: 24px;
+    color: #D1D5DB;
+}
+
+.rating-stars .star.filled {
+    color: #FFD700;
+    fill: #FFD700;
+}
+
+.rating-count {
+    color: #5A7A92;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+/* Rating Breakdown */
+.header-rating-breakdown {
+    margin-top: 1.5rem;
+}
+
+.header-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.header-rating-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1A3A52;
+    width: 25px;
+}
+
+.header-rating-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(30, 144, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.header-rating-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1E90FF 0%, #4169E1 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.header-rating-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5A7A92;
+    min-width: 30px;
+    text-align: right;
+}
+
+/* =============================================================================
+   REVIEWS PREVIEW CARD
+   ============================================================================= */
+
+.service-header-reviews {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(30, 144, 255, 0.1);
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.service-header-reviews h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1A3A52;
+    margin: 0 0 1.5rem 0;
+}
+
+.header-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.header-review-item {
+    padding: 1.25rem;
+    background: #F7F9FC;
+    border-radius: 12px;
+    border: 1px solid rgba(30, 144, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.header-review-item:hover {
+    background: #F0F8FF;
+    border-color: rgba(30, 144, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.header-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.header-reviewer-name {
+    font-weight: 700;
+    color: #1A3A52;
+    font-size: 0.95rem;
+}
+
+.header-review-rating {
+    display: flex;
+    gap: 0.15rem;
+}
+
+.header-review-rating .star {
+    width: 14px;
+    height: 14px;
+    color: #D1D5DB;
+}
+
+.header-review-rating .star.filled {
+    color: #FFD700;
+    fill: #FFD700;
+}
+
+.header-review-title {
+    font-weight: 600;
+    color: #1A3A52;
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.header-review-comment {
+    color: #5A7A92;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.header-reviews-more {
+    text-align: center;
+    padding: 1rem;
+    background: #F0F8FF;
+    border-radius: 12px;
+    border: 1px dashed rgba(30, 144, 255, 0.3);
+}
+
+.header-reviews-more p {
+    color: #1E90FF;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.header-reviews-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #5A7A92;
+}
+
+.header-reviews-empty p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1A3A52;
+    margin: 0 0 0.5rem 0;
+}
+
+.header-reviews-empty small {
+    color: #5A7A92;
+    font-size: 0.9rem;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 1200px) {
+    .service-header {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+    }
+    
+    .service-header-rating,
+    .service-header-reviews {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .service-reviews-page {
+        padding: 1rem;
+    }
+    
+    .service-header {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .service-header-content h1 {
+        font-size: 2rem;
+    }
+    
+    .rating-number {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .service-header {
+        padding: 1.25rem;
+    }
+    
+    .service-header-content h1 {
+        font-size: 1.75rem;
+    }
+    
+    .breadcrumb {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .service-meta span {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+    }
+}
+
+/* =============================================================================
+   SCROLLBAR STYLING
+   ============================================================================= */
+
+.service-header-reviews::-webkit-scrollbar {
+    width: 6px;
+}
+
+.service-header-reviews::-webkit-scrollbar-track {
+    background: #F0F8FF;
+    border-radius: 10px;
+}
+
+.service-header-reviews::-webkit-scrollbar-thumb {
+    background: rgba(30, 144, 255, 0.3);
+    border-radius: 10px;
+}
+
+.service-header-reviews::-webkit-scrollbar-thumb:hover {
+    background: rgba(30, 144, 255, 0.5);
+}

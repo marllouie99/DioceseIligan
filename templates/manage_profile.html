@@ -531,6 +531,419 @@
     .switch {
       margin: 0.5rem 0 !important;
     }
+    
+    /* ========== DONATION RANKING STYLES ========== */
+    .donation-ranking-section {
+      margin-bottom: 32px;
+    }
+    
+    .ranking-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(30, 144, 255, 0.15);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(30, 144, 255, 0.08);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .ranking-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .ranking-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1A3A52;
+      margin: 0;
+    }
+    
+    .rank-info-btn {
+      background: rgba(30, 144, 255, 0.1);
+      border: 2px solid rgba(30, 144, 255, 0.2);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #1E90FF;
+    }
+    
+    .rank-info-btn:hover {
+      background: rgba(30, 144, 255, 0.2);
+      border-color: #1E90FF;
+      transform: scale(1.1);
+    }
+    
+    /* No Rank Card */
+    .no-rank-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(30, 144, 255, 0.15);
+      border-radius: 16px;
+      padding: 48px 28px;
+      box-shadow: 0 4px 12px rgba(30, 144, 255, 0.08);
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .no-rank-icon {
+      margin-bottom: 24px;
+      color: #7A9AB2;
+    }
+    
+    .no-rank-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1A3A52;
+      margin: 0 0 16px 0;
+    }
+    
+    .no-rank-description {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #5A7A92;
+      margin: 0 0 28px 0;
+    }
+    
+    .rank-info-btn-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .rank-info-btn-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(30, 144, 255, 0.3);
+    }
+    
+    .rank-badge-container {
+      display: flex;
+      justify-content: center;
+      margin: 24px 0;
+    }
+    
+    .rank-badge {
+      padding: 32px;
+      border-radius: 20px;
+      text-align: center;
+      color: white;
+      min-width: 240px;
+      transition: transform 0.3s ease;
+    }
+    
+    .rank-badge:hover {
+      transform: translateY(-4px);
+    }
+    
+    .rank-icon {
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .rank-icon svg {
+      color: white;
+    }
+    
+    .rank-name {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .rank-amount {
+      font-size: 32px;
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .rank-progress-section {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(30, 144, 255, 0.05);
+      border-radius: 12px;
+    }
+    
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .progress-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1A3A52;
+    }
+    
+    .progress-amount {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7A9AB2;
+    }
+    
+    .progress-bar-container {
+      height: 12px;
+      background: rgba(30, 144, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.5s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .progress-percentage {
+      text-align: right;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1E90FF;
+    }
+    
+    .rank-max-achieved {
+      margin-top: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border-radius: 12px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    /* Rank Info Modal */
+    .rank-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .rank-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+    
+    .rank-modal-content {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .rank-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px;
+      border-bottom: 2px solid rgba(30, 144, 255, 0.1);
+    }
+    
+    .rank-modal-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1A3A52;
+      margin: 0;
+    }
+    
+    .rank-modal-close {
+      background: rgba(30, 144, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #1E90FF;
+    }
+    
+    .rank-modal-close:hover {
+      background: rgba(30, 144, 255, 0.2);
+      transform: rotate(90deg);
+    }
+    
+    .rank-modal-body {
+      padding: 28px;
+    }
+    
+    .rank-modal-intro {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #5A7A92;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    
+    .rank-tiers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .rank-tier-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      background: rgba(30, 144, 255, 0.03);
+      border: 2px solid rgba(30, 144, 255, 0.1);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .rank-tier-item:hover {
+      background: rgba(30, 144, 255, 0.08);
+      border-color: rgba(30, 144, 255, 0.2);
+      transform: translateX(4px);
+    }
+    
+    .rank-tier-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .rank-tier-info {
+      flex: 1;
+    }
+    
+    .rank-tier-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A3A52;
+      margin: 0 0 4px 0;
+    }
+    
+    .rank-tier-range {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1E90FF;
+      margin: 0 0 8px 0;
+    }
+    
+    .rank-tier-description {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #7A9AB2;
+      margin: 0;
+    }
+    
+    .rank-modal-footer {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(30, 144, 255, 0.05);
+      border-radius: 12px;
+    }
+    
+    .rank-modal-footer p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #5A7A92;
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+      .ranking-card {
+        padding: 20px;
+      }
+      
+      .rank-badge {
+        min-width: 200px;
+        padding: 24px;
+      }
+      
+      .rank-name {
+        font-size: 20px;
+      }
+      
+      .rank-amount {
+        font-size: 28px;
+      }
+      
+      .rank-modal-content {
+        max-height: 95vh;
+      }
+      
+      .rank-modal-header {
+        padding: 20px;
+      }
+      
+      .rank-modal-body {
+        padding: 20px;
+      }
+      
+      .rank-tier-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+      }
+      
+      .rank-tier-badge {
+        width: 56px;
+        height: 56px;
+      }
+    }
   </style>
 {% endblock %}
 
@@ -574,7 +987,11 @@
     <div class="profile-details">
       <div class="profile-name-section">
         <h2 class="profile-name">{{ user_display_name }}</h2>
-        <span class="status-badge">Growing Believer</span>
+        {% if current_rank and profile.show_donation_rank %}
+        <span class="status-badge rank-badge-{{ current_rank.icon }}" style="background: {{ current_rank.color }}22; color: {{ current_rank.color }}; border: 2px solid {{ current_rank.color }}44;">
+          {{ current_rank.name }}
+        </span>
+        {% endif %}
       </div>
       
       <div class="profile-email">{{ user.email }}</div>
@@ -1017,6 +1434,107 @@
         </div>
       </div>
 
+      <!-- Donation Ranking Section -->
+      <div class="donation-ranking-section">
+        {% if current_rank %}
+        <div class="ranking-card">
+          <div class="ranking-header">
+            <h3 class="ranking-title">Your Donor Rank</h3>
+            <button class="rank-info-btn" onclick="openRankInfoModal()" type="button" title="Learn about ranking tiers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="rank-badge-container">
+            <div class="rank-badge" style="background: linear-gradient(135deg, {{ current_rank.color }}dd 0%, {{ current_rank.color }} 100%); box-shadow: 0 8px 24px {{ current_rank.color }}40;">
+              <div class="rank-icon">
+                {% if current_rank.icon == 'bronze' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                {% elif current_rank.icon == 'silver' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    <circle cx="12" cy="12" r="3" fill="white" opacity="0.3"/>
+                  </svg>
+                {% elif current_rank.icon == 'gold' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    <path d="M12 8L13.5 11L17 11.5L14.5 14L15 17.5L12 15.5L9 17.5L9.5 14L7 11.5L10.5 11L12 8Z" fill="white" opacity="0.4"/>
+                  </svg>
+                {% elif current_rank.icon == 'platinum' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    <circle cx="12" cy="9" r="2" fill="white" opacity="0.5"/>
+                    <circle cx="9" cy="13" r="1.5" fill="white" opacity="0.5"/>
+                    <circle cx="15" cy="13" r="1.5" fill="white" opacity="0.5"/>
+                  </svg>
+                {% elif current_rank.icon == 'diamond' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M12 2L2 9L12 22L22 9L12 2Z"/>
+                    <path d="M12 2L7 9L12 16L17 9L12 2Z" fill="white" opacity="0.3"/>
+                  </svg>
+                {% elif current_rank.icon == 'champion' %}
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                    <path d="M6 9C6 10.5 7 11.5 8 12C6.5 13 6 14.5 6 16C6 18.5 8 20 10 20H14C16 20 18 18.5 18 16C18 14.5 17.5 13 16 12C17 11.5 18 10.5 18 9C18 6.5 16 5 14 5H10C8 5 6 6.5 6 9Z"/>
+                    <circle cx="12" cy="3" r="2"/>
+                  </svg>
+                {% endif %}
+              </div>
+              <div class="rank-name">{{ current_rank.name }}</div>
+              <div class="rank-amount">₱{{ total_donated|floatformat:0 }}</div>
+            </div>
+          </div>
+          
+          {% if next_rank %}
+          <div class="rank-progress-section">
+            <div class="progress-header">
+              <span class="progress-label">Progress to {{ next_rank.name }}</span>
+              <span class="progress-amount">₱{{ amount_to_next_rank|floatformat:0 }} to go</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" style="width: {{ progress_percentage }}%; background: linear-gradient(90deg, {{ current_rank.color }}, {{ next_rank.color }});"></div>
+            </div>
+            <div class="progress-percentage">{{ progress_percentage|floatformat:1 }}%</div>
+          </div>
+          {% else %}
+          <div class="rank-max-achieved">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span>Maximum Rank Achieved!</span>
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <!-- No Rank Yet - Show Encouragement Message -->
+        <div class="no-rank-card">
+          <div class="no-rank-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="64" height="64">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+          </div>
+          <h3 class="no-rank-title">Start Your Giving Journey</h3>
+          <p class="no-rank-description">
+            Make your first donation of at least ₱50 to earn your Bronze Supporter rank and join our community of generous supporters!
+          </p>
+          <button class="rank-info-btn-large" onclick="openRankInfoModal()" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Learn About Ranks
+          </button>
+        </div>
+        {% endif %}
+      </div>
+
       <!-- Donations Table -->
       <div class="section-header">
         <h2 class="section-title">Donation History</h2>
@@ -1153,6 +1671,125 @@
             {% endif %}
           </tbody>
         </table>
+      </div>
+    </div>
+    
+    <!-- Rank Info Modal -->
+    <div id="rankInfoModal" class="rank-modal" style="display: none;">
+      <div class="rank-modal-overlay" onclick="closeRankInfoModal()"></div>
+      <div class="rank-modal-content">
+        <div class="rank-modal-header">
+          <h2>Donor Ranking System</h2>
+          <button class="rank-modal-close" onclick="closeRankInfoModal()" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="rank-modal-body">
+          <p class="rank-modal-intro">
+            Our donor ranking system recognizes and celebrates your generosity. As you contribute more, you'll advance through different tiers, each with its own unique badge and recognition.
+          </p>
+          
+          <div class="rank-tiers-list">
+            <!-- Bronze Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #CD7F32dd 0%, #CD7F32 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Bronze Supporter</h3>
+                <p class="rank-tier-range">₱50 - ₱999</p>
+                <p class="rank-tier-description">Every journey begins with a single step. Thank you for starting yours with us!</p>
+              </div>
+            </div>
+            
+            <!-- Silver Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #C0C0C0dd 0%, #C0C0C0 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  <circle cx="12" cy="12" r="3" fill="white" opacity="0.3"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Silver Supporter</h3>
+                <p class="rank-tier-range">₱1,000 - ₱4,999</p>
+                <p class="rank-tier-description">Your continued support makes a meaningful difference in our community.</p>
+              </div>
+            </div>
+            
+            <!-- Gold Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #FFD700dd 0%, #FFD700 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  <path d="M12 8L13.5 11L17 11.5L14.5 14L15 17.5L12 15.5L9 17.5L9.5 14L7 11.5L10.5 11L12 8Z" fill="white" opacity="0.4"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Gold Supporter</h3>
+                <p class="rank-tier-range">₱5,000 - ₱9,999</p>
+                <p class="rank-tier-description">Your generosity shines bright and helps us reach more people in need.</p>
+              </div>
+            </div>
+            
+            <!-- Platinum Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #8B9DC3dd 0%, #8B9DC3 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  <circle cx="12" cy="9" r="2" fill="white" opacity="0.5"/>
+                  <circle cx="9" cy="13" r="1.5" fill="white" opacity="0.5"/>
+                  <circle cx="15" cy="13" r="1.5" fill="white" opacity="0.5"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Platinum Supporter</h3>
+                <p class="rank-tier-range">₱10,000 - ₱24,999</p>
+                <p class="rank-tier-description">An exceptional supporter whose impact creates lasting change.</p>
+              </div>
+            </div>
+            
+            <!-- Diamond Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #B9F2FFdd 0%, #B9F2FF 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M12 2L2 9L12 22L22 9L12 2Z"/>
+                  <path d="M12 2L7 9L12 16L17 9L12 2Z" fill="white" opacity="0.3"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Diamond Supporter</h3>
+                <p class="rank-tier-range">₱25,000 - ₱49,999</p>
+                <p class="rank-tier-description">A rare gem whose extraordinary generosity transforms lives.</p>
+              </div>
+            </div>
+            
+            <!-- Champion Tier -->
+            <div class="rank-tier-item">
+              <div class="rank-tier-badge" style="background: linear-gradient(135deg, #9D00FFdd 0%, #9D00FF 100%);">
+                <svg viewBox="0 0 24 24" fill="white" width="32" height="32">
+                  <path d="M6 9C6 10.5 7 11.5 8 12C6.5 13 6 14.5 6 16C6 18.5 8 20 10 20H14C16 20 18 18.5 18 16C18 14.5 17.5 13 16 12C17 11.5 18 10.5 18 9C18 6.5 16 5 14 5H10C8 5 6 6.5 6 9Z"/>
+                  <circle cx="12" cy="3" r="2"/>
+                </svg>
+              </div>
+              <div class="rank-tier-info">
+                <h3 class="rank-tier-name">Champion of Faith</h3>
+                <p class="rank-tier-range">₱50,000+</p>
+                <p class="rank-tier-description">The highest honor - a true champion whose boundless generosity inspires us all.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="rank-modal-footer">
+            <p><strong>Note:</strong> Rankings are based on your total completed donations across all parishes. Your rank advances automatically as you contribute more.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1326,6 +1963,20 @@
                 <span class="toggle-slider"></span>
               </label>
               <span class="toggle-label">Show Activity</span>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Donation Rank Badge</h4>
+              <p class="setting-description">Display your donor rank badge publicly on your profile</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="show_donation_rank" name="show_donation_rank" {% if profile.show_donation_rank %}checked{% endif %} onchange="updateDonationRankVisibility(this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Show Rank Badge</span>
             </div>
           </div>
         </div>
@@ -1813,6 +2464,71 @@
 <script>
   // Make CSRF token available for AJAX requests
   window.csrfToken = '{{ csrf_token }}';
+  
+  // Rank Info Modal Functions
+  function openRankInfoModal() {
+    const modal = document.getElementById('rankInfoModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  
+  function closeRankInfoModal() {
+    const modal = document.getElementById('rankInfoModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+  
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeRankInfoModal();
+    }
+  });
+  
+  // Update Donation Rank Visibility
+  function updateDonationRankVisibility(isVisible) {
+    fetch('{% url "manage_profile" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': window.csrfToken
+      },
+      body: new URLSearchParams({
+        'action': 'update_rank_visibility',
+        'show_donation_rank': isVisible
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Show success message
+        const message = isVisible ? 'Donation rank badge is now visible' : 'Donation rank badge is now hidden';
+        showNotification(message, 'success');
+        
+        // Optionally reload to show/hide badge
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotification('Failed to update setting', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('An error occurred', 'error');
+    });
+  }
+  
+  // Simple notification function
+  function showNotification(message, type) {
+    // You can implement a toast notification here
+    // For now, just use alert
+    console.log(`${type}: ${message}`);
+  }
 </script>
 
 <!-- Load utility modules -->

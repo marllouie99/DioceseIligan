@@ -269,9 +269,14 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     if owned_churches.exists():
         post_form = PostForm()
 
-    # Get community feed from followed churches AND owned churches
+    # Get community feed with advanced social media-style algorithm
+    # Includes engagement-based ranking and time-decay algorithm
     community_feed = []
     if request.user.is_authenticated:
+        from django.db.models import Count, Q
+        from django.utils import timezone
+        import math
+        
         # Get churches the user follows
         followed_churches = ChurchFollow.objects.filter(user=request.user).values_list('church_id', flat=True)
         
@@ -281,18 +286,104 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         # Combine followed and owned churches (remove duplicates)
         all_church_ids = set(followed_churches) | set(owned_church_ids)
         
-        # Get recent posts from followed AND owned churches, limited to last 20 posts
-        recent_posts = Post.objects.filter(
+        # Get posts from followed/owned parishes with engagement data (fetch more for ranking)
+        followed_posts = Post.objects.filter(
             church_id__in=all_church_ids,
-            is_active=True
-        ).select_related('church').order_by('-created_at')[:20]
+            is_active=True,
+            church__is_active=True
+        ).select_related('church').annotate(
+            likes_count=Count('likes', distinct=True),
+            comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True)
+        ).order_by('-created_at')[:30]  # Fetch more for better ranking
+        
+        # Get posts from non-followed parishes with engagement data
+        other_posts = Post.objects.filter(
+            is_active=True,
+            church__is_active=True
+        ).exclude(
+            church_id__in=all_church_ids
+        ).select_related('church').annotate(
+            likes_count=Count('likes', distinct=True),
+            comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True)
+        ).order_by('-created_at')[:15]  # Fetch more for better ranking
+        
+        # Calculate engagement score with time decay for each post
+        def calculate_post_score(post, is_followed=False):
+            """
+            Calculate post ranking score based on:
+            1. Engagement (likes, comments, views)
+            2. Time decay (newer posts score higher)
+            3. Follow bonus (followed parishes get boost)
+            
+            Similar to Reddit's "Hot" algorithm and Facebook's EdgeRank
+            """
+            now = timezone.now()
+            age_hours = (now - post.created_at).total_seconds() / 3600
+            
+            # Engagement score (weighted)
+            likes_score = post.likes_count * 3      # Likes worth 3 points
+            comments_score = post.comments_count * 5  # Comments worth 5 points (more valuable)
+            views_score = post.view_count * 0.1     # Views worth 0.1 points
+            
+            engagement_score = likes_score + comments_score + views_score
+            
+            # Time decay: posts lose 50% value every 24 hours (exponential decay)
+            # Formula: score * e^(-decay_rate * age_hours)
+            decay_rate = 0.029  # ~50% decay per 24 hours
+            time_factor = math.exp(-decay_rate * age_hours)
+            
+            # Follow bonus: followed parishes get 2x multiplier
+            follow_multiplier = 2.0 if is_followed else 1.0
+            
+            # Final score
+            final_score = engagement_score * time_factor * follow_multiplier
+            
+            # Boost very recent posts (< 2 hours old) to ensure fresh content
+            if age_hours < 2:
+                final_score *= 1.5
+            
+            return final_score
+        
+        # Score and sort followed posts
+        followed_list = list(followed_posts)
+        for post in followed_list:
+            post.feed_score = calculate_post_score(post, is_followed=True)
+        followed_list.sort(key=lambda x: x.feed_score, reverse=True)
+        
+        # Score and sort other posts
+        other_list = list(other_posts)
+        for post in other_list:
+            post.feed_score = calculate_post_score(post, is_followed=False)
+        other_list.sort(key=lambda x: x.feed_score, reverse=True)
+        
+        # Take top posts after ranking
+        followed_list = followed_list[:14]  # Top 14 followed posts
+        other_list = other_list[:6]         # Top 6 other posts
+        
+        # Combine and interleave posts for a natural feed experience
+        # Pattern: 2 followed, 1 other, 2 followed, 1 other, etc.
+        combined_posts = []
+        followed_idx = 0
+        other_idx = 0
+        
+        while followed_idx < len(followed_list) or other_idx < len(other_list):
+            # Add 2 followed posts
+            for _ in range(2):
+                if followed_idx < len(followed_list):
+                    combined_posts.append(followed_list[followed_idx])
+                    followed_idx += 1
+            
+            # Add 1 other post
+            if other_idx < len(other_list):
+                combined_posts.append(other_list[other_idx])
+                other_idx += 1
         
         # Add liked and bookmarked status to each post
-        for post in recent_posts:
+        for post in combined_posts:
             post.is_liked = post.is_liked_by(request.user)
             post.is_bookmarked = post.is_bookmarked_by(request.user)
         
-        community_feed = recent_posts
+        community_feed = combined_posts
 
     # Get recent user activities for sidebar (post interactions)
     recent_activities = []
@@ -390,6 +481,17 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         import logging
         logger = logging.getLogger(__name__)
         logger.info(f"Profile update POST data: {request.POST}")
+        
+        # Handle donation rank visibility update
+        if request.POST.get('action') == 'update_rank_visibility':
+            show_rank = request.POST.get('show_donation_rank') == 'true'
+            profile.show_donation_rank = show_rank
+            profile.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Rank visibility updated successfully'
+            })
         
         form = ProfileForm(request.POST, request.FILES, instance=profile, user=request.user)
         if form.is_valid():
@@ -527,6 +629,49 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         donation_count=Count('id')
     )
     
+    # Calculate donation ranking
+    total_donated_amount = donation_stats['total_donated'] or 0
+    
+    # Define ranking tiers (in PHP)
+    RANK_TIERS = [
+        {'name': 'Bronze Supporter', 'min': 50, 'max': 999, 'color': '#CD7F32', 'icon': 'bronze'},
+        {'name': 'Silver Supporter', 'min': 1000, 'max': 4999, 'color': '#C0C0C0', 'icon': 'silver'},
+        {'name': 'Gold Supporter', 'min': 5000, 'max': 9999, 'color': '#FFD700', 'icon': 'gold'},
+        {'name': 'Platinum Supporter', 'min': 10000, 'max': 24999, 'color': '#8B9DC3', 'icon': 'platinum'},
+        {'name': 'Diamond Supporter', 'min': 25000, 'max': 49999, 'color': '#B9F2FF', 'icon': 'diamond'},
+        {'name': 'Champion of Faith', 'min': 50000, 'max': float('inf'), 'color': '#9D00FF', 'icon': 'champion'},
+    ]
+    
+    # Determine current rank (None if no donations)
+    current_rank = None
+    if total_donated_amount >= 50:  # Only show rank if donated at least ₱50
+        for tier in RANK_TIERS:
+            if tier['min'] <= total_donated_amount <= tier['max']:
+                current_rank = tier
+                break
+    
+    # Calculate progress to next rank
+    next_rank = None
+    progress_percentage = 0
+    amount_to_next_rank = 0
+    
+    if current_rank:
+        for i, tier in enumerate(RANK_TIERS):
+            if tier['name'] == current_rank['name'] and i < len(RANK_TIERS) - 1:
+                next_rank = RANK_TIERS[i + 1]
+                amount_to_next_rank = next_rank['min'] - total_donated_amount
+                progress_percentage = ((total_donated_amount - current_rank['min']) / 
+                                      (next_rank['min'] - current_rank['min'])) * 100
+                break
+        
+        # If at max rank, set progress to 100%
+        if current_rank['name'] == 'Champion of Faith':
+            progress_percentage = 100
+    else:
+        # No rank yet, show progress to first rank (Bronze)
+        next_rank = RANK_TIERS[0]
+        amount_to_next_rank = next_rank['min'] - total_donated_amount
+    
     # Calculate analytics data
     from core.models import Booking, ChurchFollow, PostLike, PostComment
     from django.utils import timezone
@@ -606,6 +751,11 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         'user_donations': user_donations,
         'total_donated': donation_stats['total_donated'] or 0,
         'donation_count': donation_stats['donation_count'] or 0,
+        # Donation ranking data
+        'current_rank': current_rank,
+        'next_rank': next_rank,
+        'progress_percentage': progress_percentage,
+        'amount_to_next_rank': amount_to_next_rank,
         # Analytics data - All time
         'total_bookings': total_bookings,
         'total_parishes_followed': total_parishes_followed,

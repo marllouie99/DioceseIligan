@@ -1,8 +1,7 @@
 /*
  * Service Reviews Styles - ChurchIligan
- * Warm Sacred Earth Theme Integration
- * Complete Redesign with Rich Wood Grain Textures and Spiritual Brown/Gold Colors
- * Version: 2.0 - Full Theme Overhaul
+ * Blue Sky Theme Integration
+ * Version: 3.0 - Theme Variables Update
  */
 
 /* =============================================================================
@@ -14,9 +13,30 @@
     margin: 0 auto;
     padding: 2rem 1rem;
     min-height: 100vh;
-    font-family: Georgia, "Times New Roman", serif;
-    color: #2D1810;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: #1A3A52;
 }
+
+/* ============================================================================
+   Blue Sky Contrast Overrides (ensure header text never renders light/white)
+   ============================================================================ */
+.service-header .service-header-content h1,
+.service-header h1.service-title { color: #1A3A52 !important; text-shadow: none !important; }
+.service-header .service-header-content,
+.service-header .service-info { color: #1A3A52 !important; }
+.service-header .service-description { color: #5A7A92 !important; }
+.service-header .service-meta span { color: #1A3A52 !important; background: #FFFFFF !important; border-color: rgba(30,144,255,0.2) !important; }
+.service-header .service-meta .duration,
+.service-header .service-meta .price { color: #1A3A52 !important; }
+.service-header .breadcrumb { color: #1A3A52 !important; background: #FFFFFF !important; border-color: rgba(30,144,255,0.2) !important; }
+.service-header .breadcrumb a { color: #1E90FF !important; }
+.service-header .breadcrumb a:hover { color: #4169E1 !important; }
+.service-header .rating-stars .star { color: #D1D5DB !important; stroke: #9CA3AF !important; }
+.service-header .rating-stars .star.filled { color: #ffd700 !important; fill: #ffd700 !important; stroke: #ffd700 !important; }
+.service-header-rating .rating-stars .star { color: #D1D5DB !important; stroke: #9CA3AF !important; }
+.service-header-rating .rating-stars .star.filled { color: #ffd700 !important; fill: #ffd700 !important; stroke: #ffd700 !important; }
+.service-header-reviews .star { color: #D1D5DB !important; stroke: #9CA3AF !important; }
+.service-header-reviews .star.filled { color: #ffd700 !important; fill: #ffd700 !important; stroke: #ffd700 !important; }
 
 /* =============================================================================
    PAGE NAVIGATION
@@ -38,37 +58,23 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: 
-        /* Wood grain overlay */
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.1) 0.5px, transparent 2px),
-        /* Gold gradient */
-        linear-gradient(135deg, #DAA520 0%, #B8860B 50%, #8B6914 100%);
-    color: #2D1810;
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 50%, #4A9EFF 100%);
+    color: #FFFFFF;
     text-decoration: none;
     border-radius: 999px;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.9rem;
-    font-family: Georgia, "Times New Roman", serif;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-        0 6px 12px rgba(139, 69, 19, 0.15),
-        0 3px 6px rgba(218, 165, 32, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(139, 69, 19, 0.2);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+    border: none;
 }
 
 .page-navigation .back-button:hover {
-    background: 
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.08) 0.5px, transparent 2px),
-        linear-gradient(135deg, #E6B800 0%, #CC9900 50%, #996F00 100%);
+    background: linear-gradient(135deg, #4169E1 0%, #1E90FF 50%, #4A9EFF 100%);
     transform: translateY(-2px);
-    box-shadow: 
-        0 8px 16px rgba(139, 69, 19, 0.2),
-        0 4px 8px rgba(218, 165, 32, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 16px rgba(30, 144, 255, 0.4);
     text-decoration: none;
-    color: #2D1810;
+    color: #FFFFFF;
 }
 
 .page-navigation .back-button i {
@@ -110,27 +116,13 @@
     align-items: start;
     margin-bottom: 3rem;
     padding: 2.5rem;
-    background: 
-        /* Parchment texture layers */
-        radial-gradient(ellipse 200px 120px at 20% 30%, rgba(160, 82, 45, 0.12) 0%, transparent 70%),
-        radial-gradient(ellipse 150px 100px at 80% 70%, rgba(139, 69, 19, 0.10) 0%, transparent 75%),
-        radial-gradient(ellipse 100px 80px at 50% 20%, rgba(218, 165, 32, 0.08) 0%, transparent 60%),
-        /* Wood grain texture */
-        repeating-linear-gradient(45deg, rgba(139, 69, 19, 0.04) 0.5px, transparent 2px),
-        repeating-linear-gradient(-45deg, rgba(160, 82, 45, 0.03) 0.5px, transparent 2px),
-        repeating-linear-gradient(23deg, rgba(101, 67, 33, 0.02) 0.8px, transparent 3px),
-        /* Warm brown gradient */
-        linear-gradient(135deg, #8B4513 0%, #A0522D 25%, #654321 50%, #8B4513 75%, #A0522D 100%);
-    color: #FFF9E6;
+    background: linear-gradient(135deg, #F7F9FC 0%, #F0F8FF 100%);
+    color: #1A3A52;
     border-radius: 24px;
-    box-shadow: 
-        0 20px 40px rgba(139, 69, 19, 0.25),
-        0 10px 20px rgba(160, 82, 45, 0.15),
-        0 5px 10px rgba(101, 67, 33, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(30, 144, 255, 0.1);
     position: relative;
     overflow: hidden;
-    border: 3px solid rgba(218, 165, 32, 0.2);
+    border: 2px solid rgba(30, 144, 255, 0.2);
 }
 
 .service-header::before {
@@ -141,11 +133,8 @@
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(255, 249, 230, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 50% 100%, rgba(218, 165, 32, 0.06) 0%, transparent 40%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+        radial-gradient(circle at 25% 25%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.01) 0%, transparent 50%);
     z-index: 0;
 }
 
@@ -172,37 +161,29 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    color: rgba(255, 249, 230, 0.9);
+    color: #1A3A52;
     margin: 0;
-    background: 
-        /* Subtle parchment texture */
-        repeating-linear-gradient(45deg, rgba(218, 165, 32, 0.1) 0.5px, transparent 2px),
-        linear-gradient(135deg, rgba(255, 249, 230, 0.15) 0%, rgba(218, 165, 32, 0.1) 100%);
+    background: #FFFFFF;
     padding: 0.5rem 0.75rem;
     border-radius: 999px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(218, 165, 32, 0.3);
+    border: 2px solid rgba(30, 144, 255, 0.2);
     width: fit-content;
-    font-family: Georgia, "Times New Roman", serif;
-    box-shadow: 0 2px 4px rgba(139, 69, 19, 0.15);
 }
 
 .breadcrumb span {
-    color: rgba(218, 165, 32, 0.8);
+    color: #5A7A92;
     font-weight: 400;
 }
 
 .breadcrumb a {
-    color: #FFF9E6;
+    color: #1E90FF;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.3);
 }
 
 .breadcrumb a:hover {
-    color: #DAA520;
+    color: #4169E1;
     text-decoration: none;
 }
 
@@ -211,8 +192,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 1rem 0;
-    color: #FFF9E6;
-    text-shadow: 0 2px 4px rgba(139, 69, 19, 0.5);
+    color: #1A3A52;
     letter-spacing: -0.5px;
     line-height: 1.2;
 }
@@ -225,25 +205,21 @@
 }
 
 .service-meta span {
-    background: 
-        repeating-linear-gradient(45deg, rgba(218, 165, 32, 0.1) 0.5px, transparent 2px),
-        linear-gradient(135deg, rgba(255, 249, 230, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     padding: 0.5rem 1rem;
     border-radius: 999px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #FFF9E6;
-    border: 1px solid rgba(218, 165, 32, 0.3);
-    box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.3);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 2px 4px rgba(30, 144, 255, 0.3);
 }
 
 .service-description {
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba(255, 249, 230, 0.95);
+    color: #5A7A92;
     margin-bottom: 1.5rem;
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.2);
 }
 
 /* Gallery Button */
@@ -252,28 +228,22 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: 
-        repeating-linear-gradient(45deg, rgba(255, 249, 230, 0.1) 0.5px, transparent 2px),
-        linear-gradient(135deg, rgba(255, 249, 230, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
-    color: #FFF9E6;
-    border: 2px solid rgba(218, 165, 32, 0.4);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 50%, #4A9EFF 100%);
+    color: #FFFFFF;
+    border: none;
     border-radius: 999px;
     font-size: 0.9rem;
     font-weight: 600;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: inherit;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
-    text-shadow: 0 1px 2px rgba(139, 69, 19, 0.3);
+    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
 }
 
 .service-gallery-button .btn-gallery:hover {
-    background: 
-        repeating-linear-gradient(45deg, rgba(255, 249, 230, 0.15) 0.5px, transparent 2px),
-        linear-gradient(135deg, rgba(218, 165, 32, 0.3) 0%, rgba(255, 249, 230, 0.2) 100%);
-    border-color: rgba(218, 165, 32, 0.6);
+    background: linear-gradient(135deg, #4169E1 0%, #1E90FF 50%, #4A9EFF 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.2);
+    box-shadow: 0 6px 12px rgba(30, 144, 255, 0.4);
 }
 
 .service-gallery-button .btn-gallery i {
@@ -326,8 +296,8 @@
     margin: 0 0 0.5rem 0;
     font-size: 2.8rem;
     font-weight: 800;
-    color: white;
-    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    color: #1A3A52;
+    text-shadow: none;
     letter-spacing: -0.02em;
     line-height: 1;
 }
@@ -342,19 +312,18 @@
 
 .service-meta span {
     padding: 0.4rem 0.85rem;
-    background: rgba(255, 255, 255, 0.25);
+    background: #FFFFFF;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: white;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #1A3A52;
+    border: 1px solid rgba(30, 144, 255, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     white-space: nowrap;
 }
 
 .service-description {
-    color: rgba(255, 255, 255, 0.9);
+    color: #5A7A92;
     margin: 0 0 1.5rem 0;
     font-size: 0.95rem;
     line-height: 1.5;
@@ -409,7 +378,7 @@
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    color: white;
+    color: #1A3A52;
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
@@ -435,7 +404,7 @@
 .service-header-rating .rating-number {
     font-size: 3.5rem;
     font-weight: 900;
-    color: white;
+    color: #1A3A52;
     line-height: 1;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     margin-bottom: 0.5rem;
@@ -455,7 +424,7 @@
 .service-header-rating .rating-stars .star {
     width: 24px;
     height: 24px;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(26, 58, 82, 0.3);
     stroke: rgba(255, 255, 255, 0.6);
     stroke-width: 1;
     display: inline-block;
@@ -498,7 +467,7 @@
 
 .service-header-rating .rating-count {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.95);
+    color: #5A7A92;
     font-weight: 600;
     position: relative;
     z-index: 1;
@@ -568,7 +537,7 @@
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    color: white;
+    color: #1A3A52;
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
@@ -594,7 +563,7 @@
     margin: 0 0 1rem 0;
     font-size: 1.2rem;
     font-weight: 700;
-    color: white;
+    color: #1A3A52;
     text-align: center;
     position: relative;
     z-index: 1;
@@ -609,11 +578,11 @@
 }
 
 .header-review-item {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 12px;
     padding: 1rem;
     margin-bottom: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 .header-review-header {
@@ -626,7 +595,7 @@
 .header-reviewer-name {
     font-size: 0.9rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
+    color: #1A3A52;
 }
 
 .header-review-rating {
@@ -637,13 +606,13 @@
 .header-review-title {
     font-size: 0.85rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: #1A3A52;
     margin: 0 0 0.25rem 0;
 }
 
 .header-review-comment {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: #5A7A92;
     line-height: 1.4;
     margin: 0;
 }
@@ -651,14 +620,14 @@
 .header-reviews-more {
     text-align: center;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 .header-reviews-more p {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: #5A7A92;
     margin: 0;
     font-weight: 500;
 }
@@ -672,14 +641,14 @@
 
 .header-reviews-empty p {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: #1A3A52;
     margin: 0 0 0.5rem 0;
     font-weight: 600;
 }
 
 .header-reviews-empty small {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: #5A7A92;
 }
 
 /* Compact Review Form in Header */
@@ -802,7 +771,7 @@
 
 .reviews-summary h3 {
     margin: 0 0 2rem 0;
-    color: #2d3748;
+    color: #1A3A52;
     font-size: 1.8rem;
     font-weight: 700;
     text-align: center;
@@ -818,7 +787,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     border-radius: 2px;
 }
 
@@ -826,7 +795,7 @@
     text-align: center;
     min-width: 220px;
     padding: 2.5rem 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
@@ -897,7 +866,7 @@
 .rating-label {
     min-width: 100px;
     font-size: 1rem;
-    color: #2d3748;
+    color: #1A3A52;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -923,7 +892,7 @@
 
 .rating-fill {
     height: 100%;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #1E90FF 0%, #4169E1 100%);
     transition: width 0.5s ease;
     border-radius: 6px;
     position: relative;
@@ -949,13 +918,13 @@
     min-width: 40px;
     text-align: center;
     font-weight: 700;
-    color: #2d3748;
+    color: #1A3A52;
     background: white;
     padding: 0.5rem 0.75rem;
     border-radius: 16px;
     font-size: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(30, 144, 255, 0.2);
 }
 
 /* Review Form */
@@ -1063,7 +1032,7 @@
 
 .reviews-list-section h3 {
     margin: 0 0 2rem 0;
-    color: #2d3748;
+    color: #1A3A52;
     font-size: 1.8rem;
     font-weight: 700;
     text-align: center;
@@ -1079,16 +1048,16 @@
     transform: translateX(-50%);
     width: 60px;
     height: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     border-radius: 2px;
 }
 
 .review-item {
     padding: 2rem;
     margin-bottom: 1.5rem;
-    background: #f8fafc;
+    background: #FFFFFF;
     border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(30, 144, 255, 0.2);
     transition: all 0.3s ease;
     position: relative;
 }
@@ -1096,7 +1065,7 @@
 .review-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border-color: #667eea;
+    border-color: #1E90FF;
 }
 
 .review-item:last-child {
@@ -1110,7 +1079,7 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: linear-gradient(to bottom, #667eea, #764ba2);
+    background: linear-gradient(to bottom, #1E90FF, #4169E1);
     border-radius: 2px 0 0 2px;
 }
 
@@ -1125,7 +1094,7 @@
     margin: 0 0 0.25rem 0;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #2d3748;
+    color: #1A3A52;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1138,7 +1107,7 @@
 
 .review-date {
     font-size: 0.85rem;
-    color: #718096;
+    color: #5A7A92;
     font-weight: 500;
     background: #edf2f7;
     padding: 0.25rem 0.5rem;
@@ -1165,7 +1134,7 @@
 }
 
 .review-content p {
-    color: var(--text-secondary);
+    color: #5A7A92;
     line-height: 1.6;
 }
 
@@ -1176,7 +1145,7 @@
     padding: 1.5rem;
     background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(30, 144, 255, 0.2);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
@@ -1188,7 +1157,7 @@
 
 .rating-item span {
     font-size: 0.9rem;
-    color: #4a5568;
+    color: #5A7A92;
     font-weight: 600;
     background: white;
     padding: 0.25rem 0.75rem;
@@ -1211,28 +1180,28 @@
     gap: 0.5rem;
     padding: 0.6rem 1.2rem;
     background: white;
-    border: 2px solid #e2e8f0;
+    border: 2px solid rgba(30, 144, 255, 0.2);
     border-radius: 25px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #64748b;
+    color: #5A7A92;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .helpful-btn:hover {
-    background: #f8fafc;
-    border-color: #667eea;
-    color: #667eea;
+    background: #FFFFFF;
+    border-color: #1E90FF;
+    color: #1E90FF;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .helpful-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
     color: white;
-    border-color: #667eea;
+    border-color: #1E90FF;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -1331,6 +1300,23 @@
 .star.filled {
     color: #ffd700;
     fill: #ffd700;
+}
+
+/* Blue Sky theme overrides */
+.service-header {
+    color: #333;
+}
+
+.service-header-content h1 {
+    color: #333;
+}
+
+.service-meta {
+    color: #333;
+}
+
+.service-description {
+    color: #333;
 }
 
 /* Responsive Design */

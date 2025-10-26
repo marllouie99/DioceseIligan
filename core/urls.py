@@ -51,6 +51,7 @@ urlpatterns = [
     path('super-admin/categories/<int:category_id>/services/', views.super_admin_category_services, name='super_admin_category_services'),
     path('super-admin/bookings/', views.super_admin_bookings, name='super_admin_bookings'),
     path('super-admin/bookings/chart-data/', views.super_admin_bookings_chart_data, name='super_admin_bookings_chart_data'),
+    path('super-admin/donations/', views.super_admin_donations, name='super_admin_donations'),
     path('super-admin/moderation/', views.super_admin_moderation, name='super_admin_moderation'),
     
     # Media updates (AJAX)

@@ -178,6 +178,9 @@ def conversation_messages_api(request, conversation_id):
         # Get all messages in the conversation
         messages = conversation.messages.select_related('sender').all()
         
+        # Import donation rank utility
+        from accounts.donation_utils import get_user_donation_rank
+        
         data = []
         for msg in messages:
             # Determine if sender is the church owner
@@ -220,6 +223,11 @@ def conversation_messages_api(request, conversation_id):
                 except Exception:
                     pass
             
+            # Get donation rank (only for regular users, not church owners)
+            donation_rank = None
+            if not is_church_owner:
+                donation_rank = get_user_donation_rank(msg.sender)
+            
             # Prepare attachment data
             attachment_data = None
             if msg.attachment:
@@ -241,7 +249,8 @@ def conversation_messages_api(request, conversation_id):
                 'sender_name': sender_name,
                 'avatar': avatar,
                 'is_read': msg.is_read,
-                'attachment': attachment_data
+                'attachment': attachment_data,
+                'donation_rank': donation_rank
             })
         
         return JsonResponse({'messages': data})
