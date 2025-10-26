@@ -498,8 +498,13 @@ def manage_church(request, church_id=None):
         setattr(b, 'conflict_type', 'date' if has_date_conflict else ('user' if has_user_conflict else None))
         booking_list.append(b)
 
-    # Posts data for Content tab
-    posts = church.posts.filter(is_active=True).order_by('-created_at')[:20]
+    # Posts data for Content tab with counts
+    from django.db.models import Count
+    posts = church.posts.filter(is_active=True).annotate(
+        likes_count=Count('likes', distinct=True),
+        comments_count=Count('comments', filter=Q(comments__is_active=True), distinct=True),
+        bookmarks_count=Count('bookmarks', distinct=True)
+    ).order_by('-created_at')[:20]
     posts_count = church.posts.filter(is_active=True).count()
     
     # Add liked and bookmarked status to each post for consistency
@@ -5888,6 +5893,33 @@ def super_admin_bookings(request):
     
     monthly_trends = daily_trends
     
+    # Get revenue trend over time (based on trend_days filter)
+    from django.db.models import Sum
+    revenue_trends = []
+    for i in range(trend_days - 1, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        revenue = bookings.filter(
+            payment_status='paid',
+            payment_date__gte=day_start,
+            payment_date__lt=day_end
+        ).aggregate(total=Sum('payment_amount'))['total'] or 0
+        
+        # Format label based on days
+        if trend_days <= 7:
+            label = day.strftime('%a')  # Mon, Tue, etc.
+        elif trend_days <= 30:
+            label = day.strftime('%b %d')  # Jan 15
+        else:
+            label = day.strftime('%m/%d')  # 01/15
+        
+        revenue_trends.append({
+            'date': label,
+            'revenue': float(revenue)
+        })
+    
     # Get bookings by service category (based on service_days filter)
     from core.models import ServiceCategory
     category_stats = []
@@ -5922,6 +5954,46 @@ def super_admin_bookings(request):
     # Sort by count descending
     category_stats = sorted(category_stats, key=lambda x: x['count'], reverse=True)[:5]
     
+    # Get online paid bookings by parish (church) and revenue
+    from core.models import Church
+    from django.db.models import Sum
+    parish_paid_stats = []
+    parish_revenue_stats = []
+    churches = Church.objects.filter(is_active=True).order_by('name')
+    
+    for church in churches:
+        paid_count = bookings_filtered.filter(
+            church=church,
+            payment_status='paid'
+        ).count()
+        if paid_count > 0:
+            parish_paid_stats.append({
+                'name': church.name,
+                'count': paid_count,
+                'color': '#3B82F6'  # Default blue color
+            })
+        
+        # Calculate revenue for this church
+        revenue = bookings_filtered.filter(
+            church=church,
+            payment_status='paid'
+        ).aggregate(total=Sum('payment_amount'))['total'] or 0
+        
+        if revenue > 0:
+            parish_revenue_stats.append({
+                'name': church.name,
+                'revenue': float(revenue),
+                'color': '#10B981'  # Green color for revenue
+            })
+    
+    # Sort by count/revenue descending, then reverse for horizontal bar charts
+    # This makes highest values appear at the bottom (best visual practice for horizontal bars)
+    parish_paid_stats = sorted(parish_paid_stats, key=lambda x: x['count'], reverse=True)[:10]
+    parish_paid_stats = list(reversed(parish_paid_stats))
+    
+    parish_revenue_stats = sorted(parish_revenue_stats, key=lambda x: x['revenue'], reverse=True)[:10]
+    parish_revenue_stats = list(reversed(parish_revenue_stats))
+    
     # Paginate bookings (20 per page)
     from django.core.paginator import Paginator
     paginator = Paginator(bookings, 20)
@@ -5932,6 +6004,9 @@ def super_admin_bookings(request):
     import json
     monthly_trends_json = json.dumps(monthly_trends)
     category_stats_json = json.dumps(category_stats)
+    parish_paid_stats_json = json.dumps(parish_paid_stats)
+    parish_revenue_stats_json = json.dumps(parish_revenue_stats)
+    revenue_trends_json = json.dumps(revenue_trends)
     
     ctx = {
         'active': 'super_admin_bookings',
@@ -5952,9 +6027,128 @@ def super_admin_bookings(request):
         'online_payment_rate': round(online_payment_rate, 1),
         'monthly_trends': monthly_trends_json,
         'category_stats': category_stats_json,
+        'parish_paid_stats': parish_paid_stats_json,
+        'parish_revenue_stats': parish_revenue_stats_json,
+        'revenue_trends': revenue_trends_json,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_bookings.html', ctx)
+
+
+# Super Admin - Bookings Chart Data API
+@login_required
+def super_admin_bookings_chart_data(request):
+    """API endpoint to fetch chart data for bookings page without page reload."""
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from django.db.models import Count, Q, Sum
+    from datetime import datetime, timedelta
+    import json
+    
+    # Get parameters
+    chart = request.GET.get('chart')  # 'trends', 'serviceType', 'revenueTrend' (default)
+    trend_days = int(request.GET.get('trend_days', 30))
+    service_days = request.GET.get('service_days', 'all')
+    
+    # Get all bookings with related data
+    bookings = Booking.objects.select_related(
+        'user', 'church', 'service', 'service__category'
+    ).order_by('-created_at')
+    
+    # Booking Trends (daily aggregates)
+    if chart == 'trends':
+        monthly_trends = []
+        for i in range(trend_days - 1, -1, -1):
+            day = timezone.now() - timedelta(days=i)
+            day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+            day_end = day_start + timedelta(days=1)
+            
+            completed = bookings.filter(
+                status=Booking.STATUS_COMPLETED,
+                updated_at__gte=day_start,
+                updated_at__lt=day_end
+            ).count()
+            cancelled = bookings.filter(
+                Q(status=Booking.STATUS_CANCELED) | Q(status=Booking.STATUS_DECLINED),
+                updated_at__gte=day_start,
+                updated_at__lt=day_end
+            ).count()
+            pending = bookings.filter(
+                status=Booking.STATUS_REQUESTED,
+                created_at__gte=day_start,
+                created_at__lt=day_end
+            ).count()
+            
+            if trend_days <= 7:
+                label = day.strftime('%a')  # Mon, Tue, etc.
+            elif trend_days <= 30:
+                label = day.strftime('%b %d')  # Jan 15
+            else:
+                label = day.strftime('%m/%d')  # 01/15
+            
+            monthly_trends.append({
+                'month': label,
+                'completed': completed,
+                'cancelled': cancelled,
+                'pending': pending,
+            })
+        return JsonResponse({'monthly_trends': monthly_trends})
+    
+    # Bookings by Service Type
+    if chart == 'serviceType':
+        from core.models import ServiceCategory
+        category_stats = []
+        categories = ServiceCategory.objects.filter(is_active=True)
+        
+        if service_days != 'all':
+            service_period_days = int(service_days)
+            service_period_start = timezone.now() - timedelta(days=service_period_days)
+            bookings_for_categories = bookings.filter(created_at__gte=service_period_start)
+        else:
+            bookings_for_categories = bookings
+        
+        for category in categories:
+            count = bookings_for_categories.filter(service__category=category).count()
+            if count > 0:
+                category_stats.append({
+                    'name': category.name,
+                    'count': count,
+                    'color': category.color,
+                })
+        # Add uncategorized services
+        uncategorized_count = bookings_for_categories.filter(service__category__isnull=True).count()
+        if uncategorized_count > 0:
+            category_stats.append({
+                'name': 'Uncategorized',
+                'count': uncategorized_count,
+                'color': '#9CA3AF',
+            })
+        category_stats = sorted(category_stats, key=lambda x: x['count'], reverse=True)[:5]
+        return JsonResponse({'category_stats': category_stats})
+    
+    # Default: Revenue Trend Over Time (kept for backward compatibility)
+    revenue_trends = []
+    for i in range(trend_days - 1, -1, -1):
+        day = timezone.now() - timedelta(days=i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        revenue = bookings.filter(
+            payment_status='paid',
+            payment_date__gte=day_start,
+            payment_date__lt=day_end
+        ).aggregate(total=Sum('payment_amount'))['total'] or 0
+        
+        if trend_days <= 7:
+            label = day.strftime('%a')  # Mon, Tue, etc.
+        elif trend_days <= 30:
+            label = day.strftime('%b %d')  # Jan 15
+        else:
+            label = day.strftime('%m/%d')  # 01/15
+        
+        revenue_trends.append({'date': label, 'revenue': float(revenue)})
+    return JsonResponse({'revenue_trends': revenue_trends})
 
 
 # Super Admin - Moderation Management
@@ -7121,15 +7315,109 @@ def get_post_analytics(request, post_id):
             }
         }
         
+        # Donation analytics (if enabled)
+        donation_analytics = None
+        if post.enable_donation:
+            from django.db.models import Sum, Avg
+            from decimal import Decimal
+            
+            # Get completed donations
+            completed_donations = post.donations.filter(payment_status='completed')
+            
+            # Calculate donation stats
+            donation_stats = completed_donations.aggregate(
+                total_raised=Sum('amount'),
+                donor_count=Count('donor', distinct=True),
+                avg_donation=Avg('amount')
+            )
+            
+            total_raised = donation_stats['total_raised'] or Decimal('0.00')
+            donor_count = donation_stats['donor_count'] or 0
+            avg_donation = donation_stats['avg_donation'] or Decimal('0.00')
+            
+            # Calculate progress
+            goal = post.donation_goal or Decimal('0.00')
+            progress_percentage = 0
+            if goal > 0:
+                progress_percentage = min((float(total_raised) / float(goal)) * 100, 100)
+            
+            # Get donations over time (last 24 hours)
+            donations_over_time = []
+            for i in range(24):
+                hour_start = hours_ago_24 + timedelta(hours=i)
+                hour_end = hour_start + timedelta(hours=1)
+                
+                hour_donations = completed_donations.filter(
+                    completed_at__gte=hour_start,
+                    completed_at__lt=hour_end
+                ).aggregate(
+                    count=Count('id'),
+                    amount=Sum('amount')
+                )
+                
+                donations_over_time.append({
+                    'hour': hour_start.strftime('%H:%M'),
+                    'count': hour_donations['count'] or 0,
+                    'amount': float(hour_donations['amount'] or 0)
+                })
+            
+            # Get recent donations (last 10)
+            recent_donations = []
+            for donation in completed_donations.order_by('-completed_at')[:10]:
+                donor_name = 'Anonymous'
+                if donation.donor:
+                    if donation.is_anonymous:
+                        donor_name = 'Anonymous Donor'
+                    else:
+                        donor_name = donation.donor.get_full_name() or donation.donor.username
+                elif donation.donor_name:
+                    donor_name = donation.donor_name if not donation.is_anonymous else 'Anonymous Donor'
+                
+                recent_donations.append({
+                    'donor_name': donor_name,
+                    'amount': float(donation.amount),
+                    'time_ago': donation.time_ago if hasattr(donation, 'time_ago') else donation.completed_at.strftime('%Y-%m-%d %H:%M'),
+                    'is_anonymous': donation.is_anonymous
+                })
+            
+            # Donor demographics (followers vs non-followers)
+            follower_donations = completed_donations.filter(
+                donor__in=post.church.followers.values_list('user', flat=True)
+            ).count()
+            non_follower_donations = donor_count - follower_donations
+            
+            donation_analytics = {
+                'enabled': True,
+                'total_raised': float(total_raised),
+                'goal': float(goal) if goal else None,
+                'progress_percentage': round(progress_percentage, 1),
+                'donor_count': donor_count,
+                'avg_donation': float(avg_donation),
+                'donations_over_time': donations_over_time,
+                'recent_donations': recent_donations,
+                'donor_demographics': {
+                    'followers': {
+                        'count': follower_donations,
+                        'percentage': round((follower_donations / donor_count * 100) if donor_count > 0 else 0, 1)
+                    },
+                    'non_followers': {
+                        'count': non_follower_donations,
+                        'percentage': round((non_follower_donations / donor_count * 100) if donor_count > 0 else 0, 1)
+                    }
+                }
+            }
+        
         return JsonResponse({
             'success': True,
             'analytics': {
                 'post_id': post.id,
-                'post_type': post.get_post_type_display(),
-                'post_type_value': post.post_type,
+                'post_type': 'Fundraiser' if post.enable_donation else post.get_post_type_display(),
+                'post_type_value': 'fundraiser' if post.enable_donation else post.post_type,
                 'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
                 'updated_at': post.updated_at.strftime('%Y-%m-%d %H:%M'),
                 'content': post.content[:200],  # First 200 chars
+                'image_url': post.image.url if post.image else None,
+                'has_image': bool(post.image),
                 'status': 'published' if post.is_active else 'inactive',
                 'stats': {
                     'views': views_count,
@@ -7143,7 +7431,8 @@ def get_post_analytics(request, post_id):
                 'engagement_breakdown': engagement_breakdown,
                 'audience_demographics': audience_demographics,
                 'top_comments': top_comments,
-                'performance_insights': performance_insights
+                'performance_insights': performance_insights,
+                'donation_analytics': donation_analytics
             }
         })
         

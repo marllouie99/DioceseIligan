@@ -94,6 +94,16 @@ function populateAnalyticsModal(analytics) {
     // Update post content
     document.getElementById('analyticsPostContent').textContent = analytics.content;
     
+    // Update post image (if exists)
+    if (analytics.has_image && analytics.image_url) {
+        const imageSection = document.getElementById('postImageSection');
+        const imageElement = document.getElementById('analyticsPostImage');
+        imageElement.src = analytics.image_url;
+        imageSection.style.display = 'block';
+    } else {
+        document.getElementById('postImageSection').style.display = 'none';
+    }
+    
     // Update stats cards
     document.getElementById('analyticsViews').textContent = formatNumber(analytics.stats.views);
     document.getElementById('analyticsLikes').textContent = formatNumber(analytics.stats.likes);
@@ -119,6 +129,13 @@ function populateAnalyticsModal(analytics) {
     
     // Update performance insights
     updatePerformanceInsights(analytics.performance_insights);
+    
+    // Update donation analytics (if enabled)
+    if (analytics.donation_analytics && analytics.donation_analytics.enabled) {
+        showDonationAnalytics(analytics.donation_analytics);
+    } else {
+        hideDonationAnalytics();
+    }
     
     // Update meta info
     document.getElementById('analyticsPostId').textContent = analytics.post_id;
@@ -457,3 +474,280 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+
+/**
+ * Show and populate donation analytics section
+ */
+function showDonationAnalytics(donationData) {
+    const section = document.getElementById('donationAnalyticsSection');
+    if (!section) return;
+    
+    section.style.display = 'block';
+    
+    // Update donation stats cards
+    const totalRaised = donationData.total_raised || 0;
+    const goal = donationData.goal;
+    const progressPercent = donationData.progress_percentage || 0;
+    
+    document.getElementById('totalRaised').textContent = `₱${formatCurrency(totalRaised)}`;
+    document.getElementById('donorCount').textContent = formatNumber(donationData.donor_count || 0);
+    document.getElementById('avgDonation').textContent = `₱${formatCurrency(donationData.avg_donation || 0)}`;
+    
+    // Update goal progress
+    if (goal && goal > 0) {
+        document.getElementById('donationGoal').textContent = `₱${formatCurrency(goal)}`;
+        document.getElementById('donationProgress').textContent = `${progressPercent.toFixed(1)}%`;
+        document.getElementById('donationProgressBar').style.width = `${Math.min(progressPercent, 100)}%`;
+        document.getElementById('goalSection').style.display = 'block';
+    } else {
+        document.getElementById('goalSection').style.display = 'none';
+    }
+    
+    // Render donations over time chart
+    if (donationData.donations_over_time) {
+        renderDonationsChart(donationData.donations_over_time);
+    }
+    
+    // Update recent donations table
+    if (donationData.recent_donations) {
+        updateRecentDonations(donationData.recent_donations);
+    }
+    
+    // Update donor demographics
+    if (donationData.donor_demographics) {
+        updateDonorDemographics(donationData.donor_demographics);
+    }
+}
+
+/**
+ * Hide donation analytics section
+ */
+function hideDonationAnalytics() {
+    const section = document.getElementById('donationAnalyticsSection');
+    if (section) {
+        section.style.display = 'none';
+    }
+}
+
+/**
+ * Render donations over time chart
+ */
+let donationsChart = null;
+
+function renderDonationsChart(donationsData) {
+    const ctx = document.getElementById('donationsChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (donationsChart) {
+        donationsChart.destroy();
+    }
+    
+    const labels = donationsData.map(item => item.hour);
+    const amounts = donationsData.map(item => item.amount);
+    const counts = donationsData.map(item => item.count);
+    
+    donationsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Donation Amount (₱)',
+                    data: amounts,
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Number of Donations',
+                    data: counts,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y1',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 13,
+                        weight: '600'
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                if (context.datasetIndex === 0) {
+                                    label += '₱' + context.parsed.y.toFixed(2);
+                                } else {
+                                    label += context.parsed.y;
+                                }
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        },
+                        callback: function(value) {
+                            return '₱' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Amount (₱)',
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Count',
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Update recent donations table
+ */
+function updateRecentDonations(donations) {
+    const tbody = document.getElementById('recentDonationsBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    if (donations.length === 0) {
+        tbody.innerHTML = `
+            <tr class="no-donations">
+                <td colspan="3">No donations yet</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    donations.forEach(donation => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="donor-info">
+                    <div class="donor-avatar">${donation.donor_name.charAt(0).toUpperCase()}</div>
+                    <span>${escapeHtml(donation.donor_name)}</span>
+                    ${donation.is_anonymous ? '<span class="anonymous-badge">Anonymous</span>' : ''}
+                </div>
+            </td>
+            <td class="amount-cell">₱${formatCurrency(donation.amount)}</td>
+            <td class="time-cell">${donation.time_ago}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+/**
+ * Update donor demographics
+ */
+function updateDonorDemographics(demographics) {
+    // Followers
+    document.getElementById('followerDonorsCount').textContent = 
+        `${formatNumber(demographics.followers.count)} (${demographics.followers.percentage}%)`;
+    document.getElementById('followerDonorsProgress').style.width = 
+        `${demographics.followers.percentage}%`;
+    
+    // Non-Followers
+    document.getElementById('nonFollowerDonorsCount').textContent = 
+        `${formatNumber(demographics.non_followers.count)} (${demographics.non_followers.percentage}%)`;
+    document.getElementById('nonFollowerDonorsProgress').style.width = 
+        `${demographics.non_followers.percentage}%`;
+}
+
+/**
+ * Format currency with commas
+ */
+function formatCurrency(num) {
+    if (num === null || num === undefined) return '0.00';
+    return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}

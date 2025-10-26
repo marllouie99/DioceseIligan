@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelledData = monthlyTrends.map(t => t.cancelled);
     const pendingData = monthlyTrends.map(t => t.pending);
     
-    new Chart(trendsCtx, {
+    window.bookingTrendsChart = new Chart(trendsCtx, {
       type: 'line',
       data: {
         labels: labels,
@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryCounts = categoryStats.map(c => c.count);
     const categoryColors = categoryStats.map(c => c.color || 'rgba(59, 130, 246, 0.85)');
     
-    new Chart(serviceTypeCtx, {
+    window.serviceTypeChart = new Chart(serviceTypeCtx, {
       type: 'bar',
       data: {
         labels: categoryLabels.length > 0 ? categoryLabels : ['No Data'],
@@ -728,6 +728,190 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           },
           x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Revenue Trend Over Time Chart
+  const revenueTrendCtx = document.getElementById('revenueTrendChart');
+  if (revenueTrendCtx) {
+    const revenueTrends = {{ revenue_trends|safe }};
+    const dateLabels = revenueTrends.map(t => t.date);
+    const revenueData = revenueTrends.map(t => t.revenue);
+    
+    window.revenueTrendChart = new Chart(revenueTrendCtx, {
+      type: 'line',
+      data: {
+        labels: dateLabels,
+        datasets: [
+          {
+            label: 'Revenue',
+            data: revenueData,
+            borderColor: 'rgba(16, 185, 129, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+            pointBorderColor: 'white',
+            pointBorderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              callback: function(value) {
+                return '₱' + value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Revenue by Parish Chart
+  const parishRevenueCtx = document.getElementById('parishRevenueChart');
+  if (parishRevenueCtx) {
+    const parishRevenueStats = {{ parish_revenue_stats|safe }};
+    const revenueLabels = parishRevenueStats.map(p => p.name);
+    const revenueAmounts = parishRevenueStats.map(p => p.revenue);
+    const revenueColors = parishRevenueStats.map((p, index) => {
+      // Generate different shades of green for each parish
+      const hues = [
+        'rgba(16, 185, 129, 0.85)',      // Green
+        'rgba(5, 150, 105, 0.85)',       // Darker Green
+        'rgba(4, 120, 87, 0.85)',        // Even Darker Green
+        'rgba(6, 78, 59, 0.85)',         // Dark Forest Green
+        'rgba(52, 211, 153, 0.85)',      // Light Green
+        'rgba(110, 231, 183, 0.85)',     // Lighter Green
+        'rgba(167, 243, 208, 0.85)',     // Very Light Green
+        'rgba(209, 250, 229, 0.85)',     // Almost White Green
+        'rgba(34, 197, 94, 0.85)',       // Bright Green
+        'rgba(20, 83, 45, 0.85)'         // Dark Green
+      ];
+      return hues[index % hues.length];
+    });
+    
+    new Chart(parishRevenueCtx, {
+      type: 'bar',
+      data: {
+        labels: revenueLabels.length > 0 ? revenueLabels : ['No Data'],
+        datasets: [{
+          data: revenueAmounts.length > 0 ? revenueAmounts : [0],
+          backgroundColor: revenueColors,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              callback: function(value) {
+                return '₱' + value.toLocaleString();
+              }
+            }
+          },
+          y: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Online Paid Bookings by Parish Chart
+  const parishPaidCtx = document.getElementById('parishPaidBookingsChart');
+  if (parishPaidCtx) {
+    const parishPaidStats = {{ parish_paid_stats|safe }};
+    const parishLabels = parishPaidStats.map(p => p.name);
+    const parishCounts = parishPaidStats.map(p => p.count);
+    const parishColors = parishPaidStats.map((p, index) => {
+      // Generate different shades of blue for each parish
+      const hues = [
+        'rgba(59, 130, 246, 0.85)',      // Blue
+        'rgba(37, 99, 235, 0.85)',       // Darker Blue
+        'rgba(29, 78, 216, 0.85)',       // Even Darker Blue
+        'rgba(30, 58, 138, 0.85)',       // Navy
+        'rgba(96, 165, 250, 0.85)',      // Light Blue
+        'rgba(147, 197, 253, 0.85)',     // Lighter Blue
+        'rgba(191, 219, 254, 0.85)',     // Very Light Blue
+        'rgba(219, 234, 254, 0.85)',     // Almost White Blue
+        'rgba(3, 102, 214, 0.85)',       // Deep Blue
+        'rgba(12, 74, 110, 0.85)'        // Dark Navy
+      ];
+      return hues[index % hues.length];
+    });
+    
+    new Chart(parishPaidCtx, {
+      type: 'bar',
+      data: {
+        labels: parishLabels.length > 0 ? parishLabels : ['No Data'],
+        datasets: [{
+          data: parishCounts.length > 0 ? parishCounts : [0],
+          backgroundColor: parishColors,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          },
+          y: {
             grid: {
               display: false
             }
@@ -842,24 +1026,41 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTrendsChart(days);
       } else if (chartType === 'serviceType') {
         updateServiceTypeChart(days);
+      } else if (chartType === 'revenueTrend') {
+        updateRevenueTrendChart(days);
       }
     });
   });
 
-  // Function to update trends chart
+  // Function to update trends chart via AJAX
   function updateTrendsChart(days) {
     const subtitle = document.getElementById('trendSubtitle');
     if (subtitle) {
       subtitle.textContent = `Booking statistics over the last ${days} days`;
     }
     
-    // Reload page with chart filter
-    const url = new URL(window.location.href);
-    url.searchParams.set('trend_days', days);
-    window.location.href = url.toString();
+    // Fetch chart data via AJAX
+    fetch(`/app/super-admin/bookings/chart-data/?chart=trends&trend_days=${days}`)
+      .then(response => response.json())
+      .then(data => {
+        if (window.bookingTrendsChart && data.monthly_trends) {
+          const monthlyTrends = data.monthly_trends;
+          const labels = monthlyTrends.map(t => t.month);
+          const completedData = monthlyTrends.map(t => t.completed);
+          const cancelledData = monthlyTrends.map(t => t.cancelled);
+          const pendingData = monthlyTrends.map(t => t.pending);
+          
+          window.bookingTrendsChart.data.labels = labels;
+          window.bookingTrendsChart.data.datasets[0].data = completedData;
+          window.bookingTrendsChart.data.datasets[1].data = cancelledData;
+          window.bookingTrendsChart.data.datasets[2].data = pendingData;
+          window.bookingTrendsChart.update();
+        }
+      })
+      .catch(error => console.error('Error fetching trends chart data:', error));
   }
 
-  // Function to update service type chart
+  // Function to update service type chart via AJAX
   function updateServiceTypeChart(days) {
     const subtitle = document.getElementById('serviceTypeSubtitle');
     if (subtitle) {
@@ -870,14 +1071,49 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Reload page with chart filter
-    const url = new URL(window.location.href);
-    if (days === 'all') {
-      url.searchParams.delete('service_days');
-    } else {
-      url.searchParams.set('service_days', days);
+    // Fetch chart data via AJAX
+    fetch(`/app/super-admin/bookings/chart-data/?chart=serviceType&service_days=${days}`)
+      .then(response => response.json())
+      .then(data => {
+        if (window.serviceTypeChart && data.category_stats) {
+          const categoryStats = data.category_stats;
+          const categoryLabels = categoryStats.map(c => c.name);
+          const categoryCounts = categoryStats.map(c => c.count);
+          const categoryColors = categoryStats.map(c => c.color || 'rgba(59, 130, 246, 0.85)');
+          
+          window.serviceTypeChart.data.labels = categoryLabels.length > 0 ? categoryLabels : ['No Data'];
+          window.serviceTypeChart.data.datasets[0].data = categoryCounts.length > 0 ? categoryCounts : [0];
+          window.serviceTypeChart.data.datasets[0].backgroundColor = categoryColors;
+          window.serviceTypeChart.update();
+        }
+      })
+      .catch(error => console.error('Error fetching service type chart data:', error));
+  }
+
+  // Function to update revenue trend chart via AJAX
+  function updateRevenueTrendChart(days) {
+    const subtitle = document.getElementById('revenueTrendSubtitle');
+    if (subtitle) {
+      subtitle.textContent = `Revenue progression over the last ${days} days`;
     }
-    window.location.href = url.toString();
+    
+    // Fetch chart data via AJAX
+    fetch(`/app/super-admin/bookings/chart-data/?trend_days=${days}`)
+      .then(response => response.json())
+      .then(data => {
+        // Update the revenue trend chart
+        const revenueTrendCtx = document.getElementById('revenueTrendChart');
+        if (revenueTrendCtx && window.revenueTrendChart) {
+          const revenueTrends = data.revenue_trends;
+          const dateLabels = revenueTrends.map(t => t.date);
+          const revenueData = revenueTrends.map(t => t.revenue);
+          
+          window.revenueTrendChart.data.labels = dateLabels;
+          window.revenueTrendChart.data.datasets[0].data = revenueData;
+          window.revenueTrendChart.update();
+        }
+      })
+      .catch(error => console.error('Error fetching chart data:', error));
   }
 
   // Set active filter on page load based on URL parameters
@@ -1054,6 +1290,53 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="chart-container">
         <canvas id="bookingsByServiceTypeChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Trend Over Time Chart -->
+  <div style="margin-bottom: 2rem;">
+    <div class="chart-card">
+      <div class="chart-header-with-filter">
+        <div class="chart-title-group">
+          <h3 class="chart-title">Revenue Trend Over Time</h3>
+          <p class="chart-subtitle" id="revenueTrendSubtitle">Revenue progression over the last 30 days</p>
+        </div>
+        <div class="chart-time-filter">
+          <button class="time-filter-btn" data-days="7" data-chart="revenueTrend">7 Days</button>
+          <button class="time-filter-btn active" data-days="30" data-chart="revenueTrend">30 Days</button>
+          <button class="time-filter-btn" data-days="90" data-chart="revenueTrend">90 Days</button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="revenueTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue and Online Paid Bookings by Parish Charts (1x2 Grid) -->
+  <div class="charts-grid-2col">
+    <div class="chart-card">
+      <div class="chart-header-with-filter">
+        <div class="chart-title-group">
+          <h3 class="chart-title">Revenue by Parish</h3>
+          <p class="chart-subtitle" id="parishRevenueSubtitle">Total revenue from online paid bookings</p>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="parishRevenueChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header-with-filter">
+        <div class="chart-title-group">
+          <h3 class="chart-title">Online Paid Bookings by Parish</h3>
+          <p class="chart-subtitle" id="parishPaidSubtitle">Top parishes with online paid bookings</p>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="parishPaidBookingsChart"></canvas>
       </div>
     </div>
   </div>

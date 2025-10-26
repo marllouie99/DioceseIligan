@@ -55,8 +55,8 @@
                 </div>
               </td>
               <td>
-                <span class="post-type-badge post-type-{{ post.post_type|lower }}">
-                  {{ post.post_type|default:"bulletin"|title }}
+                <span class="post-type-badge post-type-{% if post.enable_donation %}fundraiser{% else %}{{ post.post_type|lower }}{% endif %}">
+                  {% if post.enable_donation %}Fundraiser{% else %}{{ post.post_type|default:"bulletin"|title }}{% endif %}
                 </span>
               </td>
               <td>

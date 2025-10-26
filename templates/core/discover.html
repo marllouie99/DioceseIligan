@@ -1,7 +1,7 @@
 {% extends 'layouts/app_base.html' %}
 {% load static media_extras %}
 
-{% block title %}Discover Churches - ChurchConnect{% endblock %}
+{% block title %}Discover Parishes - ChurchConnect{% endblock %}
 
 {% block extra_css %}
   <!-- Blue Sky Theme -->
@@ -28,8 +28,8 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-content">
-      <h1 class="page-title">Discover Churches</h1>
-      <p class="page-subtitle">Find and connect with churches in your community</p>
+      <h1 class="page-title">Discover Parishes</h1>
+      <p class="page-subtitle">Find and connect with parishes in your community</p>
     </div>
     <div class="header-actions">
       {% if user.is_superuser %}
@@ -37,7 +37,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14m7-7H5"/>
           </svg>
-          Create Church
+          Create Parish
         </a>
       {% endif %}
     </div>
@@ -53,7 +53,7 @@
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.35-4.35"/>
             </svg>
-            <input type="text" name="query" placeholder="Search churches, denominations, or locations..." value="{{ request.GET.query }}" class="search-input" id="searchInput">
+            <input type="text" name="query" placeholder="Search parishes, denominations, or locations..." value="{{ request.GET.query }}" class="search-input" id="searchInput">
             <button type="button" class="clear-btn" id="clearSearch" style="display: none;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
@@ -93,7 +93,7 @@
             <input type="text" name="city" id="{{ search_form.city.id_for_label }}" placeholder="Enter city..." value="{{ request.GET.city }}" class="filter-input">
           </div>
           <div class="filter-group">
-            <label for="{{ search_form.size.id_for_label }}" class="filter-label">Church Size</label>
+            <label for="{{ search_form.size.id_for_label }}" class="filter-label">Parish Size</label>
             <select name="size" id="{{ search_form.size.id_for_label }}" class="filter-select">
               <option value="">All Sizes</option>
               {% for value, label in search_form.size.field.choices %}
@@ -120,13 +120,13 @@
     </form>
   </div>
 
-  <!-- Results Summary and Churches Grid Container -->
+  <!-- Results Summary and Parishes Grid Container -->
   <div class="results-container">
     <div class="results-summary">
-      <p class="results-count">{{ total_churches }} church{{ total_churches|pluralize }} found</p>
+      <p class="results-count">{{ total_churches }} parish{{ total_churches|pluralize:"es" }} found</p>
     </div>
 
-    <!-- Churches Grid -->
+    <!-- Parishes Grid -->
     <div class="churches-grid">
     {% for church in churches %}
       <div class="church-card" data-church-id="{{ church.id }}">
@@ -139,7 +139,7 @@
           <span class="cover-placeholder-text">Cover image</span>
         </div>
         {% endif %}
-        <!-- Church Header with Avatar and Info -->
+        <!-- Parish Header with Avatar and Info -->
         <div class="church-header">
           <div class="church-avatar">
             {% if church.logo %}
@@ -168,7 +168,7 @@
           </div>
         </div>
         
-        <!-- Church Content -->
+        <!-- Parish Content -->
         <div class="church-content">
           <p class="church-description">{{ church.description|truncatewords:20 }}</p>
           
@@ -191,12 +191,12 @@
           </div>
         </div>
         
-        <!-- Church Actions -->
+        <!-- Parish Actions -->
         <div class="church-actions">
           {% if church.slug %}
           <a href="{% url 'core:church_detail' church.slug %}" class="btn btn-outline">
           {% else %}
-          <a href="#" class="btn btn-outline disabled" title="Church details not available">
+          <a href="#" class="btn btn-outline disabled" title="Parish details not available">
           {% endif %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -233,14 +233,14 @@
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
           <circle cx="12" cy="10" r="3"/>
         </svg>
-        <h3>No churches found</h3>
+        <h3>No parishes found</h3>
         <p>Try adjusting your search criteria.</p>
         {% if user.is_superuser %}
           <a href="{% url 'core:super_admin_create_church' %}" class="btn btn-primary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14m7-7H5"/>
             </svg>
-            Create Church
+            Create Parish
           </a>
         {% endif %}
       </div>

@@ -50,6 +50,7 @@ urlpatterns = [
     path('super-admin/categories/<int:category_id>/toggle/', views.super_admin_toggle_category, name='super_admin_toggle_category'),
     path('super-admin/categories/<int:category_id>/services/', views.super_admin_category_services, name='super_admin_category_services'),
     path('super-admin/bookings/', views.super_admin_bookings, name='super_admin_bookings'),
+    path('super-admin/bookings/chart-data/', views.super_admin_bookings_chart_data, name='super_admin_bookings_chart_data'),
     path('super-admin/moderation/', views.super_admin_moderation, name='super_admin_moderation'),
     
     # Media updates (AJAX)

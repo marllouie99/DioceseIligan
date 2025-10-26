@@ -50,6 +50,14 @@
         <p id="analyticsPostContent" class="post-content-text">Loading...</p>
       </div>
 
+      {# Post Image Section (only shown if post has image) #}
+      <div id="postImageSection" class="post-image-section" style="display: none;">
+        <h4>Post Image</h4>
+        <div class="post-image-container">
+          <img id="analyticsPostImage" src="" alt="Post Image" class="post-image">
+        </div>
+      </div>
+
       {# 1x5 Grid Analytics Cards #}
       <div class="analytics-grid-5">
         <div class="analytics-card">
@@ -240,6 +248,154 @@
               <div class="insight-content">
                 <h5>Peak Engagement Time</h5>
                 <p id="peakEngagementMessage">Most interactions occurred at peak time</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Donation Analytics Section (only shown for fundraiser posts) #}
+      <div id="donationAnalyticsSection" class="donation-analytics-section" style="display: none;">
+        <div class="section-container">
+          <div class="section-header">
+            <h4>💚 Fundraiser Analytics</h4>
+            <p>Track donations and fundraising progress</p>
+          </div>
+
+          {# 1x3 Grid Donation Stats Cards #}
+          <div class="donation-stats-grid">
+            <div class="donation-stat-card total-raised-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h5>Total Raised</h5>
+                <p class="stat-value" id="totalRaised">₱0.00</p>
+              </div>
+            </div>
+
+            <div class="donation-stat-card donors-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h5>Total Donors</h5>
+                <p class="stat-value" id="donorCount">0</p>
+              </div>
+            </div>
+
+            <div class="donation-stat-card avg-donation-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h5>Average Donation</h5>
+                <p class="stat-value" id="avgDonation">₱0.00</p>
+              </div>
+            </div>
+          </div>
+
+          {# Goal Progress (if goal is set) #}
+          <div id="goalSection" class="goal-section" style="display: none;">
+            <div class="goal-header">
+              <h5>Fundraising Goal Progress</h5>
+              <div class="goal-info">
+                <span class="progress-text"><strong id="donationProgress">0%</strong> Complete</span>
+                <span class="goal-text">Goal: <strong id="donationGoal">₱0.00</strong></span>
+              </div>
+            </div>
+            <div class="goal-progress-bar">
+              <div id="donationProgressBar" class="goal-progress-fill"></div>
+            </div>
+          </div>
+
+          {# Donations Over Time Chart #}
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Donations Over Time</h4>
+              <p>Hourly donation activity (Last 24 Hours)</p>
+            </div>
+            <div class="chart-content">
+              <canvas id="donationsChart" width="800" height="300"></canvas>
+            </div>
+          </div>
+
+          {# 1x2 Grid: Recent Donations & Donor Demographics #}
+          <div class="donation-details-grid">
+            {# Recent Donations Table #}
+            <div class="recent-donations-container">
+              <div class="section-header">
+                <h5>Recent Donations</h5>
+                <p>Latest 10 contributions</p>
+              </div>
+              <div class="donations-table-wrapper">
+                <table class="donations-table">
+                  <thead>
+                    <tr>
+                      <th>Donor</th>
+                      <th>Amount</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentDonationsBody">
+                    <tr class="no-donations">
+                      <td colspan="3">No donations yet</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {# Donor Demographics #}
+            <div class="donor-demographics-container">
+              <div class="section-header">
+                <h5>Donor Demographics</h5>
+                <p>Breakdown by follower status</p>
+              </div>
+              <div class="demographics-content">
+                <div class="demographic-item">
+                  <div class="demographic-label">
+                    <span class="demographic-name">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                      Followers
+                    </span>
+                    <span class="demographic-count" id="followerDonorsCount">0 (0%)</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill follower-progress" id="followerDonorsProgress" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div class="demographic-item">
+                  <div class="demographic-label">
+                    <span class="demographic-name">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                      </svg>
+                      Non-Followers
+                    </span>
+                    <span class="demographic-count" id="nonFollowerDonorsCount">0 (0%)</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill non-follower-progress" id="nonFollowerDonorsProgress" style="width: 0%"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
