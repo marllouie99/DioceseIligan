@@ -1,0 +1,65 @@
+SUS RESULT:
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Citizen 1	4	2	4	3	4	2	3	3	3	3
+Citizen 2	5	2	5	2	5	2	4	2	4	2
+Citizen 3	3	3	3	3	3	3	3	3	3	3
+Citizen 4	4	3	4	3	4	3	3	3	3	3
+Citizen 5	3	4	3	4	3	3	2	4	2	4
+Citizen 6	4	2	4	2	4	2	3	3	4	3
+Citizen 7	5	1	5	2	5	2	4	2	4	2
+Citizen 8	3	3	4	3	4	3	3	3	3	3
+Citizen 9	4	3	4	3	4	2	3	3	3	3
+Citizen 10	2	4	3	4	3	4	2	4	2	4
+Citizen 11	4	2	4	3	4	2	3	3	3	3
+Citizen 12	3	3	3	3	4	3	3	3	3	3
+Citizen 13	4	2	4	2	4	2	4	3	4	3
+Citizen 14	3	4	3	4	3	3	2	4	3	4
+Citizen 15	4	3	4	3	4	3	3	3	3	3
+Citizen 16	5	2	4	2	5	2	4	2	4	2
+Citizen 17	3	3	3	3	3	3	3	3	3	3
+Citizen 18	4	2	4	3	4	2	3	3	3	3
+Citizen 19	3	4	3	4	3	4	2	4	2	4
+Citizen 20	4	3	4	3	4	3	3	3	3	3
+Citizen 21	5	2	5	2	5	2	4	2	4	2
+Citizen 22	3	3	3	3	4	3	3	3	3	3
+Citizen 23	4	2	4	3	4	2	3	3	3	3
+Citizen 24	2	4	3	4	3	4	2	4	2	4
+Citizen 25	4	3	4	3	4	3	3	3	3	3
+Citizen 26	4	2	4	2	4	2	4	3	4	3
+Citizen 27	3	3	3	3	3	3	3	3	3	3
+Citizen 28	4	2	4	3	4	2	3	3	3	3
+Citizen 29	5	1	5	2	5	2	4	2	4	2
+Citizen 30	3	4	3	4	3	3	2	4	2	4
+Citizen 31	4	3	4	3	4	3	3	3	3	3
+Citizen 32	4	2	4	2	4	2	3	3	4	3
+Citizen 33	3	3	3	3	4	3	3	3	3	3
+Citizen 34	4	2	4	3	4	2	3	3	3	3
+Citizen 35	3	4	3	4	3	4	2	4	3	4
+Citizen 36	4	3	4	3	4	3	3	3	3	3
+Citizen 37	5	2	5	2	5	2	4	2	4	2
+Citizen 38	3	3	3	3	3	3	3	3	3	3
+Citizen 39	4	2	4	3	4	2	3	3	3	3
+Citizen 40	2	4	3	4	3	4	2	4	2	4
+Citizen 41	4	3	4	3	4	3	3	3	3	3
+Citizen 42	4	2	4	2	4	2	4	3	4	3
+Citizen 43	3	3	3	3	4	3	3	3	3	3
+Citizen 44	4	2	4	3	4	2	3	3	3	3
+Citizen 45	5	2	5	2	5	2	4	2	4	2
+Citizen 46	3	4	3	4	3	3	2	4	2	4
+Citizen 47	4	3	4	3	4	3	3	3	3	3
+Citizen 48	4	2	4	2	4	2	3	3	4	3
+Score:	68.25	82.25	68.25	50.50	71.25	82.25	50.00	48.00	52.50	48.00
+Citizens' Average SUS Score: 65.5
+
+
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Parish Admin 1	5	2	5	1	5	2	4	2	5	2
+Score:	5	2	5	1	5	2	4	2	5	2
+Parish Administrator's SUS Score: 87.5 (Excellent)
+
+
+
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Parish Staff 1	5	2	5	2	5	2	4	2	5	2
+Score:	5	2	5	2	5	2	4	2	5	2
+Parish Staff SUS Score: 87.5 / 100 (Excellent)

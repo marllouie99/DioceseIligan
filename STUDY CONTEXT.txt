@@ -1,5 +1,6 @@
 STUDY CONTEXT:
 
+
 The researchers plan to develop an integrated digital platform designed specifically for the parish administration or staff to efficiently manage a range of activities and services. This platform will streamline the process of accepting and organizing goods donations for parish-led outreach programs while also providing features for event reservations and the distribution of digital bulletins. Through a user-friendly platform interface, parish admins or staffs will be able to manage donations, reservation, post announcements, and deliver weekly sermon summaries and updates to the congregation. The system aims to enhance communication, promote community engagement, and ensure transparency in charitable activities, while generating insightful reports to support effective parish operations.
 
 Statement of the Problem
@@ -28,3 +29,74 @@ However, there are certain limitations to this system. The system relies on a st
 
 The study is a comprehensive web-based platform designed to streamline parish administration and enhance community engagement for Roman Catholic churches in the Philippines. This research presents the development and implementation of an integrated digital solution that addresses the operational challenges faced by parish administrators in managing donations, service bookings, event coordination, and community communication. Built using Django 5.2.6 framework with PostgreSQL database and cloud-based storage, the system integrates secure payment processing through PayPal and Stripe for donation management, enabling transparent fundraising campaigns with goal tracking and progress visualization. The platform provides a sophisticated booking system for sacramental services including baptism, weddings, and confessions, featuring intelligent scheduling with conflict detection and automated notification workflows. Parish administrators can manage their organizations through role-based access controls (owner, manager, staff), while parishioners can discover parishes, book services, make donations, and engage through social features including posts, comments, and real-time notifications. The system incorporates Philippine-specific address structures (region, province, city/municipality, barangay) and implements robust security measures including email verification, IP tracking, and rate limiting. Key functionalities include parish verification workflows, review and rating systems, comprehensive analytics dashboards, and insightful reporting tools that enable data-driven decision-making. This study 
 successfully demonstrates how modern web technologies can enhance transparency in charitable activities, improve parish-community communication, and allow parish staff to focus on their pastoral mission while efficiently managing administrative operations.
+
+- Researchers from St. Michael's College of Iligan City
+- The system name is Diocese of Iligan
+
+
+
+SUS RESULT:
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Citizen 1	4	2	4	3	4	2	3	3	3	3
+Citizen 2	5	2	5	2	5	2	4	2	4	2
+Citizen 3	3	3	3	3	3	3	3	3	3	3
+Citizen 4	4	3	4	3	4	3	3	3	3	3
+Citizen 5	3	4	3	4	3	3	2	4	2	4
+Citizen 6	4	2	4	2	4	2	3	3	4	3
+Citizen 7	5	1	5	2	5	2	4	2	4	2
+Citizen 8	3	3	4	3	4	3	3	3	3	3
+Citizen 9	4	3	4	3	4	2	3	3	3	3
+Citizen 10	2	4	3	4	3	4	2	4	2	4
+Citizen 11	4	2	4	3	4	2	3	3	3	3
+Citizen 12	3	3	3	3	4	3	3	3	3	3
+Citizen 13	4	2	4	2	4	2	4	3	4	3
+Citizen 14	3	4	3	4	3	3	2	4	3	4
+Citizen 15	4	3	4	3	4	3	3	3	3	3
+Citizen 16	5	2	4	2	5	2	4	2	4	2
+Citizen 17	3	3	3	3	3	3	3	3	3	3
+Citizen 18	4	2	4	3	4	2	3	3	3	3
+Citizen 19	3	4	3	4	3	4	2	4	2	4
+Citizen 20	4	3	4	3	4	3	3	3	3	3
+Citizen 21	5	2	5	2	5	2	4	2	4	2
+Citizen 22	3	3	3	3	4	3	3	3	3	3
+Citizen 23	4	2	4	3	4	2	3	3	3	3
+Citizen 24	2	4	3	4	3	4	2	4	2	4
+Citizen 25	4	3	4	3	4	3	3	3	3	3
+Citizen 26	4	2	4	2	4	2	4	3	4	3
+Citizen 27	3	3	3	3	3	3	3	3	3	3
+Citizen 28	4	2	4	3	4	2	3	3	3	3
+Citizen 29	5	1	5	2	5	2	4	2	4	2
+Citizen 30	3	4	3	4	3	3	2	4	2	4
+Citizen 31	4	3	4	3	4	3	3	3	3	3
+Citizen 32	4	2	4	2	4	2	3	3	4	3
+Citizen 33	3	3	3	3	4	3	3	3	3	3
+Citizen 34	4	2	4	3	4	2	3	3	3	3
+Citizen 35	3	4	3	4	3	4	2	4	3	4
+Citizen 36	4	3	4	3	4	3	3	3	3	3
+Citizen 37	5	2	5	2	5	2	4	2	4	2
+Citizen 38	3	3	3	3	3	3	3	3	3	3
+Citizen 39	4	2	4	3	4	2	3	3	3	3
+Citizen 40	2	4	3	4	3	4	2	4	2	4
+Citizen 41	4	3	4	3	4	3	3	3	3	3
+Citizen 42	4	2	4	2	4	2	4	3	4	3
+Citizen 43	3	3	3	3	4	3	3	3	3	3
+Citizen 44	4	2	4	3	4	2	3	3	3	3
+Citizen 45	5	2	5	2	5	2	4	2	4	2
+Citizen 46	3	4	3	4	3	3	2	4	2	4
+Citizen 47	4	3	4	3	4	3	3	3	3	3
+Citizen 48	4	2	4	2	4	2	3	3	4	3
+Score:	68.25	82.25	68.25	50.50	71.25	82.25	50.00	48.00	52.50	48.00
+Citizens' Average SUS Score: 65.5
+
+
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Parish Admin 1	5	2	5	1	5	2	4	2	5	2
+Score:	5	2	5	1	5	2	4	2	5	2
+Parish Administrator's SUS Score: 87.5 (Excellent)
+
+
+
+Respondent	Q1	Q2	Q3	Q4	Q5	Q6	Q7	Q8	Q9	Q10
+Parish Staff 1	5	2	5	2	5	2	4	2	5	2
+Score:	5	2	5	2	5	2	4	2	5	2
+Parish Staff SUS Score: 87.5 / 100 (Excellent)
