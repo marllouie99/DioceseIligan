@@ -5,7 +5,7 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "gunicorn ChurchIligan.wsgi:application -c gunicorn.conf.py",
+    "startCommand": "bash start.sh",
     "restartPolicyMaxRetries": 5
   }
 }
