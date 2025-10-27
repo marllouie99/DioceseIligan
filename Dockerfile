@@ -17,14 +17,17 @@ RUN pip install --upgrade pip && \
 # Copy project files
 COPY . .
 
-# Make build.sh executable and run it
-# Adding timestamp to bust cache
-RUN chmod +x build.sh && \
-    echo "Build timestamp: $(date)" && \
-    bash build.sh
+# Make build.sh executable
+RUN chmod +x build.sh
+
+# Only collect static files during build (no database needed)
+RUN python manage.py collectstatic --no-input --clear || echo "Static files collection skipped"
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 8000
 
-# Start command
-CMD ["gunicorn", "ChurchIligan.wsgi:application", "-c", "gunicorn.conf.py"]
+# Start command - run migrations then start server
+CMD ["bash", "start.sh"]
