@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentChurchSlug = null;
     let currentPostData = {};
     let currentPaymentMethod = 'paypal'; // Default to PayPal
+    let paypalButtonRendered = false; // Track if PayPal button is already rendered
     
     // Stripe Elements
     let stripe = null;
@@ -250,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentPostId = null;
         currentChurchSlug = null;
         currentPostData = {};
+        paypalButtonRendered = false; // Reset flag when closing modal
     }
     
     function renderPayPalButton() {
@@ -258,6 +260,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!amount || amount < 10) {
             document.getElementById('paypal-button-container').innerHTML = 
                 '<p class="error-message" style="display: block;">Please enter an amount of at least ₱10</p>';
+            paypalButtonRendered = false;
+            return;
+        }
+        
+        // Don't re-render if already rendered with same amount
+        if (paypalButtonRendered) {
             return;
         }
         
@@ -378,7 +386,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     showError('Payment error occurred. Please try again.');
                 }
             }
-        }).render('#paypal-button-container');
+        }).render('#paypal-button-container')
+        .then(() => {
+            paypalButtonRendered = true;
+        })
+        .catch(err => {
+            console.error('PayPal render error:', err);
+            container.innerHTML = '<p class="error-message" style="display: block;">Failed to load PayPal. Please refresh the page.</p>';
+        });
     }
     
     function showError(message) {
