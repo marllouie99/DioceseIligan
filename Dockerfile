@@ -17,11 +17,11 @@ RUN pip install --upgrade pip && \
 # Copy project files
 COPY . .
 
-# Make build.sh executable
-RUN chmod +x build.sh
-
-# Run build script
-RUN bash build.sh
+# Make build.sh executable and run it
+# Adding timestamp to bust cache
+RUN chmod +x build.sh && \
+    echo "Build timestamp: $(date)" && \
+    bash build.sh
 
 # Expose port
 EXPOSE 8000
