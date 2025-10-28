@@ -465,6 +465,12 @@
     <div class="form-section">
       <h2 class="form-section-title">Visual Identity</h2>
       
+      {% if form.errors and not is_edit %}
+        <div style="background: #fef3c7; color: #92400e; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; border: 1px solid #fbbf24;">
+          <strong>📝 Note:</strong> If you uploaded images before, please re-upload them. File uploads cannot be preserved when correcting form errors.
+        </div>
+      {% endif %}
+      
       <div class="form-grid-2">
         <div class="form-group">
           <label for="{{ form.logo.id_for_label }}" class="form-label">Church Logo</label>
@@ -474,7 +480,7 @@
                 <img src="{{ church.logo.url }}" alt="Current Logo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #d1d5db;">
                 <div>
                   <p style="margin: 0; font-size: 0.875rem; color: #6b7280; font-weight: 500;">Current Logo</p>
-                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace</p>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace (optional)</p>
                 </div>
               </div>
             </div>
@@ -491,7 +497,7 @@
                 <img src="{{ church.cover_image.url }}" alt="Current Cover" style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #d1d5db;">
                 <div>
                   <p style="margin: 0; font-size: 0.875rem; color: #6b7280; font-weight: 500;">Current Cover Image</p>
-                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace</p>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Upload a new file to replace (optional)</p>
                 </div>
               </div>
             </div>
@@ -728,47 +734,53 @@ $(document).ready(function() {
     }
   });
 
-  // If editing, preserve existing values and enable cascading
+  // Preserve location values on form errors or when editing
   {% if is_edit and church %}
-    // Store existing values
+    // Store existing values from church instance
     const existingRegion = '{{ church.region|escapejs }}';
     const existingProvince = '{{ church.province|escapejs }}';
     const existingCity = '{{ church.city_municipality|escapejs }}';
     const existingBarangay = '{{ church.barangay|escapejs }}';
-    
-    // Set the region value if it exists
-    if (existingRegion) {
-      $region.val(existingRegion);
-      
-      // Trigger region change to load provinces
-      setTimeout(() => {
-        $region.trigger('change');
-        
-        // After provinces load, set the province value
-        setTimeout(() => {
-          if (existingProvince) {
-            $province.val(existingProvince);
-            $province.trigger('change');
-            
-            // After cities load, set the city value
-            setTimeout(() => {
-              if (existingCity) {
-                $city.val(existingCity);
-                $city.trigger('change');
-                
-                // After barangays load, set the barangay value
-                setTimeout(() => {
-                  if (existingBarangay) {
-                    $barangay.val(existingBarangay);
-                  }
-                }, 300);
-              }
-            }, 300);
-          }
-        }, 300);
-      }, 100);
-    }
+  {% else %}
+    // Store values from form (in case of validation errors)
+    const existingRegion = '{{ form.region.value|escapejs }}';
+    const existingProvince = '{{ form.province.value|escapejs }}';
+    const existingCity = '{{ form.city_municipality.value|escapejs }}';
+    const existingBarangay = '{{ form.barangay.value|escapejs }}';
   {% endif %}
+  
+  // Set the region value if it exists
+  if (existingRegion) {
+    $region.val(existingRegion);
+    
+    // Trigger region change to load provinces
+    setTimeout(() => {
+      $region.trigger('change');
+      
+      // After provinces load, set the province value
+      setTimeout(() => {
+        if (existingProvince) {
+          $province.val(existingProvince);
+          $province.trigger('change');
+          
+          // After cities load, set the city value
+          setTimeout(() => {
+            if (existingCity) {
+              $city.val(existingCity);
+              $city.trigger('change');
+              
+              // After barangays load, set the barangay value
+              setTimeout(() => {
+                if (existingBarangay) {
+                  $barangay.val(existingBarangay);
+                }
+              }, 300);
+            }
+          }, 300);
+        }
+      }, 300);
+    }, 100);
+  }
 });
 </script>
 {% endblock %}

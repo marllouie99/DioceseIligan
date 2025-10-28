@@ -1137,43 +1137,55 @@ class SuperAdminChurchCreateForm(forms.ModelForm):
         except Exception:
             pass
         
-        # Initialize location dropdowns with existing values if editing
-        if self.instance and self.instance.pk:
-            # Region
-            if self.instance.region:
-                self.fields['region'].choices = [('', 'Select Region'), (self.instance.region, self.instance.region)]
-                self.fields['region'].initial = self.instance.region
-            else:
-                self.fields['region'].choices = [('', 'Select Region')]
-            
-            # Province
-            if self.instance.province:
-                self.fields['province'].choices = [('', 'Select Province'), (self.instance.province, self.instance.province)]
-                self.fields['province'].initial = self.instance.province
-                self.fields['province'].widget.attrs['disabled'] = False
-            else:
-                self.fields['province'].choices = [('', 'Select Province')]
-            
-            # City/Municipality
-            if self.instance.city_municipality:
-                self.fields['city_municipality'].choices = [('', 'Select City/Municipality'), (self.instance.city_municipality, self.instance.city_municipality)]
-                self.fields['city_municipality'].initial = self.instance.city_municipality
-                self.fields['city_municipality'].widget.attrs['disabled'] = False
-            else:
-                self.fields['city_municipality'].choices = [('', 'Select City/Municipality')]
-            
-            # Barangay
-            if self.instance.barangay:
-                self.fields['barangay'].choices = [('', 'Select Barangay'), (self.instance.barangay, self.instance.barangay)]
-                self.fields['barangay'].initial = self.instance.barangay
-                self.fields['barangay'].widget.attrs['disabled'] = False
-            else:
-                self.fields['barangay'].choices = [('', 'Select Barangay')]
+        # Get location values from either POST data (on validation error) or instance (on edit)
+        region_value = None
+        province_value = None
+        city_value = None
+        barangay_value = None
+        
+        # Check if we have POST data (form was submitted with errors)
+        if args and len(args) > 0 and hasattr(args[0], 'get'):
+            region_value = args[0].get('region')
+            province_value = args[0].get('province')
+            city_value = args[0].get('city_municipality')
+            barangay_value = args[0].get('barangay')
+        # Otherwise, check instance (editing existing church)
+        elif self.instance and self.instance.pk:
+            region_value = self.instance.region
+            province_value = self.instance.province
+            city_value = self.instance.city_municipality
+            barangay_value = self.instance.barangay
+        
+        # Initialize location dropdowns with preserved values
+        # Region
+        if region_value:
+            self.fields['region'].choices = [('', 'Select Region'), (region_value, region_value)]
+            self.fields['region'].initial = region_value
         else:
-            # For new churches, initialize empty choices
             self.fields['region'].choices = [('', 'Select Region')]
+        
+        # Province
+        if province_value:
+            self.fields['province'].choices = [('', 'Select Province'), (province_value, province_value)]
+            self.fields['province'].initial = province_value
+            self.fields['province'].widget.attrs['disabled'] = False
+        else:
             self.fields['province'].choices = [('', 'Select Province')]
+        
+        # City/Municipality
+        if city_value:
+            self.fields['city_municipality'].choices = [('', 'Select City/Municipality'), (city_value, city_value)]
+            self.fields['city_municipality'].initial = city_value
+            self.fields['city_municipality'].widget.attrs['disabled'] = False
+        else:
             self.fields['city_municipality'].choices = [('', 'Select City/Municipality')]
+        
+        # Barangay
+        if barangay_value:
+            self.fields['barangay'].choices = [('', 'Select Barangay'), (barangay_value, barangay_value)]
+            self.fields['barangay'].initial = barangay_value
+            self.fields['barangay'].widget.attrs['disabled'] = False
+        else:
             self.fields['barangay'].choices = [('', 'Select Barangay')]
         
         # Make most fields optional for flexibility
