@@ -485,6 +485,20 @@
               </div>
             </div>
           {% endif %}
+          
+          <!-- Image Preview Container for Logo -->
+          <div id="logo-preview" style="display: none; margin-bottom: 0.75rem; padding: 1rem; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <img id="logo-preview-img" src="" alt="Logo Preview" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #3b82f6;">
+              <div style="flex: 1;">
+                <p style="margin: 0; font-size: 0.875rem; color: #1e40af; font-weight: 600;">📸 Preview</p>
+                <p id="logo-preview-name" style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #3b82f6; font-weight: 500;"></p>
+                <p id="logo-preview-size" style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #60a5fa;"></p>
+                <button type="button" id="logo-clear-btn" style="margin-top: 0.5rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 500;">✕ Clear</button>
+              </div>
+            </div>
+          </div>
+          
           {{ form.logo }}
           <span class="form-help-text">Recommended: Square image, at least 200x200px</span>
         </div>
@@ -502,6 +516,22 @@
               </div>
             </div>
           {% endif %}
+          
+          <!-- Image Preview Container for Cover Image -->
+          <div id="cover-preview" style="display: none; margin-bottom: 0.75rem; padding: 1rem; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <img id="cover-preview-img" src="" alt="Cover Preview" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #3b82f6;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <p style="margin: 0; font-size: 0.875rem; color: #1e40af; font-weight: 600;">📸 Preview</p>
+                  <p id="cover-preview-name" style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #3b82f6; font-weight: 500;"></p>
+                  <p id="cover-preview-size" style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #60a5fa;"></p>
+                </div>
+                <button type="button" id="cover-clear-btn" style="padding: 0.25rem 0.75rem; background: #ef4444; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 500;">✕ Clear</button>
+              </div>
+            </div>
+          </div>
+          
           {{ form.cover_image }}
           <span class="form-help-text">Recommended: Wide image, at least 1200x400px</span>
         </div>
@@ -780,6 +810,100 @@ $(document).ready(function() {
         }
       }, 300);
     }, 100);
+  }
+
+  // Image Preview Functionality
+  // Logo Preview
+  const logoInput = document.getElementById('{{ form.logo.id_for_label }}');
+  const logoPreview = document.getElementById('logo-preview');
+  const logoPreviewImg = document.getElementById('logo-preview-img');
+  const logoPreviewName = document.getElementById('logo-preview-name');
+  const logoPreviewSize = document.getElementById('logo-preview-size');
+  const logoClearBtn = document.getElementById('logo-clear-btn');
+
+  if (logoInput) {
+    logoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file.');
+          logoInput.value = '';
+          return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          logoPreviewImg.src = e.target.result;
+          logoPreviewName.textContent = file.name;
+          logoPreviewSize.textContent = formatFileSize(file.size);
+          logoPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        logoPreview.style.display = 'none';
+      }
+    });
+
+    // Clear button
+    if (logoClearBtn) {
+      logoClearBtn.addEventListener('click', function() {
+        logoInput.value = '';
+        logoPreview.style.display = 'none';
+      });
+    }
+  }
+
+  // Cover Image Preview
+  const coverInput = document.getElementById('{{ form.cover_image.id_for_label }}');
+  const coverPreview = document.getElementById('cover-preview');
+  const coverPreviewImg = document.getElementById('cover-preview-img');
+  const coverPreviewName = document.getElementById('cover-preview-name');
+  const coverPreviewSize = document.getElementById('cover-preview-size');
+  const coverClearBtn = document.getElementById('cover-clear-btn');
+
+  if (coverInput) {
+    coverInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file.');
+          coverInput.value = '';
+          return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          coverPreviewImg.src = e.target.result;
+          coverPreviewName.textContent = file.name;
+          coverPreviewSize.textContent = formatFileSize(file.size);
+          coverPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        coverPreview.style.display = 'none';
+      }
+    });
+
+    // Clear button
+    if (coverClearBtn) {
+      coverClearBtn.addEventListener('click', function() {
+        coverInput.value = '';
+        coverPreview.style.display = 'none';
+      });
+    }
+  }
+
+  // Helper function to format file size
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
 });
 </script>
