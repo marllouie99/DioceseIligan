@@ -292,14 +292,28 @@ document.addEventListener('DOMContentLoaded', function() {
   const clearBtn = document.getElementById('clearSearch');
   const filterToggle = document.getElementById('filterToggle');
   const filtersPanel = document.getElementById('filtersPanel');
+  const searchForm = document.querySelector('.search-form');
   
-  // Show/hide clear button based on input
+  // Live search with debounce
+  let searchTimeout;
   searchInput.addEventListener('input', function() {
-    if (this.value.length > 0) {
+    const value = this.value.trim();
+    
+    // Show/hide clear button
+    if (value.length > 0) {
       clearBtn.style.display = 'flex';
     } else {
       clearBtn.style.display = 'none';
     }
+    
+    // Debounce search - wait 500ms after user stops typing
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      if (value.length >= 2 || value.length === 0) {
+        // Auto-submit form for live search
+        searchForm.submit();
+      }
+    }, 500);
   });
   
   // Clear search input
@@ -307,6 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.value = '';
     clearBtn.style.display = 'none';
     searchInput.focus();
+    // Trigger search to show all results
+    searchForm.submit();
   });
   
   // Toggle filters panel
