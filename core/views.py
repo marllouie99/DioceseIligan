@@ -451,6 +451,12 @@ def manage_church(request, church_id=None):
     # Verification UI form (separate submission endpoint)
     verif_form = ChurchVerificationUploadForm()
 
+    # Calculate date ranges (needed for analytics)
+    from datetime import datetime, timedelta
+    today = timezone.now().date()
+    last_30_days = today - timedelta(days=30)
+    last_7_days = today - timedelta(days=7)
+    
     # Get church statistics
     follower_count = church.followers.count()
     recent_followers = church.followers.select_related('user')[:10]
@@ -480,21 +486,6 @@ def manage_church(request, church_id=None):
     
     # Active followers (users who have interacted with church posts in last 30 days)
     from django.db.models import Q
-    active_followers = ChurchFollow.objects.filter(
-        church=church,
-        user__in=PostLike.objects.filter(
-            post__church=church,
-            created_at__date__gte=last_30_days
-        ).values_list('user_id', flat=True)
-    ).distinct().count() + ChurchFollow.objects.filter(
-        church=church,
-        user__in=PostComment.objects.filter(
-            post__church=church,
-            created_at__date__gte=last_30_days
-        ).values_list('user_id', flat=True)
-    ).distinct().count()
-    
-    # Remove duplicates by converting to set
     active_follower_ids = set(
         list(PostLike.objects.filter(
             post__church=church,
@@ -574,14 +565,8 @@ def manage_church(request, church_id=None):
     
     # Analytics data for Content tab
     from django.db.models import Sum
-    from datetime import datetime, timedelta
     
-    # Calculate date ranges
-    today = timezone.now().date()
-    last_30_days = today - timedelta(days=30)
-    last_7_days = today - timedelta(days=7)
-    
-    # Post analytics
+    # Post analytics (date ranges already calculated above)
     total_posts = posts_count
     posts_last_30_days = church.posts.filter(
         is_active=True, 
