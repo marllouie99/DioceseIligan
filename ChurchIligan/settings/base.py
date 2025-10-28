@@ -191,7 +191,14 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'http://127.0.0.1:8000',
     'http://localhost:8000',
     'https://churchiligan.onrender.com',
+    'https://churchiligan-production.up.railway.app',
 ])
+
+# Debug: Print CSRF_TRUSTED_ORIGINS to verify it's loaded correctly
+import sys
+if not DEBUG:
+    print(f"[CSRF DEBUG] CSRF_TRUSTED_ORIGINS loaded: {CSRF_TRUSTED_ORIGINS}", file=sys.stderr)
+    print(f"[CSRF DEBUG] ALLOWED_HOSTS loaded: {ALLOWED_HOSTS}", file=sys.stderr)
 
 # HTTPS handling behind reverse proxy (e.g., Render)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
