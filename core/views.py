@@ -454,6 +454,61 @@ def manage_church(request, church_id=None):
     # Get church statistics
     follower_count = church.followers.count()
     recent_followers = church.followers.select_related('user')[:10]
+    
+    # Followers analytics for Followers tab
+    # New followers this week
+    followers_this_week = ChurchFollow.objects.filter(
+        church=church,
+        followed_at__date__gte=last_7_days
+    ).count()
+    
+    # Followers from previous week (for comparison)
+    two_weeks_ago = today - timedelta(days=14)
+    followers_previous_week = ChurchFollow.objects.filter(
+        church=church,
+        followed_at__date__gte=two_weeks_ago,
+        followed_at__date__lt=last_7_days
+    ).count()
+    
+    # Calculate growth rate (percentage increase from previous week)
+    if followers_previous_week > 0:
+        growth_rate = round(((followers_this_week - followers_previous_week) / followers_previous_week) * 100, 1)
+    elif followers_this_week > 0:
+        growth_rate = 100  # 100% growth if we had 0 before and now have some
+    else:
+        growth_rate = 0
+    
+    # Active followers (users who have interacted with church posts in last 30 days)
+    from django.db.models import Q
+    active_followers = ChurchFollow.objects.filter(
+        church=church,
+        user__in=PostLike.objects.filter(
+            post__church=church,
+            created_at__date__gte=last_30_days
+        ).values_list('user_id', flat=True)
+    ).distinct().count() + ChurchFollow.objects.filter(
+        church=church,
+        user__in=PostComment.objects.filter(
+            post__church=church,
+            created_at__date__gte=last_30_days
+        ).values_list('user_id', flat=True)
+    ).distinct().count()
+    
+    # Remove duplicates by converting to set
+    active_follower_ids = set(
+        list(PostLike.objects.filter(
+            post__church=church,
+            created_at__date__gte=last_30_days
+        ).values_list('user_id', flat=True)) +
+        list(PostComment.objects.filter(
+            post__church=church,
+            created_at__date__gte=last_30_days
+        ).values_list('user_id', flat=True))
+    )
+    active_followers = ChurchFollow.objects.filter(
+        church=church,
+        user_id__in=active_follower_ids
+    ).count()
 
     # Appointments tab data
     appt_status = request.GET.get('appt_status', 'all')
@@ -780,6 +835,9 @@ def manage_church(request, church_id=None):
         'verif_form': verif_form,
         'follower_count': follower_count,
         'recent_followers': recent_followers,
+        'followers_this_week': followers_this_week,
+        'growth_rate': growth_rate,
+        'active_followers': active_followers,
         'bookings': booking_list,
         'booking_counts': counts,
         'appt_status': appt_status,

@@ -34,9 +34,11 @@
           </svg>
         </div>
         <div class="analytics-content">
-          <h4>{{ recent_followers|length|default:"0" }}</h4>
+          <h4>{{ followers_this_week|default:"0" }}</h4>
           <p>New This Week</p>
-          <span class="analytics-change positive">+12% from last week</span>
+          <span class="analytics-change {% if growth_rate > 0 %}positive{% elif growth_rate < 0 %}negative{% else %}neutral{% endif %}">
+            {% if growth_rate > 0 %}+{% endif %}{{ growth_rate|floatformat:1 }}% from last week
+          </span>
         </div>
       </div>
       
@@ -49,7 +51,9 @@
         <div class="analytics-content">
           <h4>{{ active_followers|default:"0" }}</h4>
           <p>Active Followers</p>
-          <span class="analytics-change positive">Engaging regularly</span>
+          <span class="analytics-change {% if active_followers > 0 %}positive{% else %}neutral{% endif %}">
+            {% if active_followers > 0 %}Engaging regularly{% else %}No recent activity{% endif %}
+          </span>
         </div>
       </div>
       
@@ -61,9 +65,11 @@
           </svg>
         </div>
         <div class="analytics-content">
-          <h4>{{ growth_rate|default:"85" }}%</h4>
+          <h4>{% if growth_rate > 0 %}+{% endif %}{{ growth_rate|floatformat:1 }}%</h4>
           <p>Growth Rate</p>
-          <span class="analytics-change positive">+5% this month</span>
+          <span class="analytics-change {% if growth_rate > 0 %}positive{% elif growth_rate < 0 %}negative{% else %}neutral{% endif %}">
+            Week over week comparison
+          </span>
         </div>
       </div>
     </div>
