@@ -2,13 +2,25 @@
 {# Individual Service Card #}
 <div class="service-card">
   <div class="service-image">
-    {% with service_images=service.get_images %}
+    {% with primary_image=service.get_primary_image service_images=service.get_images %}
       {% if service_images %}
         {% with images_count=service_images.count %}
         <div class="service-image-stack" onclick="openPhotoGallery({{ service.id }})">
-          {% for image in service_images|slice:":3" %}
-            <img src="{{ image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
-          {% endfor %}
+          {# Display primary image first if it exists #}
+          {% if primary_image %}
+            <img src="{{ primary_image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
+            {# Then display up to 2 more non-primary images #}
+            {% for image in service_images|slice:":3" %}
+              {% if not image.is_primary %}
+                <img src="{{ image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {# If no primary image, display first 3 images #}
+            {% for image in service_images|slice:":3" %}
+              <img src="{{ image.image.url }}" alt="{{ service.name }}" class="stacked-image" loading="lazy" decoding="async">
+            {% endfor %}
+          {% endif %}
           {% if images_count > 3 %}
             <div class="image-count-badge">+{{ images_count|add:"-3" }}</div>
           {% endif %}
