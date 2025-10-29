@@ -4707,7 +4707,13 @@ def get_post_comments(request, post_id):
             
             # Get user profile picture
             user_profile = getattr(comment.user, 'profile', None)
-            user_profile_picture = user_profile.profile_picture.url if user_profile and user_profile.profile_picture else None
+            user_profile_picture = None
+            if user_profile:
+                try:
+                    if user_profile.profile_picture:
+                        user_profile_picture = user_profile.profile_picture.url
+                except:
+                    pass
             
             # Get replies for this comment
             replies = comment.replies.filter(is_active=True).select_related('user', 'user__profile').order_by('created_at')
@@ -4719,7 +4725,13 @@ def get_post_comments(request, post_id):
                 
                 # Get reply user profile picture
                 reply_profile = getattr(reply.user, 'profile', None)
-                reply_profile_picture = reply_profile.profile_picture.url if reply_profile and reply_profile.profile_picture else None
+                reply_profile_picture = None
+                if reply_profile:
+                    try:
+                        if reply_profile.profile_picture:
+                            reply_profile_picture = reply_profile.profile_picture.url
+                    except:
+                        pass
                 
                 replies_data.append({
                     'id': reply.id,
