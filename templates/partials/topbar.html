@@ -17,12 +17,17 @@
 </div>
 {% else %}
 <div class="search" id="search-container">
-  <input type="text" placeholder="Search churches, events..." id="search-input" />
+  <input type="text" placeholder="Search churches, posts..." id="search-input" autocomplete="off" />
   <button class="search-clear" id="search-clear" type="button" style="display: none;">
     <svg viewBox="0 0 24 24" fill="none" style="width: 12px; height: 12px;">
       <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"/>
     </svg>
   </button>
+  <div class="search-dropdown" id="search-dropdown" style="display: none;">
+    <div class="search-results" id="search-results">
+      <!-- Results will be populated here -->
+    </div>
+  </div>
 </div>
 <div class="notification-dropdown-container" id="notification-dropdown">
   <button class="icon-btn notification-btn" id="notification-toggle" title="Notifications">

@@ -7846,3 +7846,64 @@ def user_activities(request):
     }
     
     return render(request, 'user_activities.html', context)
+
+
+@login_required
+def global_search(request):
+    """
+    Global search API for topbar search - returns churches and posts
+    """
+    query = request.GET.get('q', '').strip()
+    
+    if not query or len(query) < 2:
+        return JsonResponse({
+            'success': True,
+            'churches': [],
+            'posts': []
+        })
+    
+    # Search churches (parishes)
+    churches = Church.objects.filter(
+        Q(name__icontains=query) |
+        Q(description__icontains=query) |
+        Q(address__icontains=query)
+    ).filter(is_active=True)[:5]
+    
+    # Search posts
+    posts = Post.objects.filter(
+        Q(content__icontains=query) |
+        Q(church__name__icontains=query)
+    ).filter(is_active=True).select_related('church').order_by('-created_at')[:5]
+    
+    # Format church results
+    church_results = []
+    for church in churches:
+        church_results.append({
+            'id': church.id,
+            'name': church.name,
+            'slug': church.slug,
+            'address': church.address or '',
+            'logo_url': church.logo.url if church.logo else None,
+            'url': reverse('core:church_detail', kwargs={'slug': church.slug})
+        })
+    
+    # Format post results
+    post_results = []
+    for post in posts:
+        # Truncate content for preview
+        content_preview = post.content[:100] + '...' if len(post.content) > 100 else post.content
+        
+        post_results.append({
+            'id': post.id,
+            'content': content_preview,
+            'church_name': post.church.name,
+            'church_slug': post.church.slug,
+            'created_at': post.created_at.isoformat(),
+            'url': f"{reverse('core:church_detail', kwargs={'slug': post.church.slug})}#post-card-{post.id}"
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'churches': church_results,
+        'posts': post_results
+    })

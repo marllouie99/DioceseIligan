@@ -962,5 +962,36 @@ function toggleDescription(button) {
         feather.replace();
     }
 }
+
+// Scroll to post if hash is present in URL
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#post-card-')) {
+        // First, switch to Posts & Updates tab
+        const postsTab = document.querySelector('[data-tab="posts"]');
+        if (postsTab && !postsTab.classList.contains('active')) {
+            postsTab.click();
+        }
+        
+        // Wait a bit for posts to load and tab to switch
+        setTimeout(() => {
+            const postElement = document.querySelector(hash);
+            if (postElement) {
+                postElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                // Add a highlight effect
+                postElement.style.transition = 'background-color 0.5s ease';
+                postElement.style.backgroundColor = 'rgba(30, 144, 255, 0.1)';
+                setTimeout(() => {
+                    postElement.style.backgroundColor = '';
+                }, 2000);
+            } else {
+                console.log('Post element not found:', hash);
+            }
+        }, 800);
+    }
+});
 </script>
 {% endblock %}

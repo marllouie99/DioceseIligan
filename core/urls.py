@@ -132,6 +132,9 @@ urlpatterns = [
     # User Activities
     path('my-activities/', views.user_activities, name='user_activities'),
     
+    # Global Search
+    path('api/search/', views.global_search, name='global_search'),
+    
     # API endpoints
     path('api/service/<int:service_id>/images/', views.service_images_api, name='service_images_api'),
     

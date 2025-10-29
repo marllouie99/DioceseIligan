@@ -10,7 +10,7 @@ class SearchModule {
     this.config = {
       minQueryLength: 3,
       debounceDelay: 300,
-      searchEndpoint: '/api/search/',
+      searchEndpoint: '/app/api/search/',
       ...config
     };
     
@@ -135,19 +135,27 @@ class SearchModule {
       // Show loading state
       this.showLoadingState();
 
-      // Make search request
-      const response = await fetch(this.config.searchEndpoint, {
-        method: 'POST',
+      // Make search request (GET with query parameter)
+      const response = await fetch(`${this.config.searchEndpoint}?q=${encodeURIComponent(query)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': this.getCSRFToken(),
-        },
-        body: JSON.stringify({ query })
+        }
       });
 
       if (response.ok) {
         const data = await response.json();
-        this.displayResults(data.results || []);
+        // Handle the new API response format
+        if (data.success) {
+          // Combine churches and posts into results array
+          const results = [
+            ...(data.churches || []).map(c => ({ ...c, type: 'church' })),
+            ...(data.posts || []).map(p => ({ ...p, type: 'post' }))
+          ];
+          this.displayResults(results);
+        } else {
+          this.displayResults([]);
+        }
       } else {
         throw new Error(`Search failed: ${response.status}`);
       }
