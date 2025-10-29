@@ -83,10 +83,25 @@ class ProfileTabsModule {
    * @private
    */
   initializeDefaultTab() {
-    const activeTab = document.querySelector('.nav-tab.active');
-    if (activeTab) {
-      const tabName = activeTab.getAttribute('data-tab');
-      this.switchTab(tabName);
+    // Check for tab parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    console.log('[ProfileTabs] URL tab parameter:', tabParam);
+    console.log('[ProfileTabs] Available tabs:', Object.keys(this.tabContents));
+    
+    if (tabParam && this.tabContents[tabParam]) {
+      // Switch to tab specified in URL
+      console.log('[ProfileTabs] Switching to tab from URL:', tabParam);
+      this.switchTab(tabParam);
+    } else {
+      // Use default active tab
+      const activeTab = document.querySelector('.nav-tab.active');
+      if (activeTab) {
+        const tabName = activeTab.getAttribute('data-tab');
+        console.log('[ProfileTabs] Switching to default active tab:', tabName);
+        this.switchTab(tabName);
+      }
     }
   }
 
