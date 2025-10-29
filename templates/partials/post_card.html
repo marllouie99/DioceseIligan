@@ -233,8 +233,8 @@
         {% csrf_token %}
         <div class="comment-input-group">
           <div class="comment-avatar">
-            {% if user.profile and user.profile.profile_picture %}
-              <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="user-avatar-small" width="32" height="32">
+            {% if user.profile and user.profile.profile_image %}
+              <img src="{{ user.profile.profile_image.url }}" alt="{{ user.get_full_name }}" class="user-avatar-small" width="32" height="32">
             {% else %}
               <div class="avatar-placeholder small">{{ user_initial|default:"U" }}</div>
             {% endif %}

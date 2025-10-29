@@ -4663,6 +4663,20 @@ def add_post_comment(request, post_id):
         # Get user display data
         user_display_name, user_initial = get_user_display_data(request.user, getattr(request.user, 'profile', None))
         
+        # Get user profile picture
+        user_profile = getattr(request.user, 'profile', None)
+        user_profile_picture = None
+        if user_profile:
+            try:
+                if user_profile.profile_image:
+                    user_profile_picture = user_profile.profile_image.url
+            except:
+                pass
+        
+        # Get donation rank
+        from accounts.donation_utils import get_user_donation_rank
+        user_rank = get_user_donation_rank(request.user)
+        
         return JsonResponse({
             'success': True,
             'message': 'Comment added successfully',
@@ -4671,9 +4685,11 @@ def add_post_comment(request, post_id):
                 'content': comment.content,
                 'user_name': user_display_name,
                 'user_initial': user_initial,
+                'user_profile_picture': user_profile_picture,
                 'created_at': comment.created_at.isoformat(),
                 'is_reply': comment.is_reply,
-                'parent_id': parent_comment.id if parent_comment else None
+                'parent_id': parent_comment.id if parent_comment else None,
+                'donation_rank': user_rank
             },
             'comment_count': post.comment_count
         })
@@ -4710,8 +4726,8 @@ def get_post_comments(request, post_id):
             user_profile_picture = None
             if user_profile:
                 try:
-                    if user_profile.profile_picture:
-                        user_profile_picture = user_profile.profile_picture.url
+                    if user_profile.profile_image:
+                        user_profile_picture = user_profile.profile_image.url
                 except:
                     pass
             
@@ -4728,8 +4744,8 @@ def get_post_comments(request, post_id):
                 reply_profile_picture = None
                 if reply_profile:
                     try:
-                        if reply_profile.profile_picture:
-                            reply_profile_picture = reply_profile.profile_picture.url
+                        if reply_profile.profile_image:
+                            reply_profile_picture = reply_profile.profile_image.url
                     except:
                         pass
                 
