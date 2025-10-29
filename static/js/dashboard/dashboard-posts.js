@@ -449,7 +449,10 @@ class DashboardPosts {
     
     div.innerHTML = `
       <div class="comment-avatar">
-        <div class="avatar-placeholder small">${comment.user_initial}</div>
+        ${comment.user_profile_picture 
+          ? `<img src="${comment.user_profile_picture}" alt="${comment.user_name}" class="user-avatar-small" width="32" height="32">` 
+          : `<div class="avatar-placeholder small">${comment.user_initial}</div>`
+        }
       </div>
       <div class="comment-content">
         <div class="comment-author">
@@ -471,7 +474,10 @@ class DashboardPosts {
         ${comment.replies ? comment.replies.map(reply => 
           `<div class="comment comment-reply">
             <div class="comment-avatar">
-              <div class="avatar-placeholder small">${reply.user_initial}</div>
+              ${reply.user_profile_picture 
+                ? `<img src="${reply.user_profile_picture}" alt="${reply.user_name}" class="user-avatar-small" width="32" height="32">` 
+                : `<div class="avatar-placeholder small">${reply.user_initial}</div>`
+              }
             </div>
             <div class="comment-content">
               <div class="comment-author">

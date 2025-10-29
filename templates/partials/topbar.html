@@ -63,7 +63,13 @@
 {% endif %}
 <div class="profile-dropdown" id="profile-dropdown">
   <button class="profile-btn" id="profile-toggle"{% if profile_essentials_incomplete %} title="Complete your essential info: {{ profile_essentials_missing|join:', ' }}"{% endif %}>
-    <div class="avatar">{{ user_initial }}</div>
+    <div class="avatar">
+      {% if user.profile and user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="{{ user_display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+      {% else %}
+        {{ user_initial }}
+      {% endif %}
+    </div>
     <span class="name">{{ user_display_name }}</span>
     <span class="icon chev"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg></span>
   </button>

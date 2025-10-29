@@ -4705,6 +4705,10 @@ def get_post_comments(request, post_id):
             user_display_name, user_initial = get_user_display_data(comment.user, getattr(comment.user, 'profile', None))
             user_rank = get_user_donation_rank(comment.user)
             
+            # Get user profile picture
+            user_profile = getattr(comment.user, 'profile', None)
+            user_profile_picture = user_profile.profile_picture.url if user_profile and user_profile.profile_picture else None
+            
             # Get replies for this comment
             replies = comment.replies.filter(is_active=True).select_related('user', 'user__profile').order_by('created_at')
             replies_data = []
@@ -4712,11 +4716,17 @@ def get_post_comments(request, post_id):
             for reply in replies:
                 reply_user_display_name, reply_user_initial = get_user_display_data(reply.user, getattr(reply.user, 'profile', None))
                 reply_rank = get_user_donation_rank(reply.user)
+                
+                # Get reply user profile picture
+                reply_profile = getattr(reply.user, 'profile', None)
+                reply_profile_picture = reply_profile.profile_picture.url if reply_profile and reply_profile.profile_picture else None
+                
                 replies_data.append({
                     'id': reply.id,
                     'content': reply.content,
                     'user_name': reply_user_display_name,
                     'user_initial': reply_user_initial,
+                    'user_profile_picture': reply_profile_picture,
                     'created_at': reply.created_at.isoformat(),
                     'is_reply': True,
                     'parent_id': comment.id,
@@ -4728,6 +4738,7 @@ def get_post_comments(request, post_id):
                 'content': comment.content,
                 'user_name': user_display_name,
                 'user_initial': user_initial,
+                'user_profile_picture': user_profile_picture,
                 'created_at': comment.created_at.isoformat(),
                 'is_reply': False,
                 'replies': replies_data,
