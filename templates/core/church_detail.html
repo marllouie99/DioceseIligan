@@ -964,33 +964,42 @@ function toggleDescription(button) {
 }
 
 // Scroll to post if hash is present in URL
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
     const hash = window.location.hash;
     if (hash && hash.startsWith('#post-card-')) {
-        // First, switch to Posts & Updates tab
-        const postsTab = document.querySelector('[data-tab="posts"]');
-        if (postsTab && !postsTab.classList.contains('active')) {
-            postsTab.click();
-        }
+        console.log('[Church Detail] Detected post hash:', hash);
         
-        // Wait a bit for posts to load and tab to switch
+        // Use a longer delay to ensure all scripts have loaded
         setTimeout(() => {
-            const postElement = document.querySelector(hash);
-            if (postElement) {
-                postElement.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-                // Add a highlight effect
-                postElement.style.transition = 'background-color 0.5s ease';
-                postElement.style.backgroundColor = 'rgba(30, 144, 255, 0.1)';
+            // First, switch to Posts & Updates tab
+            const postsTab = document.querySelector('[data-tab="posts"]');
+            if (postsTab) {
+                console.log('[Church Detail] Clicking posts tab');
+                postsTab.click();
+                
+                // Wait for tab content to be visible
                 setTimeout(() => {
-                    postElement.style.backgroundColor = '';
-                }, 2000);
+                    const postElement = document.querySelector(hash);
+                    if (postElement) {
+                        console.log('[Church Detail] Scrolling to post');
+                        postElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                        // Add a highlight effect
+                        postElement.style.transition = 'background-color 0.5s ease';
+                        postElement.style.backgroundColor = 'rgba(30, 144, 255, 0.1)';
+                        setTimeout(() => {
+                            postElement.style.backgroundColor = '';
+                        }, 2000);
+                    } else {
+                        console.log('[Church Detail] Post element not found:', hash);
+                    }
+                }, 300);
             } else {
-                console.log('Post element not found:', hash);
+                console.log('[Church Detail] Posts tab not found');
             }
-        }, 800);
+        }, 100);
     }
 });
 </script>
