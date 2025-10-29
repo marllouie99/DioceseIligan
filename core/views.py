@@ -7862,18 +7862,22 @@ def global_search(request):
             'posts': []
         })
     
-    # Search churches (parishes)
-    churches = Church.objects.filter(
-        Q(name__icontains=query) |
-        Q(description__icontains=query) |
-        Q(address__icontains=query)
-    ).filter(is_active=True)[:5]
+    # Split query into words for flexible matching
+    words = query.split()
     
-    # Search posts
-    posts = Post.objects.filter(
-        Q(content__icontains=query) |
-        Q(church__name__icontains=query)
-    ).filter(is_active=True).select_related('church').order_by('-created_at')[:5]
+    # Search churches (parishes) - match any word
+    church_query = Q()
+    for word in words:
+        church_query |= Q(name__icontains=word) | Q(description__icontains=word) | Q(address__icontains=word)
+    
+    churches = Church.objects.filter(church_query).filter(is_active=True).distinct()[:5]
+    
+    # Search posts - match any word
+    post_query = Q()
+    for word in words:
+        post_query |= Q(content__icontains=word) | Q(church__name__icontains=word)
+    
+    posts = Post.objects.filter(post_query).filter(is_active=True).select_related('church').order_by('-created_at').distinct()[:5]
     
     # Format church results
     church_results = []
