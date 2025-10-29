@@ -614,10 +614,23 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         activity_type=UserInteraction.ACTIVITY_POST_VIEW
     ).select_related('content_type').prefetch_related('content_object').order_by('-created_at')[:10]
     
-    # Get user's donations
-    user_donations = Donation.objects.filter(
+    # Get user's donations with pagination
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    
+    donations_list = Donation.objects.filter(
         donor=request.user
-    ).select_related('post', 'post__church').order_by('-created_at')[:20]
+    ).select_related('post', 'post__church').order_by('-created_at')
+    
+    # Paginate donations (10 per page)
+    donations_paginator = Paginator(donations_list, 10)
+    donations_page = request.GET.get('donations_page', 1)
+    
+    try:
+        user_donations = donations_paginator.page(donations_page)
+    except PageNotAnInteger:
+        user_donations = donations_paginator.page(1)
+    except EmptyPage:
+        user_donations = donations_paginator.page(donations_paginator.num_pages)
     
     # Calculate donation statistics
     from django.db.models import Sum, Count

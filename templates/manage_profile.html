@@ -1536,7 +1536,7 @@
       </div>
 
       <!-- Donations Table -->
-      <div class="section-header">
+      <div class="section-header" id="donations-section">
         <h2 class="section-title">Donation History</h2>
         <p class="section-description">Track all your donations and their status</p>
       </div>
@@ -1672,6 +1672,67 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Pagination Controls -->
+      {% if user_donations.has_other_pages %}
+      <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+        {% if user_donations.has_previous %}
+          <a href="?donations_page=1#donations-section" class="pagination-btn" title="First page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="11 17 6 12 11 7"/>
+              <polyline points="18 17 13 12 18 7"/>
+            </svg>
+          </a>
+          <a href="?donations_page={{ user_donations.previous_page_number }}#donations-section" class="pagination-btn" title="Previous page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </a>
+        {% else %}
+          <span class="pagination-btn disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="11 17 6 12 11 7"/>
+              <polyline points="18 17 13 12 18 7"/>
+            </svg>
+          </span>
+          <span class="pagination-btn disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </span>
+        {% endif %}
+        
+        <span class="pagination-info" style="padding: 0.5rem 1rem; background: #f3f4f6; border-radius: 8px; font-size: 0.875rem; font-weight: 600; color: #374151;">
+          Page {{ user_donations.number }} of {{ user_donations.paginator.num_pages }}
+        </span>
+        
+        {% if user_donations.has_next %}
+          <a href="?donations_page={{ user_donations.next_page_number }}#donations-section" class="pagination-btn" title="Next page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+          <a href="?donations_page={{ user_donations.paginator.num_pages }}#donations-section" class="pagination-btn" title="Last page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="13 17 18 12 13 7"/>
+              <polyline points="6 17 11 12 6 7"/>
+            </svg>
+          </a>
+        {% else %}
+          <span class="pagination-btn disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </span>
+          <span class="pagination-btn disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="13 17 18 12 13 7"/>
+              <polyline points="6 17 11 12 6 7"/>
+            </svg>
+          </span>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
     
     <!-- Rank Info Modal -->
