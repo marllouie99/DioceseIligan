@@ -977,6 +977,14 @@ window.addEventListener('load', function() {
                 console.log('[Church Detail] Clicking posts tab');
                 postsTab.click();
                 
+                // Force tab to stay active by clicking again after a delay
+                setTimeout(() => {
+                    if (!postsTab.classList.contains('active')) {
+                        console.log('[Church Detail] Re-activating posts tab');
+                        postsTab.click();
+                    }
+                }, 200);
+                
                 // Wait for tab content to be visible
                 setTimeout(() => {
                     const postElement = document.querySelector(hash);
@@ -995,7 +1003,7 @@ window.addEventListener('load', function() {
                     } else {
                         console.log('[Church Detail] Post element not found:', hash);
                     }
-                }, 300);
+                }, 400);
             } else {
                 console.log('[Church Detail] Posts tab not found');
             }
