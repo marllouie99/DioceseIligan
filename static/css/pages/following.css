@@ -17,6 +17,77 @@
   box-sizing: border-box;
 }
 
+/* =============================================================================
+   PAGE HEADER WITH DISTANCE BUTTON
+   ============================================================================= */
+
+.following-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.following-page .header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Sort by Distance Button */
+.btn-sort-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-sort-distance:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-sort-distance:active {
+  transform: translateY(0);
+}
+
+.btn-sort-distance:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-sort-distance svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Distance Display in Church Card */
+.distance-item {
+  color: #10b981 !important;
+  font-weight: 600 !important;
+}
+
+.distance-item svg {
+  color: #10b981 !important;
+}
+
+.distance-text {
+  color: #10b981;
+  font-weight: 600;
+}
+
 /* Reset: never constrain the BODY width on this page class (prevents right-side gap) */
 body.page-following {
   max-width: none !important;

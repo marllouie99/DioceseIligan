@@ -33,6 +33,17 @@
       <h1 class="page-title">Following</h1>
       <p class="page-subtitle">Churches you're following</p>
     </div>
+    {% if user.is_authenticated %}
+    <div class="header-actions">
+      <button type="button" class="btn-sort-distance" id="sortByDistance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Sort by Nearest
+      </button>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Churches List -->
@@ -70,6 +81,15 @@
               </svg>
               <span>{{ church.followers_count }} followers</span>
             </div>
+            {% if user.is_authenticated %}
+            <div class="detail-item distance-item" data-church-address="{{ church.full_address }}" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span class="distance-text">Calculating...</span>
+            </div>
+            {% endif %}
             <div class="detail-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
@@ -183,6 +203,154 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
+
+  // Distance calculation and sorting
+  const sortByDistanceBtn = document.getElementById('sortByDistance');
+  if (sortByDistanceBtn) {
+    const userStreet = '{{ user_street|escapejs }}';
+    const userBarangay = '{{ user_barangay|escapejs }}';
+    const userCity = '{{ user_city|escapejs }}';
+    const userProvince = '{{ user_province|escapejs }}';
+    
+    const userAddress = [userStreet, userBarangay, userCity, userProvince, 'Philippines']
+      .filter(part => part && part.trim())
+      .join(', ');
+    
+    if (!userAddress || userAddress === 'Philippines') {
+      sortByDistanceBtn.disabled = true;
+      sortByDistanceBtn.title = 'Please complete your address in profile settings';
+      sortByDistanceBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Address Required';
+      return;
+    }
+    
+    sortByDistanceBtn.addEventListener('click', async function() {
+      this.disabled = true;
+      this.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Calculating...';
+      
+      try {
+        await calculateAndDisplayDistances(userAddress);
+        sortChurchesByDistance();
+        this.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Sorted by Nearest';
+      } catch (error) {
+        console.error('Error calculating distances:', error);
+        showNotification('Could not calculate distances. Please try again.', 'error');
+        this.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Sort by Nearest';
+      } finally {
+        this.disabled = false;
+      }
+    });
+  }
+  
+  async function calculateAndDisplayDistances(userAddress) {
+    const churchCards = document.querySelectorAll('.church-card');
+    
+    for (let i = 0; i < churchCards.length; i++) {
+      const card = churchCards[i];
+      const distanceItem = card.querySelector('.distance-item');
+      if (!distanceItem) continue;
+      
+      const churchAddress = distanceItem.dataset.churchAddress;
+      
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1100));
+      }
+      
+      const distance = await calculateDistance(userAddress, churchAddress);
+      
+      if (distance !== null) {
+        card.dataset.distance = distance;
+        distanceItem.querySelector('.distance-text').textContent = `${distance.toFixed(1)} km away`;
+        distanceItem.style.display = 'flex';
+      } else {
+        card.dataset.distance = '999999';
+        distanceItem.querySelector('.distance-text').textContent = 'Distance unavailable';
+        distanceItem.style.display = 'flex';
+      }
+    }
+  }
+  
+  async function calculateDistance(address1, address2) {
+    try {
+      const coord1 = await geocodeAddress(address1);
+      const coord2 = await geocodeAddress(address2);
+      
+      if (!coord1 || !coord2) return null;
+      
+      const R = 6371;
+      const dLat = toRad(coord2.lat - coord1.lat);
+      const dLon = toRad(coord2.lng - coord1.lng);
+      
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(toRad(coord1.lat)) * Math.cos(toRad(coord2.lat)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      
+      return distance;
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+      return null;
+    }
+  }
+  
+  function toRad(degrees) {
+    return degrees * (Math.PI / 180);
+  }
+  
+  async function geocodeAddress(address) {
+    const addressVariations = [
+      address,
+      address.split(',').slice(1).join(',').trim(),
+      address.split(',').slice(-3).join(',').trim(),
+      address.split(',').slice(-2).join(',').trim(),
+    ].filter(a => a && a !== 'Philippines');
+    
+    for (const addr of addressVariations) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1&countrycodes=ph`;
+        
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'ChurchConnect/1.0'
+          }
+        });
+        
+        if (!response.ok) {
+          continue;
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          return {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+          };
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (error) {
+        continue;
+      }
+    }
+    
+    return null;
+  }
+  
+  function sortChurchesByDistance() {
+    const list = document.querySelector('.churches-list');
+    const cards = Array.from(list.querySelectorAll('.church-card'));
+    
+    cards.sort((a, b) => {
+      const distA = parseFloat(a.dataset.distance) || 999999;
+      const distB = parseFloat(b.dataset.distance) || 999999;
+      return distA - distB;
+    });
+    
+    cards.forEach(card => list.appendChild(card));
+    list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 });
 
 function showNotification(message, type = 'info') {

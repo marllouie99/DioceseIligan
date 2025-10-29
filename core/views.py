@@ -212,6 +212,25 @@ def discover(request):
             .values_list('church_id', flat=True)
         )
     
+    # Get user address for distance calculation
+    user_address_data = {}
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            user_address_data = {
+                'user_street': profile.street_address or '',
+                'user_barangay': profile.barangay or '',
+                'user_city': profile.city_municipality or '',
+                'user_province': profile.province or '',
+            }
+        except:
+            user_address_data = {
+                'user_street': '',
+                'user_barangay': '',
+                'user_city': '',
+                'user_province': '',
+            }
+    
     ctx = {
         'active': 'discover',
         'page_title': 'Discover Churches',
@@ -220,6 +239,7 @@ def discover(request):
         'user_followed_churches': user_followed_churches,
         'total_churches': paginator.count,
     }
+    ctx.update(user_address_data)
     ctx.update(_app_context(request))
     return render(request, 'core/discover.html', ctx)
 
@@ -1237,11 +1257,31 @@ def following(request):
         followed_at=F('followers__followed_at')
     ).order_by('-followed_at')
     
+    # Get user address for distance calculation
+    user_address_data = {}
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            user_address_data = {
+                'user_street': profile.street_address or '',
+                'user_barangay': profile.barangay or '',
+                'user_city': profile.city_municipality or '',
+                'user_province': profile.province or '',
+            }
+        except:
+            user_address_data = {
+                'user_street': '',
+                'user_barangay': '',
+                'user_city': '',
+                'user_province': '',
+            }
+    
     ctx = {
         'active': 'following',
         'page_title': 'Following',
         'followed_churches': followed_churches,
     }
+    ctx.update(user_address_data)
     ctx.update(_app_context(request))
     return render(request, 'core/following.html', ctx)
 
@@ -7038,6 +7078,60 @@ def api_get_church_availability(request, church_id):
         return JsonResponse({
             'success': False,
             'error': 'An error occurred while fetching church availability data.'
+        }, status=500)
+
+
+def api_get_pending_booking_dates(request, church_id):
+    """API endpoint to fetch dates with pending bookings for the current user at a specific church."""
+    from django.http import JsonResponse
+    from datetime import date, timedelta
+    
+    try:
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'success': False,
+                'error': 'Authentication required.',
+                'pending_dates': []
+            }, status=401)
+            
+        church = get_object_or_404(Church, id=church_id)
+        
+        # Get pending bookings for this user at this church
+        # Only get bookings from today onwards
+        today = date.today()
+        future_date = today + timedelta(days=30)  # Look ahead 30 days
+        
+        pending_bookings = Booking.objects.filter(
+            user=request.user,
+            service__church=church,
+            status__in=['pending', 'requested'],  # Handle both status values
+            date__gte=today,
+            date__lte=future_date
+        ).values_list('date', flat=True).distinct()
+        
+        # Convert dates to string format
+        pending_dates = [d.strftime('%Y-%m-%d') for d in pending_bookings]
+        
+        return JsonResponse({
+            'success': True,
+            'church_id': church.id,
+            'pending_dates': pending_dates
+        }, status=200)
+        
+    except Church.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Church not found.',
+            'pending_dates': []
+        }, status=404)
+        
+    except Exception as e:
+        logger.error(f'API Pending booking dates fetch error: {str(e)}')
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while fetching pending booking dates.',
+            'pending_dates': []
         }, status=500)
 
 

@@ -163,6 +163,12 @@ class BookingModal {
     this.elements.imagePrevBtn?.addEventListener('click', () => this.previousImage());
     this.elements.imageNextBtn?.addEventListener('click', () => this.nextImage());
     
+    // Date slot button events
+    this.setupDateSlotButtons();
+    
+    // Time slot button events
+    this.setupTimeSlotButtons();
+    
     // Keyboard events
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.modal?.classList.contains('active')) {
@@ -172,10 +178,168 @@ class BookingModal {
     });
   }
   
+  setupDateSlotButtons() {
+    // Date slots will be generated after church data is loaded
+    // See open() method where generateDateSlots() is called
+  }
+  
+  async generateDateSlots() {
+    const dateSlotGrid = this.modal.querySelector('#dateSlotGrid');
+    if (!dateSlotGrid) return;
+    
+    // Clear existing slots
+    dateSlotGrid.innerHTML = '';
+    
+    // Fetch pending booking dates for this church
+    let pendingDates = [];
+    if (this.churchData && this.churchData.id) {
+      pendingDates = await this.fetchPendingBookingDates(this.churchData.id);
+    }
+    
+    // Generate next 14 days
+    const today = new Date();
+    const daysToShow = 14;
+    
+    // Sundays are typically closed for most services (example logic)
+    const closedDays = [0]; // 0 = Sunday
+    
+    for (let i = 0; i < daysToShow; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      
+      const dayOfWeek = date.getDay();
+      const dateString = this.formatDateForInput(date);
+      const isClosed = closedDays.includes(dayOfWeek);
+      const isToday = i === 0;
+      const hasPending = pendingDates.includes(dateString);
+      
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'date-slot-btn';
+      button.setAttribute('data-date', dateString);
+      
+      if (isClosed) {
+        button.classList.add('closed');
+      }
+      if (isToday) {
+        button.classList.add('today');
+      }
+      if (hasPending) {
+        button.classList.add('has-pending');
+      }
+      
+      // Create date display elements
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNumber = date.getDate();
+      const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+      
+      button.innerHTML = `
+        <span class="date-day">${dayName}</span>
+        <span class="date-number">${dayNumber}</span>
+        <span class="date-month">${monthName}</span>
+      `;
+      
+      // Add click handler (allow selection even if has pending)
+      if (!isClosed) {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          const dateValue = button.getAttribute('data-date');
+          
+          // Remove selected class from all date buttons
+          dateSlotGrid.querySelectorAll('.date-slot-btn').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          
+          // Add selected class to clicked button
+          button.classList.add('selected');
+          
+          // Set the date input value
+          if (this.elements.dateInput) {
+            this.elements.dateInput.value = dateValue;
+            this.selectedDate = dateValue;
+            this.onDateChange();
+          }
+          
+          // Show warning if date has pending booking
+          if (hasPending) {
+            this.showPendingDateWarning(dateValue);
+          }
+        });
+      }
+      
+      dateSlotGrid.appendChild(button);
+    }
+  }
+  
+  async fetchPendingBookingDates(churchId) {
+    try {
+      const response = await fetch(`/app/api/church/${churchId}/pending-booking-dates/`);
+      if (!response.ok) {
+        return [];
+      }
+      const data = await response.json();
+      return data.pending_dates || [];
+    } catch (error) {
+      console.error('Error fetching pending booking dates:', error);
+      return [];
+    }
+  }
+  
+  showPendingDateWarning(date) {
+    const dateHint = this.elements.dateHint;
+    if (dateHint) {
+      const dateObj = new Date(date + 'T00:00:00');
+      const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      dateHint.innerHTML = `⚠️ You have a pending booking request for ${formattedDate}. You can still book another appointment.`;
+      dateHint.style.color = '#d97706';
+      dateHint.style.fontWeight = '600';
+    }
+  }
+  
+  formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  
+  setupTimeSlotButtons() {
+    const timeSlotButtons = this.modal.querySelectorAll('.time-slot-btn');
+    timeSlotButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const timeValue = button.getAttribute('data-time');
+        
+        // Remove selected class from all buttons
+        timeSlotButtons.forEach(btn => btn.classList.remove('selected'));
+        
+        // Add selected class to clicked button
+        button.classList.add('selected');
+        
+        // Set the time input value
+        if (this.elements.timeInput) {
+          this.elements.timeInput.value = timeValue;
+          this.selectedTime = timeValue;
+          this.updateSummary();
+        }
+      });
+    });
+  }
+  
   onTimeChange() {
     if (this.elements.timeInput?.value) {
       this.selectedTime = this.elements.timeInput.value;
       this.updateSummary();
+      
+      // Sync with time slot buttons
+      const timeSlotButtons = this.modal.querySelectorAll('.time-slot-btn');
+      timeSlotButtons.forEach(btn => {
+        if (btn.getAttribute('data-time') === this.selectedTime) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
+      });
     }
   }
   
@@ -213,6 +377,9 @@ class BookingModal {
         // Initialize wizard
         this.updateStepDisplay();
         this.updateDateConstraints();
+        
+        // Generate date slots after church data is loaded
+        this.generateDateSlots();
       })
       .catch(error => {
         console.error('Error loading service data:', error);
@@ -757,6 +924,17 @@ class BookingModal {
   onDateChange() {
     this.selectedDate = this.elements.dateInput?.value || '';
     this.clearErrors();
+    this.updateSummary();
+    
+    // Sync with date slot buttons
+    const dateSlotButtons = this.modal.querySelectorAll('.date-slot-btn');
+    dateSlotButtons.forEach(btn => {
+      if (btn.getAttribute('data-date') === this.selectedDate) {
+        btn.classList.add('selected');
+      } else {
+        btn.classList.remove('selected');
+      }
+    });
   }
   
   updateSummary() {

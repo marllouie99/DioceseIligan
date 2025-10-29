@@ -132,14 +132,7 @@
 }
 
 .search-icon {
-  position: absolute;
-  left: 18px;
-  width: 22px;
-  height: 22px;
-  color: #7A9AB2;
-  z-index: 2;
-  transition: all 0.3s ease;
-  pointer-events: none;
+  display: none;
 }
 
 .search-input-group:focus-within .search-icon {
@@ -150,7 +143,7 @@
 .search-input-group input,
 .search-input {
   flex: 1;
-  padding: 0 110px 0 52px;
+  padding: 0 60px 0 20px;
   border: none;
   background: transparent;
   font-size: 15px;
@@ -160,6 +153,7 @@
   width: 100%;
   height: 100%;
   line-height: 56px;
+  min-width: 0;
 }
 
 .search-input-group input::placeholder {
@@ -503,6 +497,11 @@
   padding: 0 0 16px 0;
   border-bottom: 1px solid rgba(30, 144, 255, 0.15);
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .results-summary::before {
@@ -522,6 +521,59 @@
 .results-count::before {
   content: '🔍';
   font-size: 16px;
+}
+
+/* Sort by Distance Button */
+.btn-sort-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-sort-distance:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-sort-distance:active {
+  transform: translateY(0);
+}
+
+.btn-sort-distance:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-sort-distance svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Distance Display in Church Card */
+.distance-item {
+  color: #10b981 !important;
+  font-weight: 600 !important;
+}
+
+.distance-item svg {
+  color: #10b981 !important;
+}
+
+.distance-text {
+  color: #10b981;
+  font-weight: 600;
 }
 
 /* Churches Grid - Social Media Style */

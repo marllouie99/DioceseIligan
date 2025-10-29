@@ -86,6 +86,7 @@ urlpatterns = [
     path('api/service/<int:service_id>/', views.api_get_service, name='api_get_service'),
     path('api/service-images/<int:service_id>/', views.api_service_images, name='api_service_images'),
     path('api/church/<int:church_id>/availability/', views.api_get_church_availability, name='api_get_church_availability'),
+    path('api/church/<int:church_id>/pending-booking-dates/', views.api_get_pending_booking_dates, name='api_get_pending_booking_dates'),
     path('api/church/<int:church_id>/services/', views.api_get_church_services, name='api_get_church_services'),
     
     # Availability Management
