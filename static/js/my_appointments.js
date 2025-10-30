@@ -191,7 +191,7 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     // Show/hide cancel button based on status
     const cancelBtn = document.getElementById('cancel-booking-btn');
     if (cancelBtn) {
-        if (status === 'pending') {
+        if (status === 'pending' || status === 'requested') {
             cancelBtn.style.display = 'flex';
         } else {
             cancelBtn.style.display = 'none';

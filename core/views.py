@@ -1249,15 +1249,15 @@ def appointments(request):
 @login_required
 @require_http_methods(["POST"])
 def cancel_booking(request, booking_id):
-    """Cancel a booking (user can only cancel their own pending bookings)."""
+    """Cancel a booking (user can only cancel their own pending/requested bookings)."""
     try:
         booking = Booking.objects.get(id=booking_id, user=request.user)
         
-        # Only allow cancellation of pending bookings
-        if booking.status != 'pending':
+        # Only allow cancellation of pending or requested bookings
+        if booking.status not in ['pending', 'requested']:
             return JsonResponse({
                 'success': False,
-                'message': 'Only pending bookings can be cancelled.'
+                'message': 'Only pending or requested bookings can be cancelled.'
             }, status=400)
         
         # Update booking status to canceled

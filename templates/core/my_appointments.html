@@ -144,7 +144,7 @@
                     <i data-feather="eye"></i>
                   </button>
                   
-                  {% if b.status == 'pending' %}
+                  {% if b.status == 'pending' or b.status == 'requested' %}
                     <button class="booking-icon-btn btn-danger" onclick="confirmCancelBooking({{ b.id }}, '{{ b.code }}', '{{ b.service.name|escapejs }}')" title="Cancel Booking">
                       <i data-feather="x-circle"></i>
                     </button>
