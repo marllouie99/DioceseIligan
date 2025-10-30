@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -1244,6 +1244,41 @@ def appointments(request):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/my_appointments.html', ctx)
+
+
+@login_required
+@require_http_methods(["POST"])
+def cancel_booking(request, booking_id):
+    """Cancel a booking (user can only cancel their own pending bookings)."""
+    try:
+        booking = Booking.objects.get(id=booking_id, user=request.user)
+        
+        # Only allow cancellation of pending bookings
+        if booking.status != 'pending':
+            return JsonResponse({
+                'success': False,
+                'message': 'Only pending bookings can be cancelled.'
+            }, status=400)
+        
+        # Update booking status to canceled
+        booking.status = 'canceled'
+        booking.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Booking cancelled successfully.'
+        })
+        
+    except Booking.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Booking not found or you do not have permission to cancel it.'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)
 
 
 @login_required

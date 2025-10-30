@@ -10,6 +10,7 @@ let currentServiceIsFree = false;
 let stripe = null;
 let stripeElements = null;
 let stripeCardElement = null;
+let cancelBookingId = null;
 
 /**
  * Open the appointment summary modal with booking information
@@ -886,6 +887,86 @@ function initializeAppointmentSummaryModal() {
             }
         });
     }
+});
+
+/**
+ * Open cancel booking confirmation modal
+ */
+function confirmCancelBooking(bookingId, code, serviceName) {
+    cancelBookingId = bookingId;
+    document.getElementById('cancel-booking-code').textContent = code;
+    document.getElementById('cancel-booking-service').textContent = serviceName;
+    document.getElementById('cancelBookingModal').style.display = 'flex';
+    
+    // Re-initialize Feather icons
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+}
+
+/**
+ * Close cancel booking modal
+ */
+function closeCancelModal() {
+    document.getElementById('cancelBookingModal').style.display = 'none';
+    cancelBookingId = null;
+}
+
+/**
+ * Cancel the booking
+ */
+function cancelBooking() {
+    if (!cancelBookingId) return;
+    
+    const btn = document.getElementById('confirm-cancel-btn');
+    btn.disabled = true;
+    btn.textContent = 'Cancelling...';
+    
+    fetch(`/app/cancel-booking/${cancelBookingId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeCancelModal();
+            // Show success message
+            alert('Booking cancelled successfully!');
+            // Reload page to update the list
+            window.location.reload();
+        } else {
+            alert(data.message || 'Failed to cancel booking. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'Yes, Cancel Booking';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Yes, Cancel Booking';
+    });
+}
+
+/**
+ * Get CSRF token from cookies
+ */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 // Expose functions globally for inline event handlers (if needed)
@@ -893,3 +974,6 @@ window.openReviewModal = openReviewModal;
 window.closeReviewModal = closeReviewModal;
 window.openAppointmentSummary = openAppointmentSummary;
 window.closeAppointmentSummary = closeAppointmentSummary;
+window.confirmCancelBooking = confirmCancelBooking;
+window.closeCancelModal = closeCancelModal;
+window.cancelBooking = cancelBooking;
