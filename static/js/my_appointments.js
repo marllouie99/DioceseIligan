@@ -188,10 +188,11 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     statusBadge.textContent = statusDisplay;
     statusBadge.className = 'badge badge-' + status;
     
-    // Show/hide cancel button based on status
+    // Show/hide cancel button based on status (only for pending/requested, not canceled/approved/declined/completed)
     const cancelBtn = document.getElementById('cancel-booking-btn');
     if (cancelBtn) {
-        if (status === 'pending' || status === 'requested') {
+        const cancellableStatuses = ['pending', 'requested'];
+        if (cancellableStatuses.includes(status)) {
             cancelBtn.style.display = 'flex';
         } else {
             cancelBtn.style.display = 'none';
