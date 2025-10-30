@@ -14,7 +14,7 @@ let stripeCardElement = null;
 /**
  * Open the appointment summary modal with booking information
  */
-function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor) {
+function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor, declineReason) {
     // Basic info
     document.getElementById('summary-code').textContent = code;
     document.getElementById('summary-service').textContent = serviceName;
@@ -66,6 +66,16 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
         notesSection.style.display = 'block';
     } else {
         notesSection.style.display = 'none';
+    }
+    
+    // Decline Reason
+    const declineReasonSection = document.getElementById('summary-decline-reason-section');
+    const declineReasonContent = document.getElementById('summary-decline-reason');
+    if (status === 'declined' && declineReason && declineReason.trim()) {
+        declineReasonContent.textContent = declineReason;
+        declineReasonSection.style.display = 'block';
+    } else {
+        declineReasonSection.style.display = 'none';
     }
     
     // Store service price and free status

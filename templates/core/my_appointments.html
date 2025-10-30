@@ -138,7 +138,8 @@
                     '{{ b.payment_transaction_id|default:''|escapejs }}',
                     '{{ b.service.category.name|default:''|escapejs }}',
                     '{{ b.service.category.icon|default:''|escapejs }}',
-                    '{{ b.service.category.color|default:'' }}'
+                    '{{ b.service.category.color|default:'' }}',
+                    '{{ b.decline_reason|default:''|escapejs }}'
                   )" title="View Summary">
                     <i data-feather="eye"></i>
                   </button>
@@ -157,16 +158,6 @@
                 </div>
               </td>
             </tr>
-            {% if b.status == 'declined' and b.decline_reason %}
-              <tr class="decline-reason-row">
-                <td colspan="8">
-                  <div class="booking-decline-reason">
-                    <i data-feather="alert-circle"></i>
-                    <span><strong>Decline Reason:</strong> {{ b.decline_reason }}</span>
-                  </div>
-                </td>
-              </tr>
-            {% endif %}
           {% endfor %}
         </tbody>
       </table>
@@ -295,6 +286,15 @@
       <div class="invoice-notes" id="summary-notes-section" style="display: none;">
         <h3 class="section-title">ADDITIONAL NOTES</h3>
         <p class="notes-content" id="summary-notes"></p>
+      </div>
+      
+      <!-- Decline Reason Section -->
+      <div class="invoice-notes" id="summary-decline-reason-section" style="display: none;">
+        <h3 class="section-title" style="color: #dc2626;">DECLINE REASON</h3>
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 4px;">
+          <i data-feather="alert-circle" style="color: #dc2626; flex-shrink: 0; margin-top: 2px;"></i>
+          <p class="notes-content" id="summary-decline-reason" style="color: #991b1b; margin: 0;"></p>
+        </div>
       </div>
       
       <!-- Signature Section (Print Only) -->
