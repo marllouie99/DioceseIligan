@@ -192,9 +192,15 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     const cancelBtn = document.getElementById('cancel-booking-btn');
     if (cancelBtn) {
         const cancellableStatuses = ['pending', 'requested'];
-        if (cancellableStatuses.includes(status)) {
+        const nonCancellableStatuses = ['canceled', 'cancelled', 'approved', 'declined', 'completed'];
+        
+        // Explicitly hide for non-cancellable statuses
+        if (nonCancellableStatuses.includes(status.toLowerCase())) {
+            cancelBtn.style.display = 'none';
+        } else if (cancellableStatuses.includes(status.toLowerCase())) {
             cancelBtn.style.display = 'flex';
         } else {
+            // Default to hide if status is unknown
             cancelBtn.style.display = 'none';
         }
     }
