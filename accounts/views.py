@@ -632,6 +632,26 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
     except EmptyPage:
         user_donations = donations_paginator.page(donations_paginator.num_pages)
     
+    # Handle AJAX request for donations pagination
+    if request.GET.get('ajax') == '1' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        from django.template.loader import render_to_string
+        
+        # Render only the table rows
+        html = render_to_string('partials/donations_table_rows.html', {
+            'user_donations': user_donations,
+        }, request=request)
+        
+        return JsonResponse({
+            'success': True,
+            'html': html,
+            'current_page': user_donations.number,
+            'total_pages': user_donations.paginator.num_pages,
+            'has_previous': user_donations.has_previous(),
+            'has_next': user_donations.has_next(),
+            'previous_page': user_donations.previous_page_number() if user_donations.has_previous() else None,
+            'next_page': user_donations.next_page_number() if user_donations.has_next() else None,
+        })
+    
     # Calculate donation statistics
     from django.db.models import Sum, Count
     donation_stats = Donation.objects.filter(

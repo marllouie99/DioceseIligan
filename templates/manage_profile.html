@@ -1541,8 +1541,8 @@
         <p class="section-description">Track all your donations and their status</p>
       </div>
       
-      <div class="donations-table-container">
-        <table class="donations-table">
+      <div class="donations-table-container" id="donations-table-wrapper">
+        <table class="donations-table" id="donations-table">
           <thead>
             <tr>
               <th>Church</th>
@@ -1677,17 +1677,17 @@
       {% if user_donations.has_other_pages %}
       <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
         {% if user_donations.has_previous %}
-          <a href="?tab=donations&donations_page=1#donations-section" class="pagination-btn" title="First page">
+          <button class="pagination-btn" data-page="1" onclick="loadDonationsPage(1)" title="First page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <polyline points="11 17 6 12 11 7"/>
               <polyline points="18 17 13 12 18 7"/>
             </svg>
-          </a>
-          <a href="?tab=donations&donations_page={{ user_donations.previous_page_number }}#donations-section" class="pagination-btn" title="Previous page">
+          </button>
+          <button class="pagination-btn" data-page="{{ user_donations.previous_page_number }}" onclick="loadDonationsPage({{ user_donations.previous_page_number }})" title="Previous page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
-          </a>
+          </button>
         {% else %}
           <span class="pagination-btn disabled">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -1702,22 +1702,22 @@
           </span>
         {% endif %}
         
-        <span class="pagination-info" style="padding: 0.5rem 1rem; background: #f3f4f6; border-radius: 8px; font-size: 0.875rem; font-weight: 600; color: #374151;">
-          Page {{ user_donations.number }} of {{ user_donations.paginator.num_pages }}
+        <span class="pagination-info" id="donations-pagination-info" style="padding: 0.5rem 1rem; background: #f3f4f6; border-radius: 8px; font-size: 0.875rem; font-weight: 600; color: #374151;">
+          Page <span id="current-page">{{ user_donations.number }}</span> of <span id="total-pages">{{ user_donations.paginator.num_pages }}</span>
         </span>
         
         {% if user_donations.has_next %}
-          <a href="?tab=donations&donations_page={{ user_donations.next_page_number }}#donations-section" class="pagination-btn" title="Next page">
+          <button class="pagination-btn" data-page="{{ user_donations.next_page_number }}" onclick="loadDonationsPage({{ user_donations.next_page_number }})" title="Next page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
-          </a>
-          <a href="?tab=donations&donations_page={{ user_donations.paginator.num_pages }}#donations-section" class="pagination-btn" title="Last page">
+          </button>
+          <button class="pagination-btn" data-page="{{ user_donations.paginator.num_pages }}" onclick="loadDonationsPage({{ user_donations.paginator.num_pages }})" title="Last page">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <polyline points="13 17 18 12 13 7"/>
               <polyline points="6 17 11 12 6 7"/>
             </svg>
-          </a>
+          </button>
         {% else %}
           <span class="pagination-btn disabled">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -2525,6 +2525,129 @@
 <script>
   // Make CSRF token available for AJAX requests
   window.csrfToken = '{{ csrf_token }}';
+  
+  // AJAX Pagination for Donations Tab
+  function loadDonationsPage(page) {
+    const tableBody = document.querySelector('#donations-table tbody');
+    const paginationContainer = document.querySelector('.pagination-container');
+    
+    // Show loading state
+    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #7A9AB2;"><svg style="animation: spin 1s linear infinite; width: 24px; height: 24px; margin: 0 auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" opacity="0.75"/></svg><br/>Loading...</td></tr>';
+    
+    // Fetch new page data
+    fetch(`{% url 'manage_profile' %}?ajax=1&donations_page=${page}`, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update table body
+        tableBody.innerHTML = data.html;
+        
+        // Update pagination info
+        document.getElementById('current-page').textContent = data.current_page;
+        document.getElementById('total-pages').textContent = data.total_pages;
+        
+        // Update pagination buttons
+        updatePaginationButtons(data.current_page, data.total_pages, data.has_previous, data.has_next, data.previous_page, data.next_page);
+        
+        // Scroll to donations section smoothly
+        document.getElementById('donations-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #EF4444;">Error loading donations. Please try again.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #EF4444;">Error loading donations. Please try again.</td></tr>';
+    });
+  }
+  
+  function updatePaginationButtons(currentPage, totalPages, hasPrevious, hasNext, previousPage, nextPage) {
+    const container = document.querySelector('.pagination-container');
+    
+    let html = '';
+    
+    // First and Previous buttons
+    if (hasPrevious) {
+      html += `
+        <button class="pagination-btn" onclick="loadDonationsPage(1)" title="First page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+          </svg>
+        </button>
+        <button class="pagination-btn" onclick="loadDonationsPage(${previousPage})" title="Previous page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+      `;
+    } else {
+      html += `
+        <span class="pagination-btn disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+          </svg>
+        </span>
+        <span class="pagination-btn disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </span>
+      `;
+    }
+    
+    // Page info
+    html += `
+      <span class="pagination-info" style="padding: 0.5rem 1rem; background: #f3f4f6; border-radius: 8px; font-size: 0.875rem; font-weight: 600; color: #374151;">
+        Page <span id="current-page">${currentPage}</span> of <span id="total-pages">${totalPages}</span>
+      </span>
+    `;
+    
+    // Next and Last buttons
+    if (hasNext) {
+      html += `
+        <button class="pagination-btn" onclick="loadDonationsPage(${nextPage})" title="Next page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+        <button class="pagination-btn" onclick="loadDonationsPage(${totalPages})" title="Last page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </button>
+      `;
+    } else {
+      html += `
+        <span class="pagination-btn disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </span>
+        <span class="pagination-btn disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </span>
+      `;
+    }
+    
+    container.innerHTML = html;
+  }
+  
+  // Add CSS for loading spinner animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
   
   // Rank Info Modal Functions
   function openRankInfoModal() {

@@ -1,0 +1,116 @@
+{% load static %}
+{% if user_donations %}
+  {% for donation in user_donations %}
+    <tr class="donation-row status-{{ donation.payment_status }}">
+      <td class="church-cell">
+        <div class="church-info">
+          <div class="church-avatar-small">
+            {% if donation.post.church.logo %}
+              <img src="{{ donation.post.church.logo.url }}" alt="{{ donation.post.church.name }}" loading="lazy" decoding="async">
+            {% else %}
+              <div class="church-avatar-placeholder-small">{{ donation.post.church.name|first|upper }}</div>
+            {% endif %}
+          </div>
+          <a href="{% url 'core:church_detail' slug=donation.post.church.slug %}" class="church-link">
+            {{ donation.post.church.name }}
+          </a>
+        </div>
+      </td>
+      <td class="post-cell">
+        <div class="post-preview">{{ donation.post.content|truncatewords:8 }}</div>
+        {% if donation.message %}
+          <div class="donation-message-small">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            "{{ donation.message|truncatewords:5 }}"
+          </div>
+        {% endif %}
+      </td>
+      <td class="amount-cell">
+        <span class="amount-value">₱{{ donation.amount|floatformat:2 }}</span>
+      </td>
+      <td class="status-cell">
+        <span class="status-badge status-{{ donation.payment_status }}">
+          {% if donation.payment_status == 'completed' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Completed
+          {% elif donation.payment_status == 'pending' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Pending
+          {% elif donation.payment_status == 'failed' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            Failed
+          {% elif donation.payment_status == 'cancelled' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            Cancelled
+          {% elif donation.payment_status == 'refunded' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="1 4 1 10 7 10"/>
+              <polyline points="23 20 23 14 17 14"/>
+              <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+            </svg>
+            Refunded
+          {% endif %}
+        </span>
+      </td>
+      <td class="date-cell">
+        {{ donation.created_at|date:"M d, Y" }}
+      </td>
+      <td class="method-cell">
+        {% if donation.payment_method == 'paypal' %}
+          <span class="payment-method">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.76-4.852a.932.932 0 0 1 .922-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+            </svg>
+            PayPal
+          </span>
+        {% elif donation.payment_method == 'stripe' %}
+          <span class="payment-method">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            Card
+          </span>
+        {% else %}
+          {{ donation.get_payment_method_display }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="6" class="empty-row">
+      <div class="empty-donations">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <h4>No donations yet</h4>
+        <p>When you make donations to churches, they will appear here.</p>
+        <a href="{% url 'core:discover' %}" class="btn btn-primary" style="margin-top: 1rem;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Discover Churches
+        </a>
+      </div>
+    </td>
+  </tr>
+{% endif %}
