@@ -624,11 +624,16 @@ body.page-appointments {
   right: 0 !important;
   bottom: 0 !important;
   background: rgba(0, 0, 0, 0.7) !important;
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: center !important;
   z-index: 999999999 !important;
   backdrop-filter: blur(4px) !important;
+}
+
+.modal-overlay[style*="display: flex"],
+.modal-overlay.show {
+  display: flex !important;
 }
 
 .modal-container {
