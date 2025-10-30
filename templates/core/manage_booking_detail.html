@@ -181,7 +181,12 @@
     </div>
     
     <!-- Modal Body -->
-    <div class="modal-body">
+    <div class="modal-body" style="position: relative !important;">
+      <!-- Watermark Logo (Print Only) -->
+      <div class="watermark-logo print-only" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 550px !important; height: 550px !important; z-index: 0 !important; pointer-events: none !important; opacity: 0.12 !important;">
+        <img src="{% static 'images/logo.png' %}" alt="Diocese of Iligan Watermark" style="width: 100% !important; height: 100% !important; object-fit: contain !important;">
+      </div>
+      
       {% include 'core/partials/booking_invoice_content.html' %}
     </div>
     

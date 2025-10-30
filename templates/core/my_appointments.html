@@ -188,7 +188,12 @@
     </div>
     
     <!-- Modal Body -->
-    <div class="modal-body">
+    <div class="modal-body" style="position: relative !important;">
+      <!-- Watermark Logo (Print Only) -->
+      <div class="watermark-logo print-only" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 550px !important; height: 550px !important; z-index: 0 !important; pointer-events: none !important; opacity: 0.12 !important;">
+        <img src="{% static 'images/logo.png' %}" alt="Diocese of Iligan Watermark" style="width: 100% !important; height: 100% !important; object-fit: contain !important;">
+      </div>
+      
       <!-- Invoice Header -->
       <div class="invoice-header">
         <div class="invoice-title-section">
@@ -290,6 +295,40 @@
       <div class="invoice-notes" id="summary-notes-section" style="display: none;">
         <h3 class="section-title">ADDITIONAL NOTES</h3>
         <p class="notes-content" id="summary-notes"></p>
+      </div>
+      
+      <!-- Signature Section (Print Only) -->
+      <div class="signature-section print-only" style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #e5e7eb; page-break-inside: avoid;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: flex-end;">
+          <div style="text-align: center;">
+            <div style="border-bottom: 2px solid #000; height: 35px; margin-bottom: 5px;"></div>
+            <div style="font-size: 9px; color: #374151; font-weight: 600;">
+              Parish Administrator Signature
+            </div>
+          </div>
+          
+          <div style="text-align: center;">
+            <div style="border-bottom: 2px solid #000; height: 35px; margin-bottom: 5px;"></div>
+            <div style="font-size: 9px; color: #374151; font-weight: 600;">
+              Date
+            </div>
+          </div>
+          
+          <div style="text-align: center;">
+            <div style="border: 2px solid #000; height: 50px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #9ca3af; background: #fafafa;">
+              Parish Seal
+            </div>
+            <div style="font-size: 9px; color: #374151; font-weight: 600;">
+              Official Church Stamp
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer Note (Print Only) -->
+      <div class="invoice-footer-note print-only" style="margin-top: 12px;">
+        <p style="margin: 1px 0; font-size: 8px;">This is an automated appointment confirmation. Please keep this for your records.</p>
+        <p style="margin: 1px 0; font-size: 8px;">For any inquiries, please contact the church directly using the information provided above.</p>
       </div>
       
       <!-- Payment Method Section -->
