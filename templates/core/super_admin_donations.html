@@ -270,15 +270,56 @@
   margin: 0 auto 1rem;
   opacity: 0.5;
 }
+
+/* Time Filter Buttons */
+.stats-time-filter {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-secondary, #f3f4f6);
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.stats-filter-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--muted, #6b7280);
+}
+
+.stats-filter-btn:hover {
+  background: var(--border, #e5e7eb);
+  color: var(--text, #111827);
+}
+
+.stats-filter-btn.active {
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.3);
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="donations-container">
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Donation Rankings</h1>
-    <p class="page-description">View and manage donor rankings across the platform</p>
+  <!-- Header with Time Filter -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div class="page-header" style="margin-bottom: 0;">
+      <h1 class="page-title">Donation Rankings</h1>
+      <p class="page-description">View and manage donor rankings across the platform</p>
+    </div>
+    <div class="stats-time-filter">
+      <button class="stats-filter-btn active" data-period="all">All Time</button>
+      <button class="stats-filter-btn" data-period="7">7 Days</button>
+      <button class="stats-filter-btn" data-period="30">30 Days</button>
+      <button class="stats-filter-btn" data-period="90">90 Days</button>
+    </div>
   </div>
 
   <!-- Summary Statistics -->
@@ -294,8 +335,8 @@
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Donors</div>
-        <div class="stat-card-value">{{ total_donors }}</div>
-        <div class="stat-card-subtitle">Active contributors</div>
+        <div class="stat-card-value" id="statTotalDonors">{{ total_donors }}</div>
+        <div class="stat-card-subtitle" id="statDonorsSubtitle">Active contributors</div>
       </div>
     </div>
 
@@ -307,8 +348,8 @@
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Total Donations</div>
-        <div class="stat-card-value">₱{{ total_donations_amount|floatformat:2 }}</div>
-        <div class="stat-card-subtitle">All-time contributions</div>
+        <div class="stat-card-value" id="statTotalDonations">₱{{ total_donations_amount|floatformat:2 }}</div>
+        <div class="stat-card-subtitle" id="statDonationsSubtitle">All-time contributions</div>
       </div>
     </div>
 
@@ -321,14 +362,14 @@
       </div>
       <div class="stat-card-content">
         <div class="stat-card-title">Average Donation</div>
-        <div class="stat-card-value">
+        <div class="stat-card-value" id="statAvgDonation">
           {% if total_donors > 0 %}
             ₱{{ total_donations_amount|floatformat:2|add:"0"|floatformat:0|default:"0" }}
           {% else %}
             ₱0
           {% endif %}
         </div>
-        <div class="stat-card-subtitle">Per donor</div>
+        <div class="stat-card-subtitle" id="statAvgSubtitle">Per donor</div>
       </div>
     </div>
   </div>
@@ -491,8 +532,68 @@ document.querySelectorAll('.filter-select').forEach(select => {
   });
 });
 
+// Global chart variables
+let rankDistChart = null;
+let topDonorsChart = null;
+
 // Chart.js initialization
 document.addEventListener('DOMContentLoaded', function() {
+  // Stats Filter Functionality
+  const statsFilterBtns = document.querySelectorAll('.stats-filter-btn');
+  
+  statsFilterBtns.forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const period = this.dataset.period;
+      
+      // Update active state
+      statsFilterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Fetch filtered data
+      try {
+        const response = await fetch(`/app/super-admin/donations/filter-data/?period=${period}`);
+        const data = await response.json();
+        
+        // Update stat cards
+        document.getElementById('statTotalDonors').textContent = data.total_donors;
+        document.getElementById('statDonorsSubtitle').textContent = data.donors_subtitle;
+        document.getElementById('statTotalDonations').textContent = '₱' + parseFloat(data.total_donations).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('statDonationsSubtitle').textContent = data.donations_subtitle;
+        document.getElementById('statAvgDonation').textContent = '₱' + parseFloat(data.avg_donation).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('statAvgSubtitle').textContent = data.avg_subtitle;
+        
+        // Update rank distribution cards
+        if (data.rank_distribution) {
+          Object.keys(data.rank_distribution).forEach(icon => {
+            const rankData = data.rank_distribution[icon];
+            const cards = document.querySelectorAll('.rank-card');
+            cards.forEach(card => {
+              const nameSpan = card.querySelector('.rank-card-name');
+              if (nameSpan && nameSpan.textContent.trim() === rankData.name) {
+                card.querySelector('.rank-card-count').textContent = rankData.count || 0;
+                card.querySelector('.rank-card-amount').textContent = '₱' + parseFloat(rankData.total_amount || 0).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+              }
+            });
+          });
+        }
+        
+        // Update charts
+        updateRankDistributionChart(data.rank_distribution_chart);
+        updateTopDonorsChart(data.top_donors_chart);
+        
+        // Add animation
+        document.querySelectorAll('.stat-card-value').forEach(el => {
+          el.style.animation = 'none';
+          setTimeout(() => {
+            el.style.animation = 'fadeIn 0.3s ease';
+          }, 10);
+        });
+      } catch (error) {
+        console.error('Error fetching donation data:', error);
+      }
+    });
+  });
+
   // Rank Distribution Pie Chart
   const rankDistCtx = document.getElementById('rankDistributionChart');
   if (rankDistCtx) {
@@ -512,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    new Chart(rankDistCtx, {
+    rankDistChart = new Chart(rankDistCtx, {
       type: 'doughnut',
       data: {
         labels: labels,
@@ -564,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const amounts = top10.map(d => parseFloat(d.total_donated));
     const rankColors = top10.map(d => d.rank ? d.rank.color : '#9ca3af');
     
-    new Chart(topDonorsCtx, {
+    topDonorsChart = new Chart(topDonorsCtx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -617,6 +718,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Function to update rank distribution chart
+function updateRankDistributionChart(chartData) {
+  if (rankDistChart && chartData) {
+    rankDistChart.data.labels = chartData.labels;
+    rankDistChart.data.datasets[0].data = chartData.data;
+    rankDistChart.data.datasets[0].backgroundColor = chartData.colors;
+    rankDistChart.update();
+  }
+}
+
+// Function to update top donors chart
+function updateTopDonorsChart(chartData) {
+  if (topDonorsChart && chartData) {
+    topDonorsChart.data.labels = chartData.labels;
+    topDonorsChart.data.datasets[0].data = chartData.amounts;
+    topDonorsChart.data.datasets[0].backgroundColor = chartData.colors.map(c => c + '33');
+    topDonorsChart.data.datasets[0].borderColor = chartData.colors;
+    topDonorsChart.update();
+  }
+}
+
+// Add fade animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
 

@@ -1,0 +1,382 @@
+/* 
+ * Super Admin Profile Page - Sky Blue Theme
+ * Version: 1.0
+ */
+
+/* =============================================================================
+   DASHBOARD LAYOUT - SKY BLUE THEME
+   ============================================================================= */
+
+/* Dashboard Layout - Modern Grid System */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 24px;
+  align-items: start;
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
+}
+
+/* Main Content Area */
+.dashboard-layout .main-content {
+  min-width: 0;
+  background: transparent;
+  border-radius: 24px;
+  padding: 0;
+}
+
+/* Section Title with Sky Blue Accent */
+.dashboard-layout .main-content .section-title {
+  margin: 0 0 24px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1A3A52;
+  font-family: Georgia, 'Times New Roman', serif;
+  position: relative;
+  padding-bottom: 16px;
+  text-shadow: 0 2px 3px rgba(240, 248, 255, 0.9);
+}
+
+.dashboard-layout .main-content .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #1E90FF, #4169E1);
+  border-radius: 2px;
+}
+
+/* Sidebar Content */
+.dashboard-layout .sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky !important;
+  top: 8px !important;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  align-self: flex-start;
+  padding: 0;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 144, 255, 0.3) transparent;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(30, 144, 255, 0.3);
+  border-radius: 3px;
+}
+
+.dashboard-layout .sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 144, 255, 0.5);
+}
+
+/* =============================================================================
+   SIDEBAR SECTIONS - SKY BLUE THEME
+   ============================================================================= */
+
+.sidebar-section {
+  background: linear-gradient(145deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(240, 248, 255, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(30, 144, 255, 0.15);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 
+    0 8px 16px rgba(30, 144, 255, 0.12),
+    0 2px 6px rgba(30, 144, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              box-shadow 0.3s, 
+              border-color 0.3s;
+}
+
+.sidebar-section:hover {
+  box-shadow: 
+    0 12px 24px rgba(30, 144, 255, 0.15),
+    0 4px 12px rgba(30, 144, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  border-color: rgba(30, 144, 255, 0.25);
+}
+
+/* Sidebar Title */
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 20px 0;
+  color: #1A3A52;
+  position: relative;
+  padding-bottom: 12px;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.sidebar-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #1E90FF, #4169E1);
+  border-radius: 2px;
+}
+
+/* =============================================================================
+   ACTIVITY FEED - SKY BLUE THEME
+   ============================================================================= */
+
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activity-item {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(30, 144, 255, 0.1);
+  transition: background 0.2s ease, padding-left 0.3s ease;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.activity-item:hover {
+  background: rgba(240, 248, 255, 0.5);
+  padding-left: 8px;
+  border-radius: 8px;
+}
+
+.activity-text {
+  margin: 0 0 8px 0;
+  color: #1A3A52;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.activity-text strong {
+  color: #1E90FF;
+  font-weight: 700;
+  background: rgba(30, 144, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.activity-time {
+  display: inline-block;
+  color: #5A7A92;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(240, 248, 255, 0.6);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(30, 144, 255, 0.1);
+}
+
+/* =============================================================================
+   FORM STYLING
+   ============================================================================= */
+
+.credentials-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A3A52;
+  margin: 0;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 48px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(30, 144, 255, 0.2);
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1A3A52 !important;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1E90FF;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+.form-input:hover {
+  border-color: rgba(30, 144, 255, 0.3);
+}
+
+/* Ensure password text is visible when revealed */
+input[type="text"].form-input,
+input[type="password"].form-input {
+  color: #1A3A52 !important;
+  -webkit-text-fill-color: #1A3A52 !important;
+}
+
+/* Ensure placeholder is visible */
+.form-input::placeholder {
+  color: #7A9AB2 !important;
+  opacity: 0.7;
+}
+
+.form-help {
+  font-size: 13px;
+  color: #5A7A92;
+  font-style: italic;
+  margin-top: -4px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5A7A92;
+  transition: color 0.2s ease;
+  border-radius: 6px;
+}
+
+.password-toggle:hover {
+  color: #1E90FF;
+  background: rgba(30, 144, 255, 0.08);
+}
+
+.password-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.btn-primary {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 6px 20px rgba(30, 144, 255, 0.3),
+    0 2px 8px rgba(65, 105, 225, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4A9EFF 0%, #1E90FF 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 24px rgba(30, 144, 255, 0.4),
+    0 6px 12px rgba(65, 105, 225, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 12px rgba(30, 144, 255, 0.3),
+    0 2px 6px rgba(65, 105, 225, 0.2);
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .dashboard-layout .sidebar-content {
+    position: relative !important;
+    top: auto !important;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    padding: 0 16px;
+  }
+  
+  .dashboard-layout .main-content .section-title {
+    font-size: 24px;
+  }
+  
+  .sidebar-section {
+    padding: 20px;
+  }
+  
+  .sidebar-title {
+    font-size: 18px;
+  }
+}
+
+/* =============================================================================
+   FINE-TUNE ALIGNMENT
+   ============================================================================= */
+
+@media (min-width: 769px) {
+  .dashboard-layout .sidebar-content {
+    margin-top: 0;
+  }
+}

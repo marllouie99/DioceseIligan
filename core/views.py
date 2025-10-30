@@ -2126,6 +2126,69 @@ def super_admin_profile(request):
         return redirect('core:home')
 
     user = request.user
+    
+    # Handle POST request for updating credentials
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'update_credentials':
+            username = request.POST.get('username', '').strip()
+            email = request.POST.get('email', '').strip()
+            
+            # Validate inputs
+            errors = []
+            
+            if username and username != user.username:
+                # Check if username already exists
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                    errors.append('Username already exists.')
+                else:
+                    user.username = username
+            
+            if email and email != user.email:
+                # Basic email validation
+                import re
+                email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+                if not re.match(email_pattern, email):
+                    errors.append('Invalid email format.')
+                else:
+                    # Check if email already exists
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+                        errors.append('Email already exists.')
+                    else:
+                        user.email = email
+            
+            if errors:
+                for error in errors:
+                    messages.error(request, error)
+            else:
+                user.save()
+                messages.success(request, 'Credentials updated successfully.')
+                return redirect('core:super_admin_profile')
+        
+        elif action == 'change_password':
+            new_password = request.POST.get('new_password', '')
+            confirm_password = request.POST.get('confirm_password', '')
+            
+            # Super admin can change password without current password verification
+            # since they're already authenticated
+            if len(new_password) < 8:
+                messages.error(request, 'New password must be at least 8 characters long.')
+            elif new_password != confirm_password:
+                messages.error(request, 'New passwords do not match.')
+            else:
+                user.set_password(new_password)
+                user.save()
+                # Update session to prevent logout
+                from django.contrib.auth import update_session_auth_hash
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Password changed successfully.')
+                return redirect('core:super_admin_profile')
+    
     # Collect admin-related context
     groups = list(user.groups.values_list('name', flat=True))
     # Count direct and group-derived permissions
@@ -6454,6 +6517,138 @@ def super_admin_donations(request):
     context.update(_app_context(request))
     
     return render(request, 'core/super_admin_donations.html', context)
+
+
+@login_required
+def super_admin_donations_filter_data(request):
+    """AJAX endpoint for filtering donation data by time period."""
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    from django.db.models import Sum, Count, Q
+    from django.contrib.auth.models import User
+    from accounts.donation_utils import RANK_TIERS, get_user_donation_rank
+    from datetime import timedelta
+    import json
+    
+    period = request.GET.get('period', 'all')
+    
+    # Build query for donations based on period
+    donors_query = User.objects.filter(
+        donations_made__payment_status='completed'
+    )
+    
+    # Apply time filter
+    donation_filter = Q(donations_made__payment_status='completed')
+    if period != 'all':
+        now = timezone.now()
+        if period == '7':
+            start_date = now - timedelta(days=7)
+        elif period == '30':
+            start_date = now - timedelta(days=30)
+        elif period == '90':
+            start_date = now - timedelta(days=90)
+        else:
+            start_date = None
+        
+        if start_date:
+            donation_filter &= Q(donations_made__created_at__gte=start_date)
+    
+    # Get donors with filtered donations
+    donors = donors_query.annotate(
+        total_donated=Sum('donations_made__amount', filter=donation_filter),
+        donation_count=Count('donations_made', filter=donation_filter)
+    ).filter(total_donated__gte=50).select_related('profile')
+    
+    # Build donor data with ranks
+    donor_data = []
+    for donor in donors:
+        rank = get_user_donation_rank(donor)
+        
+        display_name = donor.username
+        if hasattr(donor, 'profile') and donor.profile and donor.profile.display_name:
+            display_name = donor.profile.display_name
+        elif donor.get_full_name():
+            display_name = donor.get_full_name()
+        
+        donor_data.append({
+            'display_name': display_name,
+            'total_donated': float(donor.total_donated or 0),
+            'donation_count': donor.donation_count or 0,
+            'rank': rank
+        })
+    
+    # Sort by amount
+    donor_data.sort(key=lambda x: x['total_donated'], reverse=True)
+    
+    # Calculate statistics
+    total_donors = len(donor_data)
+    total_donations = sum(d['total_donated'] for d in donor_data)
+    avg_donation = total_donations / total_donors if total_donors > 0 else 0
+    
+    # Rank distribution
+    rank_distribution = {}
+    for tier in RANK_TIERS:
+        rank_distribution[tier['icon']] = {
+            'name': tier['name'],
+            'color': tier['color'],
+            'count': 0,
+            'total_amount': 0
+        }
+    
+    for data in donor_data:
+        if data['rank']:
+            icon = data['rank']['icon']
+            rank_distribution[icon]['count'] += 1
+            rank_distribution[icon]['total_amount'] += data['total_donated']
+    
+    # Prepare chart data for rank distribution
+    rank_chart_labels = []
+    rank_chart_data = []
+    rank_chart_colors = []
+    for tier in RANK_TIERS:
+        tier_data = rank_distribution[tier['icon']]
+        if tier_data['count'] > 0:
+            rank_chart_labels.append(tier['name'])
+            rank_chart_data.append(tier_data['count'])
+            rank_chart_colors.append(tier['color'])
+    
+    # Prepare chart data for top donors
+    top_10 = donor_data[:10]
+    top_donors_labels = [d['display_name'] for d in top_10]
+    top_donors_amounts = [d['total_donated'] for d in top_10]
+    top_donors_colors = [d['rank']['color'] if d['rank'] else '#9ca3af' for d in top_10]
+    
+    # Period labels
+    period_labels = {
+        'all': 'All-time',
+        '7': 'Last 7 days',
+        '30': 'Last 30 days',
+        '90': 'Last 90 days'
+    }
+    period_label = period_labels.get(period, 'All-time')
+    
+    response_data = {
+        'total_donors': total_donors,
+        'donors_subtitle': f'{period_label} contributors',
+        'total_donations': total_donations,
+        'donations_subtitle': f'{period_label} contributions',
+        'avg_donation': avg_donation,
+        'avg_subtitle': f'{period_label} per donor',
+        'rank_distribution': rank_distribution,
+        'rank_distribution_chart': {
+            'labels': rank_chart_labels,
+            'data': rank_chart_data,
+            'colors': rank_chart_colors
+        },
+        'top_donors_chart': {
+            'labels': top_donors_labels,
+            'amounts': top_donors_amounts,
+            'colors': top_donors_colors
+        }
+    }
+    
+    return JsonResponse(response_data)
 
 
 # Super Admin - Moderation Management

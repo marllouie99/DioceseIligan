@@ -999,7 +999,6 @@ document.head.appendChild(style);
           <tr>
             <th>Service Name</th>
             <th>Parish</th>
-            <th>Provider</th>
             <th>Category</th>
             <th>Price</th>
             <th>Bookings</th>
@@ -1014,7 +1013,6 @@ document.head.appendChild(style);
             <tr>
               <td class="service-name">{{ service.name }}</td>
               <td class="parish-name">{{ service.church.name }}</td>
-              <td class="provider-name">{{ service.provider_name|default:"N/A" }}</td>
               <td><span class="category-badge">{{ service.category.name|default:"Uncategorized" }}</span></td>
               <td class="price-cell">₱{{ service.price|floatformat:0 }}</td>
               <td>{{ service.booking_count|default:0 }}</td>
@@ -1066,7 +1064,7 @@ document.head.appendChild(style);
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="9" style="text-align: center; padding: 3rem; color: var(--muted);">
+              <td colspan="8" style="text-align: center; padding: 3rem; color: var(--muted);">
                 No services found
               </td>
             </tr>
