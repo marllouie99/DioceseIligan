@@ -956,7 +956,14 @@ function cancelBooking() {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'Failed to cancel booking');
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             closeCancelModal();
@@ -972,7 +979,7 @@ function cancelBooking() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        alert(error.message || 'An error occurred. Please try again.');
         btn.disabled = false;
         btn.textContent = 'Yes, Cancel Booking';
     });
