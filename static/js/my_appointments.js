@@ -16,6 +16,9 @@ let cancelBookingId = null;
  * Open the appointment summary modal with booking information
  */
 function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor, declineReason) {
+    // Store current booking info for cancel functionality
+    currentBookingId = bookingId;
+    
     // Basic info
     document.getElementById('summary-code').textContent = code;
     document.getElementById('summary-service').textContent = serviceName;
@@ -185,6 +188,16 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     statusBadge.textContent = statusDisplay;
     statusBadge.className = 'badge badge-' + status;
     
+    // Show/hide cancel button based on status
+    const cancelBtn = document.getElementById('cancel-booking-btn');
+    if (cancelBtn) {
+        if (status === 'pending') {
+            cancelBtn.style.display = 'flex';
+        } else {
+            cancelBtn.style.display = 'none';
+        }
+    }
+    
     document.getElementById('appointmentSummaryModal').style.display = 'flex';
     
     // Re-initialize Feather icons for the modal
@@ -192,7 +205,7 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
         if (typeof feather !== 'undefined') {
             feather.replace();
         }
-    }, 50);
+    }, 100);
 }
 
 /**
@@ -890,6 +903,20 @@ function initializeAppointmentSummaryModal() {
 }
 
 /**
+ * Open cancel booking confirmation modal from summary
+ */
+function confirmCancelBookingFromSummary() {
+    const code = document.getElementById('summary-code').textContent;
+    const serviceName = document.getElementById('summary-service').textContent;
+    
+    // Close summary modal first
+    closeAppointmentSummary();
+    
+    // Open cancel confirmation modal
+    confirmCancelBooking(currentBookingId, code, serviceName);
+}
+
+/**
  * Open cancel booking confirmation modal
  */
 function confirmCancelBooking(bookingId, code, serviceName) {
@@ -975,5 +1002,6 @@ window.closeReviewModal = closeReviewModal;
 window.openAppointmentSummary = openAppointmentSummary;
 window.closeAppointmentSummary = closeAppointmentSummary;
 window.confirmCancelBooking = confirmCancelBooking;
+window.confirmCancelBookingFromSummary = confirmCancelBookingFromSummary;
 window.closeCancelModal = closeCancelModal;
 window.cancelBooking = cancelBooking;

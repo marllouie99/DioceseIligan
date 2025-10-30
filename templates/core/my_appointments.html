@@ -401,6 +401,10 @@
     
     <!-- Modal Footer -->
     <div class="modal-footer" id="summary-footer" style="display: flex; gap: 12px;">
+      <button type="button" id="cancel-booking-btn" class="btn btn-danger" onclick="confirmCancelBookingFromSummary()" style="flex: 1; display: none;">
+        <i data-feather="x-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+        Cancel Booking
+      </button>
       <button type="button" id="print-summary-btn" class="btn btn-primary" onclick="printAppointmentSummary()" style="flex: 1;">
         <i data-feather="printer" style="width: 16px; height: 16px; margin-right: 8px;"></i>
         Print
