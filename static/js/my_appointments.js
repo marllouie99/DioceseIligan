@@ -887,7 +887,7 @@ function initializeAppointmentSummaryModal() {
             }
         });
     }
-});
+}
 
 /**
  * Open cancel booking confirmation modal
