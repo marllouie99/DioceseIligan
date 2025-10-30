@@ -2411,7 +2411,7 @@
                 <div class="form-group">
                   <label for="id_region" class="form-label">Region</label>
                   <div class="searchable-select" id="region-wrapper">
-                    <input type="text" class="searchable-select-input" placeholder="Select or search region..." autocomplete="off">
+                    <input type="text" class="searchable-select-input" placeholder="Select or search region..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="combobox" aria-autocomplete="list">
                     <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
                     </svg>
@@ -2425,7 +2425,7 @@
                 <div class="form-group">
                   <label for="id_province" class="form-label">Province</label>
                   <div class="searchable-select" id="province-wrapper">
-                    <input type="text" class="searchable-select-input" placeholder="Select region first..." autocomplete="off" disabled>
+                    <input type="text" class="searchable-select-input" placeholder="Select region first..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="combobox" aria-autocomplete="list" disabled>
                     <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
                     </svg>
@@ -2439,7 +2439,7 @@
                 <div class="form-group">
                   <label for="id_city_municipality" class="form-label">City / Municipality</label>
                   <div class="searchable-select" id="city-wrapper">
-                    <input type="text" class="searchable-select-input" placeholder="Select province first..." autocomplete="off" disabled>
+                    <input type="text" class="searchable-select-input" placeholder="Select province first..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="combobox" aria-autocomplete="list" disabled>
                     <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
                     </svg>
@@ -2453,7 +2453,7 @@
                 <div class="form-group">
                   <label for="id_barangay" class="form-label">Barangay</label>
                   <div class="searchable-select" id="barangay-wrapper">
-                    <input type="text" class="searchable-select-input" placeholder="Select city first..." autocomplete="off" disabled>
+                    <input type="text" class="searchable-select-input" placeholder="Select city first..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="combobox" aria-autocomplete="list" disabled>
                     <svg class="searchable-select-arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
                     </svg>
@@ -2728,22 +2728,46 @@
 
 <script>
 // Philippine Address Cascading Dropdowns with Searchable Select
-(function() {
+let addressDropdownsInitialized = false;
+let regionCodeMap = {};
+let provinceCodeMap = {};
+let cityCodeMap = {};
+let regionComponent, provinceComponent, cityComponent, barangayComponent;
+
+function initializeAddressDropdowns() {
+    // Prevent multiple initializations
+    if (addressDropdownsInitialized) {
+        return;
+    }
+    
     const regionSelect = document.getElementById('id_region');
     const provinceSelect = document.getElementById('id_province');
     const citySelect = document.getElementById('id_city_municipality');
     const barangaySelect = document.getElementById('id_barangay');
     
-    let regionCodeMap = {};
-    let provinceCodeMap = {};
-    let cityCodeMap = {};
+    // Check if elements exist
+    if (!regionSelect || !provinceSelect || !citySelect || !barangaySelect) {
+        console.log('Address dropdown elements not found yet, will retry...');
+        return;
+    }
     
     // Initialize searchable select component
     function initSearchableSelect(wrapperId, selectId) {
         const wrapper = document.getElementById(wrapperId);
+        const select = document.getElementById(selectId);
+        
+        if (!wrapper || !select) {
+            console.error(`Cannot find elements for ${wrapperId} or ${selectId}`);
+            return null;
+        }
+        
         const input = wrapper.querySelector('.searchable-select-input');
         const dropdown = wrapper.querySelector('.searchable-select-dropdown');
-        const select = document.getElementById(selectId);
+        
+        if (!input || !dropdown) {
+            console.error(`Cannot find input or dropdown in ${wrapperId}`);
+            return null;
+        }
         
         // Toggle dropdown on input click
         input.addEventListener('click', function() {
@@ -2855,10 +2879,18 @@
     }
     
     // Initialize all searchable selects
-    const regionComponent = initSearchableSelect('region-wrapper', 'id_region');
-    const provinceComponent = initSearchableSelect('province-wrapper', 'id_province');
-    const cityComponent = initSearchableSelect('city-wrapper', 'id_city_municipality');
-    const barangayComponent = initSearchableSelect('barangay-wrapper', 'id_barangay');
+    regionComponent = initSearchableSelect('region-wrapper', 'id_region');
+    provinceComponent = initSearchableSelect('province-wrapper', 'id_province');
+    cityComponent = initSearchableSelect('city-wrapper', 'id_city_municipality');
+    barangayComponent = initSearchableSelect('barangay-wrapper', 'id_barangay');
+    
+    // Check if all components initialized successfully
+    if (!regionComponent || !provinceComponent || !cityComponent || !barangayComponent) {
+        console.error('Failed to initialize address dropdowns');
+        return;
+    }
+    
+    console.log('Address dropdowns initialized successfully');
     
     // Load regions on page load
     async function loadRegions() {
@@ -3041,7 +3073,24 @@
     
     // Initialize on page load
     loadRegions();
-})();
+    
+    // Mark as initialized
+    addressDropdownsInitialized = true;
+}
+
+// Call initialization when DOM is ready and modal is opened
+document.addEventListener('DOMContentLoaded', function() {
+    // Try to initialize immediately if elements exist
+    setTimeout(initializeAddressDropdowns, 500);
+    
+    // Also listen for modal open events
+    const editButton = document.querySelector('.edit-profile-btn');
+    if (editButton) {
+        editButton.addEventListener('click', function() {
+            setTimeout(initializeAddressDropdowns, 100);
+        });
+    }
+});
 
 // Address is now displayed directly in the HTML template, no need for JavaScript injection
 
@@ -3204,8 +3253,8 @@ function initializeAnalyticsPeriodFilter() {
 }
 
 // Add CSS animation for card updates
-const style = document.createElement('style');
-style.textContent = `
+const analyticsStyle = document.createElement('style');
+analyticsStyle.textContent = `
     .analytics-card.updating {
         opacity: 0.6;
         transform: scale(0.98);
@@ -3215,7 +3264,7 @@ style.textContent = `
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(analyticsStyle);
 
 // Handle show more/less functionality for saved posts
 document.addEventListener('DOMContentLoaded', function() {
