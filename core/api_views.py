@@ -1606,13 +1606,8 @@ def church_preview_api(request, slug):
                 user=request.user
             ).exists()
         
-        # Build location string
-        location_parts = []
-        if church.city:
-            location_parts.append(church.city)
-        if church.province:
-            location_parts.append(church.province)
-        location = ', '.join(location_parts) if location_parts else 'Location not specified'
+        # Use street address as location
+        location = church.street_address if church.street_address else 'Address not specified'
         
         return JsonResponse({
             'success': True,
