@@ -386,11 +386,20 @@ function updateTopComments(comments) {
     
     comments.forEach(comment => {
         const row = document.createElement('tr');
+        
+        // Generate avatar HTML - show profile picture if available, otherwise show initials
+        let avatarHTML;
+        if (comment.user.profile_picture) {
+            avatarHTML = `<img src="${comment.user.profile_picture}" alt="${escapeHtml(comment.user.name)}" class="user-avatar-img">`;
+        } else {
+            avatarHTML = `<div class="user-avatar">${comment.user.initials}</div>`;
+        }
+        
         row.innerHTML = `
             <td>
                 <div class="comment-user">
-                    <div class="user-avatar">${comment.user.initials}</div>
-                    <span>${comment.user.name}</span>
+                    ${avatarHTML}
+                    <span>${escapeHtml(comment.user.name)}</span>
                 </div>
             </td>
             <td>${escapeHtml(comment.content)}</td>

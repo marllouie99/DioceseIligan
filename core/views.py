@@ -739,6 +739,45 @@ def manage_church(request, church_id=None):
     # Unique donors count
     unique_donors = donations_queryset.filter(payment_status='completed').values('donor').distinct().count()
     
+    # Calculate donation trends for last 6 months
+    donation_monthly_data = []
+    for i in range(5, -1, -1):
+        month_date = today - timedelta(days=30 * i)
+        month_start = month_date.replace(day=1)
+        
+        # Calculate next month start
+        if month_start.month == 12:
+            next_month_start = month_start.replace(year=month_start.year + 1, month=1)
+        else:
+            next_month_start = month_start.replace(month=month_start.month + 1)
+        
+        month_donations = donations_queryset.filter(
+            payment_status='completed',
+            created_at__gte=month_start,
+            created_at__lt=next_month_start
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+        
+        donation_monthly_data.append(float(month_donations))
+    
+    # Calculate average monthly donations
+    average_monthly = sum(donation_monthly_data) / len(donation_monthly_data) if donation_monthly_data else 0
+    
+    # Find highest month
+    highest_month = max(donation_monthly_data) if donation_monthly_data else 0
+    
+    # Calculate growth rate (comparing last month vs previous month)
+    if len(donation_monthly_data) >= 2:
+        last_month = donation_monthly_data[-1]
+        previous_month = donation_monthly_data[-2]
+        if previous_month > 0:
+            growth_rate_donations = round(((last_month - previous_month) / previous_month) * 100, 1)
+        elif last_month > 0:
+            growth_rate_donations = 100
+        else:
+            growth_rate_donations = 0
+    else:
+        growth_rate_donations = 0
+    
     # Top donors (non-anonymous) - get unique donors with totals
     from django.db.models import Subquery, OuterRef
     top_donors_data = donations_queryset.filter(
@@ -883,6 +922,9 @@ def manage_church(request, church_id=None):
             'this_year_count': this_year_count,
             'unique_donors': unique_donors,
             'top_donors': top_donors,
+            'average_monthly': average_monthly,
+            'highest_month': highest_month,
+            'growth_rate': growth_rate_donations,
         },
         # Transactions data
         'transactions': {
@@ -7866,10 +7908,19 @@ def get_post_analytics(request, post_id):
             else:
                 initials = "U"
             
+            # Get profile picture safely
+            profile_picture = None
+            try:
+                if hasattr(comment.user, 'profile') and comment.user.profile and comment.user.profile.profile_image:
+                    profile_picture = comment.user.profile.profile_image.url
+            except Exception:
+                profile_picture = None
+            
             top_comments.append({
                 'user': {
                     'name': comment.user.get_full_name() or comment.user.username,
-                    'initials': initials
+                    'initials': initials,
+                    'profile_picture': profile_picture
                 },
                 'content': comment.content,
                 'likes': comment.likes_count,
