@@ -968,16 +968,20 @@ body {
 /* Post image styles */
 .post-image {
   margin: 12px 0 8px;
-  border-radius: 0;
+  border-radius: 8px;
   overflow: hidden;
-  max-height: 400px;
+  max-height: 500px;
+  max-width: 100%;
+  display: block;
 }
 
-.post-image img {
+img.post-image {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
+  max-width: 100%;
+  border-radius: 8px;
 }
 
 /* Avatar image styles */
