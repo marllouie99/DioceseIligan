@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
 <link rel="stylesheet" href="{% static 'css/pages/church_detail.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/post_analytics_modal.css' %}?v={{ STATIC_VERSION }}">
 <style>
   /* Tab Navigation */
   .tab-navigation {
@@ -70,6 +71,13 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* View Analytics Button */
+  .view-analytics-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+    background: linear-gradient(135deg, #1C7FE6 0%, #3A5FD1 100%);
   }
 
   /* Stats Grid */
@@ -545,18 +553,80 @@
         Recent Posts ({{ posts.count }})
       </h2>
       
-      <div style="text-align: center; padding: 4rem 2rem; color: #9ca3af;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 64px; height: 64px; margin: 0 auto 1.5rem; color: #d1d5db;">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <p style="margin: 0; font-size: 1.125rem; font-weight: 500;">No posts available yet.</p>
-      </div>
+      {% if posts %}
+        <div style="display: grid; gap: 1.5rem;">
+          {% for post in posts %}
+            <div style="background: #f8fafc; border: 1px solid rgba(30, 144, 255, 0.1); border-radius: 8px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                  <span style="display: inline-block; padding: 0.25rem 0.75rem; background: {% if post.post_type == 'general' %}#e0f2fe{% elif post.post_type == 'event' %}#fce7f3{% elif post.post_type == 'prayer' %}#ede9fe{% else %}#dcfce7{% endif %}; color: {% if post.post_type == 'general' %}#0369a1{% elif post.post_type == 'event' %}#9f1239{% elif post.post_type == 'prayer' %}#6b21a8{% else %}#15803d{% endif %}; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                    {{ post.get_post_type_display }}
+                  </span>
+                </div>
+                <span style="color: #64748b; font-size: 0.875rem;">{{ post.created_at|date:"M d, Y" }}</span>
+              </div>
+              
+              <p style="color: #1e293b; margin: 0 0 1rem 0; line-height: 1.6;">
+                {{ post.content|truncatewords:30 }}
+              </p>
+              
+              {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Post image" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+              {% endif %}
+              
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 2rem; color: #64748b; font-size: 0.875rem;">
+                  <span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;">
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                    </svg>
+                    {{ post.likes.count }} Likes
+                  </span>
+                  <span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    {{ post.comments.count }} Comments
+                  </span>
+                  <span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    {{ post.view_count }} Views
+                  </span>
+                </div>
+                <button onclick="openPostAnalyticsModal({{ post.id }})" class="view-analytics-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border: none; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                  </svg>
+                  View Analytics
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; color: #9ca3af;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 64px; height: 64px; margin: 0 auto 1.5rem; color: #d1d5db;">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p style="margin: 0; font-size: 1.125rem; font-weight: 500;">No posts available yet.</p>
+        </div>
+      {% endif %}
     </div>
   </div>
 
 </div>
+{% endblock %}
+
+<!-- Post Analytics Modal -->
+{% include 'partials/manage/post_analytics_modal.html' %}
+
 {% endblock %}
 
 {% block extra_js %}
@@ -571,5 +641,6 @@ function switchTab(tabId) {
   document.getElementById('tab-' + tabId).classList.add('active');
 }
 </script>
+<script src="{% static 'js/components/post_analytics_modal.js' %}?v={{ STATIC_VERSION }}"></script>
 {% include 'core/partials/church_detail_charts.html' %}
 {% endblock %}

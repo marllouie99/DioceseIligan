@@ -7791,8 +7791,8 @@ def get_post_analytics(request, post_id):
         
         post = get_object_or_404(Post, id=post_id)
         
-        # Check if user owns the church
-        if post.church.owner != request.user:
+        # Check if user owns the church or is a super admin
+        if not request.user.is_superuser and post.church.owner != request.user:
             return JsonResponse({
                 'success': False,
                 'message': 'You do not have permission to view this post analytics.'
