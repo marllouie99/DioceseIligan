@@ -7858,10 +7858,18 @@ def get_post_analytics(request, post_id):
         ).order_by('-likes_count', '-created_at')[:5]
         
         for comment in comments:
+            # Generate initials safely
+            if comment.user.first_name and comment.user.last_name and len(comment.user.first_name) > 0 and len(comment.user.last_name) > 0:
+                initials = f"{comment.user.first_name[0]}{comment.user.last_name[0]}".upper()
+            elif comment.user.username and len(comment.user.username) > 0:
+                initials = comment.user.username[0].upper()
+            else:
+                initials = "U"
+            
             top_comments.append({
                 'user': {
-                    'name': comment.user.get_full_name(),
-                    'initials': f"{comment.user.first_name[0]}{comment.user.last_name[0]}" if comment.user.first_name and comment.user.last_name else comment.user.username[0].upper()
+                    'name': comment.user.get_full_name() or comment.user.username,
+                    'initials': initials
                 },
                 'content': comment.content,
                 'likes': comment.likes_count,
@@ -7962,10 +7970,18 @@ def get_post_analytics(request, post_id):
                 elif donation.donor_name:
                     donor_name = donation.donor_name if not donation.is_anonymous else 'Anonymous Donor'
                 
+                # Get time display
+                if hasattr(donation, 'time_ago') and donation.time_ago:
+                    time_display = donation.time_ago
+                elif donation.completed_at:
+                    time_display = donation.completed_at.strftime('%Y-%m-%d %H:%M')
+                else:
+                    time_display = 'Unknown'
+                
                 recent_donations.append({
                     'donor_name': donor_name,
                     'amount': float(donation.amount),
-                    'time_ago': donation.time_ago if hasattr(donation, 'time_ago') else donation.completed_at.strftime('%Y-%m-%d %H:%M'),
+                    'time_ago': time_display,
                     'is_anonymous': donation.is_anonymous
                 })
             
@@ -8027,11 +8043,17 @@ def get_post_analytics(request, post_id):
         
     except Exception as e:
         import logging
+        import traceback
         logger = logging.getLogger(__name__)
         logger.error(f'Get post analytics error: {str(e)}')
+        logger.error(f'Traceback: {traceback.format_exc()}')
+        
+        # Return detailed error in development
         return JsonResponse({
             'success': False,
-            'message': 'An error occurred while fetching post analytics.'
+            'message': 'An error occurred while fetching post analytics.',
+            'error': str(e),
+            'traceback': traceback.format_exc()
         }, status=500)
 
 
