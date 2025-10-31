@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/components/chat-widget.css' %}?v={{ STATIC_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/parish_hover_card.css' %}?v={{ STATIC_VERSION }}">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %} {% if profile_essentials_incomplete %}needs-essentials{% endif %}" data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
@@ -41,6 +42,9 @@
   {% include 'partials/chat_widget.html' %}
   {% endif %}
 
+  <!-- Parish Hover Card -->
+  {% include 'partials/parish_hover_card.html' %}
+
   <!-- Load utility modules first -->
   <script defer src="{% static 'js/core/utils.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/core/navigation.js' %}?v={{ STATIC_VERSION }}"></script>
@@ -71,6 +75,7 @@
   <!-- Load dashboard modules -->
   <script defer src="{% static 'js/dashboard/dashboard-posts.js' %}?v={{ STATIC_VERSION }}"></script>
   <script defer src="{% static 'js/post-bookmark.js' %}?v={{ STATIC_VERSION }}"></script>
+  <script defer src="{% static 'js/components/parish-hover-card.js' %}?v={{ STATIC_VERSION }}"></script>
   
   <!-- Load chat widget (hidden in super admin mode) -->
   {% if user.is_authenticated and not is_admin_mode %}

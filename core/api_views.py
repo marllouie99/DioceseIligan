@@ -1579,3 +1579,113 @@ def overview_revenue_chart_api(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+
+@require_http_methods(["GET"])
+def church_preview_api(request, slug):
+    """
+    API endpoint to get church preview data for hover card.
+    
+    Args:
+        slug: Church slug
+    
+    Returns:
+        JSON response with church preview data
+    """
+    try:
+        church = get_object_or_404(Church, slug=slug)
+        
+        # Get followers count
+        followers_count = ChurchFollow.objects.filter(church=church).count()
+        
+        # Check if current user is following (if authenticated)
+        is_following = False
+        if request.user.is_authenticated:
+            is_following = ChurchFollow.objects.filter(
+                church=church,
+                user=request.user
+            ).exists()
+        
+        # Build location string
+        location_parts = []
+        if church.city:
+            location_parts.append(church.city)
+        if church.province:
+            location_parts.append(church.province)
+        location = ', '.join(location_parts) if location_parts else 'Location not specified'
+        
+        return JsonResponse({
+            'success': True,
+            'name': church.name,
+            'slug': church.slug,
+            'location': location,
+            'description': church.description or 'No description available',
+            'followers_count': followers_count,
+            'is_following': is_following,
+            'is_verified': church.is_verified,
+        })
+        
+    except Church.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Church not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def church_follow_toggle_api(request, slug):
+    """
+    API endpoint to toggle follow/unfollow a church.
+    
+    Args:
+        slug: Church slug
+    
+    Returns:
+        JSON response with updated follow status
+    """
+    try:
+        church = get_object_or_404(Church, slug=slug)
+        
+        # Check if already following
+        follow = ChurchFollow.objects.filter(
+            church=church,
+            user=request.user
+        ).first()
+        
+        if follow:
+            # Unfollow
+            follow.delete()
+            is_following = False
+        else:
+            # Follow
+            ChurchFollow.objects.create(
+                church=church,
+                user=request.user
+            )
+            is_following = True
+        
+        # Get updated followers count
+        followers_count = ChurchFollow.objects.filter(church=church).count()
+        
+        return JsonResponse({
+            'success': True,
+            'is_following': is_following,
+            'followers_count': followers_count,
+        })
+        
+    except Church.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Church not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

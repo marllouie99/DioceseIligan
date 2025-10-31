@@ -3900,15 +3900,59 @@ input:checked + .toggle-slider:before {
   transform: scale(1.05);
 }
 
-.comment-post-btn {
-  background: linear-gradient(135deg, var(--btn-start) 0%, var(--accent-gold) 100%);
-  color: var(--text-light);
+.comment-action-btn.comment-post-btn,
+button.comment-post-btn {
+  background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(30, 144, 255, 0.3) !important;
+  box-shadow: 
+    0 2px 4px rgba(30, 144, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
-.comment-post-btn:hover {
-  background: linear-gradient(135deg, var(--btn-end) 0%, #DAA520 100%);
+.comment-action-btn.comment-post-btn svg,
+button.comment-post-btn svg {
+  stroke: #FFFFFF !important;
+  fill: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  stroke-width: 2.5 !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+.comment-action-btn.comment-post-btn svg path,
+button.comment-post-btn svg path {
+  stroke: #FFFFFF !important;
+  fill: none !important;
+  stroke-width: 2.5 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.comment-action-btn.comment-post-btn .send-icon,
+button.comment-post-btn .send-icon {
+  color: #FFFFFF !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  display: block !important;
+  font-weight: bold !important;
+}
+
+.comment-action-btn.comment-post-btn:hover,
+button.comment-post-btn:hover {
+  background: linear-gradient(135deg, #1C7FE6 0%, #3A5FD1 100%) !important;
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(218, 165, 32, 0.4);
+  box-shadow: 
+    0 4px 12px rgba(30, 144, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.comment-action-btn.comment-post-btn:hover svg,
+button.comment-post-btn:hover svg {
+  stroke: #FFFFFF !important;
 }
 
 .comment-cancel-btn {

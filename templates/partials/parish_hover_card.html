@@ -1,0 +1,68 @@
+{% load static %}
+{# Parish Hover Card - Similar to Facebook profile preview #}
+<div class="parish-hover-card" id="parish-hover-card" style="display: none;">
+  <div class="parish-hover-card-content">
+    {# Close button #}
+    <button class="parish-hover-card-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18"></path>
+        <path d="M6 6L18 18"></path>
+      </svg>
+    </button>
+
+    {# Parish header with logo and name #}
+    <div class="parish-hover-header">
+      <div class="parish-hover-logo">
+        {# Logo will be dynamically inserted #}
+      </div>
+      <div class="parish-hover-name-section">
+        <h3 class="parish-hover-name"></h3>
+        <div class="parish-hover-verified"></div>
+      </div>
+    </div>
+
+    {# Parish info #}
+    <div class="parish-hover-info">
+      <div class="parish-hover-info-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span class="parish-hover-location"></span>
+      </div>
+      <div class="parish-hover-info-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span class="parish-hover-followers"></span>
+      </div>
+      <div class="parish-hover-info-item parish-hover-description">
+        {# Description will be dynamically inserted #}
+      </div>
+    </div>
+
+    {# Action buttons #}
+    <div class="parish-hover-actions">
+      <a href="#" class="parish-hover-btn parish-hover-btn-primary parish-hover-view-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        View Parish
+      </a>
+      <button class="parish-hover-btn parish-hover-btn-secondary parish-hover-follow-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        <span class="follow-btn-text">Follow</span>
+      </button>
+    </div>
+  </div>
+</div>

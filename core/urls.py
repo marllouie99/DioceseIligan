@@ -139,6 +139,8 @@ urlpatterns = [
     
     # API endpoints
     path('api/service/<int:service_id>/images/', views.service_images_api, name='service_images_api'),
+    path('api/churches/<slug:slug>/preview/', api_views.church_preview_api, name='church_preview_api'),
+    path('api/churches/<slug:slug>/follow/', api_views.church_follow_toggle_api, name='church_follow_toggle_api'),
     
     # Follower Management API endpoints
     path('api/followers/', api_views.followers_list_api, name='followers_list_api'),

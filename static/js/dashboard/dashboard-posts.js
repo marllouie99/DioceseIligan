@@ -134,8 +134,9 @@ class DashboardPosts {
 
     // Cancel comment
     document.addEventListener('click', (event) => {
-      if (event.target.classList.contains('cancel-comment')) {
-        this.cancelComment(event.target);
+      const cancelBtn = event.target.closest('.cancel-comment');
+      if (cancelBtn) {
+        this.cancelComment(cancelBtn);
       }
     });
   }
