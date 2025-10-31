@@ -187,6 +187,9 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     const statusBadge = document.getElementById('summary-status-badge');
     statusBadge.textContent = statusDisplay;
     statusBadge.className = 'badge badge-' + status;
+
+    // Normalize status for comparisons
+    const normalizedStatus = (status || '').toString().trim().toLowerCase();
     
     // Show/hide cancel button based on status (only for pending/requested, not canceled/approved/declined/completed)
     const cancelBtn = document.getElementById('cancel-booking-btn');
@@ -194,14 +197,14 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
         const cancellableStatuses = ['pending', 'requested'];
         const nonCancellableStatuses = ['canceled', 'cancelled', 'approved', 'declined', 'completed'];
         
-        // Explicitly hide for non-cancellable statuses
-        if (nonCancellableStatuses.includes(status.toLowerCase())) {
-            cancelBtn.style.display = 'none';
-        } else if (cancellableStatuses.includes(status.toLowerCase())) {
-            cancelBtn.style.display = 'flex';
+        // Explicitly hide for non-cancellable statuses; use !important to override CSS
+        if (nonCancellableStatuses.includes(normalizedStatus)) {
+            cancelBtn.style.setProperty('display', 'none', 'important');
+        } else if (cancellableStatuses.includes(normalizedStatus)) {
+            cancelBtn.style.setProperty('display', 'flex', 'important');
         } else {
             // Default to hide if status is unknown
-            cancelBtn.style.display = 'none';
+            cancelBtn.style.setProperty('display', 'none', 'important');
         }
     }
     
@@ -973,6 +976,10 @@ function cancelBooking() {
     })
     .then(data => {
         if (data.success) {
+            // Hide the cancel button immediately in the summary modal (if still open later)
+            const summaryCancelBtn = document.getElementById('cancel-booking-btn');
+            if (summaryCancelBtn) summaryCancelBtn.style.setProperty('display', 'none', 'important');
+
             closeCancelModal();
             // Show success message
             alert('Booking cancelled successfully!');
