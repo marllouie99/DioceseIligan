@@ -733,7 +733,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 48px;
 }
 
 .chart-container {
@@ -765,7 +765,8 @@
 
 .chart-content {
   position: relative;
-  height: 300px;
+  height: 320px;
+  padding-bottom: 20px;
 }
 
 .chart-content canvas {
@@ -777,6 +778,7 @@
 .demographics-section,
 .top-comments-section,
 .performance-insights-section {
+  margin-top: 48px;
   margin-bottom: 32px;
 }
 
