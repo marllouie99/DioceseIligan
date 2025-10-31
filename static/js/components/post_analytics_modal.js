@@ -65,16 +65,24 @@ async function loadPostAnalytics(postId) {
             }
         });
         
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Analytics API error:', response.status, errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
         const data = await response.json();
         
         if (data.success) {
             populateAnalyticsModal(data.analytics);
         } else {
+            console.error('Analytics data error:', data);
             showError(data.message || 'Failed to load analytics');
             closePostAnalyticsModal();
         }
     } catch (error) {
         console.error('Error loading post analytics:', error);
+        console.error('Error details:', error.message, error.stack);
         showError('An error occurred while loading analytics');
         closePostAnalyticsModal();
     }
@@ -712,10 +720,24 @@ function updateRecentDonations(donations) {
     
     donations.forEach(donation => {
         const row = document.createElement('tr');
+        
+        // Debug: Log donation data
+        console.log('Donation data:', donation);
+        
+        // Generate avatar HTML - show profile picture if available, otherwise show initials
+        let avatarHTML;
+        if (donation.profile_picture) {
+            console.log('Using profile picture:', donation.profile_picture);
+            avatarHTML = `<img src="${donation.profile_picture}" alt="${escapeHtml(donation.donor_name)}" class="donor-avatar-img">`;
+        } else {
+            console.log('Using initials:', donation.initials);
+            avatarHTML = `<div class="donor-avatar">${donation.initials || donation.donor_name.charAt(0).toUpperCase()}</div>`;
+        }
+        
         row.innerHTML = `
             <td>
                 <div class="donor-info">
-                    <div class="donor-avatar">${donation.donor_name.charAt(0).toUpperCase()}</div>
+                    ${avatarHTML}
                     <span>${escapeHtml(donation.donor_name)}</span>
                     ${donation.is_anonymous ? '<span class="anonymous-badge">Anonymous</span>' : ''}
                 </div>

@@ -7962,13 +7962,37 @@ def get_post_analytics(request, post_id):
             recent_donations = []
             for donation in completed_donations.order_by('-completed_at')[:10]:
                 donor_name = 'Anonymous'
+                profile_picture = None
+                initials = 'A'
+                
                 if donation.donor:
                     if donation.is_anonymous:
                         donor_name = 'Anonymous Donor'
+                        initials = 'A'
                     else:
                         donor_name = donation.donor.get_full_name() or donation.donor.username
+                        # Get profile image safely
+                        try:
+                            if hasattr(donation.donor, 'profile') and donation.donor.profile and donation.donor.profile.profile_image:
+                                profile_picture = donation.donor.profile.profile_image.url
+                        except Exception:
+                            profile_picture = None
+                        # Generate initials
+                        if donation.donor.first_name and donation.donor.last_name and len(donation.donor.first_name) > 0 and len(donation.donor.last_name) > 0:
+                            initials = f"{donation.donor.first_name[0]}{donation.donor.last_name[0]}".upper()
+                        elif donation.donor.username and len(donation.donor.username) > 0:
+                            initials = donation.donor.username[0].upper()
+                        else:
+                            initials = "U"
                 elif donation.donor_name:
                     donor_name = donation.donor_name if not donation.is_anonymous else 'Anonymous Donor'
+                    # Generate initials from donor_name
+                    if not donation.is_anonymous and donation.donor_name:
+                        name_parts = donation.donor_name.split()
+                        if len(name_parts) >= 2:
+                            initials = f"{name_parts[0][0]}{name_parts[-1][0]}".upper()
+                        elif len(name_parts) == 1 and len(name_parts[0]) > 0:
+                            initials = name_parts[0][0].upper()
                 
                 # Get time display
                 if hasattr(donation, 'time_ago') and donation.time_ago:
@@ -7982,7 +8006,9 @@ def get_post_analytics(request, post_id):
                     'donor_name': donor_name,
                     'amount': float(donation.amount),
                     'time_ago': time_display,
-                    'is_anonymous': donation.is_anonymous
+                    'is_anonymous': donation.is_anonymous,
+                    'profile_picture': profile_picture,
+                    'initials': initials
                 })
             
             # Donor demographics (followers vs non-followers)
