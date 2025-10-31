@@ -202,6 +202,11 @@ function renderViewsInteractionsChart(viewsData, interactionsData) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20
+                }
+            },
             plugins: {
                 legend: {
                     display: true,
@@ -297,6 +302,11 @@ function renderEngagementBreakdownChart(breakdownData) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 20
+                }
+            },
             plugins: {
                 legend: {
                     display: false
