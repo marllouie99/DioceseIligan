@@ -206,8 +206,18 @@ def conversation_messages_api(request, conversation_id):
         data = []
         for msg in messages:
             # Determine if sender is managing the church (owner or staff)
-            is_church_manager = (msg.sender == conversation.church.owner or 
-                                conversation.church.id in managed_churches)
+            # Check if the message sender is the church owner
+            is_owner = msg.sender == conversation.church.owner
+            
+            # Check if the message sender is a staff member with access to this church
+            is_staff = ChurchStaff.objects.filter(
+                user=msg.sender,
+                church=conversation.church,
+                status=ChurchStaff.STATUS_ACTIVE,
+                role=ChurchStaff.ROLE_SECRETARY
+            ).exists() if not is_owner else False
+            
+            is_church_manager = is_owner or is_staff
             
             # Get sender avatar
             avatar = None
