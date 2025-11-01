@@ -71,6 +71,9 @@
         {# Followers Tab #}
         {% include 'partials/manage/followers_tab.html' with recent_followers=recent_followers follower_count=follower_count %}
 
+        {# Parish Admins Tab #}
+        {% include 'partials/manage/admins_tab.html' with church=church %}
+
         {# Settings Tab #}
         {% include 'partials/manage/settings_tab.html' with church=church form=form verif_form=verif_form decline_reasons=decline_reasons %}
 
