@@ -35,11 +35,6 @@ def conversations_api(request):
             role=ChurchStaff.ROLE_SECRETARY  # Secretaries have messaging permission
         ).values_list('church_id', flat=True))
         
-        # Debug logging
-        print(f"[CHAT DEBUG] User: {request.user.username}")
-        print(f"[CHAT DEBUG] Owned churches: {user_churches}")
-        print(f"[CHAT DEBUG] Staff churches: {staff_churches}")
-        
         # Combine owned and managed churches
         managed_churches = list(set(user_churches) | set(staff_churches))
         
@@ -51,11 +46,6 @@ def conversations_api(request):
         ).select_related('church', 'user').prefetch_related('messages').annotate(
             last_message_time=Max('messages__created_at')
         ).order_by('-updated_at')
-        
-        print(f"[CHAT DEBUG] Managed churches: {managed_churches}")
-        print(f"[CHAT DEBUG] Found conversations: {conversations.count()}")
-        for conv in conversations:
-            print(f"[CHAT DEBUG] - Conversation {conv.id}: church_id={conv.church.id}, user={conv.user.username}")
         
         data = []
         for conv in conversations:
