@@ -8467,8 +8467,10 @@ def get_post_analytics(request, post_id):
         
         post = get_object_or_404(Post, id=post_id)
         
-        # Check if user owns the church or is a super admin
-        if not request.user.is_superuser and post.church.owner != request.user:
+        # Check if user has permission to manage content
+        has_permission, role = user_can_manage_church(request.user, post.church, required_permissions=['content'])
+        
+        if not request.user.is_superuser and not has_permission:
             return JsonResponse({
                 'success': False,
                 'message': 'You do not have permission to view this post analytics.'
