@@ -478,7 +478,13 @@
               <td>{{ forloop.counter }}</td>
               <td>
                 <div class="donor-info">
-                  <div class="donor-avatar">{{ data.display_name|first|upper }}</div>
+                  <div class="donor-avatar">
+                    {% if data.user.profile and data.user.profile.profile_image %}
+                      <img src="{{ data.user.profile.profile_image.url }}" alt="{{ data.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                      {{ data.display_name|first|upper }}
+                    {% endif %}
+                  </div>
                   <div class="donor-details">
                     <span class="donor-name">{{ data.display_name }}</span>
                     <span class="donor-email">{{ data.email }}</span>
