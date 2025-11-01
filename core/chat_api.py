@@ -21,17 +21,28 @@ def conversations_api(request):
     """
     if request.method == 'GET':
         # Get user's conversations with optimized queries
-        # Include conversations where user is the sender OR where user owns the church
+        # Include conversations where user is the sender OR where user owns/manages the church
         from django.db.models import Q
+        from .models import ChurchStaff
         
         # Get churches owned by this user
         user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
         
+        # Get churches where user is staff with messaging permissions
+        staff_churches = ChurchStaff.objects.filter(
+            user=request.user,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY  # Secretaries have messaging permission
+        ).values_list('church_id', flat=True)
+        
+        # Combine owned and managed churches
+        managed_churches = set(user_churches) | set(staff_churches)
+        
         # Get conversations where:
         # 1. User is the conversation participant (user-to-church)
-        # 2. OR user owns the church (church owner seeing incoming messages)
+        # 2. OR user owns/manages the church (seeing incoming messages)
         conversations = Conversation.objects.filter(
-            Q(user=request.user) | Q(church_id__in=user_churches)
+            Q(user=request.user) | Q(church_id__in=managed_churches)
         ).select_related('church', 'user').prefetch_related('messages').annotate(
             last_message_time=Max('messages__created_at')
         ).order_by('-updated_at')
@@ -41,11 +52,11 @@ def conversations_api(request):
             last_message = conv.get_last_message()
             unread_count = conv.get_unread_count(request.user)
             
-            # Determine if current user is the church owner
-            is_church_owner = conv.church.owner == request.user
+            # Determine if current user is managing the church (owner or staff)
+            is_church_manager = conv.church.id in managed_churches
             
-            if is_church_owner:
-                # Church owner sees the user who sent the message
+            if is_church_manager:
+                # Church manager (owner/staff) sees the user who sent the message
                 display_name = conv.user.username
                 try:
                     if conv.user.get_full_name():
@@ -165,11 +176,22 @@ def conversation_messages_api(request, conversation_id):
     POST: Send a new message in a conversation
     """
     # Verify user has access to this conversation
-    # User can access if they are the conversation participant OR the church owner
+    # User can access if they are the conversation participant OR church owner/manager
     try:
         from django.db.models import Q
+        from .models import ChurchStaff
+        
+        # Get churches user owns or manages with messaging permission
+        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
+        staff_churches = ChurchStaff.objects.filter(
+            user=request.user,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY
+        ).values_list('church_id', flat=True)
+        managed_churches = set(user_churches) | set(staff_churches)
+        
         conversation = Conversation.objects.select_related('church', 'user').get(
-            Q(id=conversation_id) & (Q(user=request.user) | Q(church__owner=request.user))
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
         )
     except Conversation.DoesNotExist:
         return JsonResponse({'error': 'Conversation not found'}, status=404)
@@ -183,13 +205,14 @@ def conversation_messages_api(request, conversation_id):
         
         data = []
         for msg in messages:
-            # Determine if sender is the church owner
-            is_church_owner = msg.sender == conversation.church.owner
+            # Determine if sender is managing the church (owner or staff)
+            is_church_manager = (msg.sender == conversation.church.owner or 
+                                conversation.church.id in managed_churches)
             
             # Get sender avatar
             avatar = None
-            if is_church_owner:
-                # Use church logo for church owner messages
+            if is_church_manager:
+                # Use church logo for church manager messages
                 try:
                     if conversation.church.logo:
                         avatar = request.build_absolute_uri(conversation.church.logo.url)
@@ -209,8 +232,8 @@ def conversation_messages_api(request, conversation_id):
             
             # Get sender name
             sender_name = msg.sender.username
-            if is_church_owner:
-                # Use church name for church owner
+            if is_church_manager:
+                # Use church name for church manager
                 sender_name = conversation.church.name
             else:
                 # Use user's display name
@@ -223,9 +246,9 @@ def conversation_messages_api(request, conversation_id):
                 except Exception:
                     pass
             
-            # Get donation rank (only for regular users, not church owners)
+            # Get donation rank (only for regular users, not church managers)
             donation_rank = None
-            if not is_church_owner:
+            if not is_church_manager:
                 donation_rank = get_user_donation_rank(msg.sender)
             
             # Prepare attachment data
@@ -358,8 +381,19 @@ def mark_conversation_read(request, conversation_id):
     """Mark all messages in a conversation as read"""
     try:
         from django.db.models import Q
+        from .models import ChurchStaff
+        
+        # Get churches user owns or manages with messaging permission
+        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
+        staff_churches = ChurchStaff.objects.filter(
+            user=request.user,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY
+        ).values_list('church_id', flat=True)
+        managed_churches = set(user_churches) | set(staff_churches)
+        
         conversation = Conversation.objects.get(
-            Q(id=conversation_id) & (Q(user=request.user) | Q(church__owner=request.user))
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
         )
         
         # Mark all unread messages (not sent by user) as read

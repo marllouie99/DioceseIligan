@@ -96,7 +96,7 @@ def user_can_manage_church(user, church, required_permissions=None):
     
     # Define role permissions
     role_permissions = {
-        ChurchStaff.ROLE_SECRETARY: ['appointments', 'services', 'availability', 'transactions'],
+        ChurchStaff.ROLE_SECRETARY: ['appointments', 'services', 'availability', 'transactions', 'messaging'],
         ChurchStaff.ROLE_VOLUNTEER: ['events', 'content']
     }
     
