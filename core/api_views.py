@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from .models import (
     Church,
     ChurchFollow,
+    ChurchStaff,
     UserInteraction,
     Booking,
     ServiceReview,
@@ -31,6 +32,24 @@ from .models import (
 from django.db import models
 
 User = get_user_model()
+
+
+def get_user_manageable_churches(user):
+    """
+    Get all churches that a user can manage (owned or staff position).
+    Returns a QuerySet of Church objects.
+    """
+    # Churches owned by user
+    owned_churches = Church.objects.filter(owner=user)
+    
+    # Churches where user is active staff
+    staff_churches = Church.objects.filter(
+        staff_members__user=user,
+        staff_members__status=ChurchStaff.STATUS_ACTIVE
+    )
+    
+    # Combine and return distinct churches
+    return (owned_churches | staff_churches).distinct()
 
 
 @login_required
@@ -51,7 +70,7 @@ def follower_activity_api(request, user_id, activity_type):
         follower = get_object_or_404(User, id=user_id)
         
         # Check if the requesting user owns churches that this follower follows
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         if not ChurchFollow.objects.filter(
             user=follower,
             church__in=user_churches
@@ -391,7 +410,7 @@ def follower_stats_api(request, user_id):
     """
     try:
         follower = get_object_or_404(User, id=user_id)
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         # Check permission
         if not ChurchFollow.objects.filter(
@@ -538,7 +557,7 @@ def followers_list_api(request):
     Supports search, filtering, and pagination.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -712,7 +731,7 @@ def follower_growth_chart_api(request):
     Returns monthly data for the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -776,7 +795,7 @@ def engagement_levels_chart_api(request):
     Returns monthly engagement distribution for the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -876,7 +895,7 @@ def revenue_trend_chart_api(request):
     Returns monthly revenue from paid bookings over the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -942,7 +961,7 @@ def payment_methods_chart_api(request):
     Returns breakdown of payment methods used for paid bookings.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -995,7 +1014,7 @@ def donation_trends_chart_api(request):
     Returns monthly donation amounts and donor counts for the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1060,7 +1079,7 @@ def engagement_trends_chart_api(request):
     Supports daily, weekly, monthly, and yearly time ranges.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1274,7 +1293,7 @@ def booking_trends_chart_api(request):
     Returns weekly booking status breakdown for the last 4 weeks.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1341,7 +1360,7 @@ def popular_services_chart_api(request):
     Returns top service categories by booking count.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1387,7 +1406,7 @@ def overview_follower_growth_chart_api(request):
     Returns monthly follower counts for the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1443,7 +1462,7 @@ def overview_weekly_engagement_chart_api(request):
     Returns daily engagement metrics for the last 7 days.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({
@@ -1515,7 +1534,7 @@ def overview_revenue_chart_api(request):
     Returns monthly donations and service revenue for the last 6 months.
     """
     try:
-        user_churches = Church.objects.filter(owner=request.user)
+        user_churches = get_user_manageable_churches(request.user)
         
         if not user_churches.exists():
             return JsonResponse({

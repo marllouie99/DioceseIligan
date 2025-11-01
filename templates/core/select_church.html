@@ -29,7 +29,8 @@
 
   <!-- Churches Grid -->
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
-    {% for church in churches %}
+    {% for item in churches_with_roles %}
+    {% with church=item.church role=item.role %}
     <a href="{% url 'core:manage_church' church_id=church.id %}" 
        style="text-decoration: none; display: block; background: linear-gradient(135deg, #FFFFFF 0%, #F0F8FF 100%); border: 2px solid rgba(30, 144, 255, 0.2); border-radius: 16px; padding: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden;"
        onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(30, 144, 255, 0.15)'; this.style.borderColor='rgba(30, 144, 255, 0.4)';"
@@ -94,16 +95,24 @@
         </div>
       </div>
       
+      <!-- Role Badge -->
+      <div style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(99, 102, 241, 0.1); color: #4f46e5; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        {{ role }}
+      </div>
+      
       <!-- Verification Badge -->
       {% if church.is_verified %}
-      <div style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(34, 197, 94, 0.1); color: #16a34a; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+      <div style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(34, 197, 94, 0.1); color: #16a34a; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width: 14px; height: 14px;">
           <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         Verified
       </div>
       {% else %}
-      <div style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(251, 191, 36, 0.1); color: #d97706; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+      <div style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; background: rgba(251, 191, 36, 0.1); color: #d97706; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="8" x2="12" y2="12"/>
@@ -115,17 +124,18 @@
       
       <!-- Manage Button -->
       <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border-radius: 8px; text-align: center; font-weight: 600; font-size: 0.9375rem;">
-        Manage Church
+        Manage Parish
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; margin-left: 0.5rem; vertical-align: middle;">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
       </div>
     </a>
+    {% endwith %}
     {% endfor %}
   </div>
 
   <!-- Empty State -->
-  {% if not churches %}
+  {% if not churches_with_roles %}
   <div style="text-align: center; padding: 4rem 2rem; background: rgba(255, 255, 255, 0.8); border: 2px dashed rgba(30, 144, 255, 0.3); border-radius: 16px;">
     <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width: 40px; height: 40px;">
@@ -134,10 +144,10 @@
       </svg>
     </div>
     <h3 style="font-size: 1.5rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.5rem 0;">
-      No Churches to Manage
+      No Parishes to Manage
     </h3>
     <p style="color: #64748b; margin: 0 0 1.5rem 0;">
-      You haven't been assigned to manage any churches yet.
+      You haven't been assigned to manage any parishes yet.
     </p>
     <a href="{% url 'core:home' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">

@@ -15,7 +15,7 @@ let cancelBookingId = null;
 /**
  * Open the appointment summary modal with booking information
  */
-function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor, declineReason) {
+function openAppointmentSummary(bookingId, code, serviceName, churchName, churchAddress, churchEmail, churchPhone, churchPaypal, date, time, statusDisplay, status, createdDate, updatedDate, userName, userEmail, userPhone, userAddress, notes, servicePrice, isFree, paymentStatus, paymentAmount, paymentMethod, paymentDate, paymentTransactionId, categoryName, categoryIcon, categoryColor, declineReason, handlerName) {
     // Store current booking info for cancel functionality
     currentBookingId = bookingId;
     
@@ -26,6 +26,14 @@ function openAppointmentSummary(bookingId, code, serviceName, churchName, church
     document.getElementById('summary-time').textContent = time;
     document.getElementById('summary-created').textContent = createdDate;
     document.getElementById('summary-updated').textContent = updatedDate;
+    
+    // Handler name for signature
+    const handlerNameEl = document.getElementById('summary-handler-name');
+    if (handlerNameEl && handlerName && handlerName.trim()) {
+        handlerNameEl.textContent = handlerName;
+    } else if (handlerNameEl) {
+        handlerNameEl.textContent = 'Parish Administrator';
+    }
     
     // Category badge
     const categoryRow = document.getElementById('summary-category-row');

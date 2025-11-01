@@ -139,7 +139,8 @@
                     '{{ b.service.category.name|default:''|escapejs }}',
                     '{{ b.service.category.icon|default:''|escapejs }}',
                     '{{ b.service.category.color|default:'' }}',
-                    '{{ b.decline_reason|default:''|escapejs }}'
+                    '{{ b.decline_reason|default:''|escapejs }}',
+                    '{% if b.handled_by %}{{ b.handled_by.get_full_name|default:b.handled_by.username|escapejs }}{% elif b.church.owner %}{{ b.church.owner.get_full_name|default:b.church.owner.username|escapejs }}{% else %}Parish Administrator{% endif %}'
                   )" title="View Summary">
                     <i data-feather="eye"></i>
                   </button>
@@ -308,8 +309,8 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: flex-end;">
           <div style="text-align: center;">
             <div style="border-bottom: 2px solid #000; height: 35px; margin-bottom: 5px;"></div>
-            <div style="font-size: 9px; color: #374151; font-weight: 600;">
-              Parish Administrator Signature
+            <div style="font-size: 9px; color: #374151; font-weight: 600;" id="summary-handler-name">
+              Parish Administrator
             </div>
           </div>
           

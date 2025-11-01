@@ -19,6 +19,7 @@ from django.utils import timezone
 from .models import (
     Church,
     ChurchFollow,
+    ChurchStaff,
     BookableService,
     ServiceCategory,
     Availability,
@@ -57,6 +58,54 @@ from django.core.files.base import ContentFile
 import os
 from django.utils import timezone
 from .notifications import create_booking_notification, NotificationTemplates
+
+
+# Permission Helper Functions
+def user_can_manage_church(user, church, required_permissions=None):
+    """
+    Check if user has permission to manage church based on ownership or staff role.
+    
+    Args:
+        user: The user to check
+        church: The church instance
+        required_permissions: List of required permissions like ['appointments', 'services', 'content', 'events']
+                            If None, just checks if user has any access
+    
+    Returns:
+        tuple: (has_permission: bool, user_role: str or None)
+    """
+    # Owner has full access
+    if church.owner == user:
+        return (True, 'owner')
+    
+    # Check staff positions
+    staff_position = ChurchStaff.objects.filter(
+        user=user,
+        church=church,
+        status=ChurchStaff.STATUS_ACTIVE
+    ).first()
+    
+    if not staff_position:
+        return (False, None)
+    
+    role = staff_position.role
+    
+    # If no specific permissions required, return True (has access)
+    if required_permissions is None:
+        return (True, role)
+    
+    # Define role permissions
+    role_permissions = {
+        ChurchStaff.ROLE_SECRETARY: ['appointments', 'services', 'availability', 'transactions'],
+        ChurchStaff.ROLE_VOLUNTEER: ['events', 'content']
+    }
+    
+    user_permissions = role_permissions.get(role, [])
+    
+    # Check if user has all required permissions
+    has_permission = all(perm in user_permissions for perm in required_permissions)
+    
+    return (has_permission, role)
 
 
 def _app_context(request):
@@ -359,6 +408,9 @@ def church_detail(request, slug):
         post_type='event'
     ).select_related('church').order_by('-event_start_date')[:10]
     
+    # Check if user can manage content (Owner or Ministry Leader/Volunteer)
+    can_manage_content, user_role = user_can_manage_church(request.user, church, ['content'])
+    
     ctx = {
         'page_title': church.name,
         'church': church,
@@ -373,6 +425,7 @@ def church_detail(request, slug):
         'essential_missing': essential_missing,
         'photo_posts': photo_posts,
         'event_posts': event_posts,
+        'can_manage_content': can_manage_content,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/church_detail.html', ctx)
@@ -380,24 +433,54 @@ def church_detail(request, slug):
 
 @login_required
 def select_church(request):
-    """Allow user to select which church to manage if they manage multiple churches."""
-    churches = request.user.owned_churches.all()
+    """Allow user to select which church to manage if they manage multiple churches or staff positions."""
+    from core.models import ChurchStaff
     
-    if not churches.exists():
+    # Get churches user owns using consistent query
+    owned_churches = Church.objects.filter(owner=request.user)
+    
+    # Get churches where user is active staff
+    staff_churches = Church.objects.filter(
+        staff_members__user=request.user,
+        staff_members__status=ChurchStaff.STATUS_ACTIVE
+    )
+    
+    # Combine both querysets using distinct to avoid duplicates
+    all_churches = (owned_churches | staff_churches).distinct()
+    
+    if not all_churches.exists():
         if request.user.is_superuser:
             return redirect('core:super_admin_create_church')
         messages.info(
             request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+            "You don't have access to manage any parishes yet. Please contact a Parish Manager."
         )
         return redirect('core:home')
     
     # If user only manages one church, redirect directly to manage_church
-    if churches.count() == 1:
-        return redirect('core:manage_church', church_id=churches.first().id)
+    if all_churches.count() == 1:
+        return redirect('core:manage_church', church_id=all_churches.first().id)
+    
+    # Annotate churches with user role for display
+    churches_with_roles = []
+    for church in all_churches:
+        if church in owned_churches:
+            role = 'Parish Manager'
+        else:
+            staff_position = ChurchStaff.objects.filter(
+                user=request.user,
+                church=church,
+                status=ChurchStaff.STATUS_ACTIVE
+            ).first()
+            role = staff_position.get_role_display() if staff_position else 'Staff'
+        
+        churches_with_roles.append({
+            'church': church,
+            'role': role
+        })
     
     ctx = {
-        'churches': churches,
+        'churches_with_roles': churches_with_roles,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/select_church.html', ctx)
@@ -434,16 +517,22 @@ def manage_church(request, church_id=None):
                     raise Church.DoesNotExist
         else:
             # If no church_id, redirect to select_church page
-            owned_churches = request.user.owned_churches.all()
-            staff_churches = Church.objects.filter(
+            owned_churches = list(request.user.owned_churches.all())
+            staff_churches = list(Church.objects.filter(
                 staff_members__user=request.user,
                 staff_members__status=ChurchStaff.STATUS_ACTIVE
-            ).distinct()
+            ).distinct())
             
-            # Combine owned and staff churches
-            all_manageable_churches = owned_churches | staff_churches
+            # Combine owned and staff churches using list
+            # Remove duplicates while preserving order
+            seen_ids = set()
+            all_manageable_churches = []
+            for church in owned_churches + staff_churches:
+                if church.id not in seen_ids:
+                    seen_ids.add(church.id)
+                    all_manageable_churches.append(church)
             
-            if not all_manageable_churches.exists():
+            if not all_manageable_churches:
                 if request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
                 messages.info(
@@ -452,8 +541,8 @@ def manage_church(request, church_id=None):
                 )
                 return redirect('core:home')
             # If only one church, use it directly
-            elif all_manageable_churches.count() == 1:
-                church = all_manageable_churches.first()
+            elif len(all_manageable_churches) == 1:
+                church = all_manageable_churches[0]
                 # Determine role for this church
                 if church in owned_churches:
                     user_role = 'owner'
@@ -910,6 +999,19 @@ def manage_church(request, church_id=None):
         notification_type=Notification.TYPE_BOOKING_REQUESTED,
         church=church
     ).count()
+    
+    # Get staff members for Parish Admins tab
+    secretaries = ChurchStaff.objects.filter(
+        church=church,
+        role=ChurchStaff.ROLE_SECRETARY,
+        status=ChurchStaff.STATUS_ACTIVE
+    ).select_related('user', 'user__profile').order_by('-added_at')
+    
+    volunteers = ChurchStaff.objects.filter(
+        church=church,
+        role=ChurchStaff.ROLE_VOLUNTEER,
+        status=ChurchStaff.STATUS_ACTIVE
+    ).select_related('user', 'user__profile').order_by('-added_at')
 
     ctx = {
         'active': 'manage',
@@ -983,6 +1085,8 @@ def manage_church(request, church_id=None):
         'top_services_by_bookings': top_services_by_bookings,
         'user_role': user_role,  # 'owner', 'secretary', 'volunteer'
         'staff_position': staff_position,  # ChurchStaff object if staff member
+        'secretaries': secretaries,  # Parish Secretaries list
+        'volunteers': volunteers,  # Ministry Leaders/Volunteers list
     }
     ctx.update(_app_context(request))
     # Override global unread count with church-specific pending count for this page
@@ -1001,9 +1105,10 @@ def get_church_followers_list(request, church_id):
     try:
         church = get_object_or_404(Church, id=church_id)
         
-        # Check if user is the church owner
-        if church.owner != request.user:
-            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        # Only church owner can manage staff
+        can_manage, role = user_can_manage_church(request.user, church)
+        if not can_manage or role != 'owner':
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can add staff members'}, status=403)
         
         # Get all followers
         followers = ChurchFollow.objects.filter(church=church).select_related('user', 'user__profile')
@@ -1045,13 +1150,13 @@ def add_church_staff(request, church_id):
     
     try:
         import json
-        from core.models import ChurchStaff
         
         church = get_object_or_404(Church, id=church_id)
         
-        # Check if user is the church owner
-        if church.owner != request.user:
-            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        # Only church owner can manage staff
+        can_manage, role = user_can_manage_church(request.user, church)
+        if not can_manage or role != 'owner':
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can add staff members'}, status=403)
         
         data = json.loads(request.body)
         user_id = data.get('user_id')
@@ -1410,7 +1515,7 @@ def events(request):
 def appointments(request):
     """User's appointments page with status filters and counts."""
     status_filter = request.GET.get('status', 'all')
-    bookings_qs = Booking.objects.filter(user=request.user).select_related('service', 'service__category', 'church').order_by('-created_at')
+    bookings_qs = Booking.objects.filter(user=request.user).select_related('service', 'service__category', 'church', 'church__owner', 'handled_by').order_by('-created_at')
 
     counts = {
         'all': bookings_qs.count(),
@@ -3068,23 +3173,34 @@ def manage_services(request):
     # Get church_id from GET parameters
     church_id = request.GET.get('church_id')
     
-    try:
-        if church_id:
-            church = request.user.owned_churches.get(id=church_id)
-        else:
-            # Fallback to first church if no church_id provided
-            church = request.user.owned_churches.first()
-            if not church:
+    if church_id:
+        church = get_object_or_404(Church, id=church_id)
+        # Check if user can manage services (Owner or Secretary)
+        can_manage, role = user_can_manage_church(request.user, church, ['services'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage services.")
+            return redirect('core:select_church')
+    else:
+        # Try to get first owned church
+        church = request.user.owned_churches.first()
+        if not church:
+            # Try to get first church where user is staff with services permission
+            staff_position = ChurchStaff.objects.filter(
+                user=request.user,
+                status=ChurchStaff.STATUS_ACTIVE,
+                role=ChurchStaff.ROLE_SECRETARY
+            ).select_related('church').first()
+            
+            if staff_position:
+                church = staff_position.church
+            else:
                 if request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
                 messages.info(
                     request,
-                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                    "You don't have permission to manage any parishes. Please contact a Parish Manager."
                 )
                 return redirect('core:home')
-    except Church.DoesNotExist:
-        messages.error(request, "You don't have permission to manage this church.")
-        return redirect('core:select_church')
     
     # Search and filter functionality
     search_query = request.GET.get('search', '')
@@ -3134,23 +3250,34 @@ def create_service(request):
     # Get church_id from GET or POST parameters
     church_id = request.GET.get('church_id') or request.POST.get('church_id')
     
-    try:
-        if church_id:
-            church = request.user.owned_churches.get(id=church_id)
-        else:
-            # Fallback to first church if no church_id provided
-            church = request.user.owned_churches.first()
-            if not church:
+    if church_id:
+        church = get_object_or_404(Church, id=church_id)
+        # Check if user can manage services (Owner or Secretary)
+        can_manage, role = user_can_manage_church(request.user, church, ['services'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage services.")
+            return redirect('core:select_church')
+    else:
+        # Try to get first owned church
+        church = request.user.owned_churches.first()
+        if not church:
+            # Try to get first church where user is staff with services permission
+            staff_position = ChurchStaff.objects.filter(
+                user=request.user,
+                status=ChurchStaff.STATUS_ACTIVE,
+                role=ChurchStaff.ROLE_SECRETARY
+            ).select_related('church').first()
+            
+            if staff_position:
+                church = staff_position.church
+            else:
                 if request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
                 messages.info(
                     request,
-                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                    "You don't have permission to manage any parishes. Please contact a Parish Manager."
                 )
                 return redirect('core:home')
-    except Church.DoesNotExist:
-        messages.error(request, "You don't have permission to manage this church.")
-        return redirect('core:select_church')
     
     if request.method == 'POST':
         form = BookableServiceForm(request.POST, request.FILES, church=church)
@@ -3213,9 +3340,10 @@ def edit_service(request, service_id):
     service = get_object_or_404(BookableService, id=service_id)
     church = service.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
-        messages.error(request, "You don't have permission to edit this service.")
+    # Check if user can manage services (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['services'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to edit services.")
         return redirect('core:select_church')
     
     if request.method == 'POST':
@@ -3264,13 +3392,14 @@ def edit_service(request, service_id):
 @login_required
 def delete_service(request, service_id):
     """Delete a bookable service."""
-    # Get the service first to determine its church
+    # Get the service to determine its church
     service = get_object_or_404(BookableService, id=service_id)
     church = service.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
-        messages.error(request, "You don't have permission to delete this service.")
+    # Check if user can manage services (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['services'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to delete services.")
         return redirect('core:select_church')
     
     if request.method == 'POST':
@@ -3315,19 +3444,16 @@ def delete_service(request, service_id):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/delete_service.html', ctx)
-
-
-# Service Image Management
 @login_required
 def manage_service_images(request, service_id):
-    """Manage images for a specific service."""
-    # Get the service first to determine its church
+    """Manage service images (add/delete)."""
     service = get_object_or_404(BookableService, id=service_id)
     church = service.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
-        messages.error(request, "You don't have permission to manage this service's images.")
+    # Check if user can manage services (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['services'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to manage service images.")
         return redirect('core:select_church')
     
     if request.method == 'POST':
@@ -3358,27 +3484,15 @@ def manage_service_images(request, service_id):
 @login_required
 def delete_service_image(request, image_id):
     """Delete a service image."""
-    try:
-        church = request.user.owned_churches.first()
-        if not church:
-            if request.user.is_superuser:
-                return redirect('core:super_admin_create_church')
-            messages.info(
-                request,
-                "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-            )
-            return redirect('core:home')
-    except Church.DoesNotExist:
-        if request.user.is_superuser:
-            return redirect('core:super_admin_create_church')
-        messages.info(
-            request,
-            "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-        )
-        return redirect('core:home')
-    
-    service_image = get_object_or_404(ServiceImage, id=image_id, service__church=church)
+    service_image = get_object_or_404(ServiceImage, id=image_id)
     service = service_image.service
+    church = service.church
+    
+    # Check if user can manage services (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['services'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to manage services.")
+        return redirect('core:select_church')
     
     if request.method == 'POST':
         service_image.delete()
@@ -3446,7 +3560,17 @@ def manage_availability(request):
 def api_service_images(request, service_id):
     """API endpoint to fetch service images for gallery modal."""
     try:
-        service = get_object_or_404(BookableService, id=service_id, church__owner=request.user)
+        service = get_object_or_404(BookableService, id=service_id)
+        church = service.church
+        
+        # Check if user can manage services (Owner or Secretary)
+        can_manage, role = user_can_manage_church(request.user, church, ['services'])
+        if not can_manage:
+            return JsonResponse({
+                'success': False,
+                'error': "You don't have permission to manage this church."
+            }, status=403)
+        
         images = service.get_images()
         
         images_data = []
@@ -3474,7 +3598,15 @@ def api_service_images(request, service_id):
 def service_gallery(request, service_id):
     """Display full image gallery for a service."""
     try:
-        service = get_object_or_404(BookableService, id=service_id, church__owner=request.user)
+        service = get_object_or_404(BookableService, id=service_id)
+        church = service.church
+        
+        # Check if user can manage services (Owner or Secretary)
+        can_manage, role = user_can_manage_church(request.user, church, ['services'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage this church.")
+            return redirect('core:select_church')
+        
         images = service.get_images()
         
         context = _app_context(request)
@@ -3643,7 +3775,10 @@ def create_booking_api(request):
 def manage_booking(request, booking_id):
     """Owner view to review/update a single booking and handle conflicts."""
     booking = get_object_or_404(Booking.objects.select_related('service', 'service__category', 'church', 'user'), id=booking_id)
-    if booking.church.owner != request.user:
+    
+    # Check if user can manage appointments (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, booking.church, ['appointments'])
+    if not can_manage:
         messages.error(request, 'You do not have permission to manage this booking.')
         return redirect('core:manage_church', church_id=booking.church.id)
 
@@ -3667,13 +3802,14 @@ def manage_booking(request, booking_id):
             old_status = booking.status
             booking.status = new_status
             booking.status_changed_at = timezone.now()
+            booking.handled_by = request.user  # Track who handled this booking
             # Clear cancel reason when status is changed away from canceled
             if new_status != Booking.STATUS_CANCELED:
                 booking.cancel_reason = ''
             # If status changed away from declined, clear decline reason
             if new_status != Booking.STATUS_DECLINED:
                 booking.decline_reason = ''
-            booking.save(update_fields=['status', 'status_changed_at', 'updated_at', 'cancel_reason', 'decline_reason'])
+            booking.save(update_fields=['status', 'status_changed_at', 'updated_at', 'cancel_reason', 'decline_reason', 'handled_by'])
             
             # Log activity for booking update
             from .models import UserInteraction
@@ -3872,11 +4008,12 @@ def delete_decline_reason(request, reason_id):
     reason = get_object_or_404(DeclineReason, id=reason_id)
     church = reason.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
+    # Only owner can manage decline reasons
+    can_manage, role = user_can_manage_church(request.user, church)
+    if not can_manage or role != 'owner':
         if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'You don\'t have permission to manage this church.'}, status=403)
-        messages.error(request, "You don't have permission to manage this church.")
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can manage decline reasons.'}, status=403)
+        messages.error(request, "Only the parish manager can manage decline reasons.")
         return redirect('core:select_church')
     if request.method == 'POST':
         reason.delete()
@@ -3893,11 +4030,12 @@ def toggle_decline_reason(request, reason_id):
     reason = get_object_or_404(DeclineReason, id=reason_id)
     church = reason.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
+    # Only owner can manage decline reasons
+    can_manage, role = user_can_manage_church(request.user, church)
+    if not can_manage or role != 'owner':
         if request.headers.get('Content-Type') == 'application/json':
-            return JsonResponse({'success': False, 'message': 'You don\'t have permission to manage this church.'}, status=403)
-        messages.error(request, "You don't have permission to manage this church.")
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can manage decline reasons.'}, status=403)
+        messages.error(request, "Only the parish manager can manage decline reasons.")
         return redirect('core:select_church')
     if request.method == 'POST':
         # Check if JSON request to parse body
@@ -4553,9 +4691,10 @@ def edit_availability(request, availability_id):
     availability = get_object_or_404(Availability, id=availability_id)
     church = availability.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
-        messages.error(request, "You don't have permission to edit this availability entry.")
+    # Check if user can manage availability (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['availability'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to edit availability.")
         return redirect('core:select_church')
     
     if request.method == 'POST':
@@ -4587,9 +4726,10 @@ def delete_availability(request, availability_id):
     availability = get_object_or_404(Availability, id=availability_id)
     church = availability.church
     
-    # Verify user owns this church
-    if church.owner != request.user:
-        messages.error(request, "You don't have permission to delete this availability entry.")
+    # Check if user can manage availability (Owner or Secretary)
+    can_manage, role = user_can_manage_church(request.user, church, ['availability'])
+    if not can_manage:
+        messages.error(request, "You don't have permission to delete availability.")
         return redirect('core:select_church')
     
     if request.method == 'POST':
@@ -4694,11 +4834,12 @@ def create_post(request, church_slug):
     """Create a new post for a church."""
     church = get_object_or_404(Church, slug=church_slug, is_active=True)
     
-    # Check if user owns this church
-    if church.owner != request.user:
+    # Check if user can manage content (Owner or Ministry Leader)
+    can_manage, role = user_can_manage_church(request.user, church, ['content'])
+    if not can_manage:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'message': 'You do not have permission to create posts for this church.'}, status=403)
-        messages.error(request, 'You do not have permission to create posts for this church.')
+            return JsonResponse({'success': False, 'message': 'You do not have permission to create posts.'}, status=403)
+        messages.error(request, 'You do not have permission to create posts.')
         return redirect('core:church_detail', slug=church.slug)
     
     if request.method == 'POST':
@@ -4755,8 +4896,9 @@ def edit_post(request, post_id):
     """Edit an existing post."""
     post = get_object_or_404(Post, id=post_id, is_active=True)
     
-    # Check if user owns this church
-    if post.church.owner != request.user:
+    # Check if user can manage content (Owner or Ministry Leader)
+    can_manage, role = user_can_manage_church(request.user, post.church, ['content'])
+    if not can_manage:
         return JsonResponse({'success': False, 'message': 'You do not have permission to edit this post.'}, status=403)
     
     if request.method == 'POST':
@@ -8025,9 +8167,10 @@ def dashboard_create_post(request):
         except Church.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Church not found.'}, status=404)
         
-        # Check if user owns this church
-        if church.owner != request.user:
-            return JsonResponse({'success': False, 'message': 'You do not have permission to post for this church.'}, status=403)
+        # Check if user can manage content (Owner or Ministry Leader)
+        can_manage, role = user_can_manage_church(request.user, church, ['content'])
+        if not can_manage:
+            return JsonResponse({'success': False, 'message': 'You do not have permission to create posts.'}, status=403)
         
         # Validate PayPal email is set if donations are enabled
         if enable_donation and not church.paypal_email:
@@ -8153,8 +8296,9 @@ def delete_post(request, post_id):
     try:
         post = get_object_or_404(Post, id=post_id)
         
-        # Check if user owns the church
-        if post.church.owner != request.user:
+        # Check if user can manage content (Owner or Ministry Leader)
+        can_manage, role = user_can_manage_church(request.user, post.church, ['content'])
+        if not can_manage:
             return JsonResponse({
                 'success': False,
                 'message': 'You do not have permission to delete this post.'
@@ -8187,8 +8331,9 @@ def get_post_data(request, post_id):
     try:
         post = get_object_or_404(Post, id=post_id)
         
-        # Check if user owns the church
-        if post.church.owner != request.user:
+        # Check if user can manage content (Owner or Ministry Leader)
+        can_manage, role = user_can_manage_church(request.user, post.church, ['content'])
+        if not can_manage:
             return JsonResponse({
                 'success': False,
                 'message': 'You do not have permission to edit this post.'
@@ -8228,8 +8373,9 @@ def update_post(request, post_id):
     try:
         post = get_object_or_404(Post, id=post_id)
         
-        # Check if user owns the church
-        if post.church.owner != request.user:
+        # Check if user can manage content (Owner or Ministry Leader)
+        can_manage, role = user_can_manage_church(request.user, post.church, ['content'])
+        if not can_manage:
             return JsonResponse({
                 'success': False,
                 'message': 'You do not have permission to edit this post.'

@@ -43,7 +43,7 @@
 </div>
 {% endif %}
 {% if not user.is_superuser or not is_admin_mode %}
-{% if user.owned_churches.exists or user.staff_positions.filter(status='active').exists %}
+{% if user.owned_churches.exists or user.staff_positions.exists %}
 <a href="{% url 'core:select_church' %}" class="manage-church-link {% if request.resolver_match.url_name == 'manage_church' or request.resolver_match.url_name == 'select_church' %}active{% endif %}" title="Manage Parish" style="position: relative;">
   <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/>

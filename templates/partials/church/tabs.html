@@ -9,7 +9,7 @@
   </div>
   <div id="tab-content">
     <div id="posts" class="tab-panel active">
-      {% if church.owner == request.user %}
+      {% if can_manage_content %}
         <div class="social-post-creation">
           <div class="post-creation-card">
             <!-- Church Avatar and Input Bar -->

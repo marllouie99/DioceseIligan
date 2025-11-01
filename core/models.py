@@ -616,6 +616,7 @@ class Booking(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_REQUESTED)
     cancel_reason = models.CharField(max_length=200, blank=True, help_text="Reason when canceled/auto-canceled")
     decline_reason = models.CharField(max_length=200, blank=True, help_text="Reason when declined")
+    handled_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='handled_bookings', help_text="Parish administrator who handled this booking")
     
     # Payment fields
     payment_status = models.CharField(max_length=20, choices=[
