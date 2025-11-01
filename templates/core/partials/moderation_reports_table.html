@@ -45,7 +45,18 @@
         <tr>
           <td class="post-title">{{ report.post.content|truncatechars:50 }}</td>
           <td class="church-name">{{ report.post.church.name }}</td>
-          <td class="reporter-name">{{ report.user.get_full_name|default:report.user.username }}</td>
+          <td class="reporter-name">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                {% if report.user.profile and report.user.profile.profile_image %}
+                  <img src="{{ report.user.profile.profile_image.url }}" alt="{{ report.user.get_full_name|default:report.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <span style="font-weight: 600; color: #6b7280; font-size: 0.875rem;">{{ report.user.get_full_name|default:report.user.username|slice:":1"|upper }}</span>
+                {% endif %}
+              </div>
+              <span>{{ report.user.get_full_name|default:report.user.username }}</span>
+            </div>
+          </td>
           <td><span class="reason-badge reason-{{ report.reason }}">{{ report.get_reason_display }}</span></td>
           <td>{{ report.created_at|date:"M d, Y" }}</td>
           <td>
@@ -104,9 +115,31 @@
         {% for report in comment_reports %}
         <tr>
           <td class="comment-content">{{ report.comment.content|truncatechars:50 }}</td>
-          <td class="author-name">{{ report.comment.user.get_full_name|default:report.comment.user.username }}</td>
+          <td class="author-name">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                {% if report.comment.user.profile and report.comment.user.profile.profile_image %}
+                  <img src="{{ report.comment.user.profile.profile_image.url }}" alt="{{ report.comment.user.get_full_name|default:report.comment.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <span style="font-weight: 600; color: #6b7280; font-size: 0.875rem;">{{ report.comment.user.get_full_name|default:report.comment.user.username|slice:":1"|upper }}</span>
+                {% endif %}
+              </div>
+              <span>{{ report.comment.user.get_full_name|default:report.comment.user.username }}</span>
+            </div>
+          </td>
           <td class="church-name"><span class="parish-name">{{ report.comment.post.church.name }}</span></td>
-          <td class="reporter-name">{{ report.user.get_full_name|default:report.user.username }}</td>
+          <td class="reporter-name">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                {% if report.user.profile and report.user.profile.profile_image %}
+                  <img src="{{ report.user.profile.profile_image.url }}" alt="{{ report.user.get_full_name|default:report.user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <span style="font-weight: 600; color: #6b7280; font-size: 0.875rem;">{{ report.user.get_full_name|default:report.user.username|slice:":1"|upper }}</span>
+                {% endif %}
+              </div>
+              <span>{{ report.user.get_full_name|default:report.user.username }}</span>
+            </div>
+          </td>
           <td><span class="reason-badge reason-{{ report.reason }}">{{ report.get_reason_display }}</span></td>
           <td>{{ report.created_at|date:"M d, Y" }}</td>
           <td>
