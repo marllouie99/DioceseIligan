@@ -253,6 +253,43 @@ class ChurchFollow(models.Model):
         return f"{self.user.get_full_name()} follows {self.church.name}"
 
 
+class ChurchStaff(models.Model):
+    """Model for parish staff members with different roles."""
+    
+    ROLE_SECRETARY = 'secretary'
+    ROLE_VOLUNTEER = 'volunteer'
+    
+    ROLE_CHOICES = [
+        (ROLE_SECRETARY, 'Parish Secretary/Coordinator'),
+        (ROLE_VOLUNTEER, 'Ministry Leader/Volunteer'),
+    ]
+    
+    STATUS_ACTIVE = 'active'
+    STATUS_INACTIVE = 'inactive'
+    
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, 'Active'),
+        (STATUS_INACTIVE, 'Inactive'),
+    ]
+    
+    church = models.ForeignKey(Church, on_delete=models.CASCADE, related_name='staff_members')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='staff_positions')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, help_text="Staff role in the parish")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='staff_added')
+    added_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['church', 'user', 'role']
+        ordering = ['-added_at']
+        verbose_name = 'Church Staff'
+        verbose_name_plural = 'Church Staff'
+    
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.get_role_display()} at {self.church.name}"
+
+
 class ServiceCategory(models.Model):
     """Model for categorizing church services (e.g., Parish Family, In-Person Services)."""
     

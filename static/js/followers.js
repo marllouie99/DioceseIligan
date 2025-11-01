@@ -841,3 +841,70 @@ document.addEventListener('click', (e) => {
         }, 100);
     }
 });
+
+// Promote Dropdown Functions
+function togglePromoteDropdown(event, userId) {
+    event.stopPropagation();
+    
+    // Close all other dropdowns
+    document.querySelectorAll('.promote-dropdown').forEach(dropdown => {
+        if (dropdown.id !== `promoteDropdown${userId}`) {
+            dropdown.style.display = 'none';
+        }
+    });
+    
+    // Toggle current dropdown
+    const dropdown = document.getElementById(`promoteDropdown${userId}`);
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown-wrapper')) {
+        document.querySelectorAll('.promote-dropdown').forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
+    }
+});
+
+// Promote follower to admin role
+async function promoteFollower(userId, role) {
+    const roleName = role === 'secretary' ? 'Parish Secretary/Coordinator' : 'Ministry Leader/Volunteer';
+    
+    if (!confirm(`Are you sure you want to promote this follower to ${roleName}?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/app/manage-church/${CURRENT_CHURCH_ID}/add-staff/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                role: role
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`Successfully promoted to ${roleName}!`);
+            // Close dropdown
+            document.querySelectorAll('.promote-dropdown').forEach(dropdown => {
+                dropdown.style.display = 'none';
+            });
+            // Optionally reload or update the UI
+            location.reload();
+        } else {
+            alert(data.message || 'Failed to promote follower');
+        }
+    } catch (error) {
+        console.error('Error promoting follower:', error);
+        alert('An error occurred while promoting the follower');
+    }
+}

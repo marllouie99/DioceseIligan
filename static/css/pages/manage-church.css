@@ -4402,3 +4402,115 @@ body.page-manage-church {
     max-width: 120px !important;
   }
 }
+
+/* =============================================================================
+   FOLLOWERS TAB - ACTION BUTTONS & PROMOTE DROPDOWN
+   ============================================================================= */
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-promote-dropdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: white;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-promote-dropdown:hover {
+  background: var(--bg-secondary);
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-promote-dropdown svg {
+  width: 16px;
+  height: 16px;
+}
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.promote-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.promote-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: white;
+  color: var(--text);
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.promote-dropdown .dropdown-item:hover {
+  background: var(--bg-secondary);
+  color: var(--brand);
+}
+
+.promote-dropdown .dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.promote-dropdown .dropdown-item:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+/* Follower Avatar Styles */
+.follower-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.follower-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.follower-avatar-small .avatar-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+}

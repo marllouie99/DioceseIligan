@@ -152,8 +152,8 @@
                   <td>
                     <div class="follower-cell">
                       <div class="follower-avatar-small">
-                        {% if follow.user.profile.profile_picture %}
-                          <img src="{{ follow.user.profile.profile_picture.url }}" 
+                        {% if follow.user.profile and follow.user.profile.profile_image %}
+                          <img src="{{ follow.user.profile.profile_image.url }}" 
                                alt="{{ follow.user.get_full_name|default:follow.user.username }}" 
                                loading="lazy">
                         {% else %}
@@ -182,12 +182,48 @@
                     </span>
                   </td>
                   <td>
-                    <button type="button" 
-                            class="btn-view-profile" 
-                            onclick="viewFollowerProfile('{{ follow.user.id }}')"
-                            title="View Profile">
-                      View Profile
-                    </button>
+                    <div class="action-buttons">
+                      <button type="button" 
+                              class="btn-view-profile" 
+                              onclick="viewFollowerProfile('{{ follow.user.id }}')"
+                              title="View Profile">
+                        View Profile
+                      </button>
+                      <div class="dropdown-wrapper">
+                        <button type="button" 
+                                class="btn-promote-dropdown" 
+                                onclick="togglePromoteDropdown(event, {{ follow.user.id }})"
+                                title="Promote to Admin">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                          </svg>
+                        </button>
+                        <div class="promote-dropdown" id="promoteDropdown{{ follow.user.id }}" style="display: none;">
+                          <button type="button" 
+                                  class="dropdown-item" 
+                                  onclick="promoteFollower({{ follow.user.id }}, 'secretary')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                              <circle cx="9" cy="7" r="4"/>
+                              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Promote to Secretary
+                          </button>
+                          <button type="button" 
+                                  class="dropdown-item" 
+                                  onclick="promoteFollower({{ follow.user.id }}, 'volunteer')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                            Promote to Ministry Leader
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               {% endfor %}

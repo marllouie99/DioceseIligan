@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import (
     Church,
     ChurchFollow,
+    ChurchStaff,
     ServiceCategory,
     BookableService,
     ServiceImage,
@@ -266,6 +267,29 @@ class ChurchFollowAdmin(admin.ModelAdmin):
     list_filter = ('church', 'followed_at')
     search_fields = ('user__username', 'user__email', 'church__name')
     autocomplete_fields = ('user', 'church')
+
+
+@admin.register(ChurchStaff)
+class ChurchStaffAdmin(admin.ModelAdmin):
+    list_display = ('user', 'church', 'role', 'status', 'added_by', 'added_at')
+    list_filter = ('role', 'status', 'church', 'added_at')
+    search_fields = ('user__username', 'user__email', 'church__name', 'added_by__username')
+    autocomplete_fields = ('user', 'church', 'added_by')
+    readonly_fields = ('added_at', 'updated_at')
+    list_select_related = ('user', 'church', 'added_by')
+    
+    fieldsets = (
+        ('Staff Information', {
+            'fields': ('church', 'user', 'role', 'status')
+        }),
+        ('Added By', {
+            'fields': ('added_by', 'added_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'church', 'added_by')
 
 
 @admin.register(Notification)

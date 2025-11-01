@@ -954,6 +954,114 @@ def manage_church(request, church_id=None):
 
 
 @login_required
+def get_church_followers_list(request, church_id):
+    """API endpoint to get followers list for adding staff members."""
+    try:
+        church = get_object_or_404(Church, id=church_id)
+        
+        # Check if user is the church owner
+        if church.owner != request.user:
+            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        
+        # Get all followers
+        followers = ChurchFollow.objects.filter(church=church).select_related('user', 'user__profile')
+        
+        # Get existing staff members
+        from core.models import ChurchStaff
+        existing_staff_ids = ChurchStaff.objects.filter(
+            church=church,
+            status=ChurchStaff.STATUS_ACTIVE
+        ).values_list('user_id', flat=True)
+        
+        followers_data = []
+        for follow in followers:
+            user = follow.user
+            profile = user.profile if hasattr(user, 'profile') else None
+            
+            followers_data.append({
+                'id': user.id,
+                'name': user.get_full_name() or user.username,
+                'email': user.email,
+                'avatar': profile.profile_image.url if profile and profile.profile_image else None,
+                'is_staff': user.id in existing_staff_ids
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'followers': followers_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
+def add_church_staff(request, church_id):
+    """API endpoint to add a staff member to the church."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid method'}, status=405)
+    
+    try:
+        import json
+        from core.models import ChurchStaff
+        
+        church = get_object_or_404(Church, id=church_id)
+        
+        # Check if user is the church owner
+        if church.owner != request.user:
+            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        role = data.get('role')
+        
+        if not user_id or not role:
+            return JsonResponse({'success': False, 'message': 'Missing required fields'}, status=400)
+        
+        # Validate role
+        if role not in [ChurchStaff.ROLE_SECRETARY, ChurchStaff.ROLE_VOLUNTEER]:
+            return JsonResponse({'success': False, 'message': 'Invalid role'}, status=400)
+        
+        # Get the user
+        staff_user = get_object_or_404(User, id=user_id)
+        
+        # Check if user follows the church
+        if not ChurchFollow.objects.filter(church=church, user=staff_user).exists():
+            return JsonResponse({'success': False, 'message': 'User must follow the church first'}, status=400)
+        
+        # Check if already exists
+        existing = ChurchStaff.objects.filter(
+            church=church,
+            user=staff_user,
+            role=role
+        ).first()
+        
+        if existing:
+            if existing.status == ChurchStaff.STATUS_INACTIVE:
+                # Reactivate
+                existing.status = ChurchStaff.STATUS_ACTIVE
+                existing.save()
+                return JsonResponse({'success': True, 'message': 'Staff member reactivated'})
+            else:
+                return JsonResponse({'success': False, 'message': 'User is already a staff member with this role'}, status=400)
+        
+        # Create new staff member
+        ChurchStaff.objects.create(
+            church=church,
+            user=staff_user,
+            role=role,
+            added_by=request.user
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Staff member added successfully'})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
 def update_church_logo(request):
     """AJAX endpoint to update the church logo from Manage Church page."""
     if request.method != 'POST':
