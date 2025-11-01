@@ -4407,10 +4407,44 @@ body.page-manage-church {
    FOLLOWERS TAB - ACTION BUTTONS & PROMOTE DROPDOWN
    ============================================================================= */
 
+/* Fix overflow on all parent containers to allow dropdown to show */
+#followers.tab-panel {
+  overflow: visible !important;
+}
+
+#followers .tab-content {
+  overflow: visible !important;
+}
+
+#followers .followers-table-section {
+  overflow: visible !important;
+}
+
+.followers-table-wrapper {
+  overflow: visible !important;
+}
+
+.followers-table {
+  overflow: visible !important;
+}
+
+.followers-table tbody {
+  overflow: visible !important;
+}
+
+.followers-table tbody tr {
+  overflow: visible !important;
+}
+
+.followers-table tbody td {
+  overflow: visible !important;
+}
+
 .action-buttons {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .btn-promote-dropdown {
@@ -4451,9 +4485,9 @@ body.page-manage-church {
   background: white;
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 220px;
-  z-index: 1000;
+  z-index: 9999;
   overflow: hidden;
 }
 
