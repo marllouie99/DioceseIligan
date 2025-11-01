@@ -914,6 +914,155 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // User Activity Trends Chart (Line Chart)
+  const userActivityCtx = document.getElementById('userActivityChart');
+  if (userActivityCtx) {
+    new Chart(userActivityCtx, {
+      type: 'line',
+      data: {
+        labels: {{ activity_labels|default:"[]"|safe }},
+        datasets: [
+          {
+            label: 'Active Users',
+            data: {{ active_users_data|default:"[]"|safe }},
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+          },
+          {
+            label: 'New Users',
+            data: {{ new_users_data|default:"[]"|safe }},
+            borderColor: 'rgba(16, 185, 129, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+              font: {
+                size: 12,
+                weight: '600'
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Service Bookings & Revenue Chart (Dual-axis Line Chart)
+  const bookingRevenueCtx = document.getElementById('bookingRevenueChart');
+  if (bookingRevenueCtx) {
+    new Chart(bookingRevenueCtx, {
+      type: 'line',
+      data: {
+        labels: {{ booking_trends_labels|default:"[]"|safe }},
+        datasets: [
+          {
+            label: 'Bookings',
+            data: {{ booking_trends_bookings|default:"[]"|safe }},
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+            yAxisID: 'y'
+          },
+          {
+            label: 'Revenue (₱)',
+            data: {{ booking_trends_revenue|default:"[]"|safe }},
+            borderColor: 'rgba(16, 185, 129, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15
+            }
+          }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            },
+            title: {
+              display: true,
+              text: 'Bookings'
+            }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            beginAtZero: true,
+            grid: {
+              drawOnChartArea: false
+            },
+            ticks: {
+              callback: function(value) {
+                return '₱' + value.toLocaleString();
+              }
+            },
+            title: {
+              display: true,
+              text: 'Revenue (₱)'
+            }
+          }
+        }
+      }
+    });
+  }
+
   // Appointment Status Chart (Bar Chart)
   const appointmentCtx = document.getElementById('appointmentChart');
   if (appointmentCtx) {
@@ -1002,6 +1151,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 size: 11
               }
             },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Donor Contributions Chart (Horizontal Bar Chart)
+  const donorCtx = document.getElementById('donorChart');
+  if (donorCtx) {
+    new Chart(donorCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ top_donors_labels|default:"[]"|safe }},
+        datasets: [{
+          label: 'Total Donated',
+          data: {{ top_donors_amounts|default:"[]"|safe }},
+          backgroundColor: 'rgba(16, 185, 129, 0.8)',
+          borderColor: 'rgba(16, 185, 129, 1)',
+          borderWidth: 2,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return '₱' + context.parsed.x.toLocaleString('en-PH', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '₱' + value.toLocaleString();
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          y: {
             grid: {
               display: false
             }
@@ -1133,7 +1339,7 @@ document.head.appendChild(style);
     </div>
   </div>
   
-  <!-- 4 Column Statistics Cards -->
+  <!-- Key Statistics: 4 Cards -->
   <div class="stats-grid">
     <div class="stat-card-overview primary">
       <div class="stat-icon-wrapper">
@@ -1171,66 +1377,11 @@ document.head.appendChild(style);
       </div>
     </div>
 
-    <div class="stat-card-overview info">
-      <div class="stat-icon-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-          <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ stats.bookings|default:0 }}</div>
-        <div class="stat-label">Total Bookings</div>
-        <div class="stat-trend">
-          <span class="trend-icon positive">↑</span>
-          <span class="trend-text">+{{ church_stats.new_churches_this_month|default:0 }} this week</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="stat-card-overview warning">
-      <div class="stat-icon-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 6v6l4 2"/>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ verif.counts.pending|default:0 }}</div>
-        <div class="stat-label">Pending Reviews</div>
-        <div class="stat-trend">
-          <span class="trend-icon neutral">→</span>
-          <span class="trend-text">Verification + Reports</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Row 2 Stats -->
-    <div class="stat-card-overview purple">
-      <div class="stat-icon-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-          <path d="M16 3.13a4 4 0 010 7.75"/>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ post_stats.total_followers|default:0 }}</div>
-        <div class="stat-label">Parish Follows</div>
-        <div class="stat-trend">
-          <span class="trend-icon positive">↑</span>
-          <span class="trend-text">+{{ post_stats.new_followers_this_week|default:0 }} this week</span>
-        </div>
-      </div>
-    </div>
-
     <div class="stat-card-overview success-alt">
       <div class="stat-icon-wrapper">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       </div>
       <div class="stat-content">
@@ -1243,44 +1394,25 @@ document.head.appendChild(style);
       </div>
     </div>
 
-    <div class="stat-card-overview pink">
+    <div class="stat-card-overview info">
       <div class="stat-icon-wrapper">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ post_stats.total_engagement|default:0 }}</div>
-        <div class="stat-label">Post Engagement</div>
+        <div class="stat-value">₱{{ service_stats.total_revenue|default:0|floatformat:0 }}</div>
+        <div class="stat-label">Booking Revenue</div>
         <div class="stat-trend">
           <span class="trend-icon positive">↑</span>
-          <span class="trend-text">Likes, comments, bookmarks</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="stat-card-overview teal">
-      <div class="stat-icon-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-          <polyline points="10 9 9 9 8 9"/>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ post_stats.posts_this_month|default:0 }}</div>
-        <div class="stat-label">Posts This Month</div>
-        <div class="stat-trend">
-          <span class="trend-icon positive">↑</span>
-          <span class="trend-text">{{ post_stats.posts_today|default:0 }} posted today</span>
+          <span class="trend-text">From paid bookings</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2 Column Charts -->
+  <!-- Enhanced Charts Section: 6 charts in 3 rows -->
   <div class="charts-section">
     <div class="chart-card">
       <h3 class="chart-title">Post Engagement</h3>
@@ -1299,8 +1431,27 @@ document.head.appendChild(style);
     </div>
   </div>
 
-  <!-- Single Chart Row -->
-  <div class="charts-section" style="grid-template-columns: 1fr;">
+  <!-- Row 2: User and Service Analytics -->
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3 class="chart-title">User Activity Trends</h3>
+      <p class="chart-subtitle">Active users and new registrations by week</p>
+      <div class="chart-container-large">
+        <canvas id="userActivityChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3 class="chart-title">Service Bookings & Revenue</h3>
+      <p class="chart-subtitle">Booking trends and revenue over time</p>
+      <div class="chart-container-large">
+        <canvas id="bookingRevenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Appointment and Donations -->
+  <div class="charts-section">
     <div class="chart-card">
       <h3 class="chart-title">Appointment Status</h3>
       <p class="chart-subtitle">Breakdown by status over 6 months</p>
@@ -1308,59 +1459,13 @@ document.head.appendChild(style);
         <canvas id="appointmentChart"></canvas>
       </div>
     </div>
-  </div>
 
-  <!-- Recent Parish Applications -->
-  <div class="applications-section">
-    <div class="section-header-applications">
-      <h2 class="section-title-applications">Recent Parish Applications</h2>
-      <p class="section-subtitle">Latest user applications to join parishes</p>
-    </div>
-    
-    <div class="applications-table-container">
-      {% if verif.pending_list %}
-      <table class="applications-table">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Parish</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for verification in verif.pending_list %}
-          <tr>
-            <td>
-              <div class="user-cell">
-                <div class="user-avatar-table">{{ verification.submitted_by.get_full_name.0|default:verification.submitted_by.username.0|upper }}</div>
-                <span class="user-name-table">{{ verification.submitted_by.get_full_name|default:verification.submitted_by.username }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="parish-cell">
-                <span class="parish-name-table">{{ verification.church.name }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="date-text">{{ verification.created_at|date:"Y-m-d" }}</span>
-            </td>
-            <td>
-              <span class="status-badge status-pending">pending</span>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="empty-icon">
-          <path d="M9 11l3 3L22 4"/>
-          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-        </svg>
-        <p class="empty-text">No pending parish applications</p>
+    <div class="chart-card">
+      <h3 class="chart-title">Donor Contributions</h3>
+      <p class="chart-subtitle">Top donors by total contributions</p>
+      <div class="chart-container-large">
+        <canvas id="donorChart"></canvas>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>

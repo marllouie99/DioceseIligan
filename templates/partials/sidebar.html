@@ -15,77 +15,168 @@
         Overview
       </a>
     </li>
-    <li>
-      <a class="{% if active == 'super_admin_churches' %}active{% endif %}" 
-         {% if active == 'super_admin_churches' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_churches' %}">
+    
+    <!-- Parish Management Group -->
+    <li class="nav-group">
+      <button class="nav-group-toggle {% if active == 'super_admin_churches' or active == 'super_admin_managers' %}expanded{% endif %}" data-group="parishes">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg></span>
-        Parishes
-      </a>
+        <span class="nav-group-label">Parish Management</span>
+        <span class="nav-group-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <ul class="nav-submenu {% if active == 'super_admin_churches' or active == 'super_admin_managers' %}show{% endif %}" data-submenu="parishes">
+        <li>
+          <a class="{% if active == 'super_admin_churches' %}active{% endif %}" 
+             {% if active == 'super_admin_churches' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_churches' %}">
+            <span class="submenu-bullet">•</span>
+            Parishes
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_managers' %}active{% endif %}" 
+             {% if active == 'super_admin_managers' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_managers' %}">
+            <span class="submenu-bullet">•</span>
+            Parish Managers
+          </a>
+        </li>
+      </ul>
     </li>
-    <li>
-      <a class="{% if active == 'super_admin_users' %}active{% endif %}" 
-         {% if active == 'super_admin_users' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_users' %}">
+    
+    <!-- User Management Group -->
+    <li class="nav-group">
+      <button class="nav-group-toggle {% if active == 'super_admin_users' or active == 'super_admin_activities' %}expanded{% endif %}" data-group="users">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" stroke-width="2"/><path d="M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2"/></svg></span>
-        Users
-      </a>
+        <span class="nav-group-label">User Management</span>
+        <span class="nav-group-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <ul class="nav-submenu {% if active == 'super_admin_users' or active == 'super_admin_activities' %}show{% endif %}" data-submenu="users">
+        <li>
+          <a class="{% if active == 'super_admin_users' %}active{% endif %}" 
+             {% if active == 'super_admin_users' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_users' %}">
+            <span class="submenu-bullet">•</span>
+            Users
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_activities' %}active{% endif %}" 
+             {% if active == 'super_admin_activities' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_user_activities' %}">
+            <span class="submenu-bullet">•</span>
+            User Activities
+          </a>
+        </li>
+      </ul>
     </li>
-    <li>
-      <a class="{% if active == 'super_admin_activities' %}active{% endif %}" 
-         {% if active == 'super_admin_activities' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_user_activities' %}">
-        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg></span>
-        User Activities
-      </a>
+    
+    <!-- Donation Management Group -->
+    <li class="nav-group">
+      <button class="nav-group-toggle {% if active == 'super_admin_donations' or active == 'super_admin_parish_donations' %}expanded{% endif %}" data-group="donations">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="nav-group-label">Donation Management</span>
+        <span class="nav-group-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <ul class="nav-submenu {% if active == 'super_admin_donations' or active == 'super_admin_parish_donations' %}show{% endif %}" data-submenu="donations">
+        <li>
+          <a class="{% if active == 'super_admin_donations' %}active{% endif %}"
+             {% if active == 'super_admin_donations' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_donations' %}">
+            <span class="submenu-bullet">•</span>
+            User Donations
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_parish_donations' %}active{% endif %}"
+             {% if active == 'super_admin_parish_donations' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_parish_donations' %}">
+            <span class="submenu-bullet">•</span>
+            Parish Donations
+          </a>
+        </li>
+      </ul>
     </li>
-    <li>
-      <a class="{% if active == 'super_admin_posts' %}active{% endif %}"
-         {% if active == 'super_admin_posts' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_posts' %}">
+    
+    <!-- Content Management Group -->
+    <li class="nav-group">
+      <button class="nav-group-toggle {% if active == 'super_admin_posts' or active == 'super_admin_moderation' %}expanded{% endif %}" data-group="content">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><line x1="7" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="2"/><line x1="7" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="2"/></svg></span>
-        Posts
-      </a>
+        <span class="nav-group-label">Content Management</span>
+        <span class="nav-group-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <ul class="nav-submenu {% if active == 'super_admin_posts' or active == 'super_admin_moderation' %}show{% endif %}" data-submenu="content">
+        <li>
+          <a class="{% if active == 'super_admin_posts' %}active{% endif %}"
+             {% if active == 'super_admin_posts' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_posts' %}">
+            <span class="submenu-bullet">•</span>
+            Posts
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_moderation' %}active{% endif %}"
+             {% if active == 'super_admin_moderation' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_moderation' %}">
+            <span class="submenu-bullet">•</span>
+            Moderation
+          </a>
+        </li>
+      </ul>
     </li>
-    <li>
-      <a class="{% if active == 'super_admin_services' %}active{% endif %}"
-         {% if active == 'super_admin_services' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_services' %}">
+    
+    <!-- Services & Bookings Group -->
+    <li class="nav-group">
+      <button class="nav-group-toggle {% if active == 'super_admin_services' or active == 'super_admin_categories' or active == 'super_admin_bookings' %}expanded{% endif %}" data-group="services">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2"/></svg></span>
-        Services
-      </a>
-    </li>
-    <li>
-      <a class="{% if active == 'super_admin_categories' %}active{% endif %}"
-         {% if active == 'super_admin_categories' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_categories' %}">
-        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg></span>
-        Categories
-      </a>
-    </li>
-    <li>
-      <a class="{% if active == 'super_admin_bookings' %}active{% endif %}"
-         {% if active == 'super_admin_bookings' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_bookings' %}">
-        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/></svg></span>
-        Bookings
-      </a>
-    </li>
-    <li>
-      <a class="{% if active == 'super_admin_donations' %}active{% endif %}"
-         {% if active == 'super_admin_donations' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_donations' %}">
-        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>
-        Donations
-      </a>
-    </li>
-    <li>
-      <a class="{% if active == 'super_admin_moderation' %}active{% endif %}"
-         {% if active == 'super_admin_moderation' %}aria-current="page"{% endif %}
-         href="{% url 'core:super_admin_moderation' %}">
-        <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg></span>
-        Moderation
-      </a>
+        <span class="nav-group-label">Services & Bookings</span>
+        <span class="nav-group-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <ul class="nav-submenu {% if active == 'super_admin_services' or active == 'super_admin_categories' or active == 'super_admin_bookings' %}show{% endif %}" data-submenu="services">
+        <li>
+          <a class="{% if active == 'super_admin_services' %}active{% endif %}"
+             {% if active == 'super_admin_services' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_services' %}">
+            <span class="submenu-bullet">•</span>
+            Services
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_categories' %}active{% endif %}"
+             {% if active == 'super_admin_categories' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_categories' %}">
+            <span class="submenu-bullet">•</span>
+            Categories
+          </a>
+        </li>
+        <li>
+          <a class="{% if active == 'super_admin_bookings' %}active{% endif %}"
+             {% if active == 'super_admin_bookings' %}aria-current="page"{% endif %}
+             href="{% url 'core:super_admin_bookings' %}">
+            <span class="submenu-bullet">•</span>
+            Bookings
+          </a>
+        </li>
+      </ul>
     </li>
     {% else %}
     <li>

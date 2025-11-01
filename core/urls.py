@@ -34,6 +34,7 @@ urlpatterns = [
     path('super-admin/churches/<int:church_id>/edit/', views.super_admin_edit_church, name='super_admin_edit_church'),
     path('api/user/<int:user_id>/profile/', views.api_user_profile, name='api_user_profile'),
     path('super-admin/users/', views.super_admin_users, name='super_admin_users'),
+    path('super-admin/managers/', views.super_admin_managers, name='super_admin_managers'),
     path('super-admin/user-activities/', views.super_admin_user_activities, name='super_admin_user_activities'),
     path('super-admin/posts/', views.super_admin_posts, name='super_admin_posts'),
     path('super-admin/posts/engagement-data/', views.super_admin_posts_engagement_data, name='super_admin_posts_engagement_data'),
@@ -54,6 +55,7 @@ urlpatterns = [
     path('super-admin/bookings/chart-data/', views.super_admin_bookings_chart_data, name='super_admin_bookings_chart_data'),
     path('super-admin/donations/', views.super_admin_donations, name='super_admin_donations'),
     path('super-admin/donations/filter-data/', views.super_admin_donations_filter_data, name='super_admin_donations_filter_data'),
+    path('super-admin/parish-donations/', views.super_admin_parish_donations, name='super_admin_parish_donations'),
     path('super-admin/moderation/', views.super_admin_moderation, name='super_admin_moderation'),
     
     # Media updates (AJAX)

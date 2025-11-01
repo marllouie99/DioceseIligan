@@ -116,6 +116,80 @@
     });
   </script>
   
+  <!-- Collapsible Navigation Groups Script -->
+  <script>
+    (function() {
+      'use strict';
+      
+      // Wait for DOM to be fully loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNavGroups);
+      } else {
+        initNavGroups();
+      }
+      
+      function initNavGroups() {
+        const navGroupToggles = document.querySelectorAll('.nav-group-toggle');
+        
+        if (!navGroupToggles.length) {
+          return; // No nav groups found, exit gracefully
+        }
+        
+        navGroupToggles.forEach(toggle => {
+          // Add click handler
+          toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const groupName = this.dataset.group;
+            if (!groupName) return;
+            
+            const submenu = document.querySelector(`[data-submenu="${groupName}"]`);
+            
+            // Toggle expanded state
+            this.classList.toggle('expanded');
+            
+            // Toggle submenu visibility
+            if (submenu) {
+              submenu.classList.toggle('show');
+            }
+            
+            // Save state to localStorage
+            const isExpanded = this.classList.contains('expanded');
+            try {
+              localStorage.setItem(`nav-group-${groupName}`, isExpanded ? 'expanded' : 'collapsed');
+            } catch (err) {
+              console.warn('localStorage not available:', err);
+            }
+          });
+          
+          // Restore state from localStorage
+          const groupName = toggle.dataset.group;
+          if (!groupName) return;
+          
+          try {
+            const savedState = localStorage.getItem(`nav-group-${groupName}`);
+            const submenu = document.querySelector(`[data-submenu="${groupName}"]`);
+            
+            if (savedState === 'expanded' && !toggle.classList.contains('expanded')) {
+              toggle.classList.add('expanded');
+              if (submenu) {
+                submenu.classList.add('show');
+              }
+            } else if (savedState === 'collapsed' && toggle.classList.contains('expanded')) {
+              toggle.classList.remove('expanded');
+              if (submenu) {
+                submenu.classList.remove('show');
+              }
+            }
+          } catch (err) {
+            console.warn('localStorage not available:', err);
+          }
+        });
+      }
+    })();
+  </script>
+  
   <!-- Global Post Menu Delegated Handler (toggle + outside close) -->
   <script>
     (function() {

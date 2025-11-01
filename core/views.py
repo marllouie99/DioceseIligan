@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q, Count, F, Exists, OuterRef, Value, BooleanField, ExpressionWrapper, IntegerField, Sum
+from django.db.models import Q, Count, F, Exists, OuterRef, Value, BooleanField, ExpressionWrapper, IntegerField, Sum, Avg
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.cache import cache
@@ -1412,7 +1412,8 @@ def super_admin_dashboard(request):
     active_users = User.objects.filter(last_login__gte=thirty_days_ago).count() if hasattr(User, 'last_login') else 0
     
     # New users this month
-    first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    now = timezone.now()
+    first_day_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     new_users_this_month = User.objects.filter(date_joined__gte=first_day_of_month).count() if hasattr(User, 'date_joined') else 0
     
     # Recent registrations (last 10 users)
@@ -1486,11 +1487,21 @@ def super_admin_dashboard(request):
         is_active=True
     ).count()
     
-    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     posts_today = Post.objects.filter(
         created_at__gte=today_start,
         is_active=True
     ).count()
+    
+    # Debug: Print to console to verify
+    print(f"DEBUG - Total Posts: {total_posts}, Posts This Month: {posts_this_month}, Posts Today: {posts_today}")
+    print(f"DEBUG - First day of month: {first_day_of_month}")
+    print(f"DEBUG - Today start: {today_start}")
+    
+    # Show when the 3 posts were created
+    recent_posts = Post.objects.filter(is_active=True).order_by('-created_at')[:5]
+    for p in recent_posts:
+        print(f"DEBUG - Post ID {p.id}: created_at = {p.created_at}")
     
     # Total engagement (likes + comments + bookmarks)
     total_likes = PostLike.objects.count()
@@ -1505,17 +1516,16 @@ def super_admin_dashboard(request):
         followed_at__gte=seven_days_ago
     ).count()
     
-    # Total donations (if you have a Donation model)
+    # Total donations (using Donation model)
     try:
-        from .models import Donation
-        total_donations = Donation.objects.filter(status='completed').aggregate(
+        total_donations = Donation.objects.filter(payment_status='completed').aggregate(
             total=Sum('amount')
         )['total'] or 0
         donations_this_month = Donation.objects.filter(
             created_at__gte=first_day_of_month,
-            status='completed'
+            payment_status='completed'
         ).aggregate(total=Sum('amount'))['total'] or 0
-    except:
+    except Exception as e:
         total_donations = 0
         donations_this_month = 0
     
@@ -1586,6 +1596,129 @@ def super_admin_dashboard(request):
     if len(parish_outreach_data['labels']) == 0:
         parish_outreach_data['labels'] = ['No Data']
         parish_outreach_data['counts'] = [0]
+    
+    # Service Statistics (for new stat cards)
+    try:
+        from .models import ServiceReview
+        total_revenue = Booking.objects.filter(
+            payment_status='paid'
+        ).aggregate(total=Sum('service__price'))['total'] or 0
+        
+        avg_rating = ServiceReview.objects.aggregate(avg=Avg('rating'))['avg']
+        if avg_rating:
+            avg_rating = round(avg_rating, 1)
+        else:
+            avg_rating = 0
+        
+        total_reviews = ServiceReview.objects.count()
+    except:
+        total_revenue = 0
+        avg_rating = 0
+        total_reviews = 0
+    
+    # User Activity Trends (last 4 weeks for new chart)
+    activity_labels = []
+    active_users_data = []
+    new_users_data = []
+    
+    for i in range(3, -1, -1):
+        week_start = timezone.now() - timedelta(weeks=i+1)
+        week_end = timezone.now() - timedelta(weeks=i)
+        
+        activity_labels.append(f'Week {4-i}')
+        
+        # Active users in that week
+        if hasattr(User, 'last_login'):
+            active_count = User.objects.filter(
+                last_login__gte=week_start,
+                last_login__lt=week_end,
+                is_active=True
+            ).count()
+        else:
+            active_count = 0
+        active_users_data.append(active_count)
+        
+        # New users in that week
+        if hasattr(User, 'date_joined'):
+            new_count = User.objects.filter(
+                date_joined__gte=week_start,
+                date_joined__lt=week_end
+            ).count()
+        else:
+            new_count = 0
+        new_users_data.append(new_count)
+    
+    # Booking Trends (last 6 months for new chart)
+    booking_trends_labels = []
+    booking_trends_bookings = []
+    booking_trends_revenue = []
+    
+    for i in range(5, -1, -1):
+        month_date = timezone.now() - timedelta(days=30 * i)
+        month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        if month_start.month == 12:
+            month_end = month_start.replace(year=month_start.year + 1, month=1)
+        else:
+            month_end = month_start.replace(month=month_start.month + 1)
+        
+        booking_trends_labels.append(month_start.strftime('%b'))
+        
+        # Booking count
+        booking_count = Booking.objects.filter(
+            created_at__gte=month_start,
+            created_at__lt=month_end
+        ).count()
+        booking_trends_bookings.append(booking_count)
+        
+        # Revenue
+        revenue = Booking.objects.filter(
+            created_at__gte=month_start,
+            created_at__lt=month_end,
+            payment_status='paid'
+        ).aggregate(total=Sum('service__price'))['total'] or 0
+        booking_trends_revenue.append(float(revenue))
+    
+    # Top Donors (for new chart)
+    top_donors_labels = []
+    top_donors_amounts = []
+    
+    try:
+        # Get top donors by completed donations only
+        top_donors = Donation.objects.filter(
+            payment_status='completed',
+            donor__isnull=False
+        ).values(
+            'donor__first_name', 
+            'donor__last_name',
+            'donor__username'
+        ).annotate(
+            total=Sum('amount')
+        ).order_by('-total')[:10]
+        
+        for donor in top_donors:
+            first_name = donor.get('donor__first_name', '')
+            last_name = donor.get('donor__last_name', '')
+            username = donor.get('donor__username', 'Unknown')
+            
+            if first_name and last_name:
+                name = f"{first_name} {last_name}"
+            elif first_name:
+                name = first_name
+            else:
+                name = username
+            
+            top_donors_labels.append(name)
+            top_donors_amounts.append(float(donor['total']))
+        
+        # If no donors found, show "No Data"
+        if not top_donors_labels:
+            top_donors_labels = ['No Data']
+            top_donors_amounts = [0]
+    except Exception as e:
+        # In case of any error, show "No Data"
+        top_donors_labels = ['No Data']
+        top_donors_amounts = [0]
     
     # Monthly growth data (last 6 months)
     monthly_growth_labels = []
@@ -1695,6 +1828,21 @@ def super_admin_dashboard(request):
         },
         'daily_post_engagement': daily_post_engagement,
         'parish_outreach': parish_outreach_data,
+        # New data for enhanced Overview tab
+        'service_stats': {
+            'total_services': total_services,
+            'total_revenue': total_revenue,
+            'avg_rating': avg_rating,
+            'total_reviews': total_reviews,
+        },
+        'activity_labels': activity_labels,
+        'active_users_data': active_users_data,
+        'new_users_data': new_users_data,
+        'booking_trends_labels': booking_trends_labels,
+        'booking_trends_bookings': booking_trends_bookings,
+        'booking_trends_revenue': booking_trends_revenue,
+        'top_donors_labels': top_donors_labels,
+        'top_donors_amounts': top_donors_amounts,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin.html', ctx)
@@ -2615,6 +2763,152 @@ def super_admin_users(request):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/super_admin_users.html', ctx)
+
+
+@login_required
+def super_admin_managers(request):
+    """Super Admin parish managers management page.
+    Shows all users who manage parishes.
+    Access is restricted to superusers.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+
+    from django.db.models import Count, Q
+    from django.core.paginator import Paginator
+    from datetime import timedelta
+    from django.contrib.auth import get_user_model
+    
+    User = get_user_model()
+    
+    # Get all users who own/manage at least one church
+    managers = User.objects.filter(
+        owned_churches__isnull=False
+    ).annotate(
+        churches_count=Count('owned_churches', distinct=True),
+        verified_churches_count=Count('owned_churches', filter=Q(owned_churches__is_verified=True), distinct=True),
+        active_churches_count=Count('owned_churches', filter=Q(owned_churches__is_active=True), distinct=True),
+        posts_count=Count('owned_churches__posts', distinct=True),
+        services_count=Count('owned_churches__bookable_services', distinct=True),
+        bookings_count=Count('owned_churches__bookable_services__bookings', distinct=True)
+    ).distinct().order_by('-date_joined')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        managers = managers.filter(
+            Q(full_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(owned_churches__name__icontains=search_query)
+        ).distinct()
+    
+    # Filter by status
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'active':
+        managers = managers.filter(is_active=True)
+    elif status_filter == 'inactive':
+        managers = managers.filter(is_active=False)
+    elif status_filter == 'verified':
+        managers = managers.filter(owned_churches__is_verified=True).distinct()
+    
+    # Pagination
+    paginator = Paginator(managers, 20)  # 20 managers per page
+    page_number = request.GET.get('page', 1)
+    managers_page = paginator.get_page(page_number)
+    
+    # Statistics
+    total_managers = User.objects.filter(owned_churches__isnull=False).distinct().count()
+    active_managers = User.objects.filter(owned_churches__isnull=False, is_active=True).distinct().count()
+    verified_managers = User.objects.filter(owned_churches__is_verified=True).distinct().count()
+    inactive_managers = User.objects.filter(owned_churches__isnull=False, is_active=False).distinct().count()
+    
+    # Calculate percentages
+    active_percentage = round((active_managers / total_managers * 100)) if total_managers > 0 else 0
+    verified_percentage = round((verified_managers / total_managers * 100)) if total_managers > 0 else 0
+    
+    # New managers this week
+    week_ago = timezone.now() - timedelta(days=7)
+    new_managers_this_week = User.objects.filter(
+        owned_churches__isnull=False,
+        date_joined__gte=week_ago
+    ).distinct().count()
+    
+    # Total parishes managed
+    total_parishes = Church.objects.filter(owner__isnull=False).count()
+    
+    # Manager activity trends (last 4 weeks)
+    activity_labels = []
+    active_managers_data = []
+    new_managers_data = []
+    
+    for i in range(3, -1, -1):
+        week_start = timezone.now() - timedelta(weeks=i+1)
+        week_end = timezone.now() - timedelta(weeks=i)
+        activity_labels.append(f'Week {4-i}')
+        
+        # Active managers (managers who logged in during that week)
+        active_count = User.objects.filter(
+            owned_churches__isnull=False,
+            last_login__gte=week_start,
+            last_login__lt=week_end
+        ).distinct().count()
+        active_managers_data.append(active_count)
+        
+        # New managers (users who became managers during that week)
+        new_count = User.objects.filter(
+            owned_churches__isnull=False,
+            date_joined__gte=week_start,
+            date_joined__lt=week_end
+        ).distinct().count()
+        new_managers_data.append(new_count)
+    
+    # Managers by parish count
+    managers_with_1_parish = User.objects.filter(owned_churches__isnull=False).annotate(
+        church_count=Count('owned_churches')
+    ).filter(church_count=1).count()
+    
+    managers_with_2_parishes = User.objects.filter(owned_churches__isnull=False).annotate(
+        church_count=Count('owned_churches')
+    ).filter(church_count=2).count()
+    
+    managers_with_3plus_parishes = User.objects.filter(owned_churches__isnull=False).annotate(
+        church_count=Count('owned_churches')
+    ).filter(church_count__gte=3).count()
+    
+    parish_count_labels = ['1 Parish', '2 Parishes', '3+ Parishes']
+    parish_count_data = [
+        managers_with_1_parish,
+        managers_with_2_parishes,
+        managers_with_3plus_parishes
+    ]
+    
+    import json
+    
+    ctx = {
+        'active': 'super_admin_managers',
+        'page_title': 'Parish Managers',
+        'managers_page': managers_page,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'stats': {
+            'total_managers': total_managers,
+            'active_managers': active_managers,
+            'verified_managers': verified_managers,
+            'inactive_managers': inactive_managers,
+            'active_percentage': active_percentage,
+            'verified_percentage': verified_percentage,
+            'new_managers_this_week': new_managers_this_week,
+            'total_parishes': total_parishes,
+        },
+        'activity_labels': json.dumps(activity_labels),
+        'active_managers_data': json.dumps(active_managers_data),
+        'new_managers_data': json.dumps(new_managers_data),
+        'parish_count_labels': json.dumps(parish_count_labels),
+        'parish_count_data': json.dumps(parish_count_data),
+    }
+    ctx.update(_app_context(request))
+    return render(request, 'core/super_admin_managers.html', ctx)
 
 
 # Bookable Services Management
@@ -6726,6 +7020,92 @@ def super_admin_donations_filter_data(request):
     }
     
     return JsonResponse(response_data)
+
+
+# Super Admin - Parish Donations Analytics
+@login_required
+def super_admin_parish_donations(request):
+    """Super Admin parish donations analytics page."""
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    from django.db.models import Sum, Count, Avg, Q
+    from datetime import timedelta
+    
+    # Get all completed donations grouped by parish
+    donations = Donation.objects.filter(
+        payment_status='completed'
+    ).select_related('post', 'post__church', 'donor')
+    
+    # Calculate overall statistics
+    stats = {
+        'total_donations': donations.aggregate(total=Sum('amount'))['total'] or 0,
+        'total_count': donations.count(),
+        'avg_donation': donations.aggregate(avg=Avg('amount'))['avg'] or 0,
+        'total_parishes': donations.values('post__church').distinct().count(),
+    }
+    
+    # Get donations by parish
+    from django.db.models import F
+    parish_donations = donations.values(
+        'post__church__id',
+        'post__church__name'
+    ).annotate(
+        total_amount=Sum('amount'),
+        donation_count=Count('id'),
+        avg_amount=Avg('amount')
+    ).order_by('-total_amount')[:10]
+    
+    # Get recent donations (last 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    recent_stats = donations.filter(created_at__gte=thirty_days_ago).aggregate(
+        total=Sum('amount'),
+        count=Count('id')
+    )
+    stats['recent_donations'] = recent_stats['total'] or 0
+    stats['recent_count'] = recent_stats['count'] or 0
+    
+    # Get donation trends (last 7 days)
+    trend_data = []
+    trend_labels = []
+    for i in range(6, -1, -1):
+        date = timezone.now() - timedelta(days=i)
+        day_donations = donations.filter(
+            created_at__date=date.date()
+        ).aggregate(total=Sum('amount'))
+        trend_data.append(float(day_donations['total'] or 0))
+        trend_labels.append(date.strftime('%b %d'))
+    
+    # Get payment method distribution
+    payment_methods = donations.values('payment_method').annotate(
+        count=Count('id'),
+        total=Sum('amount')
+    ).order_by('-total')
+    
+    # Prepare chart data
+    parish_chart_labels = [p['post__church__name'] for p in parish_donations]
+    parish_chart_data = [float(p['total_amount']) for p in parish_donations]
+    
+    payment_method_labels = []
+    payment_method_data = []
+    payment_method_dict = dict(Donation.PAYMENT_METHOD_CHOICES)
+    for pm in payment_methods:
+        payment_method_labels.append(payment_method_dict.get(pm['payment_method'], pm['payment_method']))
+        payment_method_data.append(pm['count'])
+    
+    context = {
+        'stats': stats,
+        'parish_donations': parish_donations,
+        'trend_labels': trend_labels,
+        'trend_data': trend_data,
+        'parish_chart_labels': parish_chart_labels,
+        'parish_chart_data': parish_chart_data,
+        'payment_method_labels': payment_method_labels,
+        'payment_method_data': payment_method_data,
+    }
+    
+    return render(request, 'core/super_admin_parish_donations.html', context)
 
 
 # Super Admin - Moderation Management

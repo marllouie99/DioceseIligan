@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Welcome to ChurchConnect</title>
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
   <link rel="stylesheet" href="{% static 'css/variables/warm-sacred-earth-vars.css' %}?v={{ STATIC_VERSION }}">
   <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}?v={{ STATIC_VERSION }}">
 </head>
@@ -288,7 +289,7 @@
         {% if featured_churches %}
         <div class="churches-grid">
           {% for church in featured_churches %}
-          <div class="church-card">
+          <div class="church-card" data-church-id="{{ church.id }}" data-church-slug="{{ church.slug }}" style="cursor: pointer;">
             <div class="church-card-image">
               {% if church.cover_image %}
                 <img src="{{ church.cover_image.url }}" alt="{{ church.name }}" loading="lazy">
@@ -420,8 +421,106 @@
     </div>
   </footer>
 
+  <!-- Parish Detail Modal -->
+  <div id="parishDetailModal" class="parish-modal" style="display: none;">
+    <div class="parish-modal-overlay"></div>
+    <div class="parish-modal-content">
+      <button class="parish-modal-close" aria-label="Close modal">&times;</button>
+      
+      <div class="parish-modal-header">
+        <div class="parish-modal-cover">
+          <img id="modalCoverImage" src="" alt="Parish cover" style="display: none;">
+          <div id="modalCoverPlaceholder" class="parish-cover-placeholder" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L3 9v11a2 2 0 002 2h14a2 2 0 002-2V9l-9-7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="parish-modal-title-section">
+          <h2 id="modalChurchName">Loading...</h2>
+          <div id="modalVerifiedBadge" class="verified-badge-modal" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Verified Parish</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="parish-modal-body">
+        <div class="parish-info-section">
+          <h3>About</h3>
+          <p id="modalDescription">Loading parish information...</p>
+          
+          <div class="parish-details-grid">
+            <div class="parish-detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <div class="detail-content">
+                <strong>Address</strong>
+                <p id="modalAddress">-</p>
+              </div>
+            </div>
+            
+            <div class="parish-detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <div class="detail-content">
+                <strong>Contact</strong>
+                <p id="modalEmail">-</p>
+                <p id="modalPhone">-</p>
+              </div>
+            </div>
+            
+            <div class="parish-detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <div class="detail-content">
+                <strong>Service Times</strong>
+                <p id="modalServiceTimes">-</p>
+              </div>
+            </div>
+            
+            <div class="parish-detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <div class="detail-content">
+                <strong>Community</strong>
+                <p id="modalFollowers">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="parish-services-section">
+          <h3>Available Services</h3>
+          <div id="modalServicesContainer" class="services-container">
+            <div class="services-loading">
+              <div class="spinner"></div>
+              <p>Loading services...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="parish-modal-footer">
+        <a id="modalViewFullButton" href="#" class="btn-modal-primary">View Full Parish Page</a>
+      </div>
+    </div>
+  </div>
+
   <script defer src="{% static 'js/landing.js' %}"></script>
   <script defer src="{% static 'js/hero-carousel.js' %}"></script>
+  <script defer src="{% static 'js/parish-modal.js' %}"></script>
   <script defer src="{% static 'js/utils/clock-sync.js' %}"></script>
 </body>
 </html>
