@@ -405,30 +405,70 @@ def select_church(request):
 
 @login_required
 def manage_church(request, church_id=None):
-    """Manage user's church."""
+    """Manage user's church or staff position."""
+    from core.models import ChurchStaff
+    
+    # Determine user's role and churches they can manage
+    user_role = None  # 'owner', 'secretary', 'volunteer'
+    staff_position = None
+    
     try:
         # If church_id is provided, get that specific church
         if church_id:
-            church = request.user.owned_churches.get(id=church_id)
+            # Try to get as owner first
+            try:
+                church = request.user.owned_churches.get(id=church_id)
+                user_role = 'owner'
+            except Church.DoesNotExist:
+                # Try to get as staff member
+                staff_position = ChurchStaff.objects.filter(
+                    user=request.user,
+                    church_id=church_id,
+                    status=ChurchStaff.STATUS_ACTIVE
+                ).select_related('church').first()
+                
+                if staff_position:
+                    church = staff_position.church
+                    user_role = staff_position.role
+                else:
+                    raise Church.DoesNotExist
         else:
             # If no church_id, redirect to select_church page
-            churches = request.user.owned_churches.all()
-            if not churches.exists():
+            owned_churches = request.user.owned_churches.all()
+            staff_churches = Church.objects.filter(
+                staff_members__user=request.user,
+                staff_members__status=ChurchStaff.STATUS_ACTIVE
+            ).distinct()
+            
+            # Combine owned and staff churches
+            all_manageable_churches = owned_churches | staff_churches
+            
+            if not all_manageable_churches.exists():
                 if request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
                 messages.info(
                     request,
-                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                    "You don't have access to manage any parishes. Please contact a Parish Manager."
                 )
                 return redirect('core:home')
             # If only one church, use it directly
-            elif churches.count() == 1:
-                church = churches.first()
+            elif all_manageable_churches.count() == 1:
+                church = all_manageable_churches.first()
+                # Determine role for this church
+                if church in owned_churches:
+                    user_role = 'owner'
+                else:
+                    staff_position = ChurchStaff.objects.filter(
+                        user=request.user,
+                        church=church,
+                        status=ChurchStaff.STATUS_ACTIVE
+                    ).first()
+                    user_role = staff_position.role if staff_position else None
             else:
                 # Multiple churches, redirect to selection page
                 return redirect('core:select_church')
     except Church.DoesNotExist:
-        messages.error(request, "You don't have permission to manage this church.")
+        messages.error(request, "You don't have permission to manage this parish.")
         return redirect('core:select_church')
     
     # AJAX: mark booking notifications as read when appointments tab is activated via JS
@@ -941,6 +981,8 @@ def manage_church(request, church_id=None):
         'lowest_rated_service': lowest_rated_service,
         'service_bookings_by_day': service_bookings_by_day,
         'top_services_by_bookings': top_services_by_bookings,
+        'user_role': user_role,  # 'owner', 'secretary', 'volunteer'
+        'staff_position': staff_position,  # ChurchStaff object if staff member
     }
     ctx.update(_app_context(request))
     # Override global unread count with church-specific pending count for this page

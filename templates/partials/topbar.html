@@ -43,13 +43,13 @@
 </div>
 {% endif %}
 {% if not user.is_superuser or not is_admin_mode %}
-{% if user.owned_churches.exists %}
-<a href="{% url 'core:select_church' %}" class="manage-church-link {% if request.resolver_match.url_name == 'manage_church' or request.resolver_match.url_name == 'select_church' %}active{% endif %}" title="Manage Church" style="position: relative;">
+{% if user.owned_churches.exists or user.staff_positions.filter(status='active').exists %}
+<a href="{% url 'core:select_church' %}" class="manage-church-link {% if request.resolver_match.url_name == 'manage_church' or request.resolver_match.url_name == 'select_church' %}active{% endif %}" title="Manage Parish" style="position: relative;">
   <svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2"/>
     <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
   </svg>
-  <span>Manage Church</span>
+  <span>Manage Parish</span>
   {% if unread_booking_notifications > 0 %}
   <span class="notification-badge" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600;">{{ unread_booking_notifications }}</span>
   {% endif %}

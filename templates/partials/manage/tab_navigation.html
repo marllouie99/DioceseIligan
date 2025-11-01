@@ -1,6 +1,8 @@
 {% load static %}
-{# Tab Navigation for Manage Church #}
+{# Tab Navigation for Manage Parish - Role-based tabs #}
 <div class="tabs-nav">
+  {# Overview - For all roles #}
+  {% if user_role == 'owner' or user_role == 'secretary' or user_role == 'volunteer' %}
   <button class="tab-btn {% if not request.GET.tab or request.GET.tab == 'overview' %}active{% endif %}" data-tab="overview">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="3" width="7" height="7"/>
@@ -10,6 +12,10 @@
     </svg>
     <span class="tab-label">Overview</span>
   </button>
+  {% endif %}
+  
+  {# Appointments - Owner and Secretary only #}
+  {% if user_role == 'owner' or user_role == 'secretary' %}
   <button class="tab-btn {% if request.GET.tab == 'appointments' %}active{% endif %}" data-tab="appointments" style="position: relative;">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -22,12 +28,20 @@
     <span class="notification-badge" style="position: absolute; top: 8px; right: 8px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600;">{{ unread_booking_notifications }}</span>
     {% endif %}
   </button>
+  {% endif %}
+  
+  {# Services - Owner and Secretary only #}
+  {% if user_role == 'owner' or user_role == 'secretary' %}
   <button class="tab-btn {% if request.GET.tab == 'services' %}active{% endif %}" data-tab="services">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
     </svg>
     <span class="tab-label">Services</span>
   </button>
+  {% endif %}
+  
+  {# Availability - Owner and Secretary only #}
+  {% if user_role == 'owner' or user_role == 'secretary' %}
   <button class="tab-btn {% if request.GET.tab == 'availability' %}active{% endif %}" data-tab="availability">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"/>
@@ -35,6 +49,10 @@
     </svg>
     <span class="tab-label">Availability</span>
   </button>
+  {% endif %}
+  
+  {# Events - Owner and Volunteer only #}
+  {% if user_role == 'owner' or user_role == 'volunteer' %}
   <button class="tab-btn" data-tab="events">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -42,6 +60,10 @@
     </svg>
     <span class="tab-label">Events</span>
   </button>
+  {% endif %}
+  
+  {# Content - Owner and Volunteer only #}
+  {% if user_role == 'owner' or user_role == 'volunteer' %}
   <button class="tab-btn" data-tab="content">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -52,12 +74,20 @@
     </svg>
     <span class="tab-label">Content</span>
   </button>
+  {% endif %}
+  
+  {# Donations - Owner only #}
+  {% if user_role == 'owner' %}
   <button class="tab-btn" data-tab="donations">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
     </svg>
     <span class="tab-label">Donations</span>
   </button>
+  {% endif %}
+  
+  {# Transactions - Owner and Secretary only #}
+  {% if user_role == 'owner' or user_role == 'secretary' %}
   <button class="tab-btn" data-tab="transactions">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -65,6 +95,10 @@
     </svg>
     <span class="tab-label">Transactions</span>
   </button>
+  {% endif %}
+  
+  {# Followers - Owner only #}
+  {% if user_role == 'owner' %}
   <button class="tab-btn" data-tab="followers">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -74,6 +108,10 @@
     </svg>
     <span class="tab-label">Followers</span>
   </button>
+  {% endif %}
+  
+  {# Parish Admins - Owner only #}
+  {% if user_role == 'owner' %}
   <button class="tab-btn" data-tab="admins">
     <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -82,6 +120,10 @@
     </svg>
     <span class="tab-label">Parish Admins</span>
   </button>
+  {% endif %}
+  
+  {# Settings - Owner only #}
+  {% if user_role == 'owner' %}
   <button class="tab-btn" data-tab="settings">
     {% include 'partials/icons/settings.html' with class="tab-icon" %}
     <span class="tab-label">Settings</span>
@@ -91,4 +133,5 @@
       {% endif %}
     {% endif %}
   </button>
+  {% endif %}
 </div>
