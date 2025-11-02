@@ -198,6 +198,7 @@ urlpatterns = [
     path('api/conversations/<int:conversation_id>/messages/', chat_api.conversation_messages_api, name='conversation_messages_api'),
     path('api/conversations/<int:conversation_id>/read/', chat_api.mark_conversation_read, name='mark_conversation_read'),
     path('api/conversations/<int:conversation_id>/typing/', chat_api.conversation_typing, name='conversation_typing'),
+    path('api/conversations/<int:conversation_id>/typing-status/', chat_api.conversation_typing_status, name='conversation_typing_status'),
     
     # Payment URLs (deprecated - keeping for backward compatibility)
     path('payment/gcash/<int:booking_id>/', views.gcash_payment, name='gcash_payment'),

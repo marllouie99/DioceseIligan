@@ -408,12 +408,14 @@ def mark_conversation_read(request, conversation_id):
             Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
         )
         
-        # Mark all unread messages (not sent by user) as read
+        # Mark all unread messages (not sent by user) as read with timestamp
+        from django.utils import timezone
+        
         unread_messages = conversation.messages.filter(
             is_read=False
         ).exclude(sender=request.user)
         
-        count = unread_messages.update(is_read=True)
+        count = unread_messages.update(is_read=True, read_at=timezone.now())
         
         return JsonResponse({
             'success': True,
@@ -430,24 +432,44 @@ def mark_conversation_read(request, conversation_id):
 @require_http_methods(["POST"])
 def conversation_typing(request, conversation_id):
     """
-    Handle typing indicator (optional feature)
-    This is a placeholder for WebSocket implementation
+    Handle typing indicator - stores typing status in cache
     """
     try:
+        from django.core.cache import cache
+        from django.db.models import Q
+        from .models import ChurchStaff
+        
+        # Get churches user owns or manages
+        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
+        staff_churches = ChurchStaff.objects.filter(
+            user=request.user,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY
+        ).values_list('church_id', flat=True)
+        managed_churches = set(user_churches) | set(staff_churches)
+        
         conversation = Conversation.objects.get(
-            id=conversation_id,
-            user=request.user
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
         )
         
         data = json.loads(request.body)
         is_typing = data.get('is_typing', False)
         
-        # In a real implementation, you would:
-        # 1. Store typing status in cache (Redis)
-        # 2. Broadcast via WebSocket to other participants
-        # 3. Auto-expire after 3-5 seconds
+        # Store typing status in cache with 5 second expiry
+        cache_key = f'typing_{conversation_id}_{request.user.id}'
         
-        # For now, just return success
+        if is_typing:
+            # Store user info for typing indicator
+            cache.set(cache_key, {
+                'user_id': request.user.id,
+                'username': request.user.username,
+                'display_name': request.user.get_full_name() or request.user.username,
+                'avatar': request.user.profile.avatar.url if hasattr(request.user, 'profile') and request.user.profile.avatar else None,
+            }, timeout=5)  # Auto-expire after 5 seconds
+        else:
+            # Clear typing status
+            cache.delete(cache_key)
+        
         return JsonResponse({
             'success': True,
             'is_typing': is_typing
@@ -457,5 +479,72 @@ def conversation_typing(request, conversation_id):
         return JsonResponse({'error': 'Conversation not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def conversation_typing_status(request, conversation_id):
+    """
+    Get typing status for a conversation - who is currently typing
+    """
+    try:
+        from django.core.cache import cache
+        from django.db.models import Q
+        from .models import ChurchStaff
+        
+        # Get churches user owns or manages
+        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
+        staff_churches = ChurchStaff.objects.filter(
+            user=request.user,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY
+        ).values_list('church_id', flat=True)
+        managed_churches = set(user_churches) | set(staff_churches)
+        
+        conversation = Conversation.objects.get(
+            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
+        )
+        
+        # Get all possible typers in this conversation (everyone except current user)
+        typers = []
+        
+        # Check if conversation user is typing (if current user is church manager)
+        if conversation.church_id in managed_churches:
+            cache_key = f'typing_{conversation_id}_{conversation.user.id}'
+            typing_info = cache.get(cache_key)
+            if typing_info:
+                typers.append(typing_info)
+        
+        # Check if church owner/managers are typing (if current user is the conversation user)
+        if request.user == conversation.user:
+            # Check church owner
+            if conversation.church.owner:
+                cache_key = f'typing_{conversation_id}_{conversation.church.owner.id}'
+                typing_info = cache.get(cache_key)
+                if typing_info:
+                    typers.append(typing_info)
+            
+            # Check church staff with messaging permission
+            staff_members = ChurchStaff.objects.filter(
+                church=conversation.church,
+                status=ChurchStaff.STATUS_ACTIVE,
+                role=ChurchStaff.ROLE_SECRETARY
+            ).values_list('user_id', flat=True)
+            
+            for staff_user_id in staff_members:
+                cache_key = f'typing_{conversation_id}_{staff_user_id}'
+                typing_info = cache.get(cache_key)
+                if typing_info:
+                    typers.append(typing_info)
+        
+        return JsonResponse({
+            'is_typing': len(typers) > 0,
+            'typers': typers
+        })
+        
+    except Conversation.DoesNotExist:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

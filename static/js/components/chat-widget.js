@@ -14,6 +14,7 @@ class ChatWidget {
     this.unreadCount = 0;
     this.typingTimeout = null;
     this.messagePollingInterval = null;
+    this.typingPollingInterval = null;
     this.selectedFile = null;
     this.selectedChurchFilter = 'all';
     
@@ -136,6 +137,8 @@ class ChatWidget {
     this.activeView.style.display = 'none';
     this.activeConversationId = null;
     this.updateHeader();
+    this.stopTypingPolling(); // Stop typing check when leaving chat
+    this.hideTypingIndicator(); // Clear any visible typing indicator
   }
 
   showActiveChat(conversationId) {
@@ -145,6 +148,7 @@ class ChatWidget {
     this.loadMessages(conversationId);
     this.updateHeader();
     this.markConversationAsRead(conversationId);
+    this.startTypingPolling(); // Start faster typing check
   }
 
   updateHeader() {
@@ -659,10 +663,31 @@ class ChatWidget {
     }, 10000);
   }
   
-  checkTypingStatus() {
-    // In a real implementation with WebSocket, typing status would be pushed from server
-    // For now, this is a placeholder that can be enhanced with server-side typing tracking
-    // You could store typing status in Redis with expiry and poll it
+  async checkTypingStatus() {
+    if (!this.activeConversationId) return;
+    
+    try {
+      const response = await fetch(`/app/api/conversations/${this.activeConversationId}/typing-status/`, {
+        headers: {
+          'X-CSRFToken': this.getCsrfToken(),
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.is_typing && data.typers.length > 0) {
+          const typer = data.typers[0]; // Show first typer
+          this.showTypingIndicator(typer.avatar);
+          this.updateHeaderTypingStatus(true, typer.display_name);
+        } else {
+          this.hideTypingIndicator();
+          this.updateHeaderTypingStatus(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking typing status:', error);
+    }
   }
   
   showTypingIndicator(avatar = null) {
@@ -713,6 +738,28 @@ class ChatWidget {
   stopMessagePolling() {
     if (this.messagePollingInterval) {
       clearInterval(this.messagePollingInterval);
+    }
+  }
+  
+  startTypingPolling() {
+    // Stop any existing typing poll
+    this.stopTypingPolling();
+    
+    // Check typing status immediately
+    this.checkTypingStatus();
+    
+    // Poll every 3 seconds for typing status (faster than message polling)
+    this.typingPollingInterval = setInterval(() => {
+      if (this.activeConversationId) {
+        this.checkTypingStatus();
+      }
+    }, 3000);
+  }
+  
+  stopTypingPolling() {
+    if (this.typingPollingInterval) {
+      clearInterval(this.typingPollingInterval);
+      this.typingPollingInterval = null;
     }
   }
 
@@ -915,6 +962,7 @@ class ChatWidget {
 
   destroy() {
     this.stopMessagePolling();
+    this.stopTypingPolling();
   }
 }
 
