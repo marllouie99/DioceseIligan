@@ -944,6 +944,96 @@
         height: 56px;
       }
     }
+    
+    /* Activity Stats Grid */
+    .activity-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .activity-stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    
+    .activity-stat-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .activity-stat-card.purple {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .activity-stat-card.blue {
+      background: linear-gradient(135deg, #2DD4BF 0%, #14B8A6 100%);
+    }
+    
+    .activity-stat-card.green {
+      background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    }
+    
+    .activity-stat-card.orange {
+      background: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
+    }
+    
+    .activity-stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .activity-stat-label {
+      font-size: 0.875rem;
+      opacity: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Activity Filter Tabs */
+    .activity-filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .activity-filter-tab {
+      padding: 0.625rem 1.25rem;
+      border-radius: 8px;
+      background: white;
+      border: 2px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .activity-filter-tab:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+      background: #eff6ff;
+    }
+    
+    .activity-filter-tab.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
+    }
+    
+    .view-all-link {
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
   </style>
 {% endblock %}
 
@@ -1161,7 +1251,7 @@
               <option value="oldest">Oldest First</option>
               <option value="type">By Type</option>
             </select>
-            <a href="{% url 'core:user_activities' %}" class="view-all-link">View All</a>
+            <button class="view-all-link" onclick="switchToTab('activity')">View All</button>
           </div>
         </div>
         <div class="activity-list" id="activity-list">
@@ -1307,8 +1397,36 @@
   <!-- Activity Tab Content -->
   <div id="activity-content" class="tab-content" style="display: none;">
     <div class="activity-page-content">
+      <!-- Stats Grid -->
+      <div class="activity-stats-grid">
+        <div class="activity-stat-card purple">
+          <div class="activity-stat-value">{{ activity_stats.post_like|default:0 }}</div>
+          <div class="activity-stat-label">Posts Liked</div>
+        </div>
+        <div class="activity-stat-card blue">
+          <div class="activity-stat-value">{{ activity_stats.post_comment|default:0 }}</div>
+          <div class="activity-stat-label">Comments Made</div>
+        </div>
+        <div class="activity-stat-card green">
+          <div class="activity-stat-value">{{ activity_stats.church_follow|default:0 }}</div>
+          <div class="activity-stat-label">Churches Following</div>
+        </div>
+        <div class="activity-stat-card orange">
+          <div class="activity-stat-value">{{ activity_stats.booking_create|default:0 }}</div>
+          <div class="activity-stat-label">Appointments Created</div>
+        </div>
+      </div>
+      
+      <!-- Filter Tabs -->
+      <div class="activity-filter-tabs">
+        <button class="activity-filter-tab active" data-filter="all">All Activity</button>
+        <button class="activity-filter-tab" data-filter="posts">Posts</button>
+        <button class="activity-filter-tab" data-filter="churches">Churches</button>
+        <button class="activity-filter-tab" data-filter="auth">Login History</button>
+      </div>
+      
       <div class="section-header">
-        <h2 class="section-title">All Activity</h2>
+        <h2 class="section-title">Activity Timeline</h2>
         <p class="section-description">Your complete activity history</p>
       </div>
       <div class="activity-list" id="activity-list-container">
@@ -3433,6 +3551,72 @@ document.addEventListener('DOMContentLoaded', function() {
         const years = Math.floor(months / 12);
         return `${years} year${years > 1 ? 's' : ''} ago`;
     }
+});
+
+// Switch to Activity tab function
+function switchToTab(tabName) {
+  // Click the activity nav tab
+  const activityTab = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (activityTab) {
+    activityTab.click();
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// Activity filter tabs functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const filterTabs = document.querySelectorAll('.activity-filter-tab');
+  const activityList = document.getElementById('activity-list-container');
+  
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Remove active class from all tabs
+      filterTabs.forEach(t => t.classList.remove('active'));
+      // Add active class to clicked tab
+      this.classList.add('active');
+      
+      const filter = this.getAttribute('data-filter');
+      
+      // Filter activities based on selection
+      if (activityList) {
+        const activities = activityList.querySelectorAll('.activity-item');
+        activities.forEach(activity => {
+          const activityType = activity.classList.toString();
+          
+          if (filter === 'all') {
+            activity.style.display = '';
+          } else if (filter === 'posts') {
+            // Show post-related activities (likes, comments, saves, views)
+            if (activityType.includes('post_like') || 
+                activityType.includes('post_comment') || 
+                activityType.includes('post_save') || 
+                activityType.includes('post_view')) {
+              activity.style.display = '';
+            } else {
+              activity.style.display = 'none';
+            }
+          } else if (filter === 'churches') {
+            // Show church-related activities (follows, unfollows)
+            if (activityType.includes('church_follow') || 
+                activityType.includes('church_unfollow')) {
+              activity.style.display = '';
+            } else {
+              activity.style.display = 'none';
+            }
+          } else if (filter === 'auth') {
+            // Show authentication activities (login, registration)
+            if (activityType.includes('login') || 
+                activityType.includes('register')) {
+              activity.style.display = '';
+            } else {
+              activity.style.display = 'none';
+            }
+          }
+        });
+      }
+    });
+  });
 });
 </script>
 {% endblock %}

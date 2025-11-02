@@ -763,6 +763,10 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         payment_status='completed',
         created_at__date=today
     ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    # Activity stats for Activity tab
+    from core.activity_tracker import ActivityTracker
+    activity_stats = ActivityTracker.get_activity_stats(request.user)
 
     context = {
         'form': form,
@@ -808,6 +812,7 @@ def manage_profile(request: HttpRequest) -> HttpResponse:
         'total_donated_today': total_donated_today,
         'total_parishes_followed_today': total_parishes_followed_today,
         'total_post_engagement_today': total_post_engagement_today,
+        'activity_stats': activity_stats,  # Stats for Activity tab
         'is_admin_mode': bool(request.session.get('super_admin_mode', False)) if getattr(request.user, 'is_superuser', False) else False,
     }
     return render(request, 'manage_profile.html', context)
