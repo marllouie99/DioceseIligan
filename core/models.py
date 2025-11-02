@@ -1725,6 +1725,7 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     content = models.TextField(max_length=1000, blank=True)
     is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True, help_text="Timestamp when message was seen")
     created_at = models.DateTimeField(auto_now_add=True)
     
     # File attachments
@@ -1752,10 +1753,12 @@ class Message(models.Model):
         return f"{self.sender.username}: {self.content[:50]}"
     
     def mark_as_read(self):
-        """Mark this message as read."""
+        """Mark this message as read and set seen timestamp."""
         if not self.is_read:
+            from django.utils import timezone
             self.is_read = True
-            self.save(update_fields=['is_read'])
+            self.read_at = timezone.now()
+            self.save(update_fields=['is_read', 'read_at'])
     
     def get_attachment_type(self):
         """Determine attachment type based on file extension."""

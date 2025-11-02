@@ -282,6 +282,7 @@ def conversation_messages_api(request, conversation_id):
                 'sender_name': sender_name,
                 'avatar': avatar,
                 'is_read': msg.is_read,
+                'read_at': msg.read_at.isoformat() if msg.read_at else None,
                 'attachment': attachment_data,
                 'donation_rank': donation_rank
             })
@@ -375,6 +376,7 @@ def conversation_messages_api(request, conversation_id):
                     'sender_name': sender_name,
                     'avatar': avatar,
                     'is_read': False,
+                    'read_at': None,
                     'attachment': attachment_data
                 }
             }, status=201)

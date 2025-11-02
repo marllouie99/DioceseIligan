@@ -1,0 +1,311 @@
+{% extends 'layouts/app_base.html' %}
+{% load static %}
+
+{% block title %}My Activity • ChurchConnect{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variables/blue-sky-vars.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/themes/blue-sky-theme.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}?v={{ STATIC_VERSION }}">
+<style>
+.activity-header {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.activity-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.activity-header p {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.blue {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.stat-card.green {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.stat-card.orange {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.filter-tab:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.activity-list {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.activity-item {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.activity-icon.like {
+  background: #fee2e2;
+}
+
+.activity-icon.comment {
+  background: #dbeafe;
+}
+
+.activity-icon.bookmark {
+  background: #fef3c7;
+}
+
+.activity-icon.follow {
+  background: #d1fae5;
+}
+
+.activity-icon.booking {
+  background: #e0e7ff;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-type {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.activity-details {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.activity-time {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
+  <!-- Header -->
+  <div class="activity-header">
+    <h1>My Activity</h1>
+    <p>Track your interactions across churches, posts, bookings, and more</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.post_like|default:0 }}</div>
+      <div class="stat-label">Posts Liked</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-value">{{ stats.post_comment|default:0 }}</div>
+      <div class="stat-label">Comments Made</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value">{{ stats.church_follow|default:0 }}</div>
+      <div class="stat-label">Churches Following</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-value">{{ stats.booking_create|default:0 }}</div>
+      <div class="stat-label">Appointments Created</div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <a href="?filter=all" class="filter-tab {% if activity_filter == 'all' %}active{% endif %}">
+      All Activity
+    </a>
+    <a href="?filter=posts" class="filter-tab {% if activity_filter == 'posts' %}active{% endif %}">
+      Posts
+    </a>
+    <a href="?filter=churches" class="filter-tab {% if activity_filter == 'churches' %}active{% endif %}">
+      Churches
+    </a>
+    <a href="?filter=auth" class="filter-tab {% if activity_filter == 'auth' %}active{% endif %}">
+      Login History
+    </a>
+  </div>
+
+  <!-- Activity List -->
+  <div class="activity-list">
+    {% if activities %}
+      {% for activity in activities %}
+        <div class="activity-item">
+          <div class="activity-icon {% if activity.activity_type == 'post_like' %}like{% elif activity.activity_type == 'post_comment' %}comment{% elif activity.activity_type == 'post_bookmark' %}bookmark{% elif activity.activity_type == 'church_follow' %}follow{% elif 'booking' in activity.activity_type %}booking{% endif %}">
+            {% if activity.activity_type == 'post_like' %}❤️
+            {% elif activity.activity_type == 'post_comment' %}💬
+            {% elif activity.activity_type == 'post_bookmark' %}🔖
+            {% elif activity.activity_type == 'church_follow' %}➕
+            {% elif activity.activity_type == 'church_unfollow' %}➖
+            {% elif 'booking' in activity.activity_type %}📅
+            {% else %}📊
+            {% endif %}
+          </div>
+          <div class="activity-content">
+            <div class="activity-type">
+              {% if activity.activity_type == 'post_like' %}Liked a post
+              {% elif activity.activity_type == 'post_unlike' %}Unliked a post
+              {% elif activity.activity_type == 'post_comment' %}Commented on a post
+              {% elif activity.activity_type == 'post_bookmark' %}Bookmarked a post
+              {% elif activity.activity_type == 'post_unbookmark' %}Removed bookmark
+              {% elif activity.activity_type == 'post_view' %}Viewed a post
+              {% elif activity.activity_type == 'post_share' %}Shared a post
+              {% elif activity.activity_type == 'church_follow' %}Followed a church
+              {% elif activity.activity_type == 'church_unfollow' %}Unfollowed a church
+              {% elif activity.activity_type == 'booking_create' %}Created an appointment
+              {% elif activity.activity_type == 'booking_update' %}Updated an appointment
+              {% elif activity.activity_type == 'booking_cancel' %}Cancelled an appointment
+              {% elif activity.activity_type == 'service_review' %}Reviewed a service
+              {% elif activity.activity_type == 'profile_update' %}Updated profile
+              {% elif activity.activity_type == 'login' %}Logged in
+              {% elif activity.activity_type == 'logout' %}Logged out
+              {% else %}{{ activity.activity_type|title }}
+              {% endif %}
+            </div>
+            <div class="activity-details">
+              {% if activity.content_object %}
+                {% if activity.content_object|length > 100 %}
+                  {{ activity.content_object|slice:":100" }}...
+                {% else %}
+                  {{ activity.content_object }}
+                {% endif %}
+              {% elif activity.metadata %}
+                {{ activity.metadata }}
+              {% endif %}
+            </div>
+            <div class="activity-time">
+              {{ activity.created_at|timesince }} ago
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <h3>No Activity Yet</h3>
+        <p>Your activities will appear here as you interact with churches and posts</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

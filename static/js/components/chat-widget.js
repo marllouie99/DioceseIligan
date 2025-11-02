@@ -415,6 +415,34 @@ class ChatWidget {
         rankBadgeHtml = `<span class="donation-rank-badge" style="background: ${msg.donation_rank.color}22; color: ${msg.donation_rank.color}; border: 1px solid ${msg.donation_rank.color}44;" title="${msg.donation_rank.name}">${msg.donation_rank.name}</span>`;
       }
       
+      // Build seen status HTML for sent messages
+      let seenStatusHtml = '';
+      if (isSent) {
+        if (msg.read_at) {
+          seenStatusHtml = `
+            <div class="chat-message-seen seen">
+              <span class="chat-message-seen-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                  <polyline points="20 6 9 17" transform="translate(3, 0)"></polyline>
+                </svg>
+              </span>
+              <span>Seen</span>
+            </div>
+          `;
+        } else {
+          seenStatusHtml = `
+            <div class="chat-message-seen">
+              <span class="chat-message-seen-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </div>
+          `;
+        }
+      }
+      
       html += `
         <div class="chat-message ${isSent ? 'sent' : 'received'}">
           <div class="chat-message-avatar">
@@ -430,12 +458,35 @@ class ChatWidget {
             ${!isSent && rankBadgeHtml ? `<div class="chat-message-sender">${msg.sender_name} ${rankBadgeHtml}</div>` : ''}
             ${msg.content ? `<div class="chat-message-bubble">${this.escapeHtml(msg.content)}</div>` : ''}
             ${attachmentHtml}
-            <span class="chat-message-time">${this.formatMessageTime(msg.created_at)}</span>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+              <span class="chat-message-time">${this.formatMessageTime(msg.created_at)}</span>
+              ${seenStatusHtml}
+            </div>
           </div>
         </div>
       `;
     });
 
+    // Add typing indicator at the end
+    html += `
+      <div class="chat-typing-indicator" id="chat-typing-indicator-msg">
+        <div class="chat-typing-avatar" id="chat-typing-avatar-content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+        </div>
+        <div class="chat-typing-bubble">
+          <span class="chat-typing-text">Typing</span>
+          <div class="chat-typing-dots">
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+          </div>
+        </div>
+      </div>
+    `;
+    
     this.messagesContainer.innerHTML = html;
     this.scrollToBottom();
   }
@@ -602,9 +653,61 @@ class ChatWidget {
     this.messagePollingInterval = setInterval(() => {
       if (this.activeConversationId) {
         this.loadMessages(this.activeConversationId, true); // Silent mode to prevent flickering
+        this.checkTypingStatus(); // Check if other person is typing
       }
       this.loadConversations(); // Update conversation list for unread counts
     }, 10000);
+  }
+  
+  checkTypingStatus() {
+    // In a real implementation with WebSocket, typing status would be pushed from server
+    // For now, this is a placeholder that can be enhanced with server-side typing tracking
+    // You could store typing status in Redis with expiry and poll it
+  }
+  
+  showTypingIndicator(avatar = null) {
+    const indicator = document.getElementById('chat-typing-indicator-msg');
+    const avatarContent = document.getElementById('chat-typing-avatar-content');
+    
+    if (indicator) {
+      indicator.classList.add('active');
+      
+      // Update avatar if provided
+      if (avatar && avatarContent) {
+        avatarContent.innerHTML = `<img src="${avatar}" alt="Typing">`;
+      }
+      
+      // Auto-scroll if needed
+      if (this.isScrolledToBottom()) {
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+    }
+  }
+  
+  hideTypingIndicator() {
+    const indicator = document.getElementById('chat-typing-indicator-msg');
+    if (indicator) {
+      indicator.classList.remove('active');
+    }
+  }
+  
+  updateHeaderTypingStatus(isTyping, name = null) {
+    if (isTyping) {
+      this.chatStatus.innerHTML = `
+        <span class="typing">
+          <span>typing</span>
+          <div class="chat-typing-dots">
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+          </div>
+        </span>
+      `;
+      this.chatStatus.classList.remove('online');
+    } else {
+      this.chatStatus.textContent = 'Active';
+      this.chatStatus.classList.add('online');
+    }
   }
 
   stopMessagePolling() {
