@@ -4653,6 +4653,11 @@ def super_admin_church_detail(request, church_id):
     # Get followers count
     followers_count = ChurchFollow.objects.filter(church=church).count()
     
+    # Get parish administrators (staff members)
+    staff_members = ChurchStaff.objects.filter(
+        church=church
+    ).select_related('user', 'user__profile', 'added_by').order_by('role', '-added_at')
+    
     # Get verification requests history with documents
     verification_requests = ChurchVerificationRequest.objects.filter(
         church=church
@@ -4807,6 +4812,7 @@ def super_admin_church_detail(request, church_id):
         'services': services,
         'posts': posts,
         'followers_count': followers_count,
+        'staff_members': staff_members,
         'verification_requests': verification_requests,
         # Chart data
         'booking_trends': booking_trends,

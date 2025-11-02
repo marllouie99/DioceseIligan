@@ -326,6 +326,15 @@
       </svg>
       Posts ({{ posts.count }})
     </button>
+    <button class="tab-btn" onclick="switchTab('staff')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Parish Administrators ({{ staff_members.count }})
+    </button>
   </div>
 
   <!-- Tab Content -->
@@ -616,6 +625,115 @@
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <p style="margin: 0; font-size: 1.125rem; font-weight: 500;">No posts available yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Parish Administrators Tab -->
+  <div class="tab-content" id="tab-staff">
+    <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(30, 144, 255, 0.08); border: 1px solid rgba(30, 144, 255, 0.1);">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #1A3A52; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(30, 144, 255, 0.15);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: #1E90FF;">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Parish Administrators ({{ staff_members.count }})
+      </h2>
+      
+      {% if staff_members %}
+        <!-- Parish Manager Section -->
+        <div style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.125rem; font-weight: 600; color: #1A3A52; margin: 0 0 1rem 0; padding: 0.75rem; background: rgba(30, 144, 255, 0.05); border-radius: 8px;">
+            Parish Manager
+          </h3>
+          <div style="background: #f8fafc; border: 1px solid rgba(30, 144, 255, 0.1); border-radius: 8px; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+              {% if church.owner.profile.profile_image %}
+                <img src="{{ church.owner.profile.profile_image|storage_url }}" alt="{{ church.owner.get_full_name }}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(30, 144, 255, 0.3);">
+              {% else %}
+                <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border: 2px solid rgba(30, 144, 255, 0.3);">
+                  {{ church.owner.get_full_name.0|upper }}
+                </div>
+              {% endif %}
+              <div style="flex: 1;">
+                <h4 style="font-size: 1.125rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.25rem 0;">
+                  {{ church.owner.get_full_name|default:church.owner.username }}
+                </h4>
+                <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.5rem 0;">{{ church.owner.email }}</p>
+                <span style="display: inline-block; padding: 0.25rem 0.75rem; background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); color: #166534; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                  Primary Manager
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff Members Section -->
+        {% with secretaries=staff_members|dictsort:"role" %}
+          {% regroup secretaries by role as staff_by_role %}
+          {% for role in staff_by_role %}
+            <div style="margin-bottom: 2rem;">
+              <h3 style="font-size: 1.125rem; font-weight: 600; color: #1A3A52; margin: 0 0 1rem 0; padding: 0.75rem; background: rgba(30, 144, 255, 0.05); border-radius: 8px;">
+                {% if role.grouper == 'secretary' %}Parish Secretaries{% else %}Ministry Leaders{% endif %} ({{ role.list|length }})
+              </h3>
+              <div style="display: grid; gap: 1rem;">
+                {% for staff in role.list %}
+                <div style="background: #f8fafc; border: 1px solid rgba(30, 144, 255, 0.1); border-radius: 8px; padding: 1.5rem;">
+                  <div style="display: flex; align-items: center; gap: 1.25rem;">
+                    {% if staff.user.profile.profile_image %}
+                      <img src="{{ staff.user.profile.profile_image|storage_url }}" alt="{{ staff.user.get_full_name }}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(30, 144, 255, 0.2);">
+                    {% else %}
+                      <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%); color: #1E90FF; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border: 2px solid rgba(30, 144, 255, 0.2);">
+                        {{ staff.user.get_full_name.0|upper }}
+                      </div>
+                    {% endif %}
+                    <div style="flex: 1;">
+                      <h4 style="font-size: 1.125rem; font-weight: 700; color: #1A3A52; margin: 0 0 0.25rem 0;">
+                        {{ staff.user.get_full_name|default:staff.user.username }}
+                      </h4>
+                      <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.5rem 0;">{{ staff.user.email }}</p>
+                      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <span style="display: inline-block; padding: 0.25rem 0.75rem; {% if staff.role == 'secretary' %}background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); color: #92400e; border: 1px solid rgba(245, 158, 11, 0.2);{% else %}background: linear-gradient(135deg, #F0F8FF 0%, #E8F4FF 100%); color: #1E90FF; border: 1px solid rgba(30, 144, 255, 0.2);{% endif %} border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                          {{ staff.get_role_display }}
+                        </span>
+                        {% if staff.status == 'active' %}
+                        <span style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); color: #166534; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          Active
+                        </span>
+                        {% else %}
+                        <span style="display: inline-block; padding: 0.25rem 0.75rem; background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); color: #991b1b; border: 1px solid rgba(220, 38, 38, 0.2); border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                          Inactive
+                        </span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div style="text-align: right;">
+                      <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Added by</p>
+                      <p style="font-size: 0.875rem; font-weight: 600; color: #6b7280; margin: 0;">{{ staff.added_by.get_full_name|default:staff.added_by.username }}</p>
+                      <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.25rem 0 0 0;">{{ staff.added_at|date:"M d, Y" }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endwith %}
+      {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; color: #9ca3af;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 64px; height: 64px; margin: 0 auto 1.5rem; color: #d1d5db;">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p style="margin: 0; font-size: 1.125rem; font-weight: 500;">No parish administrators added yet.</p>
         </div>
       {% endif %}
     </div>
