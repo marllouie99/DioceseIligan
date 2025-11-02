@@ -290,6 +290,75 @@ class ChurchStaff(models.Model):
         return f"{self.user.get_full_name()} - {self.get_role_display()} at {self.church.name}"
 
 
+class StaffActivityLog(models.Model):
+    """Model to track staff member activities in the parish."""
+    
+    # Action types
+    ACTION_CREATE = 'create'
+    ACTION_UPDATE = 'update'
+    ACTION_DELETE = 'delete'
+    ACTION_APPROVE = 'approve'
+    ACTION_REJECT = 'reject'
+    ACTION_CANCEL = 'cancel'
+    ACTION_VIEW = 'view'
+    
+    ACTION_CHOICES = [
+        (ACTION_CREATE, 'Created'),
+        (ACTION_UPDATE, 'Updated'),
+        (ACTION_DELETE, 'Deleted'),
+        (ACTION_APPROVE, 'Approved'),
+        (ACTION_REJECT, 'Rejected'),
+        (ACTION_CANCEL, 'Canceled'),
+        (ACTION_VIEW, 'Viewed'),
+    ]
+    
+    # Action categories
+    CATEGORY_SERVICE = 'service'
+    CATEGORY_BOOKING = 'booking'
+    CATEGORY_POST = 'post'
+    CATEGORY_AVAILABILITY = 'availability'
+    CATEGORY_STAFF = 'staff'
+    CATEGORY_EVENT = 'event'
+    CATEGORY_OTHER = 'other'
+    
+    CATEGORY_CHOICES = [
+        (CATEGORY_SERVICE, 'Service'),
+        (CATEGORY_BOOKING, 'Booking'),
+        (CATEGORY_POST, 'Post'),
+        (CATEGORY_AVAILABILITY, 'Availability'),
+        (CATEGORY_STAFF, 'Staff Management'),
+        (CATEGORY_EVENT, 'Event'),
+        (CATEGORY_OTHER, 'Other'),
+    ]
+    
+    staff = models.ForeignKey(ChurchStaff, on_delete=models.CASCADE, related_name='activities')
+    church = models.ForeignKey(Church, on_delete=models.CASCADE, related_name='staff_activities')
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    description = models.TextField(help_text="Description of the action performed")
+    
+    # Optional: track which object was affected
+    target_id = models.IntegerField(null=True, blank=True, help_text="ID of the affected object")
+    target_type = models.CharField(max_length=50, null=True, blank=True, help_text="Type of the affected object")
+    
+    # IP address for security audit
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Staff Activity Log'
+        verbose_name_plural = 'Staff Activity Logs'
+        indexes = [
+            models.Index(fields=['staff', '-created_at']),
+            models.Index(fields=['church', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.staff.user.get_full_name()} - {self.get_action_display()} {self.get_category_display()} at {self.created_at}"
+
+
 class ServiceCategory(models.Model):
     """Model for categorizing church services (e.g., Parish Family, In-Person Services)."""
     
@@ -617,6 +686,7 @@ class Booking(models.Model):
     cancel_reason = models.CharField(max_length=200, blank=True, help_text="Reason when canceled/auto-canceled")
     decline_reason = models.CharField(max_length=200, blank=True, help_text="Reason when declined")
     handled_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='handled_bookings', help_text="Parish administrator who handled this booking")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_bookings', help_text="Staff member who created this booking on behalf of user (null if user created it themselves)")
     
     # Payment fields
     payment_status = models.CharField(max_length=20, choices=[

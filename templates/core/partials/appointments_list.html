@@ -10,7 +10,7 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
         <tr>
           <th>Service</th>
           <th>User</th>
-          <th>Email</th>
+          <th>Contact</th>
           <th>Date</th>
           <th>Time</th>
           <th>Duration</th>
@@ -38,7 +38,15 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
                 <span class="user-name">{{ b.user.get_full_name|default:b.user.username }}</span>
               </div>
             </td>
-            <td class="email-cell">{{ b.user.email }}</td>
+            <td class="contact-cell">
+              {% if b.user.profile.phone %}
+                {{ b.user.profile.phone }}
+              {% elif b.user.email and not b.user.email|stringformat:"s"|slice:"-15:" == "@temporary.local" %}
+                {{ b.user.email }}
+              {% else %}
+                No contact info
+              {% endif %}
+            </td>
             <td class="date-cell">{{ b.date|date:'Y-m-d' }}</td>
             <td class="time-cell">
               {% if b.start_time %}{{ b.start_time|time:'g:i A' }}{% else %}--{% endif %}
@@ -49,7 +57,7 @@ Requires: bookings (iterable of Booking), each with b.service, b.user, and optio
             <td class="amount-cell">
               {% if b.service.price %}
                 {% if b.service.price > 0 %}
-                  ${{ b.service.price }}
+                  ₱{{ b.service.price }}
                 {% else %}
                   Donation
                 {% endif %}

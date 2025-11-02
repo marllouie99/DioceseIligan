@@ -61,6 +61,53 @@ from .notifications import create_booking_notification, NotificationTemplates
 
 
 # Permission Helper Functions
+def log_staff_activity(user, church, action, category, description, target_id=None, target_type=None, request=None):
+    """
+    Helper function to log staff activities.
+    
+    Args:
+        user: The user performing the action
+        church: The church instance
+        action: Action type (use StaffActivityLog.ACTION_* constants)
+        category: Category type (use StaffActivityLog.CATEGORY_* constants)
+        description: Human-readable description of the action
+        target_id: Optional ID of the affected object
+        target_type: Optional type of the affected object
+        request: Optional request object to get IP address
+    """
+    from core.models import ChurchStaff, StaffActivityLog
+    
+    try:
+        # Get the staff member record
+        staff_member = ChurchStaff.objects.filter(
+            user=user,
+            church=church,
+            status=ChurchStaff.STATUS_ACTIVE
+        ).first()
+        
+        if staff_member:
+            # Get IP address from request
+            ip_address = None
+            if request:
+                ip_address = request.META.get('REMOTE_ADDR') or request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+            
+            StaffActivityLog.objects.create(
+                staff=staff_member,
+                church=church,
+                action=action,
+                category=category,
+                description=description,
+                target_id=target_id,
+                target_type=target_type,
+                ip_address=ip_address
+            )
+    except Exception as e:
+        # Silently fail - don't break the main operation if logging fails
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Failed to log staff activity: {str(e)}")
+
+
 def user_can_manage_church(user, church, required_permissions=None):
     """
     Check if user has permission to manage church based on ownership or staff role.
@@ -1107,7 +1154,11 @@ def get_church_followers_list(request, church_id):
         
         # Only church owner can manage staff
         can_manage, role = user_can_manage_church(request.user, church)
-        if not can_manage or role != 'owner':
+        
+        if not can_manage:
+            return JsonResponse({'success': False, 'message': 'You do not have permission to manage this church'}, status=403)
+        
+        if role != 'owner':
             return JsonResponse({'success': False, 'message': 'Only the parish manager can add staff members'}, status=403)
         
         # Get all followers
@@ -1204,6 +1255,78 @@ def add_church_staff(request, church_id):
         
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
+def remove_church_staff(request, church_id, staff_id):
+    """API endpoint to remove a staff member from the church."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid method'}, status=405)
+    
+    try:
+        church = get_object_or_404(Church, id=church_id)
+        
+        # Only church owner can manage staff
+        can_manage, role = user_can_manage_church(request.user, church)
+        if not can_manage or role != 'owner':
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can remove staff members'}, status=403)
+        
+        # Get the staff member
+        staff_member = get_object_or_404(ChurchStaff, id=staff_id, church=church)
+        
+        # Prevent removing if already inactive
+        if staff_member.status == ChurchStaff.STATUS_INACTIVE:
+            return JsonResponse({'success': False, 'message': 'Staff member is already inactive'}, status=400)
+        
+        # Set status to inactive instead of deleting
+        staff_member.status = ChurchStaff.STATUS_INACTIVE
+        staff_member.save()
+        
+        return JsonResponse({'success': True, 'message': 'Staff member removed successfully'})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
+def get_staff_activities(request, church_id, staff_id):
+    """API endpoint to get activity logs for a staff member."""
+    try:
+        church = get_object_or_404(Church, id=church_id)
+        
+        # Only church owner can view staff activities
+        can_manage, role = user_can_manage_church(request.user, church)
+        if not can_manage or role != 'owner':
+            return JsonResponse({'success': False, 'message': 'Only the parish manager can view staff activities'}, status=403)
+        
+        # Get the staff member
+        staff_member = get_object_or_404(ChurchStaff, id=staff_id, church=church)
+        
+        # Get recent activities (last 50)
+        from core.models import StaffActivityLog
+        activities = StaffActivityLog.objects.filter(
+            staff=staff_member
+        ).select_related('staff', 'church')[:50]
+        
+        activities_data = []
+        for activity in activities:
+            activities_data.append({
+                'id': activity.id,
+                'action': activity.get_action_display(),
+                'category': activity.get_category_display(),
+                'description': activity.description,
+                'created_at': activity.created_at.strftime('%b %d, %Y at %I:%M %p'),
+                'ip_address': activity.ip_address or 'N/A',
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'activities': activities_data,
+            'total_count': staff_member.activities.count()
+        })
+        
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
@@ -3284,6 +3407,19 @@ def create_service(request):
         if form.is_valid():
             service = form.save()
             
+            # Log staff activity for service creation
+            from .models import StaffActivityLog
+            log_staff_activity(
+                user=request.user,
+                church=church,
+                action=StaffActivityLog.ACTION_CREATE,
+                category=StaffActivityLog.CATEGORY_SERVICE,
+                description=f"Created service '{service.name}' - {service.get_currency_display()}{service.price}",
+                target_id=service.id,
+                target_type='service',
+                request=request
+            )
+            
             # Handle multiple image uploads
             images = request.FILES.getlist('images')
             if images:
@@ -3350,6 +3486,20 @@ def edit_service(request, service_id):
         form = BookableServiceForm(request.POST, request.FILES, instance=service, church=church)
         if form.is_valid():
             form.save()
+            
+            # Log staff activity for service update
+            from .models import StaffActivityLog
+            log_staff_activity(
+                user=request.user,
+                church=church,
+                action=StaffActivityLog.ACTION_UPDATE,
+                category=StaffActivityLog.CATEGORY_SERVICE,
+                description=f"Updated service '{service.name}'",
+                target_id=service.id,
+                target_type='service',
+                request=request
+            )
+            
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True, 
@@ -3404,6 +3554,21 @@ def delete_service(request, service_id):
     
     if request.method == 'POST':
         service_name = service.name
+        service_id = service.id
+        
+        # Log staff activity for service deletion
+        from .models import StaffActivityLog
+        log_staff_activity(
+            user=request.user,
+            church=church,
+            action=StaffActivityLog.ACTION_DELETE,
+            category=StaffActivityLog.CATEGORY_SERVICE,
+            description=f"Deleted service '{service_name}'",
+            target_id=service_id,
+            target_type='service',
+            request=request
+        )
+        
         service.delete()
         messages.success(request, f'Service "{service_name}" has been deleted successfully!')
         return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
@@ -3519,18 +3684,35 @@ def manage_availability(request):
     
     try:
         if church_id:
-            church = request.user.owned_churches.get(id=church_id)
+            church = Church.objects.get(id=church_id)
         else:
             # Fallback to first church if no church_id provided
             church = request.user.owned_churches.first()
             if not church:
-                if request.user.is_superuser:
+                # Check if user is a secretary of any church
+                secretary_church = ChurchStaff.objects.filter(
+                    user=request.user,
+                    role__in=['secretary', 'volunteer'],
+                    status='active'
+                ).select_related('church').first()
+                
+                if secretary_church:
+                    church = secretary_church.church
+                elif request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
-                messages.info(
-                    request,
-                    "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
-                )
-                return redirect('core:home')
+                else:
+                    messages.info(
+                        request,
+                        "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager."
+                    )
+                    return redirect('core:home')
+        
+        # Check if user can manage availability (Owner or Secretary with availability permission)
+        can_manage, role = user_can_manage_church(request.user, church, ['availability'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage this church.")
+            return redirect('core:select_church')
+            
     except Church.DoesNotExist:
         messages.error(request, "You don't have permission to manage this church.")
         return redirect('core:select_church')
@@ -3811,6 +3993,28 @@ def manage_booking(request, booking_id):
                 booking.decline_reason = ''
             booking.save(update_fields=['status', 'status_changed_at', 'updated_at', 'cancel_reason', 'decline_reason', 'handled_by'])
             
+            # Log staff activity for booking management
+            from .models import StaffActivityLog
+            action_map = {
+                Booking.STATUS_APPROVED: (StaffActivityLog.ACTION_APPROVE, f"Approved booking #{booking.code} for {booking.user.get_full_name()}"),
+                Booking.STATUS_DECLINED: (StaffActivityLog.ACTION_REJECT, f"Declined booking #{booking.code} for {booking.user.get_full_name()}: {booking.decline_reason}"),
+                Booking.STATUS_CANCELED: (StaffActivityLog.ACTION_CANCEL, f"Canceled booking #{booking.code} for {booking.user.get_full_name()}"),
+                Booking.STATUS_REVIEWED: (StaffActivityLog.ACTION_UPDATE, f"Reviewed booking #{booking.code} for {booking.user.get_full_name()}"),
+                Booking.STATUS_COMPLETED: (StaffActivityLog.ACTION_UPDATE, f"Marked booking #{booking.code} as completed"),
+            }
+            if new_status in action_map:
+                action, desc = action_map[new_status]
+                log_staff_activity(
+                    user=request.user,
+                    church=booking.church,
+                    action=action,
+                    category=StaffActivityLog.CATEGORY_BOOKING,
+                    description=desc,
+                    target_id=booking.id,
+                    target_type='booking',
+                    request=request
+                )
+            
             # Log activity for booking update
             from .models import UserInteraction
             UserInteraction.log_activity(
@@ -3912,6 +4116,230 @@ def manage_booking(request, booking_id):
     }
     ctx.update(_app_context(request))
     return render(request, 'core/manage_booking_detail.html', ctx)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def create_booking_manually(request):
+    """Allow parish staff to create bookings on behalf of users."""
+    import json
+    
+    # Get church_id from query parameters
+    church_id = request.GET.get('church_id')
+    
+    if not church_id:
+        return JsonResponse({'success': False, 'message': 'Church ID is required.'}, status=400)
+    
+    try:
+        church = Church.objects.get(id=church_id)
+    except Church.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Church not found.'}, status=404)
+    
+    # Check permissions - must be owner or secretary with appointments permission
+    has_permission, role = user_can_manage_church(request.user, church, required_permissions=['appointments'])
+    if not has_permission:
+        return JsonResponse({'success': False, 'message': 'You do not have permission to create bookings for this church.'}, status=403)
+    
+    if request.method == 'GET':
+        # Return form data (services, etc.)
+        try:
+            services = BookableService.objects.filter(church=church, is_active=True).select_related('category')
+            services_data = []
+            
+            for s in services:
+                service_data = {
+                    'id': s.id,
+                    'name': s.name,
+                    'category': s.category.name if s.category else 'Uncategorized',
+                    'price': float(s.price) if s.price else 0.0,
+                    'is_free': s.is_free,
+                    'duration_minutes': s.duration if s.duration else 0,
+                }
+                services_data.append(service_data)
+            
+            return JsonResponse({'success': True, 'services': services_data})
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({'success': False, 'message': f'Error loading services: {str(e)}'}, status=500)
+    
+    elif request.method == 'POST':
+        # Create booking
+        try:
+            data = json.loads(request.body)
+            
+            # Get required fields
+            mode = data.get('mode', 'search')
+            user_id = data.get('user_id')
+            service_id = data.get('service_id')
+            date = data.get('date')
+            start_time = data.get('start_time')
+            end_time = data.get('end_time')
+            notes = data.get('notes', '')
+            auto_approve = data.get('auto_approve', False)
+            payment_status = data.get('payment_status', 'pending')
+            payment_method = data.get('payment_method')
+            
+            # Handle user based on mode
+            if mode == 'create':
+                # Create new user with contact info
+                contact_name = data.get('contact_name', '').strip()
+                contact_email = data.get('contact_email', '').strip()
+                contact_phone = data.get('contact_phone', '').strip()
+                
+                if not contact_name:
+                    return JsonResponse({'success': False, 'message': 'Contact name is required.'}, status=400)
+                
+                if not contact_email and not contact_phone:
+                    return JsonResponse({'success': False, 'message': 'At least email or phone number is required.'}, status=400)
+                
+                # Generate unique username
+                from django.utils.text import slugify
+                import random
+                base_username = slugify(contact_name.lower().replace(' ', '_'))
+                username = base_username
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}_{counter}"
+                    counter += 1
+                
+                # Create user
+                user = User.objects.create_user(
+                    username=username,
+                    email=contact_email if contact_email else f"{username}@temporary.local",
+                    first_name=contact_name.split()[0] if contact_name else '',
+                    last_name=' '.join(contact_name.split()[1:]) if len(contact_name.split()) > 1 else '',
+                    password=User.objects.make_random_password(length=32)
+                )
+                
+                # Update profile with phone if provided
+                if contact_phone:
+                    from accounts.models import Profile
+                    Profile.objects.update_or_create(
+                        user=user,
+                        defaults={'phone': contact_phone}
+                    )
+            else:
+                # Search mode - get existing user
+                if not user_id:
+                    return JsonResponse({'success': False, 'message': 'User ID is required in search mode.'}, status=400)
+                
+                try:
+                    user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'success': False, 'message': 'User not found.'}, status=404)
+            
+            # Validate service and date
+            if not service_id or not date:
+                return JsonResponse({'success': False, 'message': 'Service and date are required.'}, status=400)
+            
+            # Get service
+            try:
+                service = BookableService.objects.get(id=service_id, church=church)
+            except BookableService.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'Service not found.'}, status=404)
+            
+            # Parse date and times
+            from datetime import datetime
+            from django.utils import timezone
+            
+            booking_date = datetime.strptime(date, '%Y-%m-%d').date()
+            booking_start_time = datetime.strptime(start_time, '%H:%M').time() if start_time else None
+            booking_end_time = datetime.strptime(end_time, '%H:%M').time() if end_time else None
+            
+            # Create the booking
+            booking = Booking.objects.create(
+                user=user,
+                church=church,
+                service=service,
+                date=booking_date,
+                start_time=booking_start_time,
+                end_time=booking_end_time,
+                notes=notes,
+                status=Booking.STATUS_APPROVED if auto_approve else Booking.STATUS_REQUESTED,
+                created_by=request.user,  # Track who created it
+                handled_by=request.user if auto_approve else None,
+                payment_status=payment_status,
+                payment_method=payment_method if payment_method else None,
+                payment_amount=service.price if payment_status == 'paid' else None,
+                payment_date=timezone.now() if payment_status == 'paid' else None,
+            )
+            
+            # TODO: Send notification to user (notifications system to be implemented)
+            # Booking is created successfully without notification for now
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Booking created successfully.',
+                'booking': {
+                    'id': booking.id,
+                    'code': booking.code,
+                    'status': booking.get_status_display(),
+                }
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def search_users_api(request):
+    """Search for users by name, email, phone, or username for booking creation."""
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'users': []})
+    
+    # Search users by username, email, phone, first name, or last name
+    from django.db.models import Q
+    users = User.objects.filter(
+        Q(username__icontains=query) |
+        Q(email__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query) |
+        Q(profile__phone__icontains=query)
+    ).select_related('profile').distinct()[:10]
+    
+    users_data = []
+    for user in users:
+        # Get display name
+        display_name = user.username
+        if user.get_full_name():
+            display_name = user.get_full_name()
+        elif hasattr(user, 'profile') and user.profile and user.profile.display_name:
+            display_name = user.profile.display_name
+        
+        # Get avatar
+        avatar = None
+        if hasattr(user, 'profile') and user.profile and user.profile.profile_image:
+            avatar = user.profile.profile_image.url
+        
+        # Get phone number
+        phone = None
+        if hasattr(user, 'profile') and user.profile and user.profile.phone:
+            phone = user.profile.phone
+        
+        # Build contact info (show email or phone or both)
+        contact_info = []
+        if user.email:
+            contact_info.append(user.email)
+        if phone:
+            contact_info.append(phone)
+        
+        users_data.append({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email if user.email else '',
+            'phone': phone if phone else '',
+            'contact_info': ' | '.join(contact_info) if contact_info else 'No contact info',
+            'display_name': display_name,
+            'avatar': avatar,
+        })
+    
+    return JsonResponse({'users': users_data})
 
 
 @login_required
@@ -4627,14 +5055,31 @@ def create_availability(request):
     
     try:
         if church_id:
-            church = request.user.owned_churches.get(id=church_id)
+            church = Church.objects.get(id=church_id)
         else:
             church = request.user.owned_churches.first()
             if not church:
-                if request.user.is_superuser:
+                # Check if user is a secretary of any church
+                secretary_church = ChurchStaff.objects.filter(
+                    user=request.user,
+                    role__in=['secretary', 'volunteer'],
+                    status='active'
+                ).select_related('church').first()
+                
+                if secretary_church:
+                    church = secretary_church.church
+                elif request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
-                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-                return redirect('core:home')
+                else:
+                    messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                    return redirect('core:home')
+        
+        # Check if user can manage availability (Owner or Secretary with availability permission)
+        can_manage, role = user_can_manage_church(request.user, church, ['availability'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage this church.")
+            return redirect('core:select_church')
+            
     except Church.DoesNotExist:
         messages.error(request, "You don't have permission to manage this church.")
         return redirect('core:select_church')
@@ -4644,6 +5089,21 @@ def create_availability(request):
         if form.is_valid():
             try:
                 availability = form.save()
+                
+                # Log staff activity for availability creation
+                from .models import StaffActivityLog
+                status_desc = "closed" if availability.is_closed else "special hours"
+                log_staff_activity(
+                    user=request.user,
+                    church=church,
+                    action=StaffActivityLog.ACTION_CREATE,
+                    category=StaffActivityLog.CATEGORY_AVAILABILITY,
+                    description=f"Created {status_desc} entry for {availability.date}",
+                    target_id=availability.id,
+                    target_type='availability',
+                    request=request
+                )
+                
                 messages.success(request, f'Availability entry for {availability.date} has been created successfully!')
                 return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
             except IntegrityError:
@@ -4701,6 +5161,21 @@ def edit_availability(request, availability_id):
         form = AvailabilityForm(request.POST, instance=availability, church=church)
         if form.is_valid():
             form.save()
+            
+            # Log staff activity for availability update
+            from .models import StaffActivityLog
+            status_desc = "closed" if availability.is_closed else "special hours"
+            log_staff_activity(
+                user=request.user,
+                church=church,
+                action=StaffActivityLog.ACTION_UPDATE,
+                category=StaffActivityLog.CATEGORY_AVAILABILITY,
+                description=f"Updated {status_desc} entry for {availability.date}",
+                target_id=availability.id,
+                target_type='availability',
+                request=request
+            )
+            
             messages.success(request, f'Availability entry for {availability.date} has been updated successfully!')
             return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=availability')
         else:
@@ -4756,14 +5231,31 @@ def bulk_availability(request):
     
     try:
         if church_id:
-            church = request.user.owned_churches.get(id=church_id)
+            church = Church.objects.get(id=church_id)
         else:
             church = request.user.owned_churches.first()
             if not church:
-                if request.user.is_superuser:
+                # Check if user is a secretary of any church
+                secretary_church = ChurchStaff.objects.filter(
+                    user=request.user,
+                    role__in=['secretary', 'volunteer'],
+                    status='active'
+                ).select_related('church').first()
+                
+                if secretary_church:
+                    church = secretary_church.church
+                elif request.user.is_superuser:
                     return redirect('core:super_admin_create_church')
-                messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
-                return redirect('core:home')
+                else:
+                    messages.info(request, "You don't own any churches yet. Please contact a Super Admin to create one and assign you as manager.")
+                    return redirect('core:home')
+        
+        # Check if user can manage availability (Owner or Secretary with availability permission)
+        can_manage, role = user_can_manage_church(request.user, church, ['availability'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to manage this church.")
+            return redirect('core:select_church')
+            
     except Church.DoesNotExist:
         messages.error(request, "You don't have permission to manage this church.")
         return redirect('core:select_church')
@@ -8213,6 +8705,19 @@ def dashboard_create_post(request):
         
         post = Post.objects.create(**post_data)
         
+        # Log staff activity for post creation
+        from .models import StaffActivityLog
+        log_staff_activity(
+            user=request.user,
+            church=church,
+            action=StaffActivityLog.ACTION_CREATE,
+            category=StaffActivityLog.CATEGORY_POST,
+            description=f"Created {post.get_post_type_display()} post" + (f": '{event_title}'" if post_type == 'event' else ""),
+            target_id=post.id,
+            target_type='post',
+            request=request
+        )
+        
         # Return success response with post data
         return JsonResponse({
             'success': True,
@@ -8441,6 +8946,19 @@ def update_post(request, post_id):
             post.image = None
         
         post.save()
+        
+        # Log staff activity for post update
+        from .models import StaffActivityLog
+        log_staff_activity(
+            user=request.user,
+            church=post.church,
+            action=StaffActivityLog.ACTION_UPDATE,
+            category=StaffActivityLog.CATEGORY_POST,
+            description=f"Updated {post.get_post_type_display()} post" + (f": '{post.event_title}'" if post_type == 'event' and post.event_title else ""),
+            target_id=post.id,
+            target_type='post',
+            request=request
+        )
         
         return JsonResponse({
             'success': True,

@@ -2,8 +2,17 @@
 {# Appointments Tab Content #}
 <div class="tab-panel {% if not request.GET.tab or request.GET.tab == 'appointments' %}active{% endif %}" id="appointments">
   <div class="tab-header">
-    <h2>Appointments</h2>
-    <p>Manage church appointments and scheduling</p>
+    <div>
+      <h2>Appointments</h2>
+      <p>Manage church appointments and scheduling</p>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="openCreateBookingModal()" style="margin-left: auto;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 8px;">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Create Booking
+    </button>
   </div>
   <div class="tab-content">
     <!-- Appointments Analytics -->
@@ -138,6 +147,150 @@
     </div>
     <div id="appointments-list">
       {% include 'core/partials/appointments_list.html' %}
+    </div>
+  </div>
+</div>
+
+<!-- Create Booking Modal -->
+<div id="createBookingModal" class="modal-overlay" style="display: none;">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2>Create Booking</h2>
+      <button class="modal-close-btn" onclick="closeCreateBookingModal()">&times;</button>
+    </div>
+    
+    <form id="createBookingForm" class="modal-body">
+      {% csrf_token %}
+      
+      <!-- Info Box -->
+      <div class="booking-info">
+        <strong>Staff Booking:</strong> Create appointments on behalf of parishioners. You can search for existing users or create a new contact with their name and email/phone number.
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="form-group">
+        <label>Search Existing User or Create New</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <button type="button" class="btn btn-outline" id="searchUserBtn" onclick="toggleUserMode('search')" style="flex: 1;">
+            Search Existing User
+          </button>
+          <button type="button" class="btn btn-primary" id="createUserBtn" onclick="toggleUserMode('create')" style="flex: 1;">
+            Create New Contact
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search Existing User Mode -->
+      <div id="searchUserMode" style="display: none;">
+        <div class="form-group">
+          <label for="userSearch">Search User *</label>
+          <div class="user-search-container">
+            <input type="text" id="userSearch" class="form-control" placeholder="Search by name, email, or username..." autocomplete="off">
+            <input type="hidden" id="selectedUserId" name="user_id">
+            <div id="userSearchResults" class="search-results" style="display: none;"></div>
+          </div>
+          <div id="selectedUserDisplay" class="selected-user" style="display: none;">
+            <img id="selectedUserAvatar" src="" alt="" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+            <div>
+              <strong id="selectedUserName"></strong>
+              <p style="margin: 0; font-size: 0.875rem; color: #6b7280;" id="selectedUserEmail"></p>
+            </div>
+            <button type="button" onclick="clearUserSelection()" class="btn btn-sm btn-outline" style="margin-left: auto;">Change</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Create New Contact Mode -->
+      <div id="createUserMode" style="display: block;">
+        <div class="form-group">
+          <label for="contactName">Full Name *</label>
+          <input type="text" id="contactName" class="form-control" placeholder="Enter full name..." required>
+          <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">The person's full name for this booking</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="contactInfo">Email or Phone Number *</label>
+          <input type="text" id="contactInfo" class="form-control" placeholder="e.g., john@example.com or 09123456789" required>
+          <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">Enter email address or phone number</p>
+        </div>
+      </div>
+      
+      <!-- Service Selection -->
+      <div class="form-group">
+        <label for="serviceSelect">Service *</label>
+        <select id="serviceSelect" name="service_id" class="form-control" required>
+          <option value="">Select a service...</option>
+        </select>
+        <div id="serviceDetails" style="display: none; margin-top: 8px; padding: 10px; background: #f9fafb; border-radius: 6px; font-size: 0.875rem; border: 1px solid #e5e7eb;"></div>
+      </div>
+      
+      <!-- Date and Time -->
+      <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label for="bookingDate">Preferred Date *</label>
+          <input type="date" id="bookingDate" name="date" class="form-control" required>
+          <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">Select the appointment date</p>
+        </div>
+        <div class="form-group">
+          <label for="startTime">Preferred Time *</label>
+          <input type="time" id="startTime" name="start_time" class="form-control" required>
+          <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">Appointment start time</p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="endTime">End Time (Optional)</label>
+        <input type="time" id="endTime" name="end_time" class="form-control">
+        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">Leave blank to use service duration</p>
+      </div>
+      
+      <!-- Notes -->
+      <div class="form-group">
+        <label for="bookingNotes">Additional Notes</label>
+        <textarea id="bookingNotes" name="notes" class="form-control" rows="3" placeholder="Add any special requests, contact details, or context for this booking (e.g., 'Walk-in request', 'Phone booking', 'Family baptism')..."></textarea>
+        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">This will be visible to the user in their appointment details</p>
+      </div>
+      
+      <!-- Payment Status -->
+      <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label for="paymentStatus">Payment Status</label>
+          <select id="paymentStatus" name="payment_status" class="form-control">
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+        <div class="form-group" id="paymentMethodGroup" style="display: none;">
+          <label for="paymentMethod">Payment Method</label>
+          <select id="paymentMethod" name="payment_method" class="form-control">
+            <option value="">Select method...</option>
+            <option value="paypal">PayPal</option>
+            <option value="stripe">Credit Card</option>
+            <option value="gcash">GCash</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Auto Approve -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="autoApprove" name="auto_approve" value="1">
+          <span>Auto-approve this booking</span>
+        </label>
+        <p style="font-size: 0.875rem; color: #6b7280; margin-top: 4px;">
+          If checked, the booking will be automatically approved without review.
+        </p>
+      </div>
+      
+      <div id="createBookingError" class="error-message" style="display: none;"></div>
+    </form>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeCreateBookingModal()">Cancel</button>
+      <button type="submit" form="createBookingForm" class="btn btn-primary" id="createBookingBtn">
+        <span id="createBookingBtnText">Create Booking</span>
+        <span id="createBookingBtnLoading" style="display: none;">Creating...</span>
+      </button>
     </div>
   </div>
 </div>
