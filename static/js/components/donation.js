@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPostData = {};
     let currentPaymentMethod = 'paypal'; // Default to PayPal
     let paypalButtonRendered = false; // Track if PayPal button is already rendered
+    let currentRenderedAmount = null; // Track the amount for which button is rendered
+    let renderTimeout = null; // Debounce timer for rendering
     
     // Stripe Elements
     let stripe = null;
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             customAmountInput.value = this.dataset.amount;
             
             clearError();
-            renderPayPalButton();
+            debouncedRenderPayPalButton();
         });
     });
     
@@ -74,7 +76,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const amount = parseFloat(this.value);
         if (amount >= 10) {
-            renderPayPalButton();
+            debouncedRenderPayPalButton();
+        } else {
+            // Clear button if amount is too low
+            if (paypalButtonRendered) {
+                document.getElementById('paypal-button-container').innerHTML = 
+                    '<p style="text-align: center; color: #6b7280;">Please enter an amount of at least ₱10</p>';
+                paypalButtonRendered = false;
+                currentRenderedAmount = null;
+            }
         }
     });
     
@@ -107,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Re-render PayPal button if amount is set
                 const amount = parseFloat(customAmountInput.value);
                 if (amount >= 10) {
-                    renderPayPalButton();
+                    debouncedRenderPayPalButton();
                 }
             } else if (method === 'stripe') {
                 currentPaymentMethod = 'stripe';
@@ -252,6 +262,25 @@ document.addEventListener('DOMContentLoaded', function() {
         currentChurchSlug = null;
         currentPostData = {};
         paypalButtonRendered = false; // Reset flag when closing modal
+        currentRenderedAmount = null; // Reset rendered amount
+        
+        // Clear any pending render timeout
+        if (renderTimeout) {
+            clearTimeout(renderTimeout);
+            renderTimeout = null;
+        }
+    }
+    
+    function debouncedRenderPayPalButton() {
+        // Clear any existing timeout
+        if (renderTimeout) {
+            clearTimeout(renderTimeout);
+        }
+        
+        // Wait 500ms before rendering to avoid multiple renders while user is typing
+        renderTimeout = setTimeout(() => {
+            renderPayPalButton();
+        }, 500);
     }
     
     function renderPayPalButton() {
@@ -261,12 +290,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('paypal-button-container').innerHTML = 
                 '<p class="error-message" style="display: block;">Please enter an amount of at least ₱10</p>';
             paypalButtonRendered = false;
+            currentRenderedAmount = null;
             return;
         }
         
         // Don't re-render if already rendered with same amount
-        if (paypalButtonRendered) {
+        if (paypalButtonRendered && currentRenderedAmount === amount) {
             return;
+        }
+        
+        // If rendering for a different amount, mark as not rendered
+        if (currentRenderedAmount !== amount) {
+            paypalButtonRendered = false;
+            currentRenderedAmount = amount;
         }
         
         // Clear previous button
@@ -389,9 +425,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }).render('#paypal-button-container')
         .then(() => {
             paypalButtonRendered = true;
+            console.log('PayPal button rendered successfully for amount:', amount);
         })
         .catch(err => {
             console.error('PayPal render error:', err);
+            paypalButtonRendered = false;
+            currentRenderedAmount = null;
             container.innerHTML = '<p class="error-message" style="display: block;">Failed to load PayPal. Please refresh the page.</p>';
         });
     }
