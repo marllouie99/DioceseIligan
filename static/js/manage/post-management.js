@@ -25,6 +25,8 @@ class PostManagement {
     this.setupCharacterCounter();
     this.setupImagePreview();
     this.setupEditImagePreview();
+    this.setupDonationToggle();
+    this.setupMultipleImageUpload();
     this.isInitialized = true;
     console.log('✅ PostManagement initialized successfully');
   }
@@ -104,8 +106,8 @@ class PostManagement {
    * Setup character counter for textarea
    */
   setupCharacterCounter() {
-    const textarea = document.querySelector('#createPostForm textarea[name="content"]');
-    const counter = document.getElementById('charCount');
+    const textarea = document.getElementById('manage-post-content');
+    const counter = document.getElementById('manage-char-count');
     
     if (textarea && counter) {
       textarea.addEventListener('input', () => this.updateCharacterCount());
@@ -126,8 +128,8 @@ class PostManagement {
    * Update character count display
    */
   updateCharacterCount() {
-    const textarea = document.querySelector('#createPostForm textarea[name="content"]');
-    const counter = document.getElementById('charCount');
+    const textarea = document.getElementById('manage-post-content');
+    const counter = document.getElementById('manage-char-count');
     
     if (textarea && counter) {
       const count = textarea.value.length;
@@ -710,6 +712,101 @@ class PostManagement {
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
     }
+  }
+
+  /**
+   * Setup donation toggle functionality
+   */
+  setupDonationToggle() {
+    const donationCheckbox = document.getElementById('manage-enable-donation');
+    const donationFields = document.getElementById('manage-donation-fields');
+    
+    if (donationCheckbox && donationFields) {
+      donationCheckbox.addEventListener('change', function() {
+        donationFields.style.display = this.checked ? 'block' : 'none';
+      });
+    }
+  }
+
+  /**
+   * Setup multiple image upload functionality
+   */
+  setupMultipleImageUpload() {
+    const imageInput = document.getElementById('manage-post-images');
+    const previewContainer = document.getElementById('manage-main-images-preview');
+    const uploadText = document.getElementById('manage-upload-text');
+    
+    if (!imageInput || !previewContainer) return;
+    
+    imageInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      
+      if (files.length === 0) {
+        previewContainer.style.display = 'none';
+        if (uploadText) uploadText.textContent = 'Click to add photos (up to 10)';
+        return;
+      }
+      
+      // Limit to 10 images
+      if (files.length > 10) {
+        alert('You can only upload up to 10 images');
+        e.target.value = '';
+        return;
+      }
+      
+      // Show preview container
+      previewContainer.style.display = 'grid';
+      previewContainer.innerHTML = '';
+      
+      // Update upload text
+      if (uploadText) {
+        uploadText.textContent = `${files.length} image${files.length > 1 ? 's' : ''} selected`;
+      }
+      
+      // Preview each image
+      files.forEach((file, index) => {
+        if (!file.type.startsWith('image/')) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const previewItem = document.createElement('div');
+          previewItem.className = 'image-preview-item';
+          previewItem.innerHTML = `
+            <img src="${e.target.result}" alt="Preview ${index + 1}">
+            <button type="button" class="remove-image-btn" onclick="window.postManagement.removeImageAtIndex(${index})">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          `;
+          previewContainer.appendChild(previewItem);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  }
+
+  /**
+   * Remove image at specific index
+   */
+  removeImageAtIndex(index) {
+    const imageInput = document.getElementById('manage-post-images');
+    if (!imageInput) return;
+    
+    const dt = new DataTransfer();
+    const files = imageInput.files;
+    
+    for (let i = 0; i < files.length; i++) {
+      if (i !== index) {
+        dt.items.add(files[i]);
+      }
+    }
+    
+    imageInput.files = dt.files;
+    
+    // Trigger change event to update preview
+    imageInput.dispatchEvent(new Event('change'));
   }
 
   /**
