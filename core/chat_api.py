@@ -439,18 +439,21 @@ def conversation_typing(request, conversation_id):
         from django.db.models import Q
         from .models import ChurchStaff
         
-        # Get churches user owns or manages
-        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
-        staff_churches = ChurchStaff.objects.filter(
+        # Get conversation and check if user has access
+        conversation = Conversation.objects.get(id=conversation_id)
+        
+        # Check if user is conversation user OR manages the church
+        is_conversation_user = conversation.user == request.user
+        is_church_owner = conversation.church.owner == request.user if conversation.church.owner else False
+        is_church_staff = ChurchStaff.objects.filter(
             user=request.user,
+            church=conversation.church,
             status=ChurchStaff.STATUS_ACTIVE,
             role=ChurchStaff.ROLE_SECRETARY
-        ).values_list('church_id', flat=True)
-        managed_churches = set(user_churches) | set(staff_churches)
+        ).exists()
         
-        conversation = Conversation.objects.get(
-            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
-        )
+        if not (is_conversation_user or is_church_owner or is_church_staff):
+            return JsonResponse({'error': 'Permission denied'}, status=403)
         
         data = json.loads(request.body)
         is_typing = data.get('is_typing', False)
@@ -460,11 +463,18 @@ def conversation_typing(request, conversation_id):
         
         if is_typing:
             # Store user info for typing indicator
+            try:
+                avatar_url = None
+                if hasattr(request.user, 'profile') and request.user.profile and request.user.profile.avatar:
+                    avatar_url = request.user.profile.avatar.url
+            except:
+                avatar_url = None
+            
             cache.set(cache_key, {
                 'user_id': request.user.id,
                 'username': request.user.username,
                 'display_name': request.user.get_full_name() or request.user.username,
-                'avatar': request.user.profile.avatar.url if hasattr(request.user, 'profile') and request.user.profile.avatar else None,
+                'avatar': avatar_url,
             }, timeout=5)  # Auto-expire after 5 seconds
         else:
             # Clear typing status
@@ -494,24 +504,27 @@ def conversation_typing_status(request, conversation_id):
         from django.db.models import Q
         from .models import ChurchStaff
         
-        # Get churches user owns or manages
-        user_churches = Church.objects.filter(owner=request.user).values_list('id', flat=True)
-        staff_churches = ChurchStaff.objects.filter(
+        # Get conversation and check if user has access
+        conversation = Conversation.objects.get(id=conversation_id)
+        
+        # Check if user is conversation user OR manages the church
+        is_conversation_user = conversation.user == request.user
+        is_church_owner = conversation.church.owner == request.user if conversation.church.owner else False
+        is_church_staff = ChurchStaff.objects.filter(
             user=request.user,
+            church=conversation.church,
             status=ChurchStaff.STATUS_ACTIVE,
             role=ChurchStaff.ROLE_SECRETARY
-        ).values_list('church_id', flat=True)
-        managed_churches = set(user_churches) | set(staff_churches)
+        ).exists()
         
-        conversation = Conversation.objects.get(
-            Q(id=conversation_id) & (Q(user=request.user) | Q(church_id__in=managed_churches))
-        )
+        if not (is_conversation_user or is_church_owner or is_church_staff):
+            return JsonResponse({'error': 'Permission denied'}, status=403)
         
         # Get all possible typers in this conversation (everyone except current user)
         typers = []
         
         # Check if conversation user is typing (if current user is church manager)
-        if conversation.church_id in managed_churches:
+        if is_church_owner or is_church_staff:
             cache_key = f'typing_{conversation_id}_{conversation.user.id}'
             typing_info = cache.get(cache_key)
             if typing_info:
