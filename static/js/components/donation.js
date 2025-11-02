@@ -317,18 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Render PayPal button
         paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color: 'blue',
-                shape: 'rect',
-                label: 'paypal'
-            },
-            
             createOrder: function(data, actions) {
-                // Show loading
-                container.style.opacity = '0.6';
-                clearError();
-                
                 return fetch(`/app/donations/create/${currentPostId}/`, {
                     method: 'POST',
                     headers: {
@@ -343,8 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    container.style.opacity = '1';
-                    
                     if (data.success && data.order_id) {
                         return data.order_id;
                     } else {
@@ -352,17 +339,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .catch(error => {
-                    container.style.opacity = '1';
+                    console.error('Error creating order:', error);
                     showError(error.message);
                     throw error;
                 });
             },
             
             onApprove: function(data, actions) {
-                // Show loading
-                container.style.opacity = '0.6';
-                showError('Processing your donation...');
-                
                 // Capture the order
                 return fetch(`/app/donations/capture/${currentPostId}/`, {
                     method: 'POST',
@@ -376,51 +359,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(result => {
-                    container.style.opacity = '1';
-                    
                     if (result.success) {
                         // Redirect to success page
                         window.location.href = result.redirect_url || `/app/donations/success/${currentPostId}/`;
                     } else {
-                        showError(result.message || 'Failed to complete donation');
+                        throw new Error(result.message || 'Failed to complete donation');
                     }
                 })
                 .catch(error => {
-                    container.style.opacity = '1';
+                    console.error('Error capturing payment:', error);
                     showError('Error completing donation. Please contact support.');
-                    console.error('Capture error:', error);
                 });
-            },
-            
-            onCancel: function(data) {
-                // Call cancel endpoint
-                if (data.orderID) {
-                    fetch(`/app/donations/cancel/${currentPostId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'X-CSRFToken': getCsrfToken()
-                        },
-                        body: new URLSearchParams({
-                            'order_id': data.orderID
-                        })
-                    }).catch(err => console.error('Cancel error:', err));
-                }
-                
-                closeDonationModal();
-                showMessage('Donation cancelled', 'info');
             },
             
             onError: function(err) {
                 console.error('PayPal error:', err);
-                
-                // Don't show error for popup close (user cancelled)
-                if (err && err.message && err.message.includes('popup close')) {
-                    closeDonationModal();
-                    showMessage('Payment window was closed', 'info');
-                } else {
-                    showError('Payment error occurred. Please try again.');
-                }
+                showError('Payment failed. Please try again.');
             }
         }).render('#paypal-button-container')
         .then(() => {
