@@ -27,6 +27,7 @@ class PostManagement {
     this.setupEditImagePreview();
     this.setupDonationToggle();
     this.setupMultipleImageUpload();
+    this.setupPostTypeSelector();
     this.isInitialized = true;
     console.log('✅ PostManagement initialized successfully');
   }
@@ -807,6 +808,64 @@ class PostManagement {
     
     // Trigger change event to update preview
     imageInput.dispatchEvent(new Event('change'));
+  }
+
+  /**
+   * Setup post type selector functionality
+   */
+  setupPostTypeSelector() {
+    const typeSelector = document.getElementById('manage-post-type-selector');
+    const postTypeInput = document.getElementById('manage-post-type');
+    const eventFields = document.getElementById('manage-event-fields');
+    const contentLabel = document.getElementById('manage-content-label');
+    const textarea = document.getElementById('manage-post-content');
+    
+    if (!typeSelector) return;
+    
+    typeSelector.addEventListener('change', (e) => {
+      const postType = e.target.value;
+      
+      // Update hidden input
+      if (postTypeInput) {
+        postTypeInput.value = postType;
+      }
+      
+      // Show/hide event fields
+      if (eventFields) {
+        if (postType === 'event') {
+          eventFields.style.display = 'block';
+          if (contentLabel) contentLabel.style.display = 'block';
+          
+          // Make event fields required
+          const eventInputs = eventFields.querySelectorAll('.event-input');
+          eventInputs.forEach(input => {
+            if (input.id !== 'manage-event-location' && input.id !== 'manage-max-participants') {
+              input.required = true;
+            }
+          });
+        } else {
+          eventFields.style.display = 'none';
+          if (contentLabel) contentLabel.style.display = 'none';
+          
+          // Remove required from event fields
+          const eventInputs = eventFields.querySelectorAll('.event-input');
+          eventInputs.forEach(input => {
+            input.required = false;
+          });
+        }
+      }
+      
+      // Update placeholder text
+      if (textarea) {
+        const placeholders = {
+          general: "What's happening at your parish?",
+          photo: "Share your photos and moments...",
+          event: "Tell people about this event...",
+          prayer: "Share your prayer request..."
+        };
+        textarea.placeholder = placeholders[postType] || placeholders.general;
+      }
+    });
   }
 
   /**

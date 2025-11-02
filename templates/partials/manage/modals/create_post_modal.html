@@ -10,6 +10,18 @@
     <form id="createPostForm" class="post-creation-form" method="post" action="{% url 'core:create_post' church.slug %}" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="hidden" name="church_id" value="{{ church.id }}">
+      <input type="hidden" id="manage-post-type" name="post_type" value="general">
+      
+      <!-- Post Type Selector -->
+      <div class="form-group">
+        <label for="manage-post-type-selector" class="form-label">Post Type</label>
+        <select id="manage-post-type-selector" class="form-select post-type-select">
+          <option value="general">📝 General Post</option>
+          <option value="photo">📷 Photo Post</option>
+          <option value="event">📅 Event</option>
+          <option value="prayer">🙏 Prayer Request</option>
+        </select>
+      </div>
       
       <!-- Event-Specific Fields -->
       <div id="manage-event-fields" class="event-fields" style="display: none;">
