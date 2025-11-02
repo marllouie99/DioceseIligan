@@ -2633,7 +2633,7 @@ body.page-church-detail {
   color: #374151;
 }
 
-/* Forest Serenity Verification Badge */
+/* Sky Blue Verification Badge */
 .verified-tag {
   display: inline-flex;
   align-items: center;
@@ -2642,27 +2642,27 @@ body.page-church-detail {
   position: relative;
   overflow: hidden;
   
-  /* Beautiful forest green gradient */
+  /* Beautiful sky blue gradient */
   background: linear-gradient(135deg, 
-    rgba(5, 150, 105, 0.15) 0%, 
-    rgba(16, 185, 129, 0.12) 100%);
+    rgba(14, 165, 233, 0.15) 0%, 
+    rgba(56, 189, 248, 0.12) 100%);
   
   /* Enhanced backdrop blur */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   
-  color: white;
+  color: #0ea5e9;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   margin-left: 8px;
   
   /* Beautiful border */
-  border: 1px solid rgba(5, 150, 105, 0.2);
+  border: 1px solid rgba(14, 165, 233, 0.2);
   
   /* Subtle shadow */
   box-shadow: 
-    0 2px 4px rgba(5, 150, 105, 0.15),
+    0 2px 4px rgba(14, 165, 233, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   
   /* Smooth transitions */
@@ -2677,19 +2677,19 @@ body.page-church-detail {
 .verified-tag:hover {
   /* Enhanced gradient on hover with brighter appearance */
   background: linear-gradient(135deg, 
-    rgba(5, 150, 105, 0.25) 0%, 
-    rgba(16, 185, 129, 0.22) 100%);
+    rgba(14, 165, 233, 0.25) 0%, 
+    rgba(56, 189, 248, 0.22) 100%);
   
-  /* Keep white text on hover */
-  color: white;
+  /* Brighter blue text on hover */
+  color: #0284c7;
   
   /* Enhanced border with glow */
-  border-color: rgba(5, 150, 105, 0.4);
+  border-color: rgba(14, 165, 233, 0.4);
   
   /* Multi-layer enhanced shadows with glow */
   box-shadow: 
-    0 6px 16px rgba(5, 150, 105, 0.3),
-    0 0 20px rgba(5, 150, 105, 0.2),
+    0 6px 16px rgba(14, 165, 233, 0.3),
+    0 0 20px rgba(14, 165, 233, 0.2),
     0 2px 8px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   
@@ -2705,18 +2705,18 @@ body.page-church-detail {
 @keyframes verifiedPulse {
   0% {
     box-shadow: 
-      0 2px 4px rgba(5, 150, 105, 0.15),
+      0 2px 4px rgba(14, 165, 233, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   50% {
     box-shadow: 
-      0 2px 8px rgba(5, 150, 105, 0.25),
-      0 0 12px rgba(5, 150, 105, 0.1),
+      0 2px 8px rgba(14, 165, 233, 0.25),
+      0 0 12px rgba(14, 165, 233, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   100% {
     box-shadow: 
-      0 2px 4px rgba(5, 150, 105, 0.15),
+      0 2px 4px rgba(14, 165, 233, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 }
