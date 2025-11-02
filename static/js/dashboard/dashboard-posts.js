@@ -351,7 +351,7 @@ class DashboardPosts {
   }
 
   /**
-   * Share a post
+   * Share a post using Web Share API or clipboard fallback
    * @param {string} postId - The post ID
    */
   async sharePost(postId) {
@@ -367,13 +367,26 @@ class DashboardPosts {
       const data = await response.json();
       
       if (data.success) {
-        // Copy URL to clipboard if possible
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(data.share_url);
-          this.showSuccess('Link copied to clipboard!');
+        // Check if Web Share API is supported (mobile/modern browsers)
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: data.post_title || 'Check out this post',
+              text: data.post_content || 'Interesting post from a parish',
+              url: data.share_url
+            });
+            this.showSuccess('Shared successfully!');
+          } catch (shareError) {
+            // User cancelled the share or error occurred
+            if (shareError.name !== 'AbortError') {
+              console.error('Error sharing:', shareError);
+              // Fallback to clipboard
+              await this.fallbackToClipboard(data.share_url);
+            }
+          }
         } else {
-          // Fallback: show share modal or URL
-          this.showShareModal(data.share_url, data.post_title);
+          // Fallback to clipboard copy for desktop browsers
+          await this.fallbackToClipboard(data.share_url);
         }
       } else {
         this.showError(data.message || 'Failed to share post');
@@ -381,6 +394,25 @@ class DashboardPosts {
     } catch (error) {
       console.error('Error sharing post:', error);
       this.showError('An error occurred. Please try again.');
+    }
+  }
+
+  /**
+   * Fallback to clipboard copy when Web Share API is not available
+   * @param {string} url - URL to copy
+   */
+  async fallbackToClipboard(url) {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        this.showSuccess('Link copied to clipboard!');
+      } else {
+        // Last resort fallback for very old browsers
+        this.showShareModal(url, 'Share this post');
+      }
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      this.showShareModal(url, 'Share this post');
     }
   }
 

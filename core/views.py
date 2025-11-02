@@ -6041,22 +6041,33 @@ def get_post_comments(request, post_id):
 
 @login_required 
 def share_post(request, post_id):
-    """AJAX endpoint to handle post sharing (future implementation for social sharing)."""
+    """AJAX endpoint to handle post sharing via Web Share API or clipboard."""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
     
     try:
         post = get_object_or_404(Post, id=post_id, is_active=True)
         
-        # For now, just return the share URL
-        # In the future, this could track share counts or create notifications
+        # Build share URL
         share_url = request.build_absolute_uri(f'/posts/{post.id}/')
+        
+        # Create descriptive title based on post type
+        if post.post_type == 'event' and post.event_title:
+            post_title = f"{post.event_title} - {post.church.name}"
+        elif post.post_type == 'prayer':
+            post_title = f"Prayer Request from {post.church.name}"
+        else:
+            post_title = f"{post.church.name}'s post"
+        
+        # Get post content preview (first 150 characters)
+        post_content = post.content[:150] + '...' if len(post.content) > 150 else post.content
         
         return JsonResponse({
             'success': True,
             'message': 'Share link generated',
             'share_url': share_url,
-            'post_title': f"{post.church.name}'s post"
+            'post_title': post_title,
+            'post_content': post_content
         })
         
     except Post.DoesNotExist:
