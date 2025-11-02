@@ -6048,8 +6048,9 @@ def share_post(request, post_id):
     try:
         post = get_object_or_404(Post, id=post_id, is_active=True)
         
-        # Build share URL
-        share_url = request.build_absolute_uri(f'/posts/{post.id}/')
+        # Build share URL pointing to church detail page with post anchor
+        church_url = reverse('core:church_detail', kwargs={'slug': post.church.slug})
+        share_url = request.build_absolute_uri(f'{church_url}#post-card-{post.id}')
         
         # Create descriptive title based on post type
         if post.post_type == 'event' and post.event_title:
