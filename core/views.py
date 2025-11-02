@@ -1339,14 +1339,38 @@ def update_church_logo(request):
 
     # Get church_id from POST data
     church_id = request.POST.get('church_id')
+    
+    # Check permission: only parish managers (owners) and ministry leaders (volunteers) can change logo
     try:
         if church_id:
-            church = request.user.owned_churches.get(id=church_id)
+            try:
+                church_id = int(church_id)
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'message': 'Invalid church ID.'}, status=400)
+            
+            # Try to get as owner first
+            try:
+                church = request.user.owned_churches.get(id=church_id)
+            except Church.DoesNotExist:
+                # Check if user is a ministry leader (volunteer with content permission)
+                from .models import ChurchStaff
+                staff_position = ChurchStaff.objects.filter(
+                    user=request.user,
+                    church_id=church_id,
+                    status=ChurchStaff.STATUS_ACTIVE,
+                    role=ChurchStaff.ROLE_VOLUNTEER  # Ministry leaders only
+                ).select_related('church').first()
+                
+                if staff_position:
+                    church = staff_position.church
+                else:
+                    return JsonResponse({'success': False, 'message': "You don't have permission to update this church's logo."}, status=403)
         else:
+            # Fallback to first owned church
             church = request.user.owned_churches.first()
             if not church:
                 return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
-    except Church.DoesNotExist:
+    except Exception as e:
         return JsonResponse({'success': False, 'message': "You don't have permission to update this church."}, status=403)
 
     file_obj = request.FILES.get('logo') or request.FILES.get('file') or request.FILES.get('image')
@@ -1410,20 +1434,39 @@ def update_church_cover(request):
     import logging
     logger = logging.getLogger(__name__)
     
+    # Check permission: only parish managers (owners) and ministry leaders (volunteers) can change cover
     try:
         if church_id:
             try:
                 church_id = int(church_id)
             except (ValueError, TypeError):
                 return JsonResponse({'success': False, 'message': 'Invalid church ID.'}, status=400)
-            church = request.user.owned_churches.get(id=church_id)
-            logger.info(f"update_church_cover: Using church_id={church_id} from POST data")
+            
+            # Try to get as owner first
+            try:
+                church = request.user.owned_churches.get(id=church_id)
+                logger.info(f"update_church_cover: Using church_id={church_id} as owner")
+            except Church.DoesNotExist:
+                # Check if user is a ministry leader (volunteer with content permission)
+                from .models import ChurchStaff
+                staff_position = ChurchStaff.objects.filter(
+                    user=request.user,
+                    church_id=church_id,
+                    status=ChurchStaff.STATUS_ACTIVE,
+                    role=ChurchStaff.ROLE_VOLUNTEER  # Ministry leaders only
+                ).select_related('church').first()
+                
+                if staff_position:
+                    church = staff_position.church
+                    logger.info(f"update_church_cover: Using church_id={church_id} as ministry leader")
+                else:
+                    return JsonResponse({'success': False, 'message': "You don't have permission to update this church's cover."}, status=403)
         else:
             logger.warning(f"update_church_cover: No church_id provided for user {request.user.id}, falling back to first church")
             church = request.user.owned_churches.first()
             if not church:
                 return JsonResponse({'success': False, 'message': "You don't own any church."}, status=400)
-    except Church.DoesNotExist:
+    except Exception as e:
         return JsonResponse({'success': False, 'message': "You don't have permission to update this church."}, status=403)
 
     file_obj = request.FILES.get('cover_image') or request.FILES.get('file') or request.FILES.get('image')
