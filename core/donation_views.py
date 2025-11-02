@@ -81,13 +81,6 @@ def create_donation_order(request, post_id):
                 'message': 'Post not found or donations are not enabled'
             }, status=404)
         
-        # Verify church has PayPal configured
-        if not post.church.paypal_email:
-            return JsonResponse({
-                'success': False,
-                'message': 'This church has not set up their payment method yet'
-            }, status=400)
-        
         # Get form data
         amount = Decimal(request.POST.get('amount', 0))
         message = request.POST.get('message', '').strip()
@@ -111,10 +104,7 @@ def create_donation_order(request, post_id):
                     "currency_code": PAYPAL_CURRENCY,
                     "value": str(amount)
                 },
-                "description": f"Donation to {post.church.name}",
-                "payee": {
-                    "email_address": post.church.paypal_email
-                }
+                "description": f"Donation to {post.church.name}"
             }],
             "application_context": {
                 "brand_name": "ChurchConnect",
