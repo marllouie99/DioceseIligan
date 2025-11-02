@@ -307,11 +307,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear previous button
         const container = document.getElementById('paypal-button-container');
-        container.innerHTML = '';
+        
+        // Show loading state and disable clicks during rendering
+        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #6b7280;"><div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div><p style="margin-top: 10px; font-size: 14px;">Loading payment options...</p></div>';
+        container.style.pointerEvents = 'none';
+        container.style.opacity = '0.6';
         
         // Check if PayPal SDK is loaded
         if (typeof paypal === 'undefined') {
             container.innerHTML = '<p class="error-message" style="display: block;">PayPal is not available. Please refresh the page.</p>';
+            container.style.pointerEvents = 'auto';
+            container.style.opacity = '1';
             return;
         }
         
@@ -378,6 +384,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }).render('#paypal-button-container')
         .then(() => {
+            // Enable interaction after full render
+            container.style.pointerEvents = 'auto';
+            container.style.opacity = '1';
             paypalButtonRendered = true;
             console.log('PayPal button rendered successfully for amount:', amount);
         })
@@ -386,6 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
             paypalButtonRendered = false;
             currentRenderedAmount = null;
             container.innerHTML = '<p class="error-message" style="display: block;">Failed to load PayPal. Please refresh the page.</p>';
+            container.style.pointerEvents = 'auto';
+            container.style.opacity = '1';
         });
     }
     
