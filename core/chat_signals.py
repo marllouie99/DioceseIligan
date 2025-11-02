@@ -21,45 +21,62 @@ def create_message_notification(sender, instance, created, **kwargs):
     conversation = instance.conversation
     
     # Determine who should receive the notification
-    # If sender is the user, notify the church owner (or staff)
-    # If sender is the church owner, notify the user
+    # If sender is the user, notify all church staff with messaging access
+    # If sender is the church owner/staff, notify the user
     if instance.sender == conversation.user:
-        # User sent message to church, notify church owner
-        recipient = conversation.church.owner
+        # User sent message to church, notify all parish staff
+        sender_name = instance.sender.username
+        try:
+            if instance.sender.get_full_name():
+                sender_name = instance.sender.get_full_name()
+            if hasattr(instance.sender, 'profile') and instance.sender.profile:
+                if instance.sender.profile.display_name:
+                    sender_name = instance.sender.profile.display_name
+        except:
+            pass
         
-        # Allow message sending even if church has no owner (message will be stored)
-        # Only create notification if recipient exists
-        if recipient is not None:
-            sender_name = instance.sender.username
-            try:
-                if instance.sender.get_full_name():
-                    sender_name = instance.sender.get_full_name()
-                if hasattr(instance.sender, 'profile') and instance.sender.profile:
-                    if instance.sender.profile.display_name:
-                        sender_name = instance.sender.profile.display_name
-            except:
-                pass
-            
-            # Create notification for church owner (don't notify yourself)
-            if recipient != instance.sender:
-                title = f"New message from {sender_name}"
-                
-                if instance.attachment:
-                    if instance.content:
-                        message = f"{instance.content[:50]}... [Attachment]"
-                    else:
-                        message = f"Sent a file: {instance.attachment_name}"
-                else:
-                    message = instance.content[:100] if len(instance.content) > 100 else instance.content
-                
-                Notification.objects.create(
-                    user=recipient,
-                    title=title,
-                    message=message,
-                    notification_type=Notification.TYPE_MESSAGE_RECEIVED,
-                    priority=Notification.PRIORITY_MEDIUM,
-                    church=conversation.church
-                )
+        title = f"New message from {sender_name}"
+        
+        if instance.attachment:
+            if instance.content:
+                message_text = f"{instance.content[:50]}... [Attachment]"
+            else:
+                message_text = f"Sent a file: {instance.attachment_name}"
+        else:
+            message_text = instance.content[:100] if len(instance.content) > 100 else instance.content
+        
+        # Notify all parish staff with messaging permissions
+        from .notifications import notify_parish_staff
+        from .models import ChurchStaff
+        
+        # Get all staff with messaging permission (secretaries have messaging by default)
+        staff_with_messaging = []
+        
+        # Add church owner if exists
+        if conversation.church.owner and conversation.church.owner != instance.sender:
+            staff_with_messaging.append(conversation.church.owner)
+        
+        # Add secretaries (they have messaging permission)
+        secretaries = ChurchStaff.objects.filter(
+            church=conversation.church,
+            status=ChurchStaff.STATUS_ACTIVE,
+            role=ChurchStaff.ROLE_SECRETARY
+        ).select_related('user')
+        
+        for secretary in secretaries:
+            if secretary.user != instance.sender:
+                staff_with_messaging.append(secretary.user)
+        
+        # Create notification for each staff member
+        for staff_user in staff_with_messaging:
+            Notification.objects.create(
+                user=staff_user,
+                title=title,
+                message=message_text,
+                notification_type=Notification.TYPE_MESSAGE_RECEIVED,
+                priority=Notification.PRIORITY_MEDIUM,
+                church=conversation.church
+            )
     
     elif conversation.church.owner and instance.sender == conversation.church.owner:
         # Church owner sent message to user, notify user
