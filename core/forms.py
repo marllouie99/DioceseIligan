@@ -667,6 +667,21 @@ class BookingForm(forms.ModelForm):
         booking.status = Booking.STATUS_REQUESTED
         if commit:
             booking.save()
+            
+            # Notify all parish staff with 'appointments' permission
+            from .notifications import notify_parish_staff, NotificationTemplates
+            from .models import Notification
+            
+            tmpl = NotificationTemplates.booking_requested(booking)
+            notify_parish_staff(
+                church=booking.church,
+                notification_type=Notification.TYPE_BOOKING_REQUESTED,
+                title=tmpl['title'],
+                message=tmpl['message'],
+                required_permission='appointments',
+                priority=tmpl['priority'],
+                booking=booking
+            )
         return booking
 
 

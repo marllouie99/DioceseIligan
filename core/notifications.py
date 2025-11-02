@@ -94,6 +94,69 @@ def create_church_notification(church_owner, notification_type, title, message,
     )
 
 
+def notify_parish_staff(church, notification_type, title, message, 
+                       required_permission=None, priority=Notification.PRIORITY_MEDIUM,
+                       booking=None):
+    """
+    Notify all parish staff members (owner + active staff with permissions).
+    
+    Args:
+        church: Church instance
+        notification_type: Type of notification
+        title: Notification title
+        message: Notification message
+        required_permission: Permission required to receive notification (e.g., 'appointments', 'content')
+        priority: Priority level
+        booking: Related booking instance (optional)
+    
+    Returns:
+        List of created notifications
+    """
+    from .models import ChurchStaff
+    
+    notifications = []
+    
+    # Always notify church owner
+    owner_notification = create_notification(
+        user=church.owner,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        priority=priority,
+        church=church,
+        booking=booking
+    )
+    if owner_notification:
+        notifications.append(owner_notification)
+    
+    # Notify active staff members with the required permission
+    staff_query = ChurchStaff.objects.filter(
+        church=church,
+        status=ChurchStaff.STATUS_ACTIVE
+    ).select_related('user')
+    
+    for staff in staff_query:
+        # Check if staff has the required permission
+        if required_permission:
+            if not staff.has_permission(required_permission):
+                continue
+        
+        # Create notification for staff member
+        staff_notification = create_notification(
+            user=staff.user,
+            notification_type=notification_type,
+            title=title,
+            message=message,
+            priority=priority,
+            church=church,
+            booking=booking
+        )
+        if staff_notification:
+            notifications.append(staff_notification)
+    
+    return notifications
+
+
 def get_user_unread_count(user):
     """
     Get the count of unread notifications for a user.
