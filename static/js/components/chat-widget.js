@@ -458,7 +458,7 @@ class ChatWidget {
           </div>
           <div class="chat-message-content">
             ${!isSent && rankBadgeHtml ? `<div class="chat-message-sender">${msg.sender_name} ${rankBadgeHtml}</div>` : ''}
-            ${msg.content ? `<div class="chat-message-bubble">${this.escapeHtml(msg.content)}</div>` : ''}
+            ${msg.content ? `<div class="chat-message-bubble">${this.linkifyText(msg.content)}</div>` : ''}
             ${attachmentHtml}
             <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
               <span class="chat-message-time">${this.formatMessageTime(msg.created_at)}</span>
@@ -795,6 +795,26 @@ class ChatWidget {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  linkifyText(text) {
+    // First escape HTML to prevent XSS
+    const escaped = this.escapeHtml(text);
+    
+    // URL regex pattern - matches http(s), www, and common TLDs
+    const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9.-]+\.(com|org|net|edu|gov|io|co|app|dev|tech|info|biz|me|us|uk|ca|au)[^\s]*)/gi;
+    
+    // Replace URLs with clickable links
+    return escaped.replace(urlPattern, (url) => {
+      // Add protocol if missing
+      let href = url;
+      if (!url.match(/^https?:\/\//i)) {
+        href = 'http://' + url;
+      }
+      
+      // Create clickable link with target="_blank" to open in new tab
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>`;
+    });
   }
 
   formatTime(timestamp) {

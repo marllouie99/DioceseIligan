@@ -506,6 +506,42 @@
   border-bottom-left-radius: 4px;
 }
 
+/* Chat Links */
+.chat-link {
+  color: inherit;
+  text-decoration: underline;
+  word-break: break-all;
+  transition: opacity 0.2s ease;
+}
+
+.chat-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Links in sent messages (white on brown) */
+.chat-message.sent .chat-link {
+  color: #ffffff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.6);
+}
+
+.chat-message.sent .chat-link:hover {
+  text-decoration-color: rgba(255, 255, 255, 1);
+}
+
+/* Links in received messages (blue on white) */
+.chat-message.received .chat-link {
+  color: #0ea5e9;
+  text-decoration: underline;
+  text-decoration-color: rgba(14, 165, 233, 0.4);
+}
+
+.chat-message.received .chat-link:hover {
+  color: #0284c7;
+  text-decoration-color: rgba(14, 165, 233, 0.8);
+}
+
 .chat-message-time {
   font-size: 11px;
   color: #9ca3af;
