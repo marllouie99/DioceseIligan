@@ -118,6 +118,8 @@ def create_donation_order(request, post_id):
             }],
             "application_context": {
                 "brand_name": "ChurchConnect",
+                "landing_page": "NO_PREFERENCE",
+                "user_action": "PAY_NOW",
                 "shipping_preference": "NO_SHIPPING",
                 "return_url": f"{SITE_URL}/app/donations/success/{post_id}/",
                 "cancel_url": f"{SITE_URL}/app/post/{post_id}/"
