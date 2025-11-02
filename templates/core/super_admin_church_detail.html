@@ -643,8 +643,8 @@
         Parish Administrators ({{ staff_members.count }})
       </h2>
       
-      {% if staff_members %}
-        <!-- Parish Manager Section -->
+      <!-- Parish Manager Section -->
+      {% if church.owner %}
         <div style="margin-bottom: 2rem;">
           <h3 style="font-size: 1.125rem; font-weight: 600; color: #1A3A52; margin: 0 0 1rem 0; padding: 0.75rem; background: rgba(30, 144, 255, 0.05); border-radius: 8px;">
             Parish Manager
@@ -670,8 +670,25 @@
             </div>
           </div>
         </div>
+      {% else %}
+        <div style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.125rem; font-weight: 600; color: #1A3A52; margin: 0 0 1rem 0; padding: 0.75rem; background: rgba(30, 144, 255, 0.05); border-radius: 8px;">
+            Parish Manager
+          </h3>
+          <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1.5rem; text-align: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p style="color: #856404; font-weight: 600; margin: 0 0 0.5rem 0;">No Parish Manager Assigned</p>
+            <p style="color: #856404; font-size: 0.875rem; margin: 0;">This church currently has no primary manager. Please assign one in the edit page.</p>
+          </div>
+        </div>
+      {% endif %}
 
-        <!-- Staff Members Section -->
+      <!-- Staff Members Section -->
+      {% if staff_members %}
         {% with secretaries=staff_members|dictsort:"role" %}
           {% regroup secretaries by role as staff_by_role %}
           {% for role in staff_by_role %}
