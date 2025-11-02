@@ -149,8 +149,70 @@
     </div>
     {% endif %}
     
-    {% if post.image %}
-      <img src="{{ post.image.url }}" alt="Post image" class="post-image" loading="lazy" decoding="async" width="800" height="420">
+    {# Display multiple images in Facebook-style grid or single image #}
+    {% if post.images.all %}
+      {% with image_count=post.images.all|length images_list=post.images.all %}
+        <div class="post-images-grid" data-image-count="{{ image_count }}" data-all-images="{% for img in images_list %}{{ img.image.url }}{% if not forloop.last %}|||{% endif %}{% endfor %}">
+          {% if image_count == 1 %}
+            {# Single image - full width #}
+            <div class="post-image-single">
+              <img src="{{ post.images.first.image.url }}" alt="Post image" loading="lazy" decoding="async">
+            </div>
+          {% elif image_count == 2 %}
+            {# Two images - side by side #}
+            {% for img in images_list %}
+              <div class="post-image-half">
+                <img src="{{ img.image.url }}" alt="Post image" loading="lazy" decoding="async">
+              </div>
+            {% endfor %}
+          {% elif image_count == 3 %}
+            {# Three images - one large left, two stacked right #}
+            <div class="post-image-large">
+              <img src="{{ images_list.0.image.url }}" alt="Post image" loading="lazy" decoding="async">
+            </div>
+            <div class="post-image-small-group">
+              <div class="post-image-small">
+                <img src="{{ images_list.1.image.url }}" alt="Post image" loading="lazy" decoding="async">
+              </div>
+              <div class="post-image-small">
+                <img src="{{ images_list.2.image.url }}" alt="Post image" loading="lazy" decoding="async">
+              </div>
+            </div>
+          {% elif image_count == 4 %}
+            {# Four images - 2x2 grid #}
+            {% for img in images_list %}
+              <div class="post-image-quarter">
+                <img src="{{ img.image.url }}" alt="Post image" loading="lazy" decoding="async">
+              </div>
+            {% endfor %}
+          {% else %}
+            {# Five or more images - 2 large on top, 3+ small below with +X overlay on last #}
+            <div class="post-image-half">
+              <img src="{{ images_list.0.image.url }}" alt="Post image" loading="lazy" decoding="async">
+            </div>
+            <div class="post-image-half">
+              <img src="{{ images_list.1.image.url }}" alt="Post image" loading="lazy" decoding="async">
+            </div>
+            {% for img in images_list|slice:"2:5" %}
+              <div class="post-image-third {% if forloop.last and image_count > 5 %}has-overlay{% endif %}">
+                <img src="{{ img.image.url }}" alt="Post image" loading="lazy" decoding="async">
+                {% if forloop.last and image_count > 5 %}
+                  <div class="image-count-overlay">
+                    <span>+{{ image_count|add:"-5" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endwith %}
+    {% elif post.image %}
+      {# Legacy single image support #}
+      <div class="post-images-grid" data-image-count="1">
+        <div class="post-image-single">
+          <img src="{{ post.image.url }}" alt="Post image" class="post-image" loading="lazy" decoding="async" width="800" height="420">
+        </div>
+      </div>
     {% endif %}
     
     {% if post.enable_donation %}

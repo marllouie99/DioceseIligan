@@ -5348,6 +5348,34 @@ def create_post(request, church_slug):
                 post.church = church
                 post.save()
                 
+                # Handle multiple images
+                images = request.FILES.getlist('images')
+                if images:
+                    from .models import PostImage
+                    for index, image_file in enumerate(images):
+                        # Validate each image
+                        if image_file.size > 10 * 1024 * 1024:  # 10MB limit per image
+                            continue  # Skip large images
+                        
+                        # Create PostImage record
+                        PostImage.objects.create(
+                            post=post,
+                            image=image_file,
+                            order=index
+                        )
+                
+                # Log activity if staff member
+                log_staff_activity(
+                    user=request.user,
+                    church=church,
+                    action='create',
+                    category='post',
+                    description=f'Created {post.get_post_type_display()}: {post.content[:50]}...',
+                    target_id=post.id,
+                    target_type='post',
+                    request=request
+                )
+                
                 # Return JSON for AJAX requests
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({
@@ -5358,6 +5386,7 @@ def create_post(request, church_slug):
                             'content': post.content,
                             'post_type': post.post_type,
                             'image_url': post.image.url if post.image else None,
+                            'images_count': post.images.count(),
                             'created_at': post.created_at.strftime('%B %d, %Y at %I:%M %p')
                         }
                     })
@@ -8626,7 +8655,8 @@ def dashboard_create_post(request):
         # Get form data
         church_id = request.POST.get('church_id')
         content = request.POST.get('content', '').strip()
-        image = request.FILES.get('image')
+        image = request.FILES.get('image')  # Legacy single image
+        images = request.FILES.getlist('images')  # Multiple images
         post_type = request.POST.get('post_type', 'general')
         
         # Get event-specific fields
@@ -8710,6 +8740,21 @@ def dashboard_create_post(request):
                 pass
         
         post = Post.objects.create(**post_data)
+        
+        # Handle multiple images
+        if images:
+            from .models import PostImage
+            for index, image_file in enumerate(images):
+                # Validate each image
+                if image_file.size > 10 * 1024 * 1024:  # 10MB limit per image
+                    continue  # Skip large images
+                
+                # Create PostImage record
+                PostImage.objects.create(
+                    post=post,
+                    image=image_file,
+                    order=index
+                )
         
         # Log staff activity for post creation
         from .models import StaffActivityLog
@@ -9291,6 +9336,15 @@ def get_post_analytics(request, post_id):
                 }
             }
         
+        # Get multiple images
+        post_images = []
+        for img in post.images.all().order_by('order', 'created_at'):
+            post_images.append({
+                'id': img.id,
+                'image_url': img.image.url,
+                'order': img.order
+            })
+        
         return JsonResponse({
             'success': True,
             'analytics': {
@@ -9300,8 +9354,9 @@ def get_post_analytics(request, post_id):
                 'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
                 'updated_at': post.updated_at.strftime('%Y-%m-%d %H:%M'),
                 'content': post.content[:200],  # First 200 chars
-                'image_url': post.image.url if post.image else None,
-                'has_image': bool(post.image),
+                'image_url': post.image.url if post.image else None,  # Legacy single image
+                'has_image': bool(post.image),  # Legacy single image check
+                'images': post_images,  # Multiple images
                 'status': 'published' if post.is_active else 'inactive',
                 'stats': {
                     'views': views_count,

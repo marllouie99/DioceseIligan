@@ -52,21 +52,21 @@
         </div>
       </div>
       
-      <!-- Image Upload -->
+      <!-- Multiple Image Upload -->
       <div class="form-group" id="church-image-upload-section" style="display: none;">
         <div class="image-upload-area">
-          <input type="file" id="church-post-image" name="image" accept="image/*" class="file-input">
-          <label for="church-post-image" class="file-upload-label">
+          <input type="file" id="church-post-images" name="images" accept="image/*" multiple class="file-input">
+          <label for="church-post-images" class="file-upload-label">
             <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
               <path d="M21 15l-5-5L5 21"/>
             </svg>
-            <span class="upload-text">Click to add photo</span>
+            <span class="upload-text">Click to add photos (up to 10)</span>
+            <span class="upload-hint">You can select multiple images</span>
           </label>
-          <div id="church-image-preview" class="image-preview" style="display: none;">
-            <img id="church-preview-img" src="" alt="Preview">
-            <button type="button" id="church-remove-image" class="remove-image-btn">&times;</button>
+          <div id="church-images-preview" class="images-preview-container" style="display: none;">
+            <!-- Image previews will be added here dynamically -->
           </div>
         </div>
       </div>

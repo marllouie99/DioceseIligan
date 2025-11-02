@@ -908,6 +908,55 @@ class Post(models.Model):
         }
 
 
+class PostImage(models.Model):
+    """Model for storing multiple images per post."""
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='posts/images/', help_text="Post image")
+    order = models.PositiveIntegerField(default=0, help_text="Display order of images")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+    
+    def __str__(self):
+        return f"Image {self.order} for {self.post.church.name}'s post"
+    
+    def save(self, *args, **kwargs):
+        """Override save to optimize post images before saving."""
+        # Optimize image if present (max 1080px width x 1350px height, similar to Facebook feed)
+        if self.image:
+            # Check if this is a new upload (image has changed)
+            if self.pk:
+                try:
+                    old_instance = PostImage.objects.get(pk=self.pk)
+                    # Only optimize if the image has changed
+                    if old_instance.image != self.image:
+                        self.image = optimize_image(
+                            self.image,
+                            max_size=(1080, 1350),
+                            quality=85,
+                            format='JPEG'
+                        )
+                except PostImage.DoesNotExist:
+                    # New image, optimize it
+                    self.image = optimize_image(
+                        self.image,
+                        max_size=(1080, 1350),
+                        quality=85,
+                        format='JPEG'
+                    )
+            else:
+                # New image (no pk yet), optimize it
+                self.image = optimize_image(
+                    self.image,
+                    max_size=(1080, 1350),
+                    quality=85,
+                    format='JPEG'
+                )
+        
+        super().save(*args, **kwargs)
+
+
 class PostLike(models.Model):
     """Model for post likes."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_likes')

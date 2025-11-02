@@ -243,11 +243,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const textArea = document.getElementById('church-post-content');
     const charCount = document.getElementById('church-char-count');
     const submitBtn = form.querySelector('.post-submit-btn');
-    const fileInput = document.getElementById('church-post-image');
-    const imagePreview = document.getElementById('church-image-preview');
-    const previewImg = document.getElementById('church-preview-img');
-    const removeImageBtn = document.getElementById('church-remove-image');
+    const fileInput = document.getElementById('church-post-images');
+    const imagesPreviewContainer = document.getElementById('church-images-preview');
     const messageDiv = document.getElementById('church-post-creation-message');
+    let selectedFiles = [];
     const imageUploadSection = document.getElementById('church-image-upload-section');
     const eventFields = document.getElementById('church-event-fields');
     const contentLabel = document.getElementById('church-content-label');
@@ -330,8 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset form
         form.reset();
         charCount.textContent = '0';
-        imagePreview.style.display = 'none';
-        previewImg.src = '';
         charCount.style.color = 'inherit';
         submitBtn.disabled = true;
         imageUploadSection.style.display = 'none';
@@ -339,6 +336,11 @@ document.addEventListener('DOMContentLoaded', function() {
         contentLabel.style.display = 'none';
         donationFields.style.display = 'none';
         donationToggle.checked = false;
+        // Reset images
+        selectedFiles = [];
+        updateImagesPreview();
+        const uploadText = document.querySelector('.upload-text');
+        if (uploadText) uploadText.textContent = 'Click to add photos (up to 10)';
     }
     
     function updatePlaceholderForType(postType) {
@@ -402,32 +404,93 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Image preview
+    // Multiple Images handling
     fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            // Check file size (10MB limit)
+        const files = Array.from(this.files);
+        const maxImages = 10;
+        
+        // Check total count
+        if (selectedFiles.length + files.length > maxImages) {
+            showMessage(`You can only upload up to ${maxImages} images.`, 'error');
+            this.value = '';
+            return;
+        }
+        
+        // Validate each file
+        const validFiles = [];
+        for (const file of files) {
+            // Check file size (10MB per image)
             if (file.size > 10 * 1024 * 1024) {
-                showMessage('Image size must be less than 10MB.', 'error');
-                this.value = '';
-                return;
+                showMessage(`${file.name} is too large. Maximum size is 10MB per image.`, 'error');
+                continue;
             }
             
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                imagePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                showMessage(`${file.name} is not an image file.`, 'error');
+                continue;
+            }
+            
+            validFiles.push(file);
         }
+        
+        // Add valid files to selected files
+        selectedFiles = selectedFiles.concat(validFiles);
+        
+        // Update preview
+        updateImagesPreview();
+        
+        // Clear input
+        this.value = '';
     });
     
-    // Remove image
-    removeImageBtn.addEventListener('click', function() {
-        fileInput.value = '';
-        imagePreview.style.display = 'none';
-        previewImg.src = '';
-    });
+    function updateImagesPreview() {
+        if (selectedFiles.length === 0) {
+            imagesPreviewContainer.style.display = 'none';
+            imagesPreviewContainer.innerHTML = '';
+            document.querySelector('.file-upload-label').classList.remove('has-images');
+            return;
+        }
+        
+        imagesPreviewContainer.innerHTML = '';
+        imagesPreviewContainer.style.display = 'grid';
+        document.querySelector('.file-upload-label').classList.add('has-images');
+        
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}">
+                    <button type="button" class="remove-btn" data-index="${index}">&times;</button>
+                    <div class="image-order">${index + 1}</div>
+                `;
+                imagesPreviewContainer.appendChild(previewItem);
+                
+                // Add remove handler
+                previewItem.querySelector('.remove-btn').addEventListener('click', function() {
+                    removeImage(parseInt(this.getAttribute('data-index')));
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Update upload label text
+        const uploadText = document.querySelector('.upload-text');
+        uploadText.textContent = `${selectedFiles.length} image${selectedFiles.length > 1 ? 's' : ''} selected - Add more (${10 - selectedFiles.length} remaining)`;
+    }
+    
+    function removeImage(index) {
+        selectedFiles.splice(index, 1);
+        updateImagesPreview();
+        
+        // Reset upload text if no images
+        if (selectedFiles.length === 0) {
+            const uploadText = document.querySelector('.upload-text');
+            uploadText.textContent = 'Click to add photos (up to 10)';
+        }
+    }
     
     // Donation toggle
     const donationToggle = document.getElementById('church-enable-donation');
@@ -485,6 +548,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add post type to form data
         formData.append('post_type', currentPostType);
+        
+        // Add multiple images to form data
+        selectedFiles.forEach((file, index) => {
+            formData.append('images', file);
+        });
         
         // Add event fields if it's an event post
         if (currentPostType === 'event') {

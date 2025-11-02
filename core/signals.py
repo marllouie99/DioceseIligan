@@ -36,16 +36,19 @@ def create_booking_notifications(sender, instance, created, **kwargs):
     if created:
         # New booking request - notify church owner only
         church_owner = instance.church.owner
-        template = NotificationTemplates.booking_requested(instance)
+        
+        # Only create notification if church has an owner
+        if church_owner:
+            template = NotificationTemplates.booking_requested(instance)
 
-        create_church_notification(
-            church_owner=church_owner,
-            notification_type=Notification.TYPE_BOOKING_REQUESTED,
-            title=template['title'],
-            message=template['message'],
-            priority=template['priority'],
-            church=instance.church
-        )
+            create_church_notification(
+                church_owner=church_owner,
+                notification_type=Notification.TYPE_BOOKING_REQUESTED,
+                title=template['title'],
+                message=template['message'],
+                priority=template['priority'],
+                church=instance.church
+            )
     
     else:
         # Booking status changed - notify user

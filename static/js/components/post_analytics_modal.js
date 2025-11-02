@@ -102,14 +102,96 @@ function populateAnalyticsModal(analytics) {
     // Update post content
     document.getElementById('analyticsPostContent').textContent = analytics.content;
     
-    // Update post image (if exists)
-    if (analytics.has_image && analytics.image_url) {
-        const imageSection = document.getElementById('postImageSection');
-        const imageElement = document.getElementById('analyticsPostImage');
-        imageElement.src = analytics.image_url;
+    // Update post images (single or multiple)
+    const imageSection = document.getElementById('postImageSection');
+    const imagesContainer = document.getElementById('analyticsPostImagesContainer');
+    const imageTitle = document.getElementById('postImageTitle');
+    
+    // Check for multiple images first, then fall back to single image
+    if (analytics.images && analytics.images.length > 0) {
+        // Multiple images
+        imagesContainer.innerHTML = '';
+        imagesContainer.setAttribute('data-image-count', analytics.images.length);
+        
+        // Update title
+        imageTitle.textContent = analytics.images.length === 1 ? 'Post Image' : 'Post Images';
+        
+        // Render images based on count (using same logic as post_card.html)
+        if (analytics.images.length === 1) {
+            // Single image - full width
+            imagesContainer.innerHTML = `
+                <div class="post-image-single">
+                    <img src="${analytics.images[0].image_url}" alt="Post image" loading="lazy" decoding="async">
+                </div>
+            `;
+        } else if (analytics.images.length === 2) {
+            // Two images - side by side
+            analytics.images.forEach(img => {
+                imagesContainer.innerHTML += `
+                    <div class="post-image-half">
+                        <img src="${img.image_url}" alt="Post image" loading="lazy" decoding="async">
+                    </div>
+                `;
+            });
+        } else if (analytics.images.length === 3) {
+            // Three images - one large left, two stacked right
+            imagesContainer.innerHTML = `
+                <div class="post-image-large">
+                    <img src="${analytics.images[0].image_url}" alt="Post image" loading="lazy" decoding="async">
+                </div>
+                <div class="post-image-small-group">
+                    <div class="post-image-small">
+                        <img src="${analytics.images[1].image_url}" alt="Post image" loading="lazy" decoding="async">
+                    </div>
+                    <div class="post-image-small">
+                        <img src="${analytics.images[2].image_url}" alt="Post image" loading="lazy" decoding="async">
+                    </div>
+                </div>
+            `;
+        } else if (analytics.images.length === 4) {
+            // Four images - 2x2 grid
+            analytics.images.forEach(img => {
+                imagesContainer.innerHTML += `
+                    <div class="post-image-quarter">
+                        <img src="${img.image_url}" alt="Post image" loading="lazy" decoding="async">
+                    </div>
+                `;
+            });
+        } else {
+            // Five or more images - 2 large on top, 3+ small below with +X overlay
+            imagesContainer.innerHTML = `
+                <div class="post-image-half">
+                    <img src="${analytics.images[0].image_url}" alt="Post image" loading="lazy" decoding="async">
+                </div>
+                <div class="post-image-half">
+                    <img src="${analytics.images[1].image_url}" alt="Post image" loading="lazy" decoding="async">
+                </div>
+            `;
+            
+            for (let i = 2; i < Math.min(5, analytics.images.length); i++) {
+                const isLast = i === 4 && analytics.images.length > 5;
+                imagesContainer.innerHTML += `
+                    <div class="post-image-third ${isLast ? 'has-overlay' : ''}">
+                        <img src="${analytics.images[i].image_url}" alt="Post image" loading="lazy" decoding="async">
+                        ${isLast ? `<div class="image-count-overlay"><span>+${analytics.images.length - 5}</span></div>` : ''}
+                    </div>
+                `;
+            }
+        }
+        
+        imageSection.style.display = 'block';
+    } else if (analytics.has_image && analytics.image_url) {
+        // Legacy single image support
+        imagesContainer.innerHTML = `
+            <div class="post-image-single">
+                <img src="${analytics.image_url}" alt="Post image" loading="lazy" decoding="async">
+            </div>
+        `;
+        imagesContainer.setAttribute('data-image-count', '1');
+        imageTitle.textContent = 'Post Image';
         imageSection.style.display = 'block';
     } else {
-        document.getElementById('postImageSection').style.display = 'none';
+        imageSection.style.display = 'none';
     }
     
     // Update stats cards

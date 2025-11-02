@@ -1,0 +1,298 @@
+/* Post Images Grid - Facebook Style */
+
+.post-images-grid {
+  margin: 12px 0 8px;
+  display: grid;
+  gap: 2px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Single Image Layout */
+.post-images-grid[data-image-count="1"] {
+  grid-template-columns: 1fr;
+}
+
+.post-image-single {
+  position: relative;
+  width: 100%;
+  max-height: 600px;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-image-single img {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+}
+
+/* Two Images Layout - Side by Side */
+.post-images-grid[data-image-count="2"] {
+  grid-template-columns: repeat(2, 1fr);
+  max-height: 400px;
+}
+
+.post-image-half {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  background: #000;
+}
+
+.post-image-half img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-image-half:hover img {
+  transform: scale(1.05);
+}
+
+/* Three Images Layout - 1 Large + 2 Small */
+.post-images-grid[data-image-count="3"] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 200px);
+  max-height: 400px;
+}
+
+.post-image-large {
+  position: relative;
+  grid-row: span 2;
+  overflow: hidden;
+  background: #000;
+}
+
+.post-image-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-image-large:hover img {
+  transform: scale(1.05);
+}
+
+.post-image-small-group {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
+}
+
+.post-image-small {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.post-image-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-image-small:hover img {
+  transform: scale(1.05);
+}
+
+/* Four Images Layout - 2x2 Grid */
+.post-images-grid[data-image-count="4"] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 200px);
+  max-height: 400px;
+}
+
+.post-image-quarter {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.post-image-quarter img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-image-quarter:hover img {
+  transform: scale(1.05);
+}
+
+/* Five or More Images Layout */
+.post-images-grid[data-image-count="5"],
+.post-images-grid[data-image-count="6"],
+.post-images-grid[data-image-count="7"],
+.post-images-grid[data-image-count="8"],
+.post-images-grid[data-image-count="9"],
+.post-images-grid[data-image-count="10"] {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 180px);
+  max-height: 360px;
+}
+
+/* First two images span full width */
+.post-images-grid[data-image-count="5"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="5"] .post-image-half:nth-child(2),
+.post-images-grid[data-image-count="6"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="6"] .post-image-half:nth-child(2),
+.post-images-grid[data-image-count="7"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="7"] .post-image-half:nth-child(2),
+.post-images-grid[data-image-count="8"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="8"] .post-image-half:nth-child(2),
+.post-images-grid[data-image-count="9"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="9"] .post-image-half:nth-child(2),
+.post-images-grid[data-image-count="10"] .post-image-half:nth-child(1),
+.post-images-grid[data-image-count="10"] .post-image-half:nth-child(2) {
+  grid-column: span 1;
+}
+
+.post-image-third {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  height: 180px;
+}
+
+.post-image-third img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-image-third:hover img {
+  transform: scale(1.05);
+}
+
+/* Overlay for +X more images */
+.post-image-third.has-overlay {
+  position: relative;
+}
+
+.image-count-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.image-count-overlay:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.image-count-overlay span {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Effects for All Images */
+.post-images-grid img {
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  /* Two images - stack on mobile */
+  .post-images-grid[data-image-count="2"] {
+    grid-template-columns: 1fr;
+    max-height: 600px;
+  }
+  
+  .post-image-half {
+    height: 300px;
+  }
+  
+  /* Three images - adjust layout */
+  .post-images-grid[data-image-count="3"] {
+    grid-template-rows: repeat(2, 180px);
+    max-height: 360px;
+  }
+  
+  /* Four images - keep 2x2 but smaller */
+  .post-images-grid[data-image-count="4"] {
+    grid-template-rows: repeat(2, 150px);
+    max-height: 300px;
+  }
+  
+  .post-image-quarter {
+    height: 150px;
+  }
+  
+  /* Five or more - smaller grid */
+  .post-images-grid[data-image-count="5"],
+  .post-images-grid[data-image-count="6"],
+  .post-images-grid[data-image-count="7"],
+  .post-images-grid[data-image-count="8"],
+  .post-images-grid[data-image-count="9"],
+  .post-images-grid[data-image-count="10"] {
+    grid-template-rows: repeat(2, 150px);
+    max-height: 300px;
+  }
+  
+  .post-image-third,
+  .post-image-half {
+    height: 150px;
+  }
+  
+  .image-count-overlay span {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-image-single {
+    max-height: 400px;
+  }
+  
+  .post-image-single img {
+    max-height: 400px;
+  }
+}
+
+/* Loading state */
+.post-images-grid.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Animation on load */
+.post-images-grid img {
+  animation: fadeInImage 0.3s ease-out;
+}
+
+@keyframes fadeInImage {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

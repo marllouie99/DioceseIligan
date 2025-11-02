@@ -23,8 +23,15 @@ def create_notification(user, notification_type, title, message, priority=Notifi
         church: Related church instance (optional)
     
     Returns:
-        Notification instance
+        Notification instance or None if user is None
     """
+    # Defensive check: do not create notification if user is None
+    if user is None:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f'Attempted to create notification with None user: {notification_type} - {title}')
+        return None
+    
     return Notification.objects.create(
         user=user,
         notification_type=notification_type,

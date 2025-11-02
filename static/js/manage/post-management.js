@@ -7,6 +7,7 @@ class PostManagement {
   constructor() {
     this.isInitialized = false;
     this.isSubmitting = false;
+    this.selectedFiles = [];
   }
 
   /**
@@ -18,12 +19,14 @@ class PostManagement {
       return;
     }
 
+    console.log('🚀 Initializing PostManagement...');
     this.setupCreatePostModal();
     this.setupEditPostModal();
     this.setupCharacterCounter();
     this.setupImagePreview();
     this.setupEditImagePreview();
     this.isInitialized = true;
+    console.log('✅ PostManagement initialized successfully');
   }
 
   /**
@@ -167,9 +170,12 @@ class PostManagement {
    * Setup image preview functionality
    */
   setupImagePreview() {
-    const imageInput = document.getElementById('post-image');
+    const imageInput = document.getElementById('post-images');
     if (imageInput) {
       imageInput.addEventListener('change', (e) => this.handleImageSelect(e));
+      console.log('✅ Dashboard multi-image upload initialized');
+    } else {
+      console.warn('⚠️ Image input #post-images not found');
     }
   }
 
@@ -204,60 +210,126 @@ class PostManagement {
   }
 
   /**
-   * Handle image selection and preview
+   * Handle multiple image selection and preview
    */
   handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file.');
-        event.target.value = '';
-        return;
-      }
-
-      // Validate file size (max 10MB)
+    const files = Array.from(event.target.files);
+    const maxImages = 10;
+    
+    console.log(`📷 Dashboard: Selected ${files.length} file(s)`);
+    
+    // Check total count
+    if (this.selectedFiles.length + files.length > maxImages) {
+      alert(`You can only upload up to ${maxImages} images.`);
+      event.target.value = '';
+      return;
+    }
+    
+    // Validate each file
+    const validFiles = [];
+    for (const file of files) {
+      // Check file size (10MB per image)
       if (file.size > 10 * 1024 * 1024) {
-        alert('Image size must be less than 10MB.');
-        event.target.value = '';
-        return;
+        alert(`${file.name} is too large. Maximum size is 10MB per image.`);
+        continue;
       }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} is not an image file.`);
+        continue;
+      }
+      
+      validFiles.push(file);
+    }
+    
+    console.log(`✅ Dashboard: ${validFiles.length} valid file(s), total: ${this.selectedFiles.length + validFiles.length}`);
+    
+    // Add valid files to selected files
+    this.selectedFiles = this.selectedFiles.concat(validFiles);
+    
+    // Update preview
+    this.updateDashboardImagesPreview();
+    
+    // Clear input
+    event.target.value = '';
+  }
 
-      // Show preview
+  /**
+   * Update images preview for dashboard
+   */
+  updateDashboardImagesPreview() {
+    const container = document.getElementById('dashboard-images-preview');
+    const photoLabel = document.getElementById('dashboard-photo-label');
+    
+    console.log(`🖼️ Dashboard: Updating preview for ${this.selectedFiles.length} image(s)`);
+    
+    if (!container) {
+      console.error('❌ Dashboard: #dashboard-images-preview container not found!');
+      return;
+    }
+    
+    if (this.selectedFiles.length === 0) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      if (photoLabel) photoLabel.textContent = 'Photo/Video';
+      console.log('🔄 Dashboard: Preview hidden (no images)');
+      return;
+    }
+    
+    container.innerHTML = '';
+    container.style.display = 'grid';
+    console.log(`✅ Dashboard: Container set to grid display`);
+    
+    this.selectedFiles.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.showImagePreview(e.target.result);
+        const previewItem = document.createElement('div');
+        previewItem.className = 'image-preview-item';
+        previewItem.innerHTML = `
+          <img src="${e.target.result}" alt="Preview ${index + 1}">
+          <button type="button" class="remove-btn" data-index="${index}">&times;</button>
+          <div class="image-order">${index + 1}</div>
+        `;
+        container.appendChild(previewItem);
+        console.log(`📸 Dashboard: Added preview for image ${index + 1}`);
+        
+        // Add remove handler
+        previewItem.querySelector('.remove-btn').addEventListener('click', () => {
+          this.removeDashboardImage(index);
+        });
       };
       reader.readAsDataURL(file);
+    });
+    
+    // Update photo label
+    if (photoLabel) {
+      photoLabel.textContent = `${this.selectedFiles.length} image${this.selectedFiles.length > 1 ? 's' : ''} selected`;
+      console.log(`🏷️ Dashboard: Updated label to "${photoLabel.textContent}"`);
     }
   }
 
   /**
-   * Show image preview
+   * Remove image from dashboard selection
    */
-  showImagePreview(imageSrc) {
-    const preview = document.getElementById('imagePreview');
-    const previewImg = document.getElementById('previewImg');
-    
-    if (preview && previewImg) {
-      previewImg.src = imageSrc;
-      preview.style.display = 'block';
-    }
+  removeDashboardImage(index) {
+    this.selectedFiles.splice(index, 1);
+    this.updateDashboardImagesPreview();
   }
 
   /**
    * Hide image preview
    */
   hideImagePreview() {
-    const preview = document.getElementById('imagePreview');
-    const imageInput = document.getElementById('post-image');
-    
-    if (preview) {
-      preview.style.display = 'none';
-    }
-    if (imageInput) {
-      imageInput.value = '';
-    }
+    this.selectedFiles = [];
+    this.updateDashboardImagesPreview();
+  }
+
+  /**
+   * Remove image preview (alias for backward compatibility)
+   */
+  removeImagePreview() {
+    this.hideImagePreview();
   }
 
   /**
@@ -286,6 +358,14 @@ class PostManagement {
 
       // Submit form
       const formData = new FormData(form);
+      
+      // Add multiple images to form data
+      if (this.selectedFiles && this.selectedFiles.length > 0) {
+        this.selectedFiles.forEach((file) => {
+          formData.append('images', file);
+        });
+      }
+      
       const response = await fetch(form.action, {
         method: 'POST',
         body: formData

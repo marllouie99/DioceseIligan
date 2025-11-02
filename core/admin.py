@@ -10,6 +10,7 @@ from .models import (
     DeclineReason,
     Booking,
     Post,
+    PostImage,
     PostLike,
     PostBookmark,
     PostComment,
@@ -200,13 +201,19 @@ class DonationInline(admin.TabularInline):
         return super().get_queryset(request).select_related('donor')
 
 
+class PostImageInline(admin.TabularInline):
+    model = PostImage
+    extra = 1
+    fields = ('image', 'order')
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('church', 'short_content', 'enable_donation', 'total_donations', 'is_active', 'created_at')
     list_filter = ('is_active', 'enable_donation', 'church', 'created_at')
     search_fields = ('church__name', 'content')
     autocomplete_fields = ('church',)
-    inlines = [DonationInline]
+    inlines = [PostImageInline, DonationInline]
 
     def short_content(self, obj):
         return (obj.content or '')[:60]

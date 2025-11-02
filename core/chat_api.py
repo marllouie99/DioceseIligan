@@ -25,7 +25,7 @@ def conversations_api(request):
         from django.db.models import Q
         from .models import ChurchStaff
         
-        # Get churches owned by this user
+        # Get churches owned by this user (churches may have null owners)
         user_churches = list(Church.objects.filter(owner=request.user).values_list('id', flat=True))
         
         # Get churches where user is staff with messaging permissions
@@ -207,7 +207,7 @@ def conversation_messages_api(request, conversation_id):
         for msg in messages:
             # Determine if sender is managing the church (owner or staff)
             # Check if the message sender is the church owner
-            is_owner = msg.sender == conversation.church.owner
+            is_owner = conversation.church.owner and msg.sender == conversation.church.owner
             
             # Check if the message sender is a staff member with access to this church
             is_staff = ChurchStaff.objects.filter(
