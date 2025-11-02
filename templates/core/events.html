@@ -135,6 +135,226 @@
     @media (max-width: 768px) {
       .page-events .events-layout { gap: 20px; }
     }
+    
+    /* ===== BLUE SKY THEME FOR COMMENTS ===== */
+    .page-events .post-comments-section {
+      background: transparent !important;
+      border-top: 1px solid rgba(30, 144, 255, 0.1) !important;
+    }
+    
+    .page-events .comments-container {
+      background: transparent !important;
+      padding: 16px 20px;
+    }
+    
+    .page-events .comment {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      background: transparent !important;
+      border-bottom: 1px solid rgba(30, 144, 255, 0.08);
+    }
+    
+    .page-events .comment:last-child {
+      border-bottom: none;
+    }
+    
+    .page-events .comment-reply {
+      margin-left: 40px;
+      padding-left: 12px;
+      border-left: 2px solid rgba(30, 144, 255, 0.15);
+    }
+    
+    .page-events .comment-avatar {
+      flex-shrink: 0;
+    }
+    
+    .page-events .comment-avatar .user-avatar-small {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(30, 144, 255, 0.1);
+    }
+    
+    .page-events .comment-avatar .avatar-placeholder.small {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+      background: linear-gradient(135deg, rgba(240, 248, 255, 0.9) 0%, rgba(232, 244, 255, 0.9) 100%);
+      border: 2px solid rgba(30, 144, 255, 0.2);
+      color: #1E90FF;
+    }
+    
+    .page-events .comment-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .page-events .comment-author {
+      font-weight: 600;
+      font-size: 13px;
+      color: #1E90FF;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .page-events .comment-text {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.5;
+      word-wrap: break-word;
+      margin-bottom: 6px;
+    }
+    
+    .page-events .comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+    .page-events .comment-time {
+      color: #6b7280;
+    }
+    
+    .page-events .comment-reply-btn,
+    .page-events .comment-report-btn {
+      background: none;
+      border: none;
+      color: #1E90FF;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .page-events .comment-reply-btn:hover,
+    .page-events .comment-report-btn:hover {
+      background: rgba(30, 144, 255, 0.08);
+      color: #4169E1;
+    }
+    
+    .page-events .comment-report-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+    
+    /* Comment Form - Blue Sky Theme */
+    .page-events .comment-form {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(240, 248, 255, 0.4) 0%, rgba(232, 244, 255, 0.4) 100%);
+      border-top: 1px solid rgba(30, 144, 255, 0.1);
+    }
+    
+    .page-events .comment-input-group {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .page-events .comment-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+    
+    .page-events .comment-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 1px solid rgba(30, 144, 255, 0.2) !important;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #111827;
+      resize: vertical;
+      transition: all 0.2s ease;
+    }
+    
+    .page-events .comment-input:focus {
+      outline: none;
+      border-color: #1E90FF !important;
+      box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+      background: #ffffff !important;
+    }
+    
+    .page-events .comment-input::placeholder {
+      color: #6b7280;
+    }
+    
+    .page-events .comment-inline-controls {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      gap: 4px;
+      align-items: center;
+    }
+    
+    .page-events .comment-action-btn {
+      background: rgba(30, 144, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #1E90FF;
+    }
+    
+    .page-events .comment-action-btn:hover {
+      background: rgba(30, 144, 255, 0.2);
+      color: #4169E1;
+    }
+    
+    .page-events .comment-post-btn {
+      background: #1E90FF;
+      color: white;
+    }
+    
+    .page-events .comment-post-btn:hover {
+      background: #4169E1;
+    }
+    
+    .page-events .comment-actions {
+      display: none;
+    }
+    
+    .page-events .loading-comments,
+    .page-events .no-comments,
+    .page-events .error-comments {
+      text-align: center;
+      padding: 24px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    
+    .page-events .no-comments {
+      color: #1E90FF;
+    }
+    
+    /* Donation rank badges in comments */
+    .page-events .donation-rank-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
   </style>
 {% endblock %}
 
