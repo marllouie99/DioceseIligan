@@ -3125,9 +3125,10 @@ body.page-church-detail {
 /* Beautiful Post Images */
 .church-detail-page .post-image { 
   width: 100%; 
-  max-height: 420px; 
-  object-fit: cover; 
-  border-radius: 0;
+  height: auto;
+  max-height: 600px; 
+  object-fit: contain; 
+  border-radius: 8px;
   
   /* Subtle shadow */
   box-shadow: 
