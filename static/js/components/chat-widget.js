@@ -41,7 +41,6 @@ class ChatWidget {
     // Conversations list
     this.conversationsList = document.getElementById('chat-conversations-list');
     this.conversationsScroll = document.getElementById('chat-conversations-scroll');
-    this.newConversationBtn = document.getElementById('new-conversation-btn');
     this.churchFilter = document.getElementById('chat-church-filter');
     this.filterContainer = document.getElementById('chat-filter-container');
     
@@ -77,7 +76,6 @@ class ChatWidget {
     
     // Navigation
     this.backBtn.addEventListener('click', () => this.showConversationsList());
-    this.newConversationBtn.addEventListener('click', () => this.handleNewConversation());
     
     // Church filter
     if (this.churchFilter) {
@@ -761,11 +759,6 @@ class ChatWidget {
       clearInterval(this.typingPollingInterval);
       this.typingPollingInterval = null;
     }
-  }
-
-  handleNewConversation() {
-    // This would open a modal or redirect to select a church
-    alert('Feature coming soon: Select a church to start a conversation');
   }
 
   handleClickOutside(e) {
