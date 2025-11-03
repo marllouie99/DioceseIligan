@@ -135,7 +135,22 @@
     @media (max-width: 768px) {
       .page-events .events-layout { gap: 20px; }
     }
-    
+    .page-events .upcoming-events { display: flex; flex-direction: column; gap: 12px; }
+    .page-events .event-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: rgba(255,255,255,0.95); border: 1px solid rgba(30,144,255,0.12); border-radius: 14px; box-shadow: 0 4px 12px rgba(30,144,255,0.08); transition: box-shadow .2s ease, transform .2s ease; }
+    .page-events .event-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(30,144,255,0.12); }
+    .page-events .event-date-badge { flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg,#1E90FF 0%,#4169E1 100%); border: 2px solid rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #fff; box-shadow: 0 4px 10px rgba(30,144,255,0.18); }
+    .page-events .event-date-month { font-size: 10px; font-weight: 700; opacity: 0.9; text-transform: uppercase; letter-spacing: .3px; }
+    .page-events .event-date-day { font-size: 18px; font-weight: 900; line-height: 1; margin-top: 2px; }
+    .page-events .event-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .page-events .event-title { font-weight: 800; color: #1A3A52; font-size: 15px; line-height: 1.3; margin: 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+    .page-events .event-church { color: #1E90FF; font-size: 12px; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .page-events .event-time, .page-events .event-location { display: flex; align-items: center; gap: 6px; color: #374151; font-size: 12px; margin: 0; }
+    .page-events .event-icon { width: 14px !important; height: 14px !important; flex-shrink: 0; color: #1E90FF; display: inline-block; }
+    .page-events .event-view-btn { flex-shrink: 0; background: linear-gradient(135deg,#1E90FF 0%,#4169E1 100%); color: #fff; border: 1px solid rgba(30,144,255,0.25); border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(30,144,255,0.18); transition: transform .2s ease, box-shadow .2s ease; }
+    .page-events .event-view-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(30,144,255,0.22); }
+    .page-events .empty-events { text-align: center; padding: 20px; color: #6b7280; }
+    .page-events .empty-events .empty-icon { width: 40px; height: 40px; margin: 0 auto 10px; color: #7A9AB2; }
+    @media (max-width: 480px) { .page-events .event-card { padding: 12px; } .page-events .event-date-badge { width: 44px; height: 44px; } }
     /* ===== BLUE SKY THEME FOR COMMENTS - OVERRIDE ALL WARM THEME ===== */
     .page-events .post-comments-section {
       background: transparent !important;
