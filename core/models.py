@@ -288,6 +288,27 @@ class ChurchStaff(models.Model):
     
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.get_role_display()} at {self.church.name}"
+    
+    def has_permission(self, permission):
+        """
+        Check if this staff member has the given permission based on their role.
+        
+        Args:
+            permission (str): Permission to check (e.g., 'appointments', 'services', 'content')
+        
+        Returns:
+            bool: True if staff has the permission, False otherwise
+        """
+        # Define role permissions (same as in views.py user_can_manage_church)
+        role_permissions = {
+            self.ROLE_SECRETARY: ['appointments', 'services', 'availability', 'transactions', 'messaging'],
+            self.ROLE_VOLUNTEER: ['events', 'content']
+        }
+        
+        # Get permissions for this role
+        permissions = role_permissions.get(self.role, [])
+        
+        return permission in permissions
 
 
 class StaffActivityLog(models.Model):
