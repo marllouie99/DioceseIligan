@@ -16,6 +16,10 @@ function toggleUserMode(mode) {
   const createMode = document.getElementById('createUserMode');
   const searchBtn = document.getElementById('searchUserBtn');
   const createBtn = document.getElementById('createUserBtn');
+  const contactName = document.getElementById('contactName');
+  const contactInfo = document.getElementById('contactInfo');
+  const userSearch = document.getElementById('userSearch');
+  const selectedUserId = document.getElementById('selectedUserId');
   
   if (mode === 'search') {
     searchMode.style.display = 'block';
@@ -25,9 +29,14 @@ function toggleUserMode(mode) {
     createBtn.classList.remove('btn-primary');
     createBtn.classList.add('btn-outline');
     
-    // Clear create mode fields
-    document.getElementById('contactName').value = '';
-    document.getElementById('contactInfo').value = '';
+    // Clear create mode fields and remove required
+    contactName.value = '';
+    contactInfo.value = '';
+    contactName.removeAttribute('required');
+    contactInfo.removeAttribute('required');
+    
+    // Add required to search mode
+    selectedUserId.setAttribute('required', 'required');
   } else {
     searchMode.style.display = 'none';
     createMode.style.display = 'block';
@@ -36,8 +45,13 @@ function toggleUserMode(mode) {
     searchBtn.classList.remove('btn-primary');
     searchBtn.classList.add('btn-outline');
     
-    // Clear search mode
+    // Clear search mode and remove required
     clearUserSelection();
+    selectedUserId.removeAttribute('required');
+    
+    // Add required to create mode
+    contactName.setAttribute('required', 'required');
+    contactInfo.setAttribute('required', 'required');
   }
 }
 
@@ -53,6 +67,9 @@ function openCreateBookingModal() {
   const dateInput = document.getElementById('bookingDate');
   const today = new Date().toISOString().split('T')[0];
   dateInput.setAttribute('min', today);
+  
+  // Initialize in create mode (default)
+  toggleUserMode('create');
 }
 
 // Close modal
