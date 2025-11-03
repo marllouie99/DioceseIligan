@@ -1058,9 +1058,12 @@ def manage_church(request, church_id=None):
     online_count = online_bookings.count()
     
     # Cash/Walk-in bookings (completed but no online payment)
+    # Use Q objects for proper OR query and exclude online bookings
     cash_bookings = all_completed_bookings.filter(
-        payment_method__isnull=True
-    ) | all_completed_bookings.filter(payment_method='')
+        Q(payment_method__isnull=True) | Q(payment_method='')
+    ).exclude(
+        id__in=online_bookings.values_list('id', flat=True)
+    )
     cash_revenue = sum(booking.service.price for booking in cash_bookings)
     cash_count = cash_bookings.count()
     
