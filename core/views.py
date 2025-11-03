@@ -1038,6 +1038,42 @@ def manage_church(request, church_id=None):
     )
     this_month_revenue = this_month_transactions.aggregate(total=Sum('payment_amount'))['total'] or Decimal('0.00')
     
+    # ========== COMPREHENSIVE REVENUE OVERVIEW (ALL BOOKINGS) ==========
+    # Track ALL completed bookings regardless of payment method
+    all_completed_bookings = Booking.objects.filter(
+        church=church,
+        status='completed'
+    ).select_related('service')
+    
+    # Calculate total potential revenue from all completed bookings
+    total_all_revenue = sum(booking.service.price for booking in all_completed_bookings)
+    total_all_bookings = all_completed_bookings.count()
+    
+    # Online payments (went through payment gateway)
+    online_bookings = all_completed_bookings.filter(
+        payment_method__isnull=False,
+        payment_status='paid'
+    ).exclude(payment_method='')
+    online_revenue = online_bookings.aggregate(total=Sum('payment_amount'))['total'] or Decimal('0.00')
+    online_count = online_bookings.count()
+    
+    # Cash/Walk-in bookings (completed but no online payment)
+    cash_bookings = all_completed_bookings.filter(
+        payment_method__isnull=True
+    ) | all_completed_bookings.filter(payment_method='')
+    cash_revenue = sum(booking.service.price for booking in cash_bookings)
+    cash_count = cash_bookings.count()
+    
+    # Free bookings (service price = 0)
+    free_bookings = all_completed_bookings.filter(service__price=0)
+    free_count = free_bookings.count()
+    
+    # This month's comprehensive revenue
+    this_month_all_bookings = all_completed_bookings.filter(
+        date__gte=current_month_start
+    )
+    this_month_all_revenue = sum(booking.service.price for booking in this_month_all_bookings)
+    
     # Get unread booking notifications for THIS specific church
     # Only count REQUESTED bookings (pending appointments) for the badge
     unread_booking_notifications_for_church = Notification.objects.filter(
@@ -1122,6 +1158,15 @@ def manage_church(request, church_id=None):
             'completed_transactions': completed_transactions,
             'pending_transactions': pending_transactions,
             'this_month_revenue': this_month_revenue,
+            # Comprehensive revenue overview (all bookings)
+            'total_all_revenue': total_all_revenue,
+            'total_all_bookings': total_all_bookings,
+            'online_revenue': online_revenue,
+            'online_count': online_count,
+            'cash_revenue': cash_revenue,
+            'cash_count': cash_count,
+            'free_count': free_count,
+            'this_month_all_revenue': this_month_all_revenue,
         },
         # Services statistics
         'total_services': total_services,

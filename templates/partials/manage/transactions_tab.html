@@ -12,8 +12,93 @@
   </style>
   
   <div class="tab-content">
-    <!-- 1x4 Analytics Cards Grid -->
-    <div class="analytics-grid-4">
+    <!-- Revenue Overview Section (All Bookings) -->
+    <div class="content-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px; color: white;">
+      <div class="section-header" style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 16px; margin-bottom: 20px;">
+        <h3 style="color: white; margin: 0; font-size: 1.25rem;">📊 Complete Revenue Overview</h3>
+        <p style="color: rgba(255,255,255,0.9); margin: 4px 0 0 0; font-size: 0.875rem;">Total revenue from ALL completed bookings (online + cash/walk-in)</p>
+      </div>
+      
+      <!-- Total Revenue Card -->
+      <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 style="color: white; margin: 0; font-size: 2.5rem; font-weight: 700;">₱{{ transactions.total_all_revenue|floatformat:2|default:"0.00" }}</h2>
+          <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.875rem; font-weight: 600;">
+            {{ transactions.total_all_bookings|default:"0" }} Bookings
+          </div>
+        </div>
+        <p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 0.875rem;">Total revenue from all completed services</p>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2);">
+          <span style="font-size: 0.875rem; color: rgba(255,255,255,0.8);">This Month: </span>
+          <strong style="font-size: 1.1rem; color: white;">₱{{ transactions.this_month_all_revenue|floatformat:2|default:"0.00" }}</strong>
+        </div>
+      </div>
+      
+      <!-- Revenue Breakdown -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <!-- Online Payments -->
+        <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 16px; backdrop-filter: blur(10px);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="background: rgba(16, 185, 129, 0.3); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.75rem;">Online Payments</p>
+              <h4 style="color: white; margin: 0; font-size: 1.25rem; font-weight: 700;">₱{{ transactions.online_revenue|floatformat:2|default:"0.00" }}</h4>
+            </div>
+          </div>
+          <p style="color: rgba(255,255,255,0.7); margin: 0; font-size: 0.8rem;">{{ transactions.online_count|default:"0" }} bookings via payment gateway</p>
+        </div>
+        
+        <!-- Cash/Walk-in -->
+        <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 16px; backdrop-filter: blur(10px);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="background: rgba(59, 130, 246, 0.3); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div>
+              <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.75rem;">Cash/Walk-in</p>
+              <h4 style="color: white; margin: 0; font-size: 1.25rem; font-weight: 700;">₱{{ transactions.cash_revenue|floatformat:2|default:"0.00" }}</h4>
+            </div>
+          </div>
+          <p style="color: rgba(255,255,255,0.7); margin: 0; font-size: 0.8rem;">{{ transactions.cash_count|default:"0" }} bookings paid in cash</p>
+        </div>
+        
+        <!-- Free Services -->
+        <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 16px; backdrop-filter: blur(10px);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="background: rgba(168, 85, 247, 0.3); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.75rem;">Free Services</p>
+              <h4 style="color: white; margin: 0; font-size: 1.25rem; font-weight: 700;">{{ transactions.free_count|default:"0" }}</h4>
+            </div>
+          </div>
+          <p style="color: rgba(255,255,255,0.7); margin: 0; font-size: 0.8rem;">Complimentary bookings (no charge)</p>
+        </div>
+      </div>
+      
+      <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.8);">
+        💡 <strong>Tip:</strong> This includes ALL completed bookings. The "Online Transactions" section below tracks only payment gateway transactions.
+      </div>
+    </div>
+
+    <!-- Online Transactions Analytics (Original Section) -->
+    <div class="section-header" style="margin-bottom: 16px;">
+      <h3 style="font-size: 1.125rem; color: #374151;">💳 Online Payment Transactions</h3>
+      <p style="font-size: 0.875rem; color: #6b7280; margin: 4px 0 0 0;">Bookings processed through online payment gateway</p>
+    </div>
+    
+    <!-- 1x4 Analytics Cards Grid --><div class="analytics-grid-4">
       <div class="analytics-card">
         <div class="analytics-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
