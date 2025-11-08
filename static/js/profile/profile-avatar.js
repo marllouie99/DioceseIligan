@@ -58,7 +58,7 @@ class ProfileAvatarModule {
    */
   validateElements() {
     if (!this.uploadBtn || !this.fileInput) {
-      console.warn('Avatar upload elements not found');
+      console.info('Avatar upload elements not found');
       return false;
     }
     return true;

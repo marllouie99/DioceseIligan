@@ -55,7 +55,7 @@ class ProfileFormModule {
    */
   validateElements() {
     if (!this.form) {
-      console.warn('Profile form element not found');
+      console.info('Profile form element not found');
       return false;
     }
     return true;

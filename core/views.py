@@ -3463,37 +3463,62 @@ def create_service(request):
     """Create a new bookable service."""
     # Get church_id from GET or POST parameters
     church_id = request.GET.get('church_id') or request.POST.get('church_id')
+    church = None
+    all_churches = None
     
     if church_id:
         church = get_object_or_404(Church, id=church_id)
-        # Check if user can manage services (Owner or Secretary)
-        can_manage, role = user_can_manage_church(request.user, church, ['services'])
-        if not can_manage:
-            messages.error(request, "You don't have permission to manage services.")
-            return redirect('core:select_church')
+        # Allow super-admin to create services for any church
+        if not request.user.is_superuser:
+            # Check if user can manage services (Owner or Secretary)
+            can_manage, role = user_can_manage_church(request.user, church, ['services'])
+            if not can_manage:
+                messages.error(request, "You don't have permission to manage services.")
+                return redirect('core:select_church')
     else:
-        # Try to get first owned church
-        church = request.user.owned_churches.first()
-        if not church:
-            # Try to get first church where user is staff with services permission
-            staff_position = ChurchStaff.objects.filter(
-                user=request.user,
-                status=ChurchStaff.STATUS_ACTIVE,
-                role=ChurchStaff.ROLE_SECRETARY
-            ).select_related('church').first()
-            
-            if staff_position:
-                church = staff_position.church
-            else:
-                if request.user.is_superuser:
-                    return redirect('core:super_admin_create_church')
-                messages.info(
-                    request,
-                    "You don't have permission to manage any parishes. Please contact a Parish Manager."
-                )
-                return redirect('core:home')
+        # Super-admin can select any church
+        if request.user.is_superuser:
+            # Get all churches for the dropdown
+            all_churches = Church.objects.all().order_by('name')
+            # If no church selected yet, show form with church selector
+            if request.method != 'POST':
+                church = None
+        else:
+            # Try to get first owned church
+            church = request.user.owned_churches.first()
+            if not church:
+                # Try to get first church where user is staff with services permission
+                staff_position = ChurchStaff.objects.filter(
+                    user=request.user,
+                    status=ChurchStaff.STATUS_ACTIVE,
+                    role=ChurchStaff.ROLE_SECRETARY
+                ).select_related('church').first()
+                
+                if staff_position:
+                    church = staff_position.church
+                else:
+                    messages.info(
+                        request,
+                        "You don't have permission to manage any parishes. Please contact a Parish Manager."
+                    )
+                    return redirect('core:home')
     
     if request.method == 'POST':
+        # Super-admin must select a church
+        if request.user.is_superuser and not church_id:
+            messages.error(request, 'Please select a parish for this service.')
+            all_churches = Church.objects.all().order_by('name')
+            form = BookableServiceForm(request.POST, request.FILES, church=None)
+            ctx = {
+                'active': 'manage',
+                'page_title': 'Create Service',
+                'church': None,
+                'form': form,
+                'all_churches': all_churches,
+            }
+            ctx.update(_app_context(request))
+            return render(request, 'core/create_service.html', ctx)
+        
         form = BookableServiceForm(request.POST, request.FILES, church=church)
         if form.is_valid():
             service = form.save()
@@ -3530,6 +3555,10 @@ def create_service(request):
                     'service_id': service.id
                 })
             messages.success(request, f'Service "{service.name}" has been created successfully!')
+            
+            # Redirect super-admin to super-admin services page, others to manage church page
+            if request.user.is_superuser:
+                return redirect('core:super_admin_services')
             return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -3555,6 +3584,7 @@ def create_service(request):
         'page_title': 'Create Service',
         'church': church,
         'form': form,
+        'all_churches': all_churches,
     }
     ctx.update(_app_context(request))
     return render(request, 'core/create_service.html', ctx)
@@ -3567,11 +3597,13 @@ def edit_service(request, service_id):
     service = get_object_or_404(BookableService, id=service_id)
     church = service.church
     
-    # Check if user can manage services (Owner or Secretary)
-    can_manage, role = user_can_manage_church(request.user, church, ['services'])
-    if not can_manage:
-        messages.error(request, "You don't have permission to edit services.")
-        return redirect('core:select_church')
+    # Allow super-admin to edit any service
+    if not request.user.is_superuser:
+        # Check if user can manage services (Owner or Secretary)
+        can_manage, role = user_can_manage_church(request.user, church, ['services'])
+        if not can_manage:
+            messages.error(request, "You don't have permission to edit services.")
+            return redirect('core:select_church')
     
     if request.method == 'POST':
         form = BookableServiceForm(request.POST, request.FILES, instance=service, church=church)
@@ -3598,6 +3630,10 @@ def edit_service(request, service_id):
                     'service_id': service.id
                 })
             messages.success(request, f'Service "{service.name}" has been updated successfully!')
+            
+            # Redirect super-admin to super-admin services page, others to manage church page
+            if request.user.is_superuser:
+                return redirect('core:super_admin_services')
             return HttpResponseRedirect(reverse('core:manage_church', kwargs={'church_id': church.id}) + '?tab=services')
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

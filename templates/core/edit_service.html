@@ -200,7 +200,11 @@
       </div>
 
       <div class="form-actions">
-        <a href="{% url 'core:manage_church' %}?tab=services" class="btn btn-secondary">Cancel</a>
+        {% if user.is_superuser %}
+        <a href="{% url 'core:super_admin_services' %}" class="btn btn-secondary">Cancel</a>
+        {% else %}
+        <a href="{% url 'core:manage_church' church.id %}?tab=services" class="btn btn-secondary">Cancel</a>
+        {% endif %}
         <button type="submit" class="btn btn-primary" id="submit-btn">
           <span class="btn-text">Update Service</span>
           <span class="btn-spinner" style="display: none;">

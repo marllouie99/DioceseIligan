@@ -1,0 +1,24 @@
+Fix create booking modal validation errors - add missing name attributes
+
+ISSUE:
+Browser validation errors in create booking modal:
+- "An invalid form control with name='' is not focusable"
+- Errors on contactName and contactInfo fields
+- Form submission blocked by browser validation
+
+ROOT CAUSE:
+- contactName input had id but no name attribute
+- contactInfo input had id but no name attribute
+- Browser requires both id AND name for required form controls
+
+FIX:
+- Added name="contact_name" to contactName field
+- Added name="contact_info" to contactInfo field
+- Browser validation now works correctly
+
+FIELDS FIXED:
+Line 207: contactName -> added name="contact_name"
+Line 213: contactInfo -> added name="contact_info"
+gggg
+RESULT:
+Form validation errors resolved, modal can submit successfully

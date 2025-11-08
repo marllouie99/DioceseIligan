@@ -42,16 +42,31 @@ class ProfileSystem {
    * @private
    */
   initializeModules() {
-    // Initialize each module
-    this.modules.modal = new window.ProfileModalModule();
-    this.modules.form = new window.ProfileFormModule();
-    this.modules.avatar = new window.ProfileAvatarModule();
+    // Only initialize modules if their required elements exist
+    // This prevents console warnings on pages without profile editing UI
+    
+    // Modal module - only if profile edit modal exists
+    if (document.getElementById('profile-edit-modal')) {
+      this.modules.modal = new window.ProfileModalModule();
+    }
+    
+    // Form module - only if profile form exists
+    if (document.getElementById('profile-form') || document.getElementById('profile-edit-form')) {
+      this.modules.form = new window.ProfileFormModule();
+    }
+    
+    // Avatar module - only if avatar upload elements exist
+    if (document.getElementById('id_profile_image') || document.querySelector('.avatar-upload-btn')) {
+      this.modules.avatar = new window.ProfileAvatarModule();
+    }
+    
+    // Display and utils modules are always safe to initialize
     this.modules.display = new window.ProfileDisplayModule();
     this.modules.utils = new window.ProfileUtilsModule();
     
     // Initialize modules
     Object.values(this.modules).forEach(module => {
-      if (module.init) {
+      if (module && module.init) {
         module.init();
       }
     });
@@ -68,7 +83,7 @@ class ProfileSystem {
     });
 
     document.addEventListener('profile:closeModal', () => {
-      this.modules.modal.close();
+      this.modules.modal?.close();
     });
 
     document.addEventListener('profile:avatarChanged', (e) => {
@@ -87,23 +102,23 @@ class ProfileSystem {
   setupGlobalFunctions() {
     // Global functions for backward compatibility
     window.updateProfileDisplay = (profileData) => {
-      this.modules.display.updateProfileDisplay(profileData);
+      this.modules.display?.updateProfileDisplay(profileData);
     };
     
     window.displayFormErrors = (errors) => {
-      this.modules.form.displayFormErrors(errors);
+      this.modules.form?.displayFormErrors(errors);
     };
     
     window.openProfileModal = () => {
-      this.modules.modal.open();
+      this.modules.modal?.open();
     };
     
     window.closeProfileModal = () => {
-      this.modules.modal.close();
+      this.modules.modal?.close();
     };
     
     window.toggleProfileModal = () => {
-      this.modules.modal.toggle();
+      this.modules.modal?.toggle();
     };
   }
 
@@ -114,10 +129,10 @@ class ProfileSystem {
    */
   handleProfileUpdated(profileData) {
     // Update display with new data
-    this.modules.display.updateProfileDisplay(profileData);
+    this.modules.display?.updateProfileDisplay(profileData);
     
     // Show success notification
-    this.modules.utils.showNotification('Profile updated successfully!', 'success');
+    this.modules.utils?.showNotification('Profile updated successfully!', 'success');
   }
 
   /**
@@ -151,21 +166,21 @@ class ProfileSystem {
    * Open profile modal
    */
   openModal() {
-    this.modules.modal.open();
+    this.modules.modal?.open();
   }
 
   /**
    * Close profile modal
    */
   closeModal() {
-    this.modules.modal.close();
+    this.modules.modal?.close();
   }
 
   /**
    * Toggle profile modal
    */
   toggleModal() {
-    this.modules.modal.toggle();
+    this.modules.modal?.toggle();
   }
 
   /**
@@ -173,7 +188,7 @@ class ProfileSystem {
    * @returns {boolean} Modal open state
    */
   isModalOpen() {
-    return this.modules.modal.isModalOpen();
+    return this.modules.modal?.isModalOpen() || false;
   }
 
   /**
@@ -181,14 +196,14 @@ class ProfileSystem {
    * @param {Object} profileData - Profile data
    */
   updateDisplay(profileData) {
-    this.modules.display.updateProfileDisplay(profileData);
+    this.modules.display?.updateProfileDisplay(profileData);
   }
 
   /**
    * Reset profile form
    */
   resetForm() {
-    this.modules.form.reset();
+    this.modules.form?.reset();
   }
 
   /**
@@ -196,7 +211,7 @@ class ProfileSystem {
    * @returns {boolean} Validation result
    */
   validateForm() {
-    return this.modules.form.validate();
+    return this.modules.form?.validate() || false;
   }
 
   /**
@@ -204,7 +219,7 @@ class ProfileSystem {
    * @returns {string|null} Current avatar source
    */
   getCurrentAvatar() {
-    return this.modules.avatar.getCurrentAvatar();
+    return this.modules.avatar?.getCurrentAvatar() || null;
   }
 
   /**
@@ -212,14 +227,14 @@ class ProfileSystem {
    * @param {string} src - Avatar source
    */
   setAvatar(src) {
-    this.modules.avatar.setAvatar(src);
+    this.modules.avatar?.setAvatar(src);
   }
 
   /**
    * Clear avatar
    */
   clearAvatar() {
-    this.modules.avatar.clearAvatar();
+    this.modules.avatar?.clearAvatar();
   }
 
   /**
@@ -230,11 +245,11 @@ class ProfileSystem {
     this.config = { ...this.config, ...config };
     
     // Update module configurations
-    if (config.maxFileSize) {
+    if (config.maxFileSize && this.modules.avatar) {
       this.modules.avatar.setMaxFileSize(config.maxFileSize);
     }
     
-    if (config.allowedImageTypes) {
+    if (config.allowedImageTypes && this.modules.avatar) {
       this.modules.avatar.setAllowedTypes(config.allowedImageTypes);
     }
   }
@@ -251,7 +266,7 @@ class ProfileSystem {
    * Refresh all modules
    */
   refresh() {
-    this.modules.display.refreshElements();
+    this.modules.display?.refreshElements();
   }
 
   /**

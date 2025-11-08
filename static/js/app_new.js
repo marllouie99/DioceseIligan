@@ -47,7 +47,8 @@ class App {
     // Initialize each module safely to avoid hard failures
     this.modules.navigation = this.safeInstantiate('NavigationModule');
     this.modules.profile = this.safeInstantiate('ProfileModule');
-    this.modules.search = this.safeInstantiate('SearchModule');
+    // SearchModule is optional - silently skip if not available
+    this.modules.search = this.safeInstantiate('SearchModule', [], true);
     this.modules.toasts = this.safeInstantiate('ToastModule');
     
     // Initialize modules
@@ -62,16 +63,19 @@ class App {
    * Safely instantiate a window constructor if available
    * @param {string} constructorName
    * @param {Array} args
+   * @param {boolean} silent - If true, don't show warning when not found
    * @returns {Object|null}
    * @private
    */
-  safeInstantiate(constructorName, args = []) {
+  safeInstantiate(constructorName, args = [], silent = false) {
     try {
       const Ctor = window[constructorName];
       if (typeof Ctor === 'function') {
         return new Ctor(...args);
       }
-      console.warn(`${constructorName} not available on window`);
+      if (!silent) {
+        console.warn(`${constructorName} not available on window`);
+      }
       return null;
     } catch (e) {
       window.Utils?.handleError(e, `${constructorName} Instantiation`);

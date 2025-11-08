@@ -28,7 +28,11 @@
       </div>
       <div class="header-text">
         <h1 class="page-title">Create New Service</h1>
+        {% if user.is_superuser %}
+        <p class="page-subtitle">Add a bookable service for any parish</p>
+        {% else %}
         <p class="page-subtitle">Add a bookable service for your church</p>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -53,6 +57,19 @@
         <div class="form-section">
           <h2 class="section-title">Service Information</h2>
           <div class="form-grid">
+            {% if user.is_superuser and all_churches %}
+            <div class="form-group form-group-full">
+              <label for="church_id" class="form-label">Select Parish *</label>
+              <select name="church_id" id="church_id" class="form-select" required>
+                <option value="">-- Select a Parish --</option>
+                {% for ch in all_churches %}
+                <option value="{{ ch.id }}" {% if church and church.id == ch.id %}selected{% endif %}>{{ ch.name }}</option>
+                {% endfor %}
+              </select>
+              <small class="form-help">Select the parish this service belongs to</small>
+            </div>
+            {% endif %}
+            
             <div class="form-group form-group-full">
               <label for="{{ form.name.id_for_label }}" class="form-label">Service Name *</label>
               {{ form.name }}
@@ -202,7 +219,13 @@
       </div>
 
       <div class="form-actions">
-        <a href="{% url 'core:manage_church' %}?tab=services" class="btn btn-secondary">Cancel</a>
+        {% if user.is_superuser %}
+        <a href="{% url 'core:super_admin_services' %}" class="btn btn-secondary">Cancel</a>
+        {% elif church %}
+        <a href="{% url 'core:manage_church' church.id %}?tab=services" class="btn btn-secondary">Cancel</a>
+        {% else %}
+        <a href="{% url 'core:home' %}" class="btn btn-secondary">Cancel</a>
+        {% endif %}
         <button type="submit" class="btn btn-primary" id="submit-btn">
           <span class="btn-text">Create Service</span>
           <span class="btn-spinner" style="display: none;">

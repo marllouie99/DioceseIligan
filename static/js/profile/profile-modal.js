@@ -55,7 +55,7 @@ class ProfileModalModule {
    */
   validateElements() {
     if (!this.modal) {
-      console.warn('Profile modal element not found');
+      console.info('Profile modal element not found');
       return false;
     }
     return true;
