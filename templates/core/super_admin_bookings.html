@@ -326,6 +326,44 @@
   box-shadow: 0 0 0 3px var(--shadow-accent);
 }
 
+/* Export Button */
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: 1px solid #10B981;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.btn-export svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-export:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.25);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-export:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+}
+
 /* Table */
 .table-wrapper {
   overflow-x: auto;
@@ -604,6 +642,11 @@
   
   .section-actions {
     flex-direction: column;
+  }
+  
+  .btn-export {
+    width: 100%;
+    margin-top: 0.5rem;
   }
 }
 </style>
@@ -1371,6 +1414,15 @@ document.addEventListener('DOMContentLoaded', function() {
           <option value="failed">Failed</option>
           <option value="refunded">Refunded</option>
         </select>
+        <a href="{% url 'core:export_bookings_excel' %}" class="btn-export" title="Export to Excel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="21"/>
+            <line x1="8" y1="13" x2="16" y2="21"/>
+          </svg>
+          Export to Excel
+        </a>
       </div>
     </div>
     

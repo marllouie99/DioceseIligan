@@ -7672,6 +7672,167 @@ def super_admin_bookings_chart_data(request):
     return JsonResponse({'revenue_trends': revenue_trends})
 
 
+# Super Admin - Export Bookings to Excel
+@login_required
+def export_bookings_excel(request):
+    """Export all bookings to Excel file."""
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access Super Admin.')
+        return redirect('core:home')
+    
+    import openpyxl
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+    from openpyxl.utils import get_column_letter
+    from django.http import HttpResponse
+    from datetime import datetime
+    
+    # Get all bookings with related data
+    bookings = Booking.objects.select_related(
+        'user', 'church', 'service', 'service__category'
+    ).order_by('-created_at')
+    
+    # Create workbook and worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'All Bookings'
+    
+    # Define headers
+    headers = [
+        'Booking ID',
+        'Service Name',
+        'Category',
+        'Parish/Church',
+        'User Name',
+        'User Email',
+        'Date',
+        'Start Time',
+        'End Time', 
+        'Price',
+        'Payment Status',
+        'Payment Amount',
+        'Booking Status',
+        'Created Date',
+        'Updated Date',
+        'Notes'
+    ]
+    
+    # Add headers to worksheet
+    for col, header in enumerate(headers, 1):
+        cell = worksheet.cell(row=1, column=col)
+        cell.value = header
+        cell.font = Font(bold=True, color='FFFFFF')
+        cell.fill = PatternFill(start_color='2E86AB', end_color='2E86AB', fill_type='solid')
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'), 
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+    
+    # Add booking data
+    for row_num, booking in enumerate(bookings, 2):
+        # Booking ID
+        worksheet.cell(row=row_num, column=1).value = booking.code
+        
+        # Service Name
+        worksheet.cell(row=row_num, column=2).value = booking.service.name
+        
+        # Category
+        worksheet.cell(row=row_num, column=3).value = booking.service.category.name if booking.service.category else 'Uncategorized'
+        
+        # Parish/Church
+        worksheet.cell(row=row_num, column=4).value = booking.church.name
+        
+        # User Name
+        worksheet.cell(row=row_num, column=5).value = booking.user.get_full_name()
+        
+        # User Email
+        worksheet.cell(row=row_num, column=6).value = booking.user.email
+        
+        # Date
+        worksheet.cell(row=row_num, column=7).value = booking.date.strftime('%Y-%m-%d') if booking.date else ''
+        
+        # Start Time
+        worksheet.cell(row=row_num, column=8).value = booking.start_time.strftime('%H:%M') if booking.start_time else ''
+        
+        # End Time
+        worksheet.cell(row=row_num, column=9).value = booking.end_time.strftime('%H:%M') if booking.end_time else ''
+        
+        # Price
+        worksheet.cell(row=row_num, column=10).value = str(booking.service.price_display)
+        
+        # Payment Status
+        payment_status = ''
+        if booking.status == 'completed' or booking.payment_status == 'paid':
+            payment_status = 'Paid'
+        elif booking.payment_status == 'failed':
+            payment_status = 'Failed'
+        elif booking.payment_status == 'refunded':
+            payment_status = 'Refunded'
+        else:
+            payment_status = booking.get_payment_status_display() or 'Pending'
+        worksheet.cell(row=row_num, column=11).value = payment_status
+        
+        # Payment Amount
+        worksheet.cell(row=row_num, column=12).value = float(booking.payment_amount) if booking.payment_amount else 0.0
+        
+        # Booking Status
+        worksheet.cell(row=row_num, column=13).value = booking.get_status_display()
+        
+        # Created Date
+        worksheet.cell(row=row_num, column=14).value = booking.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Updated Date
+        worksheet.cell(row=row_num, column=15).value = booking.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Notes
+        worksheet.cell(row=row_num, column=16).value = booking.notes or ''
+        
+        # Add borders to all cells in the row
+        for col in range(1, len(headers) + 1):
+            cell = worksheet.cell(row=row_num, column=col)
+            cell.border = Border(
+                left=Side(style='thin'),
+                right=Side(style='thin'),
+                top=Side(style='thin'),
+                bottom=Side(style='thin')
+            )
+            # Alternate row coloring
+            if row_num % 2 == 0:
+                cell.fill = PatternFill(start_color='F8F9FA', end_color='F8F9FA', fill_type='solid')
+    
+    # Auto-adjust column widths
+    for col in range(1, len(headers) + 1):
+        column_letter = get_column_letter(col)
+        max_length = 0
+        column = worksheet[column_letter]
+        
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        
+        adjusted_width = min(max_length + 2, 50)  # Cap at 50 characters
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+    
+    # Create HTTP response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    
+    # Generate filename with current date
+    filename = f"bookings_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    # Save workbook to response
+    workbook.save(response)
+    
+    return response
+
+
 # Super Admin - Donation Rankings
 @login_required
 def super_admin_donations(request):

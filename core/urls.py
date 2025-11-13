@@ -57,6 +57,7 @@ urlpatterns = [
     path('super-admin/categories/<int:category_id>/services/', views.super_admin_category_services, name='super_admin_category_services'),
     path('super-admin/bookings/', views.super_admin_bookings, name='super_admin_bookings'),
     path('super-admin/bookings/chart-data/', views.super_admin_bookings_chart_data, name='super_admin_bookings_chart_data'),
+    path('super-admin/bookings/export-excel/', views.export_bookings_excel, name='export_bookings_excel'),
     path('super-admin/donations/', views.super_admin_donations, name='super_admin_donations'),
     path('super-admin/donations/filter-data/', views.super_admin_donations_filter_data, name='super_admin_donations_filter_data'),
     path('super-admin/parish-donations/', views.super_admin_parish_donations, name='super_admin_parish_donations'),
