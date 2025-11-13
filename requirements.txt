@@ -44,6 +44,6 @@ django-cloudinary-storage==0.3.0
 # Payment processing
 stripe==11.1.1
 
-# Export functionality (optional - for Excel and PDF exports)
+# Export functionality - for Excel and PDF exports
 openpyxl==3.1.2
 reportlab==4.2.5
